@@ -1,13 +1,17 @@
 ﻿///<reference path='dts\node.d.ts' />
 ///<reference path='dts\express.d.ts' />
-///<reference path='dts\general.d.ts' />
+///<reference path='serviceCore.ts' />
 
 var crypto = require('crypto');
-//var VV: VaultCore = require('./core');
+
+var apiServiceCoreSettings = require('./serviceCore');
 var uuid=require('node-uuid');
 
+var serviceSettings = new apiServiceCoreSettings()
+
 class VVRequestSigning {
-    request : any;
+    request: any;
+    
  /**
  * Signs a request and returns a string that can be placed in the X-Authentication
  * @param {String} algorithm     Allowed values are: RIPEMD160, SHA1, SHA256, SHA384. SHA512, MD5.
@@ -43,7 +47,7 @@ class VVRequestSigning {
 			authAlgorithm = 'VVA-HMAC-' + algorithm;
 		}
 
-		this.request = new VV.HttpRequest(targetUrl,'region1', method, headers,data);
+        this.request = new serviceSettings.HttpRequest(targetUrl, 'region1', method, headers, data, serviceSettings.util);
 		
 		authSignedHeaders = this.signedHeaders();
 		//CREATE THE CANONICAL REQUEST
@@ -89,14 +93,14 @@ class VVRequestSigning {
 
 	canonicalHeaders() {
 		var headers = [];
-		VV.util.each.call(this, this.request.headers, function (key, item) {
+		serviceSettings.util.each.call(this, this.request.headers, function (key, item) {
 		  headers.push([key, item]);
 		});
 		headers.sort(function (a, b) {
 		  return a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1;
 		});
 		var parts = [];
-		VV.util.arrayEach.call(this, headers, function (item) {
+		serviceSettings.util.arrayEach.call(this, headers, function (item) {
 		  if (item[0] !== 'X-Authorization') {
 			parts.push(item[0].toLowerCase() + ':' +
 			  this.canonicalHeaderValues(item[1].toString()));
@@ -111,7 +115,7 @@ class VVRequestSigning {
 
 	signedHeaders() {
 		var keys = [];
-		VV.util.each.call(this, this.request.headers, function (key) {
+		serviceSettings.util.each.call(this, this.request.headers, function (key) {
 		  key = key.toLowerCase();
 		  if (key !== 'X-Authorization') keys.push(key);
 		});
@@ -119,7 +123,7 @@ class VVRequestSigning {
 	}
 
 	hexEncodedHash(value : string) {
-		return VV.util.crypto.sha256(value, 'hex');
+	    return serviceSettings.util.crypto.sha256(value, 'hex');
 	}
 	
     urlsafeB64Decode(str) {

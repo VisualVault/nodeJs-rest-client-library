@@ -1,12 +1,12 @@
 ﻿///<reference path='dts\node.d.ts' />
 ///<reference path='dts\express.d.ts' />
 ///<reference path='dts\general.d.ts' />
-///<reference path='core.ts' />
+///<reference path='serviceCore.ts' />
 
 /* Copyright 2013 Auersoft */
 
-require('./core');
-(module).exports = VV;
+require('./serviceCore');
+//(module).exports = new ApiServiceCoreSettings();
 
 var HTTP = require('http');
 var jwt = require('./jwtSupport');
