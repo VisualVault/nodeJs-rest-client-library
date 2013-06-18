@@ -55,21 +55,94 @@
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="app.js" />
-    <Content Include="core.js" />
-    <Content Include="http.js" />
-    <Content Include="jwtSupport.js" />
-    <Content Include="loginTest.js" />
+    <Content Include="app.js">
+      <DependentUpon>app.ts</DependentUpon>
+    </Content>
+    <Content Include="app.min.js">
+      <DependentUpon>app.ts</DependentUpon>
+    </Content>
+    <Content Include="app.ts" />
+    <Content Include="core.js">
+      <DependentUpon>core.ts</DependentUpon>
+    </Content>
+    <Content Include="core.min.js">
+      <DependentUpon>core.ts</DependentUpon>
+    </Content>
+    <Content Include="dts\general.d.ts" />
+    <Content Include="http.js">
+      <DependentUpon>http.ts</DependentUpon>
+    </Content>
+    <Content Include="http.min.js">
+      <DependentUpon>http.ts</DependentUpon>
+    </Content>
+    <Content Include="jwtSupport.js">
+      <DependentUpon>jwtSupport.ts</DependentUpon>
+    </Content>
+    <Content Include="jwtSupport.min.js">
+      <DependentUpon>jwtSupport.ts</DependentUpon>
+    </Content>
+    <Content Include="loginTest.js">
+      <DependentUpon>loginTest.ts</DependentUpon>
+    </Content>
+    <Content Include="loginTest.min.js">
+      <DependentUpon>loginTest.ts</DependentUpon>
+    </Content>
+    <Content Include="loginTest.ts" />
+    <Content Include="core.ts" />
+    <Content Include="dts\express.d.ts" />
+    <Content Include="dts\node.d.ts" />
+    <Content Include="http.ts" />
+    <Content Include="jwtSupport.ts" />
+    <Content Include="originals\app.js" />
+    <Content Include="originals\core.js" />
+    <Content Include="originals\http.js" />
+    <Content Include="originals\jwtSupport.js" />
+    <Content Include="originals\loginTest.js" />
+    <Content Include="originals\routes\scheduledscripts.js" />
+    <Content Include="originals\routes\scripts.js" />
+    <Content Include="originals\util.js" />
+    <Content Include="originals\VVClient.js" />
+    <Content Include="originals\VVEntities.js" />
+    <Content Include="originals\VVRequestSigning.js" />
+    <Content Include="requestSigning.js">
+      <DependentUpon>requestSigning.ts</DependentUpon>
+    </Content>
+    <Content Include="requestSigning.min.js">
+      <DependentUpon>requestSigning.ts</DependentUpon>
+    </Content>
+    <Content Include="requestSigning.ts" />
     <Content Include="routes\scheduledscripts.js" />
     <Content Include="routes\scripts.js" />
-    <Content Include="util.js" />
+    <Content Include="util.js">
+      <DependentUpon>util.ts</DependentUpon>
+    </Content>
+    <Content Include="util.min.js">
+      <DependentUpon>util.ts</DependentUpon>
+    </Content>
+    <Content Include="util.ts" />
     <Content Include="VVClient.js" />
-    <Content Include="VVEntities.js" />
-    <Content Include="VVRequestSigning.js" />
+    <Content Include="VVEntities.js">
+      <DependentUpon>VVEntities.ts</DependentUpon>
+    </Content>
+    <Content Include="VVEntities.min.js">
+      <DependentUpon>VVEntities.ts</DependentUpon>
+    </Content>
+    <Content Include="VVEntities.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.yml" />
     <Content Include="web.config" />
+    <Content Include="originals\config.yml" />
+    <Content Include="originals\web.config" />
+    <Content Include="app.js.map">
+      <DependentUpon>app.ts</DependentUpon>
+    </Content>
+    <None Include="originals\web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="originals\web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
