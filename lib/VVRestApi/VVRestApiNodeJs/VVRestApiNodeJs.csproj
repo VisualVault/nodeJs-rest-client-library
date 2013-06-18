@@ -120,7 +120,13 @@
       <DependentUpon>util.ts</DependentUpon>
     </Content>
     <Content Include="util.ts" />
-    <Content Include="VVClient.js" />
+    <Content Include="VVClient.js">
+      <DependentUpon>VVClient.ts</DependentUpon>
+    </Content>
+    <Content Include="VVClient.min.js">
+      <DependentUpon>VVClient.ts</DependentUpon>
+    </Content>
+    <Content Include="VVClient.ts" />
     <Content Include="VVEntities.js">
       <DependentUpon>VVEntities.ts</DependentUpon>
     </Content>

@@ -6,7 +6,6 @@ var crypto = require('crypto');
 //var VV: VaultCore = require('./core');
 var uuid=require('node-uuid');
 
-
 class VVRequestSigning {
     request : any;
  /**
@@ -49,17 +48,24 @@ class VVRequestSigning {
 		authSignedHeaders = this.signedHeaders();
 		//CREATE THE CANONICAL REQUEST
 		var canonicalRequest = this.createCanonicalRequest();
-			
+		//console.log("canonicalRequest:\n\n" + canonicalRequest);
+
 		var stringToSign = authAlgorithm + '\n' + xRequestDate + '\n' + developerId + '\n' + this.hexEncodedHash(canonicalRequest);
 	
+ 	    //console.log("\n\nstringToSign:\n\n" + stringToSign);
+
+ 	    //console.log("developerSecret: " + developerSecret);
 				
 		var kSigning = crypto.createHmac(algorithms[algorithm], xRequestDate).update(authNonce + developerSecret).digest('hex');
 		
-		
+ 	    //console.log("\n\nkSigning: " + kSigning);
+
 		authSignature = crypto.createHmac(algorithms[algorithm], kSigning).update(stringToSign).digest('hex');
 			
 		var xAuthorization = "Algorithm=" + authAlgorithm + ", Credential=" + authCredentials + ", SignedHeaders=" + authSignedHeaders + ", Nonce=" + authNonce + ", Signature=" + authSignature;
-	
+
+ 	    //console.log("\n\nxAuthorization: " + xAuthorization);
+
 		headers["X-Authorization"] = xAuthorization;
 		
     }
