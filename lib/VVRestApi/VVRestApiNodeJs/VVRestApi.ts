@@ -1,7 +1,7 @@
 ﻿///<reference path='dts\node.d.ts' />
 ///<reference path='dts\express.d.ts' />
 ///<reference path='dts\general.d.ts' />
-///<reference path='serviceCore.ts' />
+///<reference path='Vault\Common\sessionToken.ts' />
 
 /* Copyright 2013 Auersoft */
 
@@ -29,80 +29,16 @@ var Q = require('q');
  */
 class VVRestApi {
     _config: any;
-    _isAuthenticated: bool;
-    _token: string;
-    _isDebugMode: bool;
-    _developerSecret: string;
-    _developerId: string;
-    _apiKey: string;
-    _custAlias: string;
-    _custDbAlias: string;
-    _baseUrl: string;
-    _apiUrl: string;
-    _authenticationUrl: string;
-
-    constructor(custAlias, custDbAlias, apiKey, developerId, developerSecret, baseUrl, isDebugMode) {
+    _sessionToken: sessionToken;
+    
+    constructor() {
+        this._config = null;
+        this._sessionToken = null;
+        
+    }
+    init(sessionToken: sessionToken) {
         this._config = require('./config.yml');
-
-        this._isAuthenticated = false;
-        this._token = null;
-
-        this._isDebugMode = false;
-        this._developerSecret = "";
-        this._developerId = "";
-        this._apiKey = "";
-
-        this._custAlias = "";
-        this._custDbAlias = "";
-
-        this._baseUrl = "";
-        this._apiUrl = "";
-        this._authenticationUrl = "";
-
-        //Base URL should not end with a trailing slash
-        if (this.endsWith(baseUrl, '/')) {
-            baseUrl = baseUrl.substring(0, baseUrl.length - 1);
-        }
-
-        if (typeof custAlias === 'string') {
-            this._custAlias = custAlias;
-            this._custDbAlias = custDbAlias;
-            this._developerSecret = developerSecret;
-            this._developerId = developerId;
-            this._apiKey = apiKey;
-            this._baseUrl = baseUrl;
-        } else if (typeof custAlias === 'object') {
-            var params = custAlias;
-
-            this._custAlias = params.CustomerAlias;
-            this._custDbAlias = params.DatabaseAlias;
-            this._developerSecret = params.DeveloperSecret;
-            this._developerId = params.DeveloperId;
-            this._apiKey = params.ApiKey;
-            this._baseUrl = params.baseUrl;
-        }
-
-        this._apiUrl = this._config.ApiUri.replace('{custalias}', this._custAlias).replace('{custdbalias}', this._custDbAlias);
-        this._authenticationUrl = this._config.AutheticateUri.replace('{custalias}', this._custAlias).replace('{custdbalias}', this._custDbAlias);
-
-        if (this._developerSecret === null || this._developerSecret === '') {
-            this._developerSecret = this._config.DeveloperSecret;
-        }
-
-        if (this._developerId === null || this._developerId === '') {
-            this._developerId = this._config.DeveloperId;
-        }
-
-        if (this._apiKey === null || this._apiKey === '') {
-            this._apiKey = this._config.ApiKey;
-        }
-
-        this._isDebugMode = isDebugMode;
-
-        if (this._isDebugMode) {
-            console.log("Authentication Url: " + this._authenticationUrl);
-            console.log("Base Url: " + this._baseUrl);
-        }
+        this._sessionToken = sessionToken;
     }
 
     endsWith(source, suffix) {
@@ -113,7 +49,7 @@ class VVRestApi {
         var self = this;
 
         var deferred = Q.defer();
-
+        
         Q.when( this.__getToken() )
             .then(function (response) {
                 console.log('acquireSecurityToken Success');
@@ -284,15 +220,15 @@ class VVRestApi {
     }
 
     getSecurityToken() {
-        return this._token;
+        return this._sessionToken.tokenBase64;
     }
 
     isAuthenticated() {
-        return this._isAuthenticated;
+        return this._sessionToken.isAuthenticated;
     }
 
     getBaseUrl() {
-        return this._baseUrl;
+        return this._sessionToken.baseUrl;
     }
 
     request(httpVerb, url, params, data) {
@@ -321,12 +257,12 @@ class VVRestApi {
         var options = { method: 'GET', uri: url, qs: params };
 
         //if security token hasn't been acquired then get it
-        if (this._token == null) {
+        if (this._sessionToken.tokenBase64 == null) {
             //send request for security token
             this.__acquireNewTokenWithRequest(options, requestCallback);
         } else {
             //add security token to parameters that make up the query string
-            params.token = this._token;
+            params.token = this._sessionToken.tokenBase64;
 
 
             console.log("Performing GET request to url:" + url);
@@ -347,12 +283,12 @@ class VVRestApi {
         var options = { method: 'POST', uri: url, qs: params, json: data };
 
         //if security token hasn't been acquired then get it
-        if (this._token == null) {
+        if (this._sessionToken.tokenBase64 == null) {
             //send request for security token
             this.__acquireNewTokenWithRequest(options, requestCallback);
         } else {
             //add security token to parameters that make up the query string
-            params.token = this._token;
+            params.token = this._sessionToken.tokenBase64;
 
             console.log("Performing POST request to url:" + url);
 
@@ -372,12 +308,12 @@ class VVRestApi {
         var options = { method: 'PUT', uri: url, qs: params, json: data };
 
         //if security token hasn't been acquired then get it
-        if (this._token == null) {
+        if (this._sessionToken.tokenBase64 == null) {
             //send request for security token
             this.__acquireNewTokenWithRequest(options, requestCallback);
         } else {
             //add security token to parameters that make up the query string
-            params.token = this._token;
+            params.token = this._sessionToken.tokenBase64;
 
             console.log("Performing PUT request to url:" + url);
 
@@ -398,12 +334,12 @@ class VVRestApi {
 
 
         //if security token hasn't been acquired then get it
-        if (this._token == null) {
+        if (this._sessionToken.tokenBase64 == null) {
             //send request for security token
             this.__acquireNewTokenWithRequest(options, requestCallback);
         } else {
             //add security token to parameters that make up the query string
-            params.token = this._token;
+            params.token = this._sessionToken.tokenBase64;
 
             console.log("Performing DELETE request to url:" + url);
 
@@ -477,8 +413,8 @@ class VVRestApi {
                 deferred.reject(new Error(error));
             } else {
                 if (response.statusCode === 403) {
-                    self._token = null;
-                    self._isAuthenticated = false;
+                    self._sessionToken.tokenBase64 = null;
+                    self._sessionToken.isAuthenticated = false;
 
                     var errorData = JSON.parse(responseData);
                     deferred.reject(new Error(errorData.meta));
@@ -505,7 +441,7 @@ class VVRestApi {
     }
 
     __getUrl(resourceUrl) {
-        return this._baseUrl + this._apiUrl + resourceUrl;
+        return this._sessionToken.baseUrl + this._sessionToken.apiUrl + resourceUrl;
     }
 
     __getToken() {
@@ -517,7 +453,7 @@ class VVRestApi {
         var deferred = Q.defer();
 
         //read token key from config file
-        var buff = new Buffer(this._developerSecret, "base64");
+        var buff = new Buffer(this._sessionToken.developerSecret, "base64");
 
         var initiatedAtDate = new Date();
         var initiatedAtSeconds = parseInt((initiatedAtDate.getTime() / 1000).toString());
@@ -540,8 +476,8 @@ class VVRestApi {
         //setup claim portion of jwt token
         var claim = {
             iss: 'self:user',
-            devid: this._developerId,
-            prn: this._apiKey,
+            devid: this._sessionToken.developerId,
+            prn: this._sessionToken.loginToken,
             aud: 'http://VisualVault/api',
             exp: expireSeconds,
             nbf: notBeforeSeconds,
@@ -557,27 +493,26 @@ class VVRestApi {
         //setup response callback that will be called when request has completed
         var getTokenCallback = function (error, response, body) {
             if (error) {
-                self._isAuthenticated = false;
+                self._sessionToken.isAuthenticated = false;
                 console.log('Error from acquiring token: ' + error);
                 deferred.reject(new Error(error));
             } else {
-                if (self._isDebugMode) {
-                    console.log('Returned Status: ' + response.statusCode);
-                    console.log('Returned Body: ' + response.body);
-                }
+                
                 //console.log(response.body);
                 if (response.statusCode == 200) {
                     var responseObject = JSON.parse(body);
-                    self._token = responseObject.data.token;
-                    self._isAuthenticated = true;
+                    self._sessionToken.expirationDateUtc = new Date(responseObject.data.expires);
+                    self._sessionToken.tokenBase64 = responseObject.data.expires;
+
+                    self._sessionToken.isAuthenticated = true;
 
                     deferred.resolve(null);
                 } else if (response.statusCode == 401 || response.statusCode == 403) {
-                    self._isAuthenticated = false;
+                    self._sessionToken.isAuthenticated = false;
                     console.log("Authorization has been refused for current credentials");
                     deferred.reject(new Error("Authorization has been refused for current credentials"));
                 } else {
-                    self._isAuthenticated = false;
+                    self._sessionToken.isAuthenticated = false;
                     console.log("Unknown response for access token");
                     deferred.reject(new Error("Unknown response for access token"));
                 }
@@ -586,7 +521,7 @@ class VVRestApi {
 
 
         //determine url to request security token
-        var urlSecurity = this._baseUrl + this._authenticationUrl;
+        var urlSecurity = this._sessionToken.baseUrl + this._sessionToken.authenticationUrl;
 
         //setup authorization header section to be added to request headers
         //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
@@ -595,7 +530,7 @@ class VVRestApi {
         headers["Authorization"] = "Bearer " + token;
 
         var rs = require('./requestSigning.js');
-        rs.sign(headers, urlSecurity, 'GET', null, this._developerId, this._developerSecret, "SHA256");
+        rs.sign(headers, urlSecurity, 'GET', null, this._sessionToken.developerId, this._sessionToken.developerSecret, "SHA256");
 
         //create the options object for the request
         var options = { method: 'GET', uri: urlSecurity, headers: headers };
@@ -603,7 +538,7 @@ class VVRestApi {
         //console.log(options);
 
         console.log("\n\nSending request for access token to " + urlSecurity + "\n\n");
-
+        console.log("token: " + token);
         //make request for security token using signed JWT token
         nodeJsRequest(options, function (error, response, body) {
             getTokenCallback(error, response, body);
@@ -615,4 +550,4 @@ class VVRestApi {
 
 }
 
-(module).exports = VVRestApi;
+(module).exports = new VVRestApi();

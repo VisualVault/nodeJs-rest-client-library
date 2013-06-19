@@ -1,5 +1,6 @@
 ///<reference path='dts\node.d.ts' />
 ///<reference path='dts\express.d.ts' />
+///<reference path='dts\vvrestapi.d.ts' />
 
 //you must have the following items installed:
 //npm install js-yaml
@@ -39,27 +40,24 @@ var developerSecret = 'hTxqwYYjnhIbl3IRmSlRYSZOYhWJwFdxX75CboH2qpc=';
 // console.log("Developer ID: " + developerId);
 // console.log("Developer Secret: " + developerSecret);
 
-var vvClientHandler = require('./VVClient.js');
+var vvClientHandler = require('./VVRestApi');
+var vvAuthorize : authorize = require('./authorize');
 
+//var vvClient = new vvClientHandler(customerAlias, databaseAlias, apiKey, developerId, developerSecret, vaultServerUrl, true);
+//vvClient.acquireSecurityToken();
 
-var vvClient = new vvClientHandler(customerAlias, databaseAlias, apiKey, developerId, developerSecret, vaultServerUrl, true);
-vvClient.acquireSecurityToken();
-
- // Q
-	// .when(
-		// vvClient.acquireSecurityToken()
-	// )
-	// .then(
-		// function () {
-			// console.log("Calling the user's Main method");
-
-			// //user.main(ffColl, vvClient, res);
-		// }
-	// )
-	// .fail(
-		// function (tokenError) {
-			// console.log("Supervisor: Error response from acquireSecurityToken: " + tokenError.message);
-			// attemptCount++;
-			// //scriptSecondAttempt(req, res, baseUrl, ffColl, user, attemptCount);
-		// }
-// );
+ Q.when(
+         vvAuthorize.getVaultApi(apiKey, developerId, developerSecret, vaultServerUrl, customerAlias, databaseAlias)
+	 )
+	 .then(
+		 function (result) {
+			 console.log("getVaultApi succeeded");
+			 debugger;
+			 //user.main(ffColl, vvClient, res);
+		 }
+	 )
+	 .fail(
+		 function (tokenError) {
+			 console.log("Supervisor: Error response from getVaultApi: " + tokenError.message);			 
+		 }
+ );

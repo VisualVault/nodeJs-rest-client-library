@@ -62,7 +62,15 @@
       <DependentUpon>app.ts</DependentUpon>
     </Content>
     <Content Include="app.ts" />
+    <Content Include="Authorize.js">
+      <DependentUpon>authorize.ts</DependentUpon>
+    </Content>
+    <Content Include="Authorize.min.js">
+      <DependentUpon>authorize.ts</DependentUpon>
+    </Content>
+    <Content Include="authorize.ts" />
     <Content Include="dts\general.d.ts" />
+    <Content Include="dts\vvrestapi.d.ts" />
     <Content Include="jwtSupport.js">
       <DependentUpon>jwtSupport.ts</DependentUpon>
     </Content>
@@ -95,13 +103,20 @@
     <Content Include="requestSigning.ts" />
     <Content Include="routes\scheduledscripts.js" />
     <Content Include="routes\scripts.js" />
-    <Content Include="VVClient.js">
-      <DependentUpon>VVClient.ts</DependentUpon>
+    <Content Include="vault\common\sessionToken.js">
+      <DependentUpon>sessionToken.ts</DependentUpon>
     </Content>
-    <Content Include="VVClient.min.js">
-      <DependentUpon>VVClient.ts</DependentUpon>
+    <Content Include="vault\common\sessionToken.min.js">
+      <DependentUpon>sessionToken.ts</DependentUpon>
     </Content>
-    <Content Include="VVClient.ts" />
+    <Content Include="vault\common\sessionToken.ts" />
+    <Content Include="VVRestApi.js">
+      <DependentUpon>VVRestApi.ts</DependentUpon>
+    </Content>
+    <Content Include="VVRestApi.min.js">
+      <DependentUpon>VVRestApi.ts</DependentUpon>
+    </Content>
+    <Content Include="VVRestApi.ts" />
     <Content Include="VVEntities.js">
       <DependentUpon>VVEntities.ts</DependentUpon>
     </Content>
