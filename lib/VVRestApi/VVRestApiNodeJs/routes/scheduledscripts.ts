@@ -1,7 +1,8 @@
 ﻿/* Copyright 2013 Auersoft */
 ///<reference path='..\dts\node.d.ts' />
 ///<reference path='..\dts\express.d.ts' />
-///<reference path='..\dts\vvRestApi.d.ts' />
+
+import clientLibrary = require('../vvRestApi');
 
 exports.processRequest = function (req, res) {
 
@@ -55,15 +56,14 @@ exports.processRequest = function (req, res) {
                 var user = require("../userscheduledscript");
 
                 //get the customer name and other credentials
-                var params: vvRestApi.common.loginCredentials = user.getCredentials();
+                var params: clientLibrary.common.loginCredentials = user.getCredentials();
 
                 //add baseUrl to parameters for vvClient
                 params.baseUrl = baseUrl;
 
                 //read the vvClient file
-                var clientLibrary: vvRestApi = require('./vvRestApi');
-
-                var vvAuthorize: vvRestApi.authorize = new clientLibrary.authorize();
+               
+                var vvAuthorize: clientLibrary.authorize = new clientLibrary.authorize();
                 //create the vvclient object
 
                 //making call to vvClient to get access token
@@ -75,7 +75,7 @@ exports.processRequest = function (req, res) {
                         function (result) {
                             console.log("Calling the user's Main method");
 
-                            var myVault: vvRestApi.vvClient = result;
+                            var myVault: clientLibrary.vvClient = result;
                             user.main(myVault, res);
                         }
                     )
@@ -110,9 +110,8 @@ var scriptSecondAttempt = function (req, res, baseUrl, user, attemptCount) {
     params.baseUrl = baseUrl;
 
     //read the vvClient file
-    var clientLibrary: vvRestApi = require('./vvRestApi');
 
-    var vvAuthorize: vvRestApi.authorize = new clientLibrary.authorize();
+    var vvAuthorize: clientLibrary.authorize = new clientLibrary.authorize();
 
 
 
@@ -128,7 +127,7 @@ var scriptSecondAttempt = function (req, res, baseUrl, user, attemptCount) {
             function (result) {
                 console.log("Calling the user's Main method");
 
-                var myVault: vvRestApi.vvClient = result;
+                var myVault: clientLibrary.vvClient = result;
 
                 user.main(myVault, res);
             }

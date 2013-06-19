@@ -1,19 +1,18 @@
 ﻿///<reference path='..\dts\node.d.ts' />
 ///<reference path='..\dts\express.d.ts' />
-///<reference path='..\dts\vvRestApi.d.ts' />
 
+import clientLibrary = require('../vvRestApi');
 
-module mySampleProject {
+export module mySampleProject {
+   
     export class sampleScheduledScript {
-        clientLibrary: vvRestApi;
-
+     
         constructor() {
-            this.clientLibrary = require('../vvRestApi');
+            
         }
 
-        getCredentials(): vvRestApi.common.loginCredentials {
-            debugger;
-            var options = new this.clientLibrary.common.loginCredentials("", "", "", "VaultTest", "Main");
+        getCredentials() {
+            var options = new clientLibrary.common.loginCredentials("", "", "", "VaultTest", "Main");
             
             return options;
         }

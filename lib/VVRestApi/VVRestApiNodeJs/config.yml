@@ -1,6 +1,3 @@
-
-
-
 # VisualVault URIs
 ApiUri: /api/v1/{custalias}/{custdbalias}
 AutheticateUri: /api/v1/{custalias}/{custdbalias}/authorize
@@ -16,11 +13,11 @@ AutheticateUri: /api/v1/{custalias}/{custdbalias}/authorize
 
 # VisualVault endpoints
 ResourceUri:
-  FormTemplates: /formtemplates
-  Forms: /formtemplates/{id}/forms
-  Sites: /sites
-  Users: /sites/{id}/users
-  Groups: /sites/{id}/groups
-  Folders: /folders
-  Documents: /folders/{id}/documents
-  Emails: /emails
+FormTemplates: /formtemplates
+Forms: /formtemplates/{id}/forms
+Sites: /sites
+Users: /sites/{id}/users
+Groups: /sites/{id}/groups
+Folders: /folders
+Documents: /folders/{id}/documents
+Emails: /emails

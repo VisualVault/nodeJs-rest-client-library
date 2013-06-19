@@ -95,7 +95,6 @@
       <DependentUpon>vvRestApi.ts</DependentUpon>
     </Content>
     <Content Include="vvRestApi.ts" />
-    <Content Include="dts\vvRestApi.d.ts" />
     <Content Include="loginTest.js">
       <DependentUpon>loginTest.ts</DependentUpon>
     </Content>
@@ -113,6 +112,9 @@
     <Content Include="web.config" />
     <Content Include="app.js.map">
       <DependentUpon>app.ts</DependentUpon>
+    </Content>
+    <Content Include="samples\sampleUserScript.min.js.map">
+      <DependentUpon>sampleUserScript.js</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>

@@ -1,7 +1,7 @@
 ﻿///<reference path='..\dts\node.d.ts' />
 ///<reference path='..\dts\express.d.ts' />
-///<reference path='..\dts\vvRestApi.d.ts' />
 
+import clientLibrary = require('../vvRestApi');
 
 module mySampleProject {
     export class sampleScheduledScript {
@@ -21,7 +21,7 @@ module mySampleProject {
             return options;
         }
 
-        main(vaultClient: vvRestApi.vvClient, response) {
+        main(vaultClient: clientLibrary.vvClient, response) {
 
             var Q = require('q');
 
