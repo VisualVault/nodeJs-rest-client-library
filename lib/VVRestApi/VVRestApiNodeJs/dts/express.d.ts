@@ -5,7 +5,7 @@ declare module "express" {
     export function static (path: string): any;
     import http = module("http");
     export var listen;
-
+    
     // Connect middleware
     export function bodyParser(options?: any): (req: ExpressServerRequest, res: ExpressServerResponse, next) => void;
     export function errorHandler(opts?: any): (req: ExpressServerRequest, res: ExpressServerResponse, next) => void;

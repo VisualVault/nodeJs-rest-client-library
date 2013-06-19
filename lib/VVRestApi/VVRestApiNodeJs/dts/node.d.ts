@@ -12,16 +12,16 @@
 declare var process: NodeProcess;
 declare var global: any;
 
-declare var console: {
-    log(...data: any[]): void;
-    info(...data: any[]): void;
-    error(...data: any[]): void;
-    warn(...data: any[]): void;
-    dir(obj: any): void;
-    timeEnd(label: string): void;
-    trace(label: string): void;
-    assert(expression: any, ...message: string[]): void;
-}
+//declare var console: {
+//    log(...data: any[]): void;
+//    info(...data: any[]): void;
+//    error(...data: any[]): void;
+//    warn(...data: any[]): void;
+//    dir(obj: any): void;
+//    timeEnd(label: string): void;
+//    trace(label: string): void;
+//    assert(expression: any, ...message: string[]): void;
+//}
 
 declare var __filename: string;
 declare var __dirname: string;
@@ -75,7 +75,7 @@ declare var Buffer: {
 *                                               *
 ************************************************/
 
-class EventEmitter {
+declare class EventEmitter {
     addListener(event: string, listener: Function);
     on(event: string, listener: Function);
     once(event: string, listener: Function): void;
@@ -86,7 +86,7 @@ class EventEmitter {
     emit(event: string, arg1?: any, arg2?: any): void;
 }
 
-class WritableStream extends EventEmitter {
+declare class WritableStream extends EventEmitter {
     writable: bool;
     write(str: string, encoding?: string, fd?: string): bool;
     write(buffer: NodeBuffer): bool;
@@ -97,7 +97,7 @@ class WritableStream extends EventEmitter {
     destroySoon(): void;
 }
 
-class ReadableStream extends EventEmitter {
+declare class ReadableStream extends EventEmitter {
     readable: bool;
     setEncoding(encoding: string): void;
     pause(): void;
@@ -106,7 +106,7 @@ class ReadableStream extends EventEmitter {
     pipe(destination: WritableStream, options?: { end?: bool; }): void;
 }
 
-class NodeProcess extends EventEmitter {
+declare class NodeProcess extends EventEmitter {
     stdout: WritableStream;
     stderr: WritableStream;
     stdin: ReadableStream;
@@ -307,7 +307,7 @@ declare module "cluster" {
     }
     export interface Worker {
         id: string;
-        process: child_process;
+        process: any; ///child_process;
         suicide: bool;
         send(message: any, sendHandle?: any): void;
         destroy(): void;

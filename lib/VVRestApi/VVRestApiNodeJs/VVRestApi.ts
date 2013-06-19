@@ -2,7 +2,7 @@
 ///<reference path='dts\express.d.ts' />
 
 export module vvRestApi {
-
+        
     export class vvClient {
         _config: any;
         _sessionToken: common.sessionToken;
@@ -24,7 +24,7 @@ export module vvRestApi {
         }
 
 
-        endsWith(source, suffix) {
+        private endsWith(source, suffix) {
             return source.indexOf(suffix, source.length - suffix.length) !== -1;
         }
 
@@ -32,8 +32,10 @@ export module vvRestApi {
             var self = this;
 
             var deferred = this.Q.defer();
+            var vvAuthorize = new authorize();
+            
 
-            this.Q.when(this.__getToken())
+            this.Q.when(vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl))
                 .then(function (response) {
                     console.log('acquireSecurityToken Success');
                     deferred.resolve(response);
@@ -237,7 +239,13 @@ export module vvRestApi {
 
             //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
             // Signature, X-VVA-RequestDate, X-VV-ContentMD5
-            var options = { method: 'GET', uri: url, qs: params };
+
+            var headers = {};
+            
+            var rs = new common.requestSigning();
+            rs.sign(headers, url, 'GET', null, this._sessionToken.developerId, this._sessionToken.developerSecret);
+
+            var options = { method: 'GET', uri: url, qs: params, headers: headers };
 
             //if security token hasn't been acquired then get it
             if (this._sessionToken.tokenBase64 == null) {
@@ -263,7 +271,12 @@ export module vvRestApi {
             //create the options object for the call
             //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
             // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
-            var options = { method: 'POST', uri: url, qs: params, json: data };
+            var headers = {};
+
+            var rs = new common.requestSigning();
+            rs.sign(headers, url, 'POST', data, this._sessionToken.developerId, this._sessionToken.developerSecret);
+          
+            var options = { method: 'POST', uri: url, qs: params, json: data, headers: headers };
 
             //if security token hasn't been acquired then get it
             if (this._sessionToken.tokenBase64 == null) {
@@ -288,7 +301,12 @@ export module vvRestApi {
             //create the options object for the call
             //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
             // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
-            var options = { method: 'PUT', uri: url, qs: params, json: data };
+            var headers = {};
+
+            var rs = new common.requestSigning();
+            rs.sign(headers, url, 'PUT', data, this._sessionToken.developerId, this._sessionToken.developerSecret);
+            
+            var options = { method: 'PUT', uri: url, qs: params, json: data, headers: headers };
 
             //if security token hasn't been acquired then get it
             if (this._sessionToken.tokenBase64 == null) {
@@ -313,7 +331,12 @@ export module vvRestApi {
             //create the options object for the call
             //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
             // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
-            var options = { method: 'DELETE', uri: url, qs: params };
+            var headers = {};
+
+            var rs = new common.requestSigning();
+            rs.sign(headers, url, 'DELETE', null, this._sessionToken.developerId, this._sessionToken.developerSecret);
+            
+            var options = { method: 'DELETE', uri: url, qs: params, headers: headers };
 
 
             //if security token hasn't been acquired then get it
@@ -337,9 +360,11 @@ export module vvRestApi {
             var attemptCount = 0;
 
             //making call to getToken to get access token
+            var vvAuthorize = new authorize();
+            
             this.Q
                 .when(
-                    this.__getToken()
+                vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl)
                 )
                 .then(
                 function () {
@@ -361,9 +386,12 @@ export module vvRestApi {
 
         private __recursiveAttemptAcquireToken(options, requestCallback, attemptCount) {
             //making call to vvClient to get access token
+
+            var vvAuthorize = new authorize();
+
             this.Q
                 .when(
-                    this.__getToken()
+                vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl)
                 )
                 .then(
                 function () {
@@ -427,111 +455,7 @@ export module vvRestApi {
             return this._sessionToken.baseUrl + this._sessionToken.apiUrl + resourceUrl;
         }
 
-        private __getToken() {
-            var self = this;
-
-            console.log("Getting token");
-
-            //create deferred object containing promise
-            var deferred = this.Q.defer();
-
-            //read token key from config file
-            var buff = new Buffer(this._sessionToken.developerSecret, "base64");
-
-            var initiatedAtDate = new Date();
-            var initiatedAtSeconds = parseInt((initiatedAtDate.getTime() / 1000).toString());
-            //console.log('Initiated at date set to: ' + initiatedAtDate);
-
-            var expireDate = new Date();
-            expireDate.setMinutes(expireDate.getMinutes() + 30);
-            var expireSeconds = parseInt((expireDate.getTime() / 1000).toString());
-            //console.log('Expire date set to: ' + expireDate);
-
-
-            var notBeforeDate = new Date();
-            notBeforeDate.setMinutes(notBeforeDate.getMinutes() - 5);
-            var notBeforeSeconds = parseInt((notBeforeDate.getTime() / 1000).toString());
-            //console.log('Not before date set to: ' + notBeforeDate);
-
-
-            // console.log("Creating claim");
-
-            //setup claim portion of jwt token
-            var claim = {
-                iss: 'self:user',
-                devid: this._sessionToken.developerId,
-                prn: this._sessionToken.loginToken,
-                aud: 'http://VisualVault/api',
-                exp: expireSeconds,
-                nbf: notBeforeSeconds,
-                iat: initiatedAtSeconds
-            };
-
-
-            // console.log(claim);
-
-            //create JWT token and sign it
-            var jwt = new common.jwt()
-            var token = jwt.encode(claim, buff, 'HS256');
-
-            //setup response callback that will be called when request has completed
-            var getTokenCallback = function (error, response, body) {
-                if (error) {
-                    self._sessionToken.isAuthenticated = false;
-                    console.log('Error from acquiring token: ' + error);
-                    deferred.reject(new Error(error));
-                } else {
-
-                    //console.log(response.body);
-                    if (response.statusCode == 200) {
-                        var responseObject = JSON.parse(body);
-                        self._sessionToken.expirationDateUtc = new Date(responseObject.data.expires);
-                        self._sessionToken.tokenBase64 = responseObject.data.expires;
-
-                        self._sessionToken.isAuthenticated = true;
-
-                        deferred.resolve(null);
-                    } else if (response.statusCode == 401 || response.statusCode == 403) {
-                        self._sessionToken.isAuthenticated = false;
-                        console.log("Authorization has been refused for current credentials");
-                        deferred.reject(new Error("Authorization has been refused for current credentials"));
-                    } else {
-                        self._sessionToken.isAuthenticated = false;
-                        console.log("Unknown response for access token");
-                        deferred.reject(new Error("Unknown response for access token"));
-                    }
-                }
-            };
-
-
-            //determine url to request security token
-            var urlSecurity = this._sessionToken.baseUrl + this._sessionToken.authenticationUrl;
-
-            //setup authorization header section to be added to request headers
-            //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
-            // X-Authorization, X-VV-RequestDate
-            var headers = {};
-            headers["Authorization"] = "Bearer " + token;
-
-            var rs = new common.requestSigning();
-            rs.sign(headers, urlSecurity, 'GET', null, this._sessionToken.developerId, this._sessionToken.developerSecret);
-
-            //create the options object for the request
-            var options = { method: 'GET', uri: urlSecurity, headers: headers };
-
-            //console.log(options);
-
-            console.log("\n\nSending request for access token to " + urlSecurity + "\n\n");
-            console.log("token: " + token);
-            //make request for security token using signed JWT token
-            this.nodeJsRequest(options, function (error, response, body) {
-                getTokenCallback(error, response, body);
-            });
-
-            //return promise object
-            return deferred.promise;
-        }
-
+    
     }
 
     export class authorize {
@@ -564,7 +488,7 @@ export module vvRestApi {
 
         }
 
-        private acquireSecurityToken(loginToken: string, developerId: string, developerSecret: string, baseUrl: string, apiUrl: string, customerAlias: string, databaseAlias: string, authenticationUrl: string) {
+        public acquireSecurityToken(loginToken: string, developerId: string, developerSecret: string, baseUrl: string, apiUrl: string, customerAlias: string, databaseAlias: string, authenticationUrl: string) {
             var self = this;
 
             var deferred = this.Q.defer();
@@ -1660,6 +1584,5 @@ export module vvRestApi {
         }
     }
 }
-
 
 (module ).exports = vvRestApi;
