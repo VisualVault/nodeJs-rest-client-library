@@ -1,6 +1,6 @@
 ///<reference path='dts\node.d.ts' />
 ///<reference path='dts\express.d.ts' />
-///<reference path='dts\vvrestapi.d.ts' />
+///<reference path='dts\vvRestApi.d.ts' />
 
 //you must have the following items installed:
 //npm install js-yaml
@@ -15,8 +15,6 @@
 
 var fs = require('fs');
 var Q = require('q');
-  
-
 
 //This is a test js file
 //Enter the following credentials
@@ -40,11 +38,9 @@ var developerSecret = 'hTxqwYYjnhIbl3IRmSlRYSZOYhWJwFdxX75CboH2qpc=';
 // console.log("Developer ID: " + developerId);
 // console.log("Developer Secret: " + developerSecret);
 
-var vvClientHandler = require('./VVRestApi');
-var vvAuthorize : authorize = require('./authorize');
+var clientLibrary: vvRestApi = require('./vvRestApi');
 
-//var vvClient = new vvClientHandler(customerAlias, databaseAlias, apiKey, developerId, developerSecret, vaultServerUrl, true);
-//vvClient.acquireSecurityToken();
+var vvAuthorize: vvRestApi.authorize = new clientLibrary.authorize();
 
  Q.when(
          vvAuthorize.getVaultApi(apiKey, developerId, developerSecret, vaultServerUrl, customerAlias, databaseAlias)
@@ -52,8 +48,8 @@ var vvAuthorize : authorize = require('./authorize');
 	 .then(
 		 function (result) {
 			 console.log("getVaultApi succeeded");
-			 debugger;
-			 //user.main(ffColl, vvClient, res);
+			 var myVault: vvRestApi.vvClient = result;
+			 var folders = myVault.getFolders(null);
 		 }
 	 )
 	 .fail(

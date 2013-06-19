@@ -62,21 +62,40 @@
       <DependentUpon>app.ts</DependentUpon>
     </Content>
     <Content Include="app.ts" />
-    <Content Include="Authorize.js">
-      <DependentUpon>authorize.ts</DependentUpon>
+    <Content Include="routes\scheduledscripts.js">
+      <DependentUpon>scheduledscripts.ts</DependentUpon>
     </Content>
-    <Content Include="Authorize.min.js">
-      <DependentUpon>authorize.ts</DependentUpon>
+    <Content Include="routes\scheduledscripts.min.js">
+      <DependentUpon>scheduledscripts.ts</DependentUpon>
     </Content>
-    <Content Include="authorize.ts" />
-    <Content Include="dts\general.d.ts" />
-    <Content Include="dts\vvrestapi.d.ts" />
-    <Content Include="jwtSupport.js">
-      <DependentUpon>jwtSupport.ts</DependentUpon>
+    <Content Include="routes\scripts.js">
+      <DependentUpon>scripts.ts</DependentUpon>
     </Content>
-    <Content Include="jwtSupport.min.js">
-      <DependentUpon>jwtSupport.ts</DependentUpon>
+    <Content Include="routes\scripts.min.js">
+      <DependentUpon>scripts.ts</DependentUpon>
     </Content>
+    <Content Include="samples\sampleScheduledScript.js">
+      <DependentUpon>sampleScheduledScript.ts</DependentUpon>
+    </Content>
+    <Content Include="samples\sampleScheduledScript.min.js">
+      <DependentUpon>sampleScheduledScript.ts</DependentUpon>
+    </Content>
+    <Content Include="samples\sampleScheduledScript.ts" />
+    <Content Include="samples\sampleUserScript.js">
+      <DependentUpon>sampleUserScript.ts</DependentUpon>
+    </Content>
+    <Content Include="samples\sampleUserScript.min.js">
+      <DependentUpon>sampleUserScript.ts</DependentUpon>
+    </Content>
+    <Content Include="samples\sampleUserScript.ts" />
+    <Content Include="vvRestApi.js">
+      <DependentUpon>vvRestApi.ts</DependentUpon>
+    </Content>
+    <Content Include="vvRestApi.min.js">
+      <DependentUpon>vvRestApi.ts</DependentUpon>
+    </Content>
+    <Content Include="vvRestApi.ts" />
+    <Content Include="dts\vvRestApi.d.ts" />
     <Content Include="loginTest.js">
       <DependentUpon>loginTest.ts</DependentUpon>
     </Content>
@@ -84,46 +103,10 @@
       <DependentUpon>loginTest.ts</DependentUpon>
     </Content>
     <Content Include="loginTest.ts" />
-    <Content Include="serviceCore.js">
-      <DependentUpon>serviceCore.ts</DependentUpon>
-    </Content>
-    <Content Include="serviceCore.min.js">
-      <DependentUpon>serviceCore.ts</DependentUpon>
-    </Content>
-    <Content Include="serviceCore.ts" />
     <Content Include="dts\express.d.ts" />
     <Content Include="dts\node.d.ts" />
-    <Content Include="jwtSupport.ts" />
-    <Content Include="requestSigning.js">
-      <DependentUpon>requestSigning.ts</DependentUpon>
-    </Content>
-    <Content Include="requestSigning.min.js">
-      <DependentUpon>requestSigning.ts</DependentUpon>
-    </Content>
-    <Content Include="requestSigning.ts" />
-    <Content Include="routes\scheduledscripts.js" />
-    <Content Include="routes\scripts.js" />
-    <Content Include="vault\common\sessionToken.js">
-      <DependentUpon>sessionToken.ts</DependentUpon>
-    </Content>
-    <Content Include="vault\common\sessionToken.min.js">
-      <DependentUpon>sessionToken.ts</DependentUpon>
-    </Content>
-    <Content Include="vault\common\sessionToken.ts" />
-    <Content Include="VVRestApi.js">
-      <DependentUpon>VVRestApi.ts</DependentUpon>
-    </Content>
-    <Content Include="VVRestApi.min.js">
-      <DependentUpon>VVRestApi.ts</DependentUpon>
-    </Content>
-    <Content Include="VVRestApi.ts" />
-    <Content Include="VVEntities.js">
-      <DependentUpon>VVEntities.ts</DependentUpon>
-    </Content>
-    <Content Include="VVEntities.min.js">
-      <DependentUpon>VVEntities.ts</DependentUpon>
-    </Content>
-    <Content Include="VVEntities.ts" />
+    <Content Include="routes\scheduledscripts.ts" />
+    <Content Include="routes\scripts.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.yml" />
