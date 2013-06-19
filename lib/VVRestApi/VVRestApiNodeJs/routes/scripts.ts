@@ -13,7 +13,6 @@ exports.scripts = function (req, res) {
     var fs = require('fs');
     var Q = require('q');
     var meta = { code: 400, error: ''};
-    var formFieldCollection = require("../vault/forms/formFieldCollection");
     var attemptCount = 0;
 
     // create the FormFieldCollection object populating
@@ -35,11 +34,14 @@ exports.scripts = function (req, res) {
         res.json(201, meta);
     }
 
+    //read the vvClient file
+    var clientLibrary: vvRestApi = require('./vvRestApi');
+    
     //retrieve baseUrl from form encoded post
     var baseUrl = req.body.baseUrl;
 
     //create formfield collection from form encoded post
-    var ffColl = new formFieldCollection(JSON.parse(req.body.fields));
+    var ffColl = new clientLibrary.forms.formFieldCollection(JSON.parse(req.body.fields));
 
     //test for valid script id on the queryString
     if (typeof req.query.id === 'string') {
@@ -69,9 +71,7 @@ exports.scripts = function (req, res) {
                 //add baseUrl to parameters for vvClient
                 params.baseUrl = baseUrl;
 
-                //read the vvClient file
-                var clientLibrary: vvRestApi = require('./vvRestApi');
-
+              
                 var vvAuthorize: vvRestApi.authorize = new clientLibrary.authorize();
 
                 //making call to vvClient to get access token
@@ -116,26 +116,27 @@ var scriptSecondAttempt = function (req, res, baseUrl, ffColl, user, attemptCoun
     //add baseUrl to parameters for vvClient
     params.baseUrl = baseUrl;
 
-    //read the vvClient file
-    var Client = require('../vault/vaultApi');
-
-    //create the vvclient object
-    var vvClient = new Client(params);
-
+  
 
     var Q = require('q');
     var meta = { code: 200, error: '' };
 
+    //read the vvClient file
+    var clientLibrary: vvRestApi = require('./vvRestApi');
+
+    var vvAuthorize: vvRestApi.authorize = new clientLibrary.authorize();
+
     //making call to vvClient to get access token
     Q
         .when(
-            vvClient.acquireSecurityToken()
+                vvAuthorize.getVaultApi(params.loginToken, params.developerId, params.developerSecret, params.baseUrl, params.customerAlias, params.databaseAlias)
         )
         .then(
-            function () {
+            function (result) {
                 console.log("Calling the user's Main method");
 
-                user.main(ffColl, vvClient, res);
+                var myVault: vvRestApi.vvClient = result;
+                user.main(ffColl, myVault, res);
             }
         )
         .fail(

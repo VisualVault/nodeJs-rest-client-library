@@ -55,7 +55,7 @@ exports.processRequest = function (req, res) {
                 var user = require("../userscheduledscript");
 
                 //get the customer name and other credentials
-                var params : vvRestApi.common.loginCredentials = user.getCredentials();
+                var params: vvRestApi.common.loginCredentials = user.getCredentials();
 
                 //add baseUrl to parameters for vvClient
                 params.baseUrl = baseUrl;
@@ -65,15 +65,11 @@ exports.processRequest = function (req, res) {
 
                 var vvAuthorize: vvRestApi.authorize = new clientLibrary.authorize();
                 //create the vvclient object
-            
-
-
-
 
                 //making call to vvClient to get access token
                 Q
                     .when(
-                        vvAuthorize.getVaultApi(params.loginToken, params.developerId, params.developerSecret, params.baseUrl, params.customerAlias, params.databaseAlias)                        
+                        vvAuthorize.getVaultApi(params.loginToken, params.developerId, params.developerSecret, params.baseUrl, params.customerAlias, params.databaseAlias)
                     )
                     .then(
                         function (result) {
@@ -114,10 +110,10 @@ var scriptSecondAttempt = function (req, res, baseUrl, user, attemptCount) {
     params.baseUrl = baseUrl;
 
     //read the vvClient file
-    var Client = require('../vaultApi');
+    var clientLibrary: vvRestApi = require('./vvRestApi');
 
-    //create the vvclient object
-    var vvClient = new Client(params);
+    var vvAuthorize: vvRestApi.authorize = new clientLibrary.authorize();
+
 
 
     var Q = require('q');
@@ -126,13 +122,15 @@ var scriptSecondAttempt = function (req, res, baseUrl, user, attemptCount) {
     //making call to vvClient to get access token
     Q
         .when(
-            vvClient.acquireSecurityToken()
-        )
-        .then(
-            function () {
+              vvAuthorize.getVaultApi(params.loginToken, params.developerId, params.developerSecret, params.baseUrl, params.customerAlias, params.databaseAlias)
+            )
+            .then(
+            function (result) {
                 console.log("Calling the user's Main method");
 
-                user.main(vvClient, res);
+                var myVault: vvRestApi.vvClient = result;
+
+                user.main(myVault, res);
             }
         )
         .fail(

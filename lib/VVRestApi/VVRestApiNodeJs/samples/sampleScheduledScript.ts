@@ -30,8 +30,6 @@ module mySampleProject {
 
             var siteParams = { fields: "id, name, sitetype" };
             
-
-
             var foldersData = {
                 q: '',
                 fields: 'id,name',
@@ -48,6 +46,7 @@ module mySampleProject {
             Q
                 .allResolved(
                     [
+                        
                         vaultClient.getSites(siteParams)
 
                     ]

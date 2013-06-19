@@ -5,16 +5,15 @@
 
 module mySampleProject {
     export class sampleScheduledScript {
-        returnFieldDef: vvRestApi.common.returnField;
+        clientLibrary: vvRestApi;
 
         constructor() {
-            this.returnFieldDef = require('..\vault\common\returnField');
+            this.clientLibrary = require('../vvRestApi');
         }
 
         getCredentials(): vvRestApi.common.loginCredentials {
             debugger;
-            var commonLogin: vvRestApi.common = require('..\vault\common\loginCredentials')
-            var options = new commonLogin.loginCredentials("", "", "", "VaultTest", "Main");
+            var options = new this.clientLibrary.common.loginCredentials("", "", "", "VaultTest", "Main");
             
             return options;
         }
