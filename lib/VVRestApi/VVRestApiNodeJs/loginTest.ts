@@ -49,7 +49,8 @@ var vvAuthorize = new clientLibrary.authorize();
 			 console.log("getVaultApi succeeded");
 			 var myVault: clientLibrary.vvClient = result;
              debugger;
-             var folders = myVault.getFolders(null);
+             var folders = myVault.library.getFolders(null);
+             
 		 }
 	 )
 	 .fail(

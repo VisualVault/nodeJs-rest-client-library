@@ -4,470 +4,45 @@
 module vvRestApi {
 
     export class vvClient {
-        _config: any;
-        _sessionToken: common.sessionToken;
-        HTTP: any;
-        jsyaml: any;
-        nodeJsRequest: any;
-        Q: any;
+        private _httpHelper: common.httpHelper;
+        public email: email.emailManager;
+        public forms: forms.formsManager;
+        public groups: groups.groupsManager;
+        public library: library.libraryManager;
+        public sites: sites.sitesManager;
+        public users: users.usersManager;
 
-        constructor(sessionToken: any) {
-            this.HTTP = require('http');
-            this.jsyaml = require('js-yaml');
-            this.nodeJsRequest = require('request');
-            this.Q = require('q');
-
-            this._config = require('./config.yml');
-            this._sessionToken = sessionToken;
-
-            //(module).exports = new ApiServiceCoreSettings();
-
-        
+        constructor(sessionToken: common.sessionToken) {
+            var yamlConfig = require('./config.yml');            
+            this._httpHelper = new common.httpHelper(sessionToken, yamlConfig);
+            
+            this.email = new email.emailManager(this._httpHelper);
+            this.forms = new forms.formsManager(this._httpHelper);
+            this.groups = new groups.groupsManager(this._httpHelper);
+            this.library = new library.libraryManager(this._httpHelper);
+            this.sites = new sites.sitesManager(this._httpHelper);
+            this.users = new users.usersManager(this._httpHelper);
         }
-
 
         private endsWith(source, suffix) {
             return source.indexOf(suffix, source.length - suffix.length) !== -1;
         }
 
         private acquireSecurityToken() {
-            var self = this;
-
-            var deferred = this.Q.defer();
-            var vvAuthorize = new authorize();
-
-
-            this.Q.when(vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl))
-                .then(function (response) {
-                    console.log('acquireSecurityToken Success');
-                    deferred.resolve(response);
-                })
-                .fail(function (error) {
-                    console.log('acquireSecurityToken Failed');
-                    deferred.reject(new Error(error));
-                });
-
-            return deferred.promise;
+            return this._httpHelper.acquireSecurityToken();          
         }
 
-        //get the FormTemplates
-        getFormTemplates(params) {
-            var url = this.__getUrl(this._config.ResourceUri.FormTemplates);
-
-            var opts = { method: 'GET' };
-
-            return this.__doVvClientRequest(url, opts, params, null);
+        public getSecurityToken() {
+            return this._httpHelper._sessionToken.tokenBase64;
         }
 
-        //get list of form data instances
-        getForms(params, formTemplateId) {
-            var resourceUri = this._config.ResourceUri.Forms.replace('{id}', formTemplateId);
-            var url = this.__getUrl(resourceUri);
-
-            var opts = { method: 'GET' };
-
-            return this.__doVvClientRequest(url, opts, params, null);
+        public isAuthenticated() {
+            return this._httpHelper._sessionToken.isAuthenticated;
         }
 
-        //create new form data instance
-        postForms(params, data, formTemplateId) {
-            var resourceUri = this._config.ResourceUri.Forms.replace('{id}', formTemplateId);
-            var url = this.__getUrl(resourceUri);
-
-            var opts = { method: 'POST' };
-
-            return this.__doVvClientRequest(url, opts, params, data);
+        public getBaseUrl() {
+            return this._httpHelper._sessionToken.baseUrl;
         }
-
-        //create a new revision existing form data instance
-        postFormRevision(params, data, formTemplateId, formId) {
-            var resourceUri = this._config.ResourceUri.Forms.replace('{id}', formTemplateId);
-            var url = this.__getUrl(resourceUri + '/' + formId);
-
-            var opts = { method: 'POST' };
-
-            return this.__doVvClientRequest(url, opts, params, data);
-        }
-
-        //get the Sites
-        getSites(params) {
-            var url = this.__getUrl(this._config.ResourceUri.Sites);
-
-            var opts = { method: 'GET' };
-
-            return this.__doVvClientRequest(url, opts, params, null);
-        }
-
-        //create new Site
-        postSites(params, data) {
-            var resourceUri = this._config.ResourceUri.Sites;
-            var url = this.__getUrl(resourceUri);
-
-            var opts = { method: 'POST' };
-
-            return this.__doVvClientRequest(url, opts, params, data);
-        }
-
-        //update existing Site
-        putSites(params, data, siteId) {
-            var resourceUri = this._config.ResourceUri.Sites;
-            var url = this.__getUrl(resourceUri + '/' + siteId);
-
-            var opts = { method: 'PUT' };
-
-            return this.__doVvClientRequest(url, opts, params, data);
-        }
-
-        //get list of users
-        getUsers(params, siteId) {
-            var resourceUri = this._config.ResourceUri.Users.replace('{id}', siteId);
-            var url = this.__getUrl(resourceUri);
-
-            var opts = { method: 'GET' };
-
-            return this.__doVvClientRequest(url, opts, params, null);
-        }
-
-        //create new User
-        postUsers(params, data, siteId) {
-            var resourceUri = this._config.ResourceUri.Users.replace('{id}', siteId);
-            var url = this.__getUrl(resourceUri);
-
-            var opts = { method: 'POST' };
-
-            return this.__doVvClientRequest(url, opts, params, data);
-        }
-
-        //update existing User
-        putUsers(params, data, siteId, usId) {
-            var resourceUri = this._config.ResourceUri.Users.replace('{id}', siteId);
-            var url = this.__getUrl(resourceUri + '/' + usId);
-
-            var opts = { method: 'PUT' };
-
-            return this.__doVvClientRequest(url, opts, params, data);
-        }
-
-        //get list of groups
-        getGroups(params, siteId) {
-            var resourceUri = this._config.ResourceUri.Groups.replace('{id}', siteId);
-            var url = this.__getUrl(resourceUri);
-
-            var opts = { method: 'GET' };
-
-            return this.__doVvClientRequest(url, opts, params, null);
-        }
-
-        //create new Group
-        postGroups(params, data, siteId) {
-            var resourceUri = this._config.ResourceUri.Groups.replace('{id}', siteId);
-            var url = this.__getUrl(resourceUri);
-
-            var opts = { method: 'POST' };
-
-            return this.__doVvClientRequest(url, opts, params, data);
-        }
-
-        //update existing Group
-        putGroups(params, data, siteId, grId) {
-            var resourceUri = this._config.ResourceUri.Groups.replace('{id}', siteId);
-            var url = this.__getUrl(resourceUri + '/' + grId);
-
-            var opts = { method: 'PUT' };
-
-            return this.__doVvClientRequest(url, opts, params, data);
-        }
-
-        //get the Folders
-        getFolders(params) {
-            var url = this.__getUrl(this._config.ResourceUri.Folders);
-
-            var opts = { method: 'GET' };
-
-            return this.__doVvClientRequest(url, opts, params, null);
-        }
-
-        //get list of documents
-        getDocuments(params, folderId) {
-            var resourceUri = this._config.ResourceUri.Documents.replace('{id}', folderId);
-            var url = this.__getUrl(resourceUri);
-
-            var opts = { method: 'GET' };
-
-            return this.__doVvClientRequest(url, opts, params, null);
-        }
-
-        //create new Email
-        postEmails(params, data) {
-            var url = this.__getUrl(this._config.ResourceUri.Emails);
-
-            var opts = { method: 'POST' };
-
-            return this.__doVvClientRequest(url, opts, params, data);
-        }
-
-        getSecurityToken() {
-            return this._sessionToken.tokenBase64;
-        }
-
-        isAuthenticated() {
-            return this._sessionToken.isAuthenticated;
-        }
-
-        getBaseUrl() {
-            return this._sessionToken.baseUrl;
-        }
-
-        request(httpVerb, url, params, data) {
-            var opts = { method: '' };
-
-            if (httpVerb.toLowerCase() === 'post') {
-                opts.method = 'POST';
-            } else if (httpVerb.toLowerCase() === 'put') {
-                opts.method = 'PUT';
-            } else if (httpVerb.toLowerCase() === 'delete') {
-                opts.method = 'DELETE';
-            } else {
-                opts.method = 'GET';
-            }
-
-            return this.__doVvClientRequest(url, opts, params, data);
-        }
-
-        httpGet(url, params, requestCallback) {
-            var self = this;
-
-            //create the options object for the call 
-
-            //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
-            // Signature, X-VVA-RequestDate, X-VV-ContentMD5
-
-            var headers = {};
-
-            var options = { method: 'GET', uri: url, qs: params || {}, headers: headers, json: null };
-
-            //if security token hasn't been acquired then get it
-            
-            if (this._sessionToken.tokenBase64 == null) {
-                //send request for security token
-                this.__acquireNewTokenWithRequest(options, requestCallback);
-            } else {
-                //add security token to parameters that make up the query string
-                options.qs.token = this._sessionToken.tokenBase64;
-
-                var rs = new common.requestSigning();
-                rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
-
-                console.log("Performing GET request to url:" + url);
-
-                //make call
-                this.nodeJsRequest(options, function (error, response, body) {
-                    requestCallback(error, response, body);
-                });
-            }
-        }
-
-        httpPost(url, params, data, requestCallback) {
-            var self = this;
-
-            //create the options object for the call
-            //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
-            // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
-            var headers = {};
-
-
-            var options = { method: 'POST', uri: url, qs: params || {}, json: data, headers: headers };
-
-            //if security token hasn't been acquired then get it
-            if (this._sessionToken.tokenBase64 == null) {
-                //send request for security token
-                this.__acquireNewTokenWithRequest(options, requestCallback);
-            } else {
-                //add security token to parameters that make up the query string
-                options.qs.token = this._sessionToken.tokenBase64;
-
-                var rs = new common.requestSigning();
-                rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
-
-                console.log("Performing POST request to url:" + url);
-
-                //make call
-                this.nodeJsRequest(options, function (error, response, body) {
-                    requestCallback(error, response, body);
-                });
-            }
-        }
-
-        httpPut(url, params, data, requestCallback) {
-            var self = this;
-
-            //create the options object for the call
-            //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
-            // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
-            var headers = {};
-
-            var options = { method: 'PUT', uri: url, qs: params || {}, json: data, headers: headers };
-
-            //if security token hasn't been acquired then get it
-            if (this._sessionToken.tokenBase64 == null) {
-                //send request for security token
-                this.__acquireNewTokenWithRequest(options, requestCallback);
-            } else {
-                //add security token to parameters that make up the query string
-                options.qs.token = this._sessionToken.tokenBase64;
-
-                var rs = new common.requestSigning();
-                rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
-
-                console.log("Performing PUT request to url:" + url);
-
-                //make call
-                this.nodeJsRequest(options, function (error, response, body) {
-                    requestCallback(error, response, body);
-                });
-            }
-        }
-
-        httpDelete(url, params, requestCallback) {
-            var self = this;
-
-            //create the options object for the call
-            //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
-            // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
-            var headers = {};
-
-            
-            var options = { method: 'DELETE', uri: url, qs: params || {}, json: null, headers: headers };
-
-
-            //if security token hasn't been acquired then get it
-            if (this._sessionToken.tokenBase64 == null) {
-                //send request for security token
-                this.__acquireNewTokenWithRequest(options, requestCallback);
-            } else {
-                //add security token to parameters that make up the query string
-                options.qs.token = this._sessionToken.tokenBase64;
-
-                var rs = new common.requestSigning();
-                rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
-
-                console.log("Performing DELETE request to url:" + url);
-
-                //make call
-                this.nodeJsRequest(options, function (error, response, body) {
-                    requestCallback(error, response, body);
-                });
-            }
-        }
-
-        private __acquireNewTokenWithRequest(options, requestCallback) {
-            var attemptCount = 0;
-
-            //making call to getToken to get access token
-            var vvAuthorize = new authorize();
-
-            this.Q
-                .when(
-                vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl)
-                )
-                .then(
-                function (result) {
-                    var sessionToken: common.sessionToken = result;
-                    options.qs.token = sessionToken.tokenBase64;
-
-                    var rs = new common.requestSigning();
-                    rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
-                    
-                    //make call
-                    this.nodeJsRequest(options, function (error, response, body) {
-                        requestCallback(error, response, body);
-                    });
-                }
-                )
-                .fail(
-                function (tokenError) {
-                    attemptCount++;
-                    this.__recursiveAttemptAcquireToken(options, requestCallback, attemptCount);
-                }
-                );
-        }
-
-        private __recursiveAttemptAcquireToken(options, requestCallback, attemptCount) {
-            //making call to vvClient to get access token
-
-            var vvAuthorize = new authorize();
-
-            this.Q
-                .when(
-                vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl)
-                )
-                .then(
-                function (result) {
-                    var sessionToken: common.sessionToken = result;
-                    options.qs.token = sessionToken.tokenBase64;
-
-                    var rs = new common.requestSigning();
-                    rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
-                    
-                    //make call
-                    this.nodeJsRequest(options, function (error, response, body) {
-                        requestCallback(error, response, body);
-                    });
-                }
-                )
-                .fail(
-                function (tokenError) {
-                    if (attemptCount < 6) {
-                        attemptCount++;
-                        this.__recursiveAttemptAcquireToken(options, requestCallback, attemptCount);
-                    }
-                }
-                );
-        }
-
-        private __doVvClientRequest(url, opts, params, data) {
-            var self = this;
-            var deferred = this.Q.defer();
-
-            var vvClientRequestCallback = function (error, response, responseData) {
-                debugger;
-                if (error) {
-                    console.log('In vvClientRequestCallback with error condition');
-                    deferred.reject(new Error(error));
-                } else {
-                    if (response.statusCode === 403) {
-                        self._sessionToken.tokenBase64 = null;
-                        self._sessionToken.isAuthenticated = false;
-
-                        var errorData = JSON.parse(responseData);
-                        deferred.reject(new Error(errorData.meta));
-                    } else {
-                        console.log('In vvClientRequestCallback with success: ' + responseData);
-                        deferred.resolve(responseData);
-                    }
-                }
-            };
-
-            if (opts.method === 'GET') {
-                this.httpGet(url, params, vvClientRequestCallback);
-            } else if (opts.method === 'POST') {
-                this.httpPost(url, params, data, vvClientRequestCallback);
-            } else if (opts.method === 'PUT') {
-                this.httpPut(url, params, data, vvClientRequestCallback);
-            } else if (opts.method === 'DELETE') {
-                this.httpDelete(url, params, vvClientRequestCallback);
-            } else {
-                throw new Error('http request method name error');
-            }
-
-            return deferred.promise;
-        }
-
-        private __getUrl(resourceUrl) {
-            return this._sessionToken.baseUrl + this._sessionToken.apiUrl + resourceUrl;
-        }
-
-
     }
 
     export class authorize {
@@ -660,6 +235,294 @@ module vvRestApi {
     }
 
     export module common {
+
+        export class httpHelper {
+            _config: any;
+            _sessionToken: common.sessionToken;
+            HTTP: any;
+            jsyaml: any;
+            nodeJsRequest: any;
+            Q: any;
+            httpHelper: common.httpHelper;
+     
+            constructor(sessionToken: common.sessionToken, yamlConfig: any) {
+                this.HTTP = require('http');
+                this.jsyaml = require('js-yaml');
+                this.nodeJsRequest = require('request');
+                this.Q = require('q');
+                
+                this._sessionToken = sessionToken;
+                this._config = yamlConfig;
+            }
+
+            acquireSecurityToken() {
+                var self = this;
+
+                var deferred = this.Q.defer();
+                var vvAuthorize = new authorize();
+
+
+                this.Q.when(vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl))
+                    .then(function (response) {
+                        console.log('acquireSecurityToken Success');
+                        deferred.resolve(response);
+                    })
+                    .fail(function (error) {
+                        console.log('acquireSecurityToken Failed');
+                        deferred.reject(new Error(error));
+                    });
+
+                return deferred.promise;
+            }
+            request(httpVerb, url, params, data) {
+                var opts = { method: '' };
+
+                if (httpVerb.toLowerCase() === 'post') {
+                    opts.method = 'POST';
+                } else if (httpVerb.toLowerCase() === 'put') {
+                    opts.method = 'PUT';
+                } else if (httpVerb.toLowerCase() === 'delete') {
+                    opts.method = 'DELETE';
+                } else {
+                    opts.method = 'GET';
+                }
+
+                return this.doVvClientRequest(url, opts, params, data);
+            }
+
+            httpGet(url, params, requestCallback) {
+                var self = this;
+
+                //create the options object for the call 
+
+                //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
+                // Signature, X-VVA-RequestDate, X-VV-ContentMD5
+
+                var headers = {};
+
+                var options = { method: 'GET', uri: url, qs: params || {}, headers: headers, json: null };
+
+                //if security token hasn't been acquired then get it
+                
+                if (this._sessionToken.tokenBase64 == null) {
+                    //send request for security token
+                    this.__acquireNewTokenWithRequest(options, requestCallback);
+                } else {
+                    //add security token to parameters that make up the query string
+                    options.qs.token = this._sessionToken.tokenBase64;
+
+                    var rs = new common.requestSigning();
+                    rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
+
+                    console.log("Performing GET request to url:" + url);
+
+                    //make call
+                    this.nodeJsRequest(options, function (error, response, body) {
+                        requestCallback(error, response, body);
+                    });
+                }
+            }
+
+            httpPost(url, params, data, requestCallback) {
+                var self = this;
+
+                //create the options object for the call
+                //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
+                // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
+                var headers = {};
+
+
+                var options = { method: 'POST', uri: url, qs: params || {}, json: data, headers: headers };
+
+                //if security token hasn't been acquired then get it
+                if (this._sessionToken.tokenBase64 == null) {
+                    //send request for security token
+                    this.__acquireNewTokenWithRequest(options, requestCallback);
+                } else {
+                    //add security token to parameters that make up the query string
+                    options.qs.token = this._sessionToken.tokenBase64;
+
+                    var rs = new common.requestSigning();
+                    rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
+
+                    console.log("Performing POST request to url:" + url);
+
+                    //make call
+                    this.nodeJsRequest(options, function (error, response, body) {
+                        requestCallback(error, response, body);
+                    });
+                }
+            }
+
+            httpPut(url, params, data, requestCallback) {
+                var self = this;
+
+                //create the options object for the call
+                //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
+                // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
+                var headers = {};
+
+                var options = { method: 'PUT', uri: url, qs: params || {}, json: data, headers: headers };
+
+                //if security token hasn't been acquired then get it
+                if (this._sessionToken.tokenBase64 == null) {
+                    //send request for security token
+                    this.__acquireNewTokenWithRequest(options, requestCallback);
+                } else {
+                    //add security token to parameters that make up the query string
+                    options.qs.token = this._sessionToken.tokenBase64;
+
+                    var rs = new common.requestSigning();
+                    rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
+
+                    console.log("Performing PUT request to url:" + url);
+
+                    //make call
+                    this.nodeJsRequest(options, function (error, response, body) {
+                        requestCallback(error, response, body);
+                    });
+                }
+            }
+
+            httpDelete(url, params, requestCallback) {
+                var self = this;
+
+                //create the options object for the call
+                //THIS IS WHERE WE NEED TO ADD THE HEADERS REQUIRED BY REST API
+                // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
+                var headers = {};
+
+                
+                var options = { method: 'DELETE', uri: url, qs: params || {}, json: null, headers: headers };
+
+
+                //if security token hasn't been acquired then get it
+                if (this._sessionToken.tokenBase64 == null) {
+                    //send request for security token
+                    this.__acquireNewTokenWithRequest(options, requestCallback);
+                } else {
+                    //add security token to parameters that make up the query string
+                    options.qs.token = this._sessionToken.tokenBase64;
+
+                    var rs = new common.requestSigning();
+                    rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
+
+                    console.log("Performing DELETE request to url:" + url);
+
+                    //make call
+                    this.nodeJsRequest(options, function (error, response, body) {
+                        requestCallback(error, response, body);
+                    });
+                }
+            }
+
+            private __acquireNewTokenWithRequest(options, requestCallback) {
+                var attemptCount = 0;
+
+                //making call to getToken to get access token
+                var vvAuthorize = new authorize();
+
+                this.Q
+                    .when(
+                    vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl)
+                    )
+                    .then(
+                    function (result) {
+                        var sessionToken: common.sessionToken = result;
+                        options.qs.token = sessionToken.tokenBase64;
+
+                        var rs = new common.requestSigning();
+                        rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
+                        
+                        //make call
+                        this.nodeJsRequest(options, function (error, response, body) {
+                            requestCallback(error, response, body);
+                        });
+                    }
+                    )
+                    .fail(
+                    function (tokenError) {
+                        attemptCount++;
+                        this.__recursiveAttemptAcquireToken(options, requestCallback, attemptCount);
+                    }
+                    );
+            }
+
+            private __recursiveAttemptAcquireToken(options, requestCallback, attemptCount) {
+                //making call to vvClient to get access token
+
+                var vvAuthorize = new authorize();
+
+                this.Q
+                    .when(
+                    vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl)
+                    )
+                    .then(
+                    function (result) {
+                        var sessionToken: common.sessionToken = result;
+                        options.qs.token = sessionToken.tokenBase64;
+
+                        var rs = new common.requestSigning();
+                        rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
+                        
+                        //make call
+                        this.nodeJsRequest(options, function (error, response, body) {
+                            requestCallback(error, response, body);
+                        });
+                    }
+                    )
+                    .fail(
+                    function (tokenError) {
+                        if (attemptCount < 6) {
+                            attemptCount++;
+                            this.__recursiveAttemptAcquireToken(options, requestCallback, attemptCount);
+                        }
+                    }
+                    );
+            }
+
+            public doVvClientRequest(url, opts, params, data) {
+                var self = this;
+                var deferred = this.Q.defer();
+
+                var vvClientRequestCallback = function (error, response, responseData) {
+                    debugger;
+                    if (error) {
+                        console.log('In vvClientRequestCallback with error condition');
+                        deferred.reject(new Error(error));
+                    } else {
+                        if (response.statusCode === 403) {
+                            self._sessionToken.tokenBase64 = null;
+                            self._sessionToken.isAuthenticated = false;
+
+                            var errorData = JSON.parse(responseData);
+                            deferred.reject(new Error(errorData.meta));
+                        } else {
+                            console.log('In vvClientRequestCallback with success: ' + responseData);
+                            deferred.resolve(responseData);
+                        }
+                    }
+                };
+
+                if (opts.method === 'GET') {
+                    this.httpGet(url, params, vvClientRequestCallback);
+                } else if (opts.method === 'POST') {
+                    this.httpPost(url, params, data, vvClientRequestCallback);
+                } else if (opts.method === 'PUT') {
+                    this.httpPut(url, params, data, vvClientRequestCallback);
+                } else if (opts.method === 'DELETE') {
+                    this.httpDelete(url, params, vvClientRequestCallback);
+                } else {
+                    throw new Error('http request method name error');
+                }
+
+                return deferred.promise;
+            }
+
+            public getUrl(resourceUrl) {
+                return this._sessionToken.baseUrl + this._sessionToken.apiUrl + resourceUrl;
+            }
+        }
 
         export class jwt {
             crypto: any;
@@ -1545,6 +1408,26 @@ module vvRestApi {
         }
     }
 
+    export module email {
+        export class emailManager {
+
+            _httpHelper: common.httpHelper
+
+            constructor(httpHelper: common.httpHelper) {
+                this._httpHelper = httpHelper;
+            }
+
+            //create new Email
+            postEmails(params, data) {
+                var url = this._httpHelper.getUrl(this._httpHelper._config.ResourceUri.Emails);
+
+                var opts = { method: 'POST' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, data);
+            }
+        }
+    }
+    
     export module forms {
         export class formFieldCollection {
             _ffColl: any;
@@ -1600,31 +1483,208 @@ module vvRestApi {
 
         export class formsManager {
 
+            _httpHelper: common.httpHelper;
+
+            constructor(httpHelper: common.httpHelper) {
+                this._httpHelper = httpHelper;
+            }
+
+            //get the FormTemplates
+            getFormTemplates(params) {
+                var url = this._httpHelper.getUrl(this._httpHelper._config.ResourceUri.FormTemplates);
+
+                var opts = { method: 'GET' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, null);
+            }
+
+            //get list of form data instances
+            getForms(params, formTemplateId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Forms.replace('{id}', formTemplateId);
+                var url = this._httpHelper.getUrl(resourceUri);
+
+                var opts = { method: 'GET' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, null);
+            }
+
+            //create new form data instance
+            postForms(params, data, formTemplateId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Forms.replace('{id}', formTemplateId);
+                var url = this._httpHelper.getUrl(resourceUri);
+
+                var opts = { method: 'POST' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, data);
+            }
+
+            //create a new revision existing form data instance
+            postFormRevision(params, data, formTemplateId, formId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Forms.replace('{id}', formTemplateId);
+                var url = this._httpHelper.getUrl(resourceUri + '/' + formId);
+
+                var opts = { method: 'POST' };
+                
+                return this._httpHelper.doVvClientRequest(url, opts, params, data);
+            }
         }
     }
 
     export module groups {
 
         export class groupsManager {
+            _httpHelper: common.httpHelper
+
+            constructor(httpHelper: common.httpHelper) {
+                this._httpHelper = httpHelper;
+            }
+
+        
 
         }
     }
 
     export module library {
         export class libraryManager {
+            _httpHelper: common.httpHelper
+
+            constructor(httpHelper: common.httpHelper) {
+                this._httpHelper = httpHelper;
+            }
+
+            
+            //get the Folders
+            getFolders(params) {
+                var url = this._httpHelper.getUrl(this._httpHelper._config.ResourceUri.Folders);
+
+                var opts = { method: 'GET' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, null);
+            }
+
+            //get list of documents
+            getDocuments(params, folderId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Documents.replace('{id}', folderId);
+                var url = this._httpHelper.getUrl(resourceUri);
+
+                var opts = { method: 'GET' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, null);
+            }
 
         }
     }
 
     export module sites {
         export class sitesManager {
+            
+            _httpHelper: common.httpHelper
+
+            constructor(httpHelper: common.httpHelper) {
+                this._httpHelper = httpHelper;
+            }
+
+            //get the Sites
+            getSites(params) {
+                var url = this._httpHelper.getUrl(this._httpHelper._config.ResourceUri.Sites);
+
+                var opts = { method: 'GET' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, null);
+            }
+
+            //create new Site
+            postSites(params, data) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Sites;
+                var url = this._httpHelper.getUrl(resourceUri);
+
+                var opts = { method: 'POST' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, data);
+            }
+
+            //update existing Site
+            putSites(params, data, siteId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Sites;
+                var url = this._httpHelper.getUrl(resourceUri + '/' + siteId);
+
+                var opts = { method: 'PUT' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, data);
+            }
+
+            //get list of groups
+            getGroups(params, siteId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Groups.replace('{id}', siteId);
+                var url = this._httpHelper.getUrl(resourceUri);
+
+                var opts = { method: 'GET' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, null);
+            }
+
+            //create new Group
+            postGroups(params, data, siteId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Groups.replace('{id}', siteId);
+                var url = this._httpHelper.getUrl(resourceUri);
+
+                var opts = { method: 'POST' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, data);
+            }
+
+            //update existing Group
+            putGroups(params, data, siteId, grId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Groups.replace('{id}', siteId);
+                var url = this._httpHelper.getUrl(resourceUri + '/' + grId);
+
+                var opts = { method: 'PUT' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, data);
+            }
 
         }
     }
 
     export module users {
         export class usersManager {
+            _httpHelper: common.httpHelper
 
+            constructor(httpHelper: common.httpHelper) {
+                this._httpHelper = httpHelper;
+            }
+
+            
+            //get list of users
+            getUsers(params, siteId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Users.replace('{id}', siteId);
+                var url = this._httpHelper.getUrl(resourceUri);
+
+                var opts = { method: 'GET' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, null);
+            }
+
+            //create new User
+            postUsers(params, data, siteId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Users.replace('{id}', siteId);
+                var url = this._httpHelper.getUrl(resourceUri);
+
+                var opts = { method: 'POST' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, data);
+            }
+
+            //update existing User
+            putUsers(params, data, siteId, usId) {
+                var resourceUri = this._httpHelper._config.ResourceUri.Users.replace('{id}', siteId);
+                var url = this._httpHelper.getUrl(resourceUri + '/' + usId);
+
+                var opts = { method: 'PUT' };
+
+                return this._httpHelper.doVvClientRequest(url, opts, params, data);
+            }
+           
         }
     }
 }

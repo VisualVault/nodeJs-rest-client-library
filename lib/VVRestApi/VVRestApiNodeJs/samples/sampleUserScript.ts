@@ -17,7 +17,7 @@ export module mySampleProject {
             return options;
         }
 
-        main(ffCollection, vvClient, response) {
+        main(ffCollection, vvClient: clientLibrary.vvClient, response) {
 
             var outArray = [];
             var ff1 = ffCollection.getFormFieldByName("Text1");
@@ -41,8 +41,8 @@ export module mySampleProject {
 
             Q
                 .when(
-                    vvClient.getFormTemplates(formParams),
-                    vvClient.getSites(siteParams)
+                    vvClient.forms.getFormTemplates(formParams),
+                    vvClient.sites.getSites(siteParams)
                 )
                 .then(
                     function (result1, result2) {

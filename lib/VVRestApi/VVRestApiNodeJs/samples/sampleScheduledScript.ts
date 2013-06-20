@@ -15,7 +15,7 @@ module mySampleProject {
                 databaseAlias: "main",
                 developerId: "",
                 developerSecret: "",
-                logingToken: ""
+                loginToken: ""
             };
        
             return options;
@@ -46,9 +46,7 @@ module mySampleProject {
             Q
                 .allResolved(
                     [
-                        
-                        vaultClient.getSites(siteParams)
-
+                        vaultClient.sites.getSites(siteParams)
                     ]
                 )
                 .then(
