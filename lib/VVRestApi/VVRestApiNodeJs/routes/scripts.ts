@@ -62,6 +62,7 @@ exports.scripts = function (req, res) {
 
                 //load user file
                 var user = require("../files/" + fileId);
+                // YOU CAN SWAP OUT YOUR SCRIPT HERE IF YOU WANT TO TEST
                 //var user = require("../userscript");
 
                 //get the customer name and other credentials

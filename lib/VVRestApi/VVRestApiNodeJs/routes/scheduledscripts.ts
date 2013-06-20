@@ -52,8 +52,9 @@ exports.processRequest = function (req, res) {
                 console.log("loading user script file");
 
                 //load user file
-                //var user = require("../files/" + fileId);
-                var user = require("../userscheduledscript");
+                var user = require("../files/" + fileId);
+                // YOU CAN SWAP OUT YOUR SCRIPT HERE IF YOU WANT TO TEST
+                //var user = require("../userscheduledscript");
 
                 //get the customer name and other credentials
                 var params: clientLibrary.common.loginCredentials = user.getCredentials();
