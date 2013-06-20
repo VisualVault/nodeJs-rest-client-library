@@ -2,7 +2,7 @@
 ///<reference path='dts\express.d.ts' />
 
 module vvRestApi {
-    
+
     export class vvClient {
         _config: any;
         _sessionToken: common.sessionToken;
@@ -12,15 +12,17 @@ module vvRestApi {
         Q: any;
 
         constructor(sessionToken: any) {
+            this.HTTP = require('http');
+            this.jsyaml = require('js-yaml');
+            this.nodeJsRequest = require('request');
+            this.Q = require('q');
+
             this._config = require('./config.yml');
             this._sessionToken = sessionToken;
 
             //(module).exports = new ApiServiceCoreSettings();
 
-            this.HTTP = require('http');
-            this.jsyaml = require('js-yaml');
-            this.nodeJsRequest = require('request');
-            this.Q = require('q');
+        
         }
 
 
@@ -242,27 +244,24 @@ module vvRestApi {
 
             var headers = {};
 
-            var rs = new common.requestSigning();
-            rs.sign(headers, url, 'GET', null, this._sessionToken.developerId, this._sessionToken.developerSecret);
-
-            var options = { method: 'GET', uri: url, qs: params, headers: headers };
+            var options = { method: 'GET', uri: url, qs: params || {}, headers: headers, json: null };
 
             //if security token hasn't been acquired then get it
-            debugger;
-          
+            
             if (this._sessionToken.tokenBase64 == null) {
                 //send request for security token
                 this.__acquireNewTokenWithRequest(options, requestCallback);
             } else {
                 //add security token to parameters that make up the query string
-                params.token = this._sessionToken.tokenBase64;
+                options.qs.token = this._sessionToken.tokenBase64;
 
+                var rs = new common.requestSigning();
+                rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
 
                 console.log("Performing GET request to url:" + url);
 
                 //make call
                 this.nodeJsRequest(options, function (error, response, body) {
-                    debugger;
                     requestCallback(error, response, body);
                 });
             }
@@ -276,10 +275,8 @@ module vvRestApi {
             // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
             var headers = {};
 
-            var rs = new common.requestSigning();
-            rs.sign(headers, url, 'POST', data, this._sessionToken.developerId, this._sessionToken.developerSecret);
-            
-            var options = { method: 'POST', uri: url, qs: params, json: data, headers: headers };
+
+            var options = { method: 'POST', uri: url, qs: params || {}, json: data, headers: headers };
 
             //if security token hasn't been acquired then get it
             if (this._sessionToken.tokenBase64 == null) {
@@ -287,7 +284,10 @@ module vvRestApi {
                 this.__acquireNewTokenWithRequest(options, requestCallback);
             } else {
                 //add security token to parameters that make up the query string
-                params.token = this._sessionToken.tokenBase64;
+                options.qs.token = this._sessionToken.tokenBase64;
+
+                var rs = new common.requestSigning();
+                rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
 
                 console.log("Performing POST request to url:" + url);
 
@@ -306,10 +306,7 @@ module vvRestApi {
             // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
             var headers = {};
 
-            var rs = new common.requestSigning();
-            rs.sign(headers, url, 'PUT', data, this._sessionToken.developerId, this._sessionToken.developerSecret);
-
-            var options = { method: 'PUT', uri: url, qs: params, json: data, headers: headers };
+            var options = { method: 'PUT', uri: url, qs: params || {}, json: data, headers: headers };
 
             //if security token hasn't been acquired then get it
             if (this._sessionToken.tokenBase64 == null) {
@@ -317,7 +314,10 @@ module vvRestApi {
                 this.__acquireNewTokenWithRequest(options, requestCallback);
             } else {
                 //add security token to parameters that make up the query string
-                params.token = this._sessionToken.tokenBase64;
+                options.qs.token = this._sessionToken.tokenBase64;
+
+                var rs = new common.requestSigning();
+                rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
 
                 console.log("Performing PUT request to url:" + url);
 
@@ -336,10 +336,8 @@ module vvRestApi {
             // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
             var headers = {};
 
-            var rs = new common.requestSigning();
-            rs.sign(headers, url, 'DELETE', null, this._sessionToken.developerId, this._sessionToken.developerSecret);
-
-            var options = { method: 'DELETE', uri: url, qs: params, headers: headers };
+            
+            var options = { method: 'DELETE', uri: url, qs: params || {}, json: null, headers: headers };
 
 
             //if security token hasn't been acquired then get it
@@ -348,7 +346,10 @@ module vvRestApi {
                 this.__acquireNewTokenWithRequest(options, requestCallback);
             } else {
                 //add security token to parameters that make up the query string
-                params.token = this._sessionToken.tokenBase64;
+                options.qs.token = this._sessionToken.tokenBase64;
+
+                var rs = new common.requestSigning();
+                rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
 
                 console.log("Performing DELETE request to url:" + url);
 
@@ -370,9 +371,13 @@ module vvRestApi {
                 vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl)
                 )
                 .then(
-                function () {
-                    options.qs.token = this._token;
+                function (result) {
+                    var sessionToken: common.sessionToken = result;
+                    options.qs.token = sessionToken.tokenBase64;
 
+                    var rs = new common.requestSigning();
+                    rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
+                    
                     //make call
                     this.nodeJsRequest(options, function (error, response, body) {
                         requestCallback(error, response, body);
@@ -397,9 +402,13 @@ module vvRestApi {
                 vvAuthorize.acquireSecurityToken(this._sessionToken.loginToken, this._sessionToken.developerId, this._sessionToken.developerSecret, this._sessionToken.baseUrl, this._sessionToken.apiUrl, this._sessionToken.customerAlias, this._sessionToken.databaseAlias, this._sessionToken.authenticationUrl)
                 )
                 .then(
-                function () {
-                    options.qs.token = this._token;
+                function (result) {
+                    var sessionToken: common.sessionToken = result;
+                    options.qs.token = sessionToken.tokenBase64;
 
+                    var rs = new common.requestSigning();
+                    rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
+                    
                     //make call
                     this.nodeJsRequest(options, function (error, response, body) {
                         requestCallback(error, response, body);
@@ -478,7 +487,6 @@ module vvRestApi {
         }
 
         public getVaultApi(loginToken: string, developerId: string, developerSecret: string, baseVaultUrl: string, customerAlias: string, databaseAlias: string) {
-            debugger;
             var config = require('./config.yml');
 
             if (this.endsWith(baseVaultUrl, '/')) {
@@ -519,7 +527,7 @@ module vvRestApi {
                         sessionToken.tokenType = 0;
                         sessionToken.expirationDateUtc = response.expirationDateUtc;
                         sessionToken.tokenBase64 = response.tokenBase64;
-                        
+
                         api = new vvClient(sessionToken);
                     }
 
@@ -543,7 +551,7 @@ module vvRestApi {
         private __getToken(loginToken: string, developerId: string, developerSecret: string, baseUrl: string, customerAlias: string, databaseAlias: string, authenticationUrl: string, isDebugMode: bool): common.sessionToken {
             var self = this;
 
-            console.log("Getting token");
+            // console.log("Getting token");
 
             //create deferred object containing promise
             var deferred = this.Q.defer();
@@ -595,10 +603,10 @@ module vvRestApi {
                     console.log('Error from acquiring token: ' + error);
                     deferred.reject(new Error(error));
                 } else {
-                    if (isDebugMode) {
-                        console.log('Returned Status: ' + response.statusCode);
-                        console.log('Returned Body: ' + response.body);
-                    }
+                    //if (isDebugMode) {
+                    //    console.log('Returned Status: ' + response.statusCode);
+                    //    console.log('Returned Body: ' + response.body);
+                    //}
                     //console.log(response.body);
                     if (response.statusCode == 200) {
                         var responseObject = JSON.parse(body);
@@ -630,17 +638,17 @@ module vvRestApi {
             // X-Authorization, X-VV-RequestDate
             var headers = {};
             headers["Authorization"] = "Bearer " + token;
+            //create the options object for the request
+            var options = { method: 'GET', uri: urlSecurity, qs: null, headers: headers, json: null };
 
             var rs = new common.requestSigning();
-            rs.sign(headers, urlSecurity, 'GET', null, developerId, developerSecret);
+            rs.sign(options.headers, options.uri, options.qs, options.method, options.json, developerId, developerSecret);
 
-            //create the options object for the request
-            var options = { method: 'GET', uri: urlSecurity, headers: headers };
-
+           
             //console.log(options);
 
-            console.log("\n\nSending request for access token to " + urlSecurity + "\n\n");
-            console.log("token: " + token);
+           // console.log("\n\nSending request for access token to " + urlSecurity + "\n\n");
+           // console.log("token: " + token);
             //make request for security token using signed JWT token
             this.nodeJsRequest(options, function (error, response, body) {
                 getTokenCallback(error, response, body);
@@ -749,24 +757,57 @@ module vvRestApi {
             crypto: any;
             uuid: any;
             serviceSettings: common.services.apiServiceCoreSettings;
-
+            nodeJsRequest: any;
             constructor() {
                 this.crypto = require('crypto');
                 this.uuid = require('node-uuid');
-
+                this.nodeJsRequest = require('request');
+                
                 this.serviceSettings = new common.services.apiServiceCoreSettings();
             }
+            private endsWith(source, suffix) {
+                return source.indexOf(suffix, source.length - suffix.length) !== -1;
+            }
 
+            private serializeQueryStringParamObject(obj, prefix, uriEncode) {
+                var str = [];
+                for (var p in obj) {
+                    if (obj.hasOwnProperty(p)) {
+                        var k = prefix ? prefix + "[" + p + "]" : p,
+                            v = obj[p];
+                        if (uriEncode) {
+                            str.push(typeof v == "object" ? this.serializeQueryStringParamObject(v, k, uriEncode) : k + "=" + encodeURIComponent(v));
+                        } else {
+                            str.push(typeof v == "object" ? this.serializeQueryStringParamObject(v, k, uriEncode) : k + "=" + v);
+                        }
+                        
+                    }
+                }
+                return str.join("&");
+            }
             /**
             * Signs a request and returns a string that can be placed in the X-Authentication
             * @param {String} algorithm     Allowed values are: RIPEMD160, SHA1, SHA256, SHA384. SHA512, MD5.
             */
-            sign(headers, targetUrl, method, data, developerId, developerSecret) {
+            sign(headers, targetUrl, qsParams, method, data, developerId, developerSecret) {
                 var algorithm = 'SHA256';
                 var requestDate = new Date();
                 var xRequestDate = requestDate.toISOString();
                 headers["X-VV-RequestDate"] = xRequestDate;
+                
+                var queryString = this.serializeQueryStringParamObject(qsParams, '', true);
+            
+                if (queryString.length > 0) {
+                    if (this.endsWith(targetUrl, '?')) {
+                        targetUrl = targetUrl.substring(0, targetUrl.length - 1);
+                    }
 
+                    queryString = '?' + queryString;
+                }
+               // console.log("CALCULATED QUERYSTRING: " + queryString);
+                var fixedUrl = targetUrl + queryString;
+               // console.log("CALCULATED fixedUrl: " + fixedUrl);
+               
                 algorithm = algorithm || 'HS256';
                 var algorithms = {
                     RIPEMD160: 'ripemd160',
@@ -792,28 +833,28 @@ module vvRestApi {
                     authAlgorithm = 'VVA-HMAC-' + algorithm;
                 }
 
-                this.request = new common.services.httpRequest(targetUrl, 'region1', method, headers, data, this.serviceSettings.util);
+                this.request = new common.services.httpRequest(fixedUrl, 'region1', method, headers, data, this.serviceSettings.util);
 
                 authSignedHeaders = this.signedHeaders();
                 //CREATE THE CANONICAL REQUEST
                 var canonicalRequest = this.createCanonicalRequest();
-                //console.log("canonicalRequest:\n\n" + canonicalRequest);
+                // console.log("canonicalRequest:\n\n" + canonicalRequest);
 
                 var stringToSign = authAlgorithm + '\n' + xRequestDate + '\n' + developerId + '\n' + this.hexEncodedHash(canonicalRequest);
 
-                //console.log("\n\nstringToSign:\n\n" + stringToSign);
+                // console.log("\n\nstringToSign:\n\n" + stringToSign);
 
-                //console.log("developerSecret: " + developerSecret);
+                // console.log("developerSecret: " + developerSecret);
 
                 var kSigning = this.crypto.createHmac(algorithms[algorithm], xRequestDate).update(authNonce + developerSecret).digest('hex');
 
-                //console.log("\n\nkSigning: " + kSigning);
+                // console.log("\n\nkSigning: " + kSigning);
 
                 authSignature = this.crypto.createHmac(algorithms[algorithm], kSigning).update(stringToSign).digest('hex');
 
                 var xAuthorization = "Algorithm=" + authAlgorithm + ", Credential=" + authCredentials + ", SignedHeaders=" + authSignedHeaders + ", Nonce=" + authNonce + ", Signature=" + authSignature;
 
-                //console.log("\n\nxAuthorization: " + xAuthorization);
+                // console.log("\n\nxAuthorization: " + xAuthorization);
 
                 headers["X-Authorization"] = xAuthorization;
 
@@ -1305,9 +1346,9 @@ module vvRestApi {
                     return 'vvclient-nodejs/' + this.serviceCoreSettings.VERSION + ' ' + this.engine();
                 }
 
-                uriEscape(string) {
+                uriEscape(inputString) {
                     /*jshint undef:false */
-                    var output = encodeURIComponent(string);
+                    var output = encodeURIComponent(inputString);
                     output = output.replace(/[^A-Za-z0-9_.~\-%]+/g, escape);
 
                     // VV percent-encodes some extra non-standard characters in a URI
@@ -1318,9 +1359,9 @@ module vvRestApi {
                     return output;
                 }
 
-                uriEscapePath(string) {
+                uriEscapePath(inputString) {
                     var parts = [];
-                    this.arrayEach(string.split('/'), function (part) {
+                    this.arrayEach(inputString.split('/'), function (part) {
                         parts.push(this.uriEscape(part));
                     });
                     return parts.join('/');
