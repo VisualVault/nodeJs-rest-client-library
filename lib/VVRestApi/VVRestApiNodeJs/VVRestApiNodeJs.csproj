@@ -74,6 +74,7 @@
     <Content Include="routes\scripts.min.js">
       <DependentUpon>scripts.ts</DependentUpon>
     </Content>
+    <Content Include="Quick Start.txt" />
     <Content Include="samples\sampleScheduledScript.js">
       <DependentUpon>sampleScheduledScript.ts</DependentUpon>
     </Content>

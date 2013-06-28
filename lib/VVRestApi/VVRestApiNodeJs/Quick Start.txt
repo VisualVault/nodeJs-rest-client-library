@@ -1,0 +1,13 @@
+﻿You must have the following items installed in the base directory of your project:
+	npm install js-yaml
+	npm install q
+	npm install request
+	npm install node-uuid
+
+
+To debug install node-inspector
+	npm install node-inspector
+
+Then run your file by typing 'node --debug-brk myFile.js' in a command window.
+
+In another command window run 'node-inspector'
