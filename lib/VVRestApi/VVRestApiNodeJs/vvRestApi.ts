@@ -219,7 +219,6 @@ module vvRestApi {
             var rs = new common.requestSigning();
             rs.sign(options.headers, options.uri, options.qs, options.method, options.json, developerId, developerSecret);
 
-
             //console.log(options);
 
             // console.log("\n\nSending request for access token to " + urlSecurity + "\n\n");
@@ -289,15 +288,7 @@ module vvRestApi {
 
                 return this.doVvClientRequest(url, opts, params, data);
             }
-
-
-            sortParams(params) {
-                debugger;
-                var sortedParams = null;
-
-                return params;
-            }
-
+            
             httpGet(url, params, requestCallback) {
                 var self = this;
 
@@ -308,7 +299,6 @@ module vvRestApi {
 
                 var headers = {};
 
-                params = this.sortParams(params);
                 var options = { method: 'GET', uri: url, qs: params || {}, headers: headers, json: null };
 
                 //if security token hasn't been acquired then get it
@@ -340,7 +330,6 @@ module vvRestApi {
                 // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
                 var headers = {};
 
-                params = this.sortParams(params);
                 var options = { method: 'POST', uri: url, qs: params || {}, json: data, headers: headers };
 
                 //if security token hasn't been acquired then get it
@@ -371,7 +360,6 @@ module vvRestApi {
                 // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
                 var headers = {};
 
-                params = this.sortParams(params);
                 var options = { method: 'PUT', uri: url, qs: params || {}, json: data, headers: headers };
 
                 //if security token hasn't been acquired then get it
@@ -402,7 +390,6 @@ module vvRestApi {
                 // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
                 var headers = {};
 
-                params = this.sortParams(params);
                 var options = { method: 'DELETE', uri: url, qs: params || {}, json: null, headers: headers };
 
 
@@ -496,7 +483,6 @@ module vvRestApi {
                 var deferred = this.Q.defer();
 
                 var vvClientRequestCallback = function (error, response, responseData) {
-                    debugger;
                     if (error) {
                         console.log('In vvClientRequestCallback with error condition');
                         deferred.reject(new Error(error));
@@ -508,7 +494,12 @@ module vvRestApi {
                             var errorData = JSON.parse(responseData);
                             deferred.reject(new Error(errorData.meta));
                         } else {
-                            console.log('In vvClientRequestCallback with success: ' + responseData);
+                            if (typeof responseData == "object" && responseData != null) {
+                                console.log('In vvClientRequestCallback with success: ' + JSON.stringify(responseData));
+                            } else {
+                                console.log('In vvClientRequestCallback with success: ' + responseData);
+                            }
+                            
                             deferred.resolve(responseData);
                         }
                     }
@@ -691,12 +682,14 @@ module vvRestApi {
             * @param {String} algorithm     Allowed values are: RIPEMD160, SHA1, SHA256, SHA384. SHA512, MD5.
             */
             sign(headers, targetUrl, qsParams, method, data, developerId, developerSecret) {
+                //console.log("START SIGNING");
+                //console.log("Data: " + data);
+
                 var algorithm = 'SHA256';
                 var requestDate = new Date();
                 var xRequestDate = requestDate.toISOString();
                 headers["X-VV-RequestDate"] = xRequestDate;
 
-                debugger;
                 var sortedParams = this.sortQueryStringParamObject(qsParams, '', true);
                 //var queryString = sortedParams.join("&");
                 var queryString = '';
@@ -718,7 +711,7 @@ module vvRestApi {
 
                     queryString = '?' + queryString;
                 }
-                // console.log("CALCULATED QUERYSTRING: " + queryString);
+                //console.log("CALCULATED QUERYSTRING: " + queryString);
                 var fixedUrl = targetUrl + queryString;
                 // console.log("CALCULATED fixedUrl: " + fixedUrl);
 
@@ -768,7 +761,7 @@ module vvRestApi {
 
                 var xAuthorization = "Algorithm=" + authAlgorithm + ", Credential=" + authCredentials + ", SignedHeaders=" + authSignedHeaders + ", Nonce=" + authNonce + ", Signature=" + authSignature;
 
-                //console.log("\n\nxAuthorization: " + xAuthorization);
+               //console.log("\n\nxAuthorization: " + xAuthorization);
 
                 headers["X-Authorization"] = xAuthorization;
 
@@ -783,8 +776,10 @@ module vvRestApi {
                 parts.push(this.canonicalHeaders());
                 parts.push(this.signedHeaders());
                 if (this.request.body != null && this.request.body.length > 0) {
+                    //console.log('has body');
                     parts.push(this.hexEncodedHash(this.request.body));
                 } else {
+                    //console.log('no body');
                     parts.push('');
                 }
                 return parts.join('\n');
@@ -1220,7 +1215,19 @@ module vvRestApi {
                     }
 
                     //this.headers['User-Agent'] = VV.util.userAgent();
-                    this.body = data || '';
+                    var jsonData = '';
+                    
+                    if (typeof data == "object" && data != null) {
+                        //console.log("parsing data to JSON");
+                        //console.log(data);
+                        jsonData = JSON.stringify(data);
+                        //console.log("parsed data:" + jsonData)
+                        this.body = jsonData || '';
+                    } else {
+                        this.body = data || '';
+                    }
+
+                    
                     this.endpoint = currentEndpoint;
                     this.region = region;
                 }
@@ -1230,7 +1237,6 @@ module vvRestApi {
                 }
 
                 search() {
-                    debugger;
                     return this.path.split('?', 2)[1] || '';
                 }
             }

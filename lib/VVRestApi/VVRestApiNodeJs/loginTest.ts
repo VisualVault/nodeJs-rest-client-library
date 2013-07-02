@@ -49,6 +49,26 @@ Q.when(
         console.log("getVaultApi succeeded");
         var myVault: clientLibrary.vvClient = result;
         debugger;
+
+        var toField = "test@visualvault.com";
+        var ccField = "test@visualvault.com";
+        var subjectField = "Test Subject";
+        var bodyField = "Test Body";
+        var emailData = {
+            recipients: '',
+            ccrecipients: '',
+            subject: '',
+            body: ''
+        };
+
+        emailData.recipients = toField;
+        emailData.ccrecipients = ccField;
+        emailData.subject = subjectField;
+        emailData.body = bodyField;
+
+        var emailParams = null;
+        myVault.email.postEmails(emailParams, emailData)
+
         var folders = myVault.library.getFolders(null);
 
         var data = {
@@ -64,7 +84,11 @@ Q.when(
         };
 
         myVault.sites.getSites(data2);
-    
+        
+        
+       
+            
+
     }
     )
     .fail(
