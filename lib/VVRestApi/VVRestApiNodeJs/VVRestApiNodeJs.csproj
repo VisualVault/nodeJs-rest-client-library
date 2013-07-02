@@ -111,9 +111,6 @@
   <ItemGroup>
     <Content Include="config.yml" />
     <Content Include="web.config" />
-    <Content Include="app.js.map">
-      <DependentUpon>app.ts</DependentUpon>
-    </Content>
     <Content Include="samples\sampleUserScript.min.js.map">
       <DependentUpon>sampleUserScript.js</DependentUpon>
     </Content>

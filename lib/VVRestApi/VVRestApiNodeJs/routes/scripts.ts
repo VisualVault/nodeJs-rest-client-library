@@ -59,8 +59,21 @@ exports.scripts = function (req, res) {
                 res.json(201, meta);
             } else {
                 console.log("loading user script file");
-
+                
                 //load user file
+                try {
+                    
+                    for (var p in require.cache) {
+                        if (p.indexOf(fileId) > -1) {
+                            console.log("deleting cached user script file: " + p);
+                            delete require.cache[p]    
+                        }                       
+                    }
+                    
+				} catch(ex) {
+                    console.log(ex);
+                }
+
                 var user = require("../files/" + fileId);
                 // YOU CAN SWAP OUT YOUR SCRIPT HERE IF YOU WANT TO TEST
                 //var user = require("../userscript");
