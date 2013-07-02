@@ -7,6 +7,8 @@ import express3 = module("express");
 var message = "Web site starting";
 console.log(message);
 
+var routeAlias = 'scriptserver';
+
 var express = require('express')
     , scriptController = require('./routes/scripts')
     , scheduleController = require('./routes/scheduledscripts')
@@ -30,23 +32,23 @@ app.configure('development', function () {
     app.use(express.errorHandler());
 });
 
-app.get('/vvnodeserver', scriptController.testsite);
-app.get('/node/vvnodeserver', scriptController.testsite);
+app.get('/' + routeAlias, scriptController.testsite);
+app.get('/node/' + routeAlias, scriptController.testsite);
 
-app.get('/vvnodeserver/app.js', scriptController.testsite);
-app.get('/node/vvnodeserver/app.js', scriptController.testsite);
+app.get('/' + routeAlias + '/app.js', scriptController.testsite);
+app.get('/node/' + routeAlias + '/app.js', scriptController.testsite);
 
-app.post('/vvnodeserver/scripts', scriptController.scripts);
-app.post('/node/vvnodeserver/scripts', scriptController.scripts);
+app.post('/' + routeAlias + '/scripts', scriptController.scripts);
+app.post('/node/' + routeAlias + '/scripts', scriptController.scripts);
 
-app.get('/vvnodeserver/scripts', scriptController.scripts);
-app.get('/node/vvnodeserver/scripts', scriptController.scripts);
+app.get('/' + routeAlias + '/scripts', scriptController.scripts);
+app.get('/node/' + routeAlias + '/scripts', scriptController.scripts);
 
-app.post('/vvnodeserver/scheduledscripts', scheduleController.processRequest);
-app.post('/node/vvnodeserver/scheduledscripts', scheduleController.processRequest);
+app.post('/' + routeAlias + '/scheduledscripts', scheduleController.processRequest);
+app.post('/node/' + routeAlias + '/scheduledscripts', scheduleController.processRequest);
 
-app.get('/vvnodeserver/scheduledscripts', scheduleController.processRequest);
-app.get('/node/vvnodeserver/scheduledscripts', scheduleController.processRequest);
+app.get('/' + routeAlias + '/scheduledscripts', scheduleController.processRequest);
+app.get('/node/' + routeAlias + '/scheduledscripts', scheduleController.processRequest);
 
 
 http.createServer(app).listen(app.get('port'), function () {
