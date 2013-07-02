@@ -13,9 +13,9 @@ module vvRestApi {
         public users: users.usersManager;
 
         constructor(sessionToken: common.sessionToken) {
-            var yamlConfig = require('./config.yml');            
+            var yamlConfig = require('./config.yml');
             this._httpHelper = new common.httpHelper(sessionToken, yamlConfig);
-            
+
             this.email = new email.emailManager(this._httpHelper);
             this.forms = new forms.formsManager(this._httpHelper);
             this.groups = new groups.groupsManager(this._httpHelper);
@@ -29,7 +29,7 @@ module vvRestApi {
         }
 
         private acquireSecurityToken() {
-            return this._httpHelper.acquireSecurityToken();          
+            return this._httpHelper.acquireSecurityToken();
         }
 
         public getSecurityToken() {
@@ -219,11 +219,11 @@ module vvRestApi {
             var rs = new common.requestSigning();
             rs.sign(options.headers, options.uri, options.qs, options.method, options.json, developerId, developerSecret);
 
-           
+
             //console.log(options);
 
-           // console.log("\n\nSending request for access token to " + urlSecurity + "\n\n");
-           // console.log("token: " + token);
+            // console.log("\n\nSending request for access token to " + urlSecurity + "\n\n");
+            // console.log("token: " + token);
             //make request for security token using signed JWT token
             this.nodeJsRequest(options, function (error, response, body) {
                 getTokenCallback(error, response, body);
@@ -244,13 +244,13 @@ module vvRestApi {
             nodeJsRequest: any;
             Q: any;
             httpHelper: common.httpHelper;
-     
+
             constructor(sessionToken: common.sessionToken, yamlConfig: any) {
                 this.HTTP = require('http');
                 this.jsyaml = require('js-yaml');
                 this.nodeJsRequest = require('request');
                 this.Q = require('q');
-                
+
                 this._sessionToken = sessionToken;
                 this._config = yamlConfig;
             }
@@ -290,6 +290,14 @@ module vvRestApi {
                 return this.doVvClientRequest(url, opts, params, data);
             }
 
+
+            sortParams(params) {
+                debugger;
+                var sortedParams = null;
+
+                return params;
+            }
+
             httpGet(url, params, requestCallback) {
                 var self = this;
 
@@ -300,10 +308,11 @@ module vvRestApi {
 
                 var headers = {};
 
+                params = this.sortParams(params);
                 var options = { method: 'GET', uri: url, qs: params || {}, headers: headers, json: null };
 
                 //if security token hasn't been acquired then get it
-                
+
                 if (this._sessionToken.tokenBase64 == null) {
                     //send request for security token
                     this.__acquireNewTokenWithRequest(options, requestCallback);
@@ -331,7 +340,7 @@ module vvRestApi {
                 // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
                 var headers = {};
 
-
+                params = this.sortParams(params);
                 var options = { method: 'POST', uri: url, qs: params || {}, json: data, headers: headers };
 
                 //if security token hasn't been acquired then get it
@@ -362,6 +371,7 @@ module vvRestApi {
                 // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
                 var headers = {};
 
+                params = this.sortParams(params);
                 var options = { method: 'PUT', uri: url, qs: params || {}, json: data, headers: headers };
 
                 //if security token hasn't been acquired then get it
@@ -392,7 +402,7 @@ module vvRestApi {
                 // X-Authorization, X-VV-RequestDate, X-VV-ContentMD5
                 var headers = {};
 
-                
+                params = this.sortParams(params);
                 var options = { method: 'DELETE', uri: url, qs: params || {}, json: null, headers: headers };
 
 
@@ -433,7 +443,7 @@ module vvRestApi {
 
                         var rs = new common.requestSigning();
                         rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
-                        
+
                         //make call
                         this.nodeJsRequest(options, function (error, response, body) {
                             requestCallback(error, response, body);
@@ -464,7 +474,7 @@ module vvRestApi {
 
                         var rs = new common.requestSigning();
                         rs.sign(options.headers, options.uri, options.qs, options.method, options.json, this._sessionToken.developerId, this._sessionToken.developerSecret);
-                        
+
                         //make call
                         this.nodeJsRequest(options, function (error, response, body) {
                             requestCallback(error, response, body);
@@ -625,28 +635,56 @@ module vvRestApi {
                 this.crypto = require('crypto');
                 this.uuid = require('node-uuid');
                 this.nodeJsRequest = require('request');
-                
+
                 this.serviceSettings = new common.services.apiServiceCoreSettings();
             }
             private endsWith(source, suffix) {
                 return source.indexOf(suffix, source.length - suffix.length) !== -1;
             }
 
-            private serializeQueryStringParamObject(obj, prefix, uriEncode) {
+            private sortQueryStringParamObject(obj, prefix, uriEncode) {
                 var str = [];
                 for (var p in obj) {
-                    if (obj.hasOwnProperty(p)) {
+                     if (obj.hasOwnProperty(p)) {
                         var k = prefix ? prefix + "[" + p + "]" : p,
                             v = obj[p];
                         if (uriEncode) {
-                            str.push(typeof v == "object" ? this.serializeQueryStringParamObject(v, k, uriEncode) : k + "=" + encodeURIComponent(v));
+                            if (typeof v == "undefined" || v == null) {
+                                str.push({ key: k, value: '', output: k + "=" });
+                            }
+                            else if (typeof v == "object") {
+                                str.push(this.sortQueryStringParamObject(v, k, uriEncode));
+                            } else {
+                                if (v == null) {
+                                    v = '';
+                                }
+                                str.push({ key: k, value: v, output: k + "=" + encodeURIComponent(v) });
+                            }
                         } else {
-                            str.push(typeof v == "object" ? this.serializeQueryStringParamObject(v, k, uriEncode) : k + "=" + v);
+                            if (typeof v == "undefined" || v == null) {
+                                str.push({ key: k, value: '', output: k + "=" });
+                            }
+                            else if (typeof v == "object") {
+                                str.push(this.sortQueryStringParamObject(v, k, uriEncode));
+                            } else {
+                                if (v == null) {
+                                    v = '';
+                                }
+                                str.push({ key: k, value: v, output: k + "=" + v });
+                            }
                         }
-                        
-                    }
+                    } 
                 }
-                return str.join("&");
+                var sorted = str.sort(function (a, b) {
+                    if (a.key > b.key)
+                        return 1;
+                    if (a.key < b.key)
+                        return -1;
+                    // a must be equal to b
+                    return 0;
+                });
+
+                return sorted;
             }
             /**
             * Signs a request and returns a string that can be placed in the X-Authentication
@@ -657,9 +695,22 @@ module vvRestApi {
                 var requestDate = new Date();
                 var xRequestDate = requestDate.toISOString();
                 headers["X-VV-RequestDate"] = xRequestDate;
+
+                debugger;
+                var sortedParams = this.sortQueryStringParamObject(qsParams, '', true);
+                //var queryString = sortedParams.join("&");
+                var queryString = '';
+
+                var outputOnly = [];
                 
-                var queryString = this.serializeQueryStringParamObject(qsParams, '', true);
-            
+                for (var i = 0, len = sortedParams.length; i < len; ++i) {
+                    outputOnly[i] = sortedParams[i].output;
+                }
+
+                queryString = outputOnly.join("&");
+                
+                //console.log("sorted qs: " + queryString);
+
                 if (queryString.length > 0) {
                     if (this.endsWith(targetUrl, '?')) {
                         targetUrl = targetUrl.substring(0, targetUrl.length - 1);
@@ -667,10 +718,10 @@ module vvRestApi {
 
                     queryString = '?' + queryString;
                 }
-               // console.log("CALCULATED QUERYSTRING: " + queryString);
+                // console.log("CALCULATED QUERYSTRING: " + queryString);
                 var fixedUrl = targetUrl + queryString;
-               // console.log("CALCULATED fixedUrl: " + fixedUrl);
-               
+                // console.log("CALCULATED fixedUrl: " + fixedUrl);
+
                 algorithm = algorithm || 'HS256';
                 var algorithms = {
                     RIPEMD160: 'ripemd160',
@@ -701,23 +752,23 @@ module vvRestApi {
                 authSignedHeaders = this.signedHeaders();
                 //CREATE THE CANONICAL REQUEST
                 var canonicalRequest = this.createCanonicalRequest();
-                // console.log("canonicalRequest:\n\n" + canonicalRequest);
+                //console.log("canonicalRequest:\n\n" + canonicalRequest);
 
                 var stringToSign = authAlgorithm + '\n' + xRequestDate + '\n' + developerId + '\n' + this.hexEncodedHash(canonicalRequest);
 
-                // console.log("\n\nstringToSign:\n\n" + stringToSign);
+                //console.log("\n\nstringToSign:\n\n" + stringToSign);
 
-                // console.log("developerSecret: " + developerSecret);
+                //console.log("developerSecret: " + developerSecret);
 
                 var kSigning = this.crypto.createHmac(algorithms[algorithm], xRequestDate).update(authNonce + developerSecret).digest('hex');
 
-                // console.log("\n\nkSigning: " + kSigning);
+                //console.log("\n\nkSigning: " + kSigning);
 
                 authSignature = this.crypto.createHmac(algorithms[algorithm], kSigning).update(stringToSign).digest('hex');
 
                 var xAuthorization = "Algorithm=" + authAlgorithm + ", Credential=" + authCredentials + ", SignedHeaders=" + authSignedHeaders + ", Nonce=" + authNonce + ", Signature=" + authSignature;
 
-                // console.log("\n\nxAuthorization: " + xAuthorization);
+                //console.log("\n\nxAuthorization: " + xAuthorization);
 
                 headers["X-Authorization"] = xAuthorization;
 
@@ -1179,6 +1230,7 @@ module vvRestApi {
                 }
 
                 search() {
+                    debugger;
                     return this.path.split('?', 2)[1] || '';
                 }
             }
@@ -1427,7 +1479,7 @@ module vvRestApi {
             }
         }
     }
-    
+
     export module forms {
         export class formFieldCollection {
             _ffColl: any;
@@ -1524,7 +1576,7 @@ module vvRestApi {
                 var url = this._httpHelper.getUrl(resourceUri + '/' + formId);
 
                 var opts = { method: 'POST' };
-                
+
                 return this._httpHelper.doVvClientRequest(url, opts, params, data);
             }
         }
@@ -1539,7 +1591,7 @@ module vvRestApi {
                 this._httpHelper = httpHelper;
             }
 
-        
+
 
         }
     }
@@ -1552,7 +1604,7 @@ module vvRestApi {
                 this._httpHelper = httpHelper;
             }
 
-            
+
             //get the Folders
             getFolders(params) {
                 var url = this._httpHelper.getUrl(this._httpHelper._config.ResourceUri.Folders);
@@ -1577,7 +1629,7 @@ module vvRestApi {
 
     export module sites {
         export class sitesManager {
-            
+
             _httpHelper: common.httpHelper
 
             constructor(httpHelper: common.httpHelper) {
@@ -1654,7 +1706,7 @@ module vvRestApi {
                 this._httpHelper = httpHelper;
             }
 
-            
+
             //get list of users
             getUsers(params, siteId) {
                 var resourceUri = this._httpHelper._config.ResourceUri.Users.replace('{id}', siteId);
@@ -1684,7 +1736,7 @@ module vvRestApi {
 
                 return this._httpHelper.doVvClientRequest(url, opts, params, data);
             }
-           
+
         }
     }
 }

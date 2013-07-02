@@ -1,4 +1,5 @@
 ﻿You must have the following items installed in the base directory of your project:
+	npm install express
 	npm install js-yaml
 	npm install q
 	npm install request

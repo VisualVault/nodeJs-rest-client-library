@@ -41,20 +41,34 @@ import clientLibrary = require('./vvRestApi');
 
 var vvAuthorize = new clientLibrary.authorize();
 
- Q.when(
-         vvAuthorize.getVaultApi(apiKey, developerId, developerSecret, vaultServerUrl, customerAlias, databaseAlias)
-	 )
-	 .then(
-		 function (result) {
-			 console.log("getVaultApi succeeded");
-			 var myVault: clientLibrary.vvClient = result;
-             debugger;
-             var folders = myVault.library.getFolders(null);
-             
-		 }
-	 )
-	 .fail(
-		 function (tokenError) {
-			 console.log("Supervisor: Error response: " + tokenError.message);			 
-		 }
- );
+Q.when(
+    vvAuthorize.getVaultApi(apiKey, developerId, developerSecret, vaultServerUrl, customerAlias, databaseAlias)
+    )
+    .then(
+    function (result) {
+        console.log("getVaultApi succeeded");
+        var myVault: clientLibrary.vvClient = result;
+        debugger;
+        var folders = myVault.library.getFolders(null);
+
+        var data = {
+            q: "name eq 'My site'",
+            fields: "id, name"
+        };
+
+        myVault.sites.getSites(data);
+
+        var data2 = {
+            q: null,
+            fields: "id, name"
+        };
+
+        myVault.sites.getSites(data2);
+    
+    }
+    )
+    .fail(
+    function (tokenError) {
+        console.log("Supervisor: Error response: " + tokenError.message);
+    }
+    );
