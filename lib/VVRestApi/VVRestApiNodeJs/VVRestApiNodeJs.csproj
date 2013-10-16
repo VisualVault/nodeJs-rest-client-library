@@ -62,6 +62,8 @@
       <DependentUpon>app.ts</DependentUpon>
     </Content>
     <Content Include="app.ts" />
+    <TypeScriptCompile Include="app.ts" />
+    
     <Content Include="routes\scheduledscripts.js">
       <DependentUpon>scheduledscripts.ts</DependentUpon>
     </Content>
@@ -82,6 +84,7 @@
       <DependentUpon>sampleScheduledScript.ts</DependentUpon>
     </Content>
     <Content Include="samples\sampleScheduledScript.ts" />
+    <TypeScriptCompile Include="samples\sampleScheduledScript.ts" />
     <Content Include="samples\sampleUserScript.js">
       <DependentUpon>sampleUserScript.ts</DependentUpon>
     </Content>
@@ -89,6 +92,7 @@
       <DependentUpon>sampleUserScript.ts</DependentUpon>
     </Content>
     <Content Include="samples\sampleUserScript.ts" />
+    <TypeScriptCompile Include="samples\sampleUserScript.ts" />
     <Content Include="vvRestApi.js">
       <DependentUpon>vvRestApi.ts</DependentUpon>
     </Content>
@@ -96,6 +100,7 @@
       <DependentUpon>vvRestApi.ts</DependentUpon>
     </Content>
     <Content Include="vvRestApi.ts" />
+    <TypeScriptCompile Include="vvRestApi.ts" />
     <Content Include="loginTest.js">
       <DependentUpon>loginTest.ts</DependentUpon>
     </Content>
@@ -103,10 +108,15 @@
       <DependentUpon>loginTest.ts</DependentUpon>
     </Content>
     <Content Include="loginTest.ts" />
+    <TypeScriptCompile Include="loginTest.ts" />
     <Content Include="dts\express.d.ts" />
     <Content Include="dts\node.d.ts" />
     <Content Include="routes\scheduledscripts.ts" />
+    <TypeScriptCompile Include="routes\scheduledscripts.ts" />
+    
     <Content Include="routes\scripts.ts" />
+    <TypeScriptCompile Include="routes\Scripts.ts" />
+
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.yml" />
@@ -119,6 +129,11 @@
     <Folder Include="Common\" />
     <Folder Include="files\" />
     <Folder Include="signing\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="routes\scripts.min.js.map">
+      <DependentUpon>scripts.js</DependentUpon>
+    </Content>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" />
 </Project>

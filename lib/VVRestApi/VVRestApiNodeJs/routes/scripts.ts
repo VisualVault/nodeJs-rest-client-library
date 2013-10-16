@@ -16,31 +16,50 @@ exports.scripts = function (req, res) {
     var meta = { code: 400, error: ''};
     var attemptCount = 0;
 
-    // create the FormFieldCollection object populating
-    // with the form fields from the body of the request
-    if (typeof req.body.script === 'undefined') {
+
+    var script = null;
+    var baseUrl = null;
+    var ffColl = null;
+
+
+    if (req.body instanceof Array) {
+        for (var x = 0; x < req.body.length; x++) {
+            var key = req.body[x].Key;
+            var value = req.body[x].Value;
+
+            if (key == "script") {
+                //retrieve script from form encoded post
+                script = value;
+            } else if (key == "baseUrl") {
+                //retrieve baseUrl from form encoded post
+                baseUrl = value;
+            } else if (key == "fields") {
+                //create formfield collection from form encoded post
+                ffColl = JSON.parse(value);
+            }
+        }
+    } else {
+        console.log('Error, body of request did not contain key/value pairs for script and baseurl values');
+        meta.code = 201;
+        meta.error = "Error, body of request did not contain key/value pairs for script and baseurl values";
+        res.json(201, meta);
+    }
+
+
+    if (script === null) {
         console.log('Error, undefined form value named script');
         meta.code = 201;
         meta.error = "script not found";
         res.json(201, meta);
     }
-
-    //retrieve script from form encoded post
-    var script = req.body.script;
-
-    if (typeof req.body.baseUrl === 'undefined') {
+    
+    if (baseUrl === null) {
         console.log('Error, undefined form value named baseUrl');
         meta.code = 201;
         meta.error = "baseUrl not found";
         res.json(201, meta);
     }
 
-   
-    //retrieve baseUrl from form encoded post
-    var baseUrl = req.body.baseUrl;
-
-    //create formfield collection from form encoded post
-    var ffColl = new clientLibrary.forms.formFieldCollection(JSON.parse(req.body.fields));
 
     //test for valid script id on the queryString
     if (typeof req.query.id === 'string') {
@@ -70,7 +89,7 @@ exports.scripts = function (req, res) {
                         }                       
                     }
                     
-				} catch(ex) {
+                } catch(ex) {
                     console.log(ex);
                 }
 
