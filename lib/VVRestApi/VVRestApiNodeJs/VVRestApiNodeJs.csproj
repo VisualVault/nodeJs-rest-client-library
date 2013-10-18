@@ -55,28 +55,11 @@
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="app.js">
-      <DependentUpon>app.ts</DependentUpon>
-    </Content>
-    <Content Include="app.min.js">
-      <DependentUpon>app.ts</DependentUpon>
-    </Content>
-    <Content Include="app.ts" />
-    <TypeScriptCompile Include="app.ts" />
-    
-    <Content Include="routes\scheduledscripts.js">
-      <DependentUpon>scheduledscripts.ts</DependentUpon>
-    </Content>
-    <Content Include="routes\scheduledscripts.min.js">
-      <DependentUpon>scheduledscripts.ts</DependentUpon>
-    </Content>
-    <Content Include="routes\scripts.js">
-      <DependentUpon>scripts.ts</DependentUpon>
-    </Content>
-    <Content Include="routes\scripts.min.js">
-      <DependentUpon>scripts.ts</DependentUpon>
-    </Content>
+    <Content Include="app.js" />
+    <Content Include="loginTest.js" />
     <Content Include="Quick Start.txt" />
+    <Content Include="routes\scheduledscripts.js" />
+    <Content Include="routes\scripts.js" />
     <Content Include="samples\sampleScheduledScript.js">
       <DependentUpon>sampleScheduledScript.ts</DependentUpon>
     </Content>
@@ -93,33 +76,12 @@
     </Content>
     <Content Include="samples\sampleUserScript.ts" />
     <TypeScriptCompile Include="samples\sampleUserScript.ts" />
-    <Content Include="vvRestApi.js">
-      <DependentUpon>vvRestApi.ts</DependentUpon>
-    </Content>
-    <Content Include="vvRestApi.min.js">
-      <DependentUpon>vvRestApi.ts</DependentUpon>
-    </Content>
-    <Content Include="vvRestApi.ts" />
-    <TypeScriptCompile Include="vvRestApi.ts" />
-    <Content Include="loginTest.js">
-      <DependentUpon>loginTest.ts</DependentUpon>
-    </Content>
-    <Content Include="loginTest.min.js">
-      <DependentUpon>loginTest.ts</DependentUpon>
-    </Content>
-    <Content Include="loginTest.ts" />
-    <TypeScriptCompile Include="loginTest.ts" />
     <Content Include="dts\express.d.ts" />
     <Content Include="dts\node.d.ts" />
-    <Content Include="routes\scheduledscripts.ts" />
-    <TypeScriptCompile Include="routes\scheduledscripts.ts" />
-    
-    <Content Include="routes\scripts.ts" />
-    <TypeScriptCompile Include="routes\Scripts.ts" />
-
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.yml" />
+    <Content Include="VVRestApi.js" />
     <Content Include="web.config" />
     <Content Include="samples\sampleUserScript.min.js.map">
       <DependentUpon>sampleUserScript.js</DependentUpon>
@@ -130,10 +92,4 @@
     <Folder Include="files\" />
     <Folder Include="signing\" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="routes\scripts.min.js.map">
-      <DependentUpon>scripts.js</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" />
 </Project>
