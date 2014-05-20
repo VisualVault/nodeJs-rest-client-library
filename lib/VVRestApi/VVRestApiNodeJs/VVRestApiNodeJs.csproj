@@ -60,22 +60,8 @@
     <Content Include="Quick Start.txt" />
     <Content Include="routes\scheduledscripts.js" />
     <Content Include="routes\scripts.js" />
-    <Content Include="samples\sampleScheduledScript.js">
-      <DependentUpon>sampleScheduledScript.ts</DependentUpon>
-    </Content>
-    <Content Include="samples\sampleScheduledScript.min.js">
-      <DependentUpon>sampleScheduledScript.ts</DependentUpon>
-    </Content>
-    <Content Include="samples\sampleScheduledScript.ts" />
+    <Content Include="samples\SampleCustomScript.js" />
     <TypeScriptCompile Include="samples\sampleScheduledScript.ts" />
-    <Content Include="samples\sampleUserScript.js">
-      <DependentUpon>sampleUserScript.ts</DependentUpon>
-    </Content>
-    <Content Include="samples\sampleUserScript.min.js">
-      <DependentUpon>sampleUserScript.ts</DependentUpon>
-    </Content>
-    <Content Include="samples\sampleUserScript.ts" />
-    <TypeScriptCompile Include="samples\sampleUserScript.ts" />
     <Content Include="dts\express.d.ts" />
     <Content Include="dts\node.d.ts" />
   </ItemGroup>
@@ -83,9 +69,6 @@
     <Content Include="config.yml" />
     <Content Include="VVRestApi.js" />
     <Content Include="web.config" />
-    <Content Include="samples\sampleUserScript.min.js.map">
-      <DependentUpon>sampleUserScript.js</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Common\" />
