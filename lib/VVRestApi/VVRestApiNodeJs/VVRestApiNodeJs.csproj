@@ -55,7 +55,9 @@
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="app-Express4.js" />
     <Content Include="app.js" />
+    <Content Include="FileVersions.txt" />
     <Content Include="loginTest.js" />
     <Content Include="Quick Start.txt" />
     <Content Include="routes\scheduledscripts.js" />
