@@ -58,6 +58,7 @@
     <Content Include="app-Express4.js" />
     <Content Include="app.js" />
     <Content Include="FileVersions.txt" />
+    <Content Include="Installation of Node Js.txt" />
     <Content Include="loginTest.js" />
     <Content Include="Quick Start.txt" />
     <Content Include="routes\scheduledscripts.js" />
@@ -76,5 +77,8 @@
     <Folder Include="Common\" />
     <Folder Include="files\" />
     <Folder Include="signing\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Installation of Node JS.docx" />
   </ItemGroup>
 </Project>

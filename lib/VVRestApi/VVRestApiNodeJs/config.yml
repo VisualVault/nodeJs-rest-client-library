@@ -5,11 +5,6 @@
 ApiUri: /api/v1/{custalias}/{custdbalias}
 AutheticateUri: /OAuth/Token
 
-#DeveloperId: Your DeveloperId here
-ClientId: ce9e042b-8755-42d5-97af-435afe70152b
-#DeveloperSecret:
-ClientSecret: /PbgaChHbPoboS/1s07E6pfGCNFSdqPsDnB/yiKHfHw=
-
 # VisualVault endpoints
 ResourceUri:
   FormTemplates: /formtemplates
