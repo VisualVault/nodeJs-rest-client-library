@@ -1,5 +1,7 @@
-﻿Installation of Node JS:
-    Currently version v0.8.23 has been tested and confirmed to work with all dependencies
+﻿About NodeJs Client Library
+    
+
+Installation of Node JS:
     Install may be downloaded from  - http://nodejs.org/download/
 
 Install IISNode:
@@ -30,7 +32,7 @@ Creating IIS site:  Default Web Site/node
 
 
 Create subdirectory VVNodeServer
-    Physical path   -   c:\program files\iisnode\www\vvnodeserver
+    Physical path   -   c:\program files\iisnode\www\vvnodeserverNode
 
 
 Install package dependencies:
