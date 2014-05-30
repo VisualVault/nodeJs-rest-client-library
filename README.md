@@ -1,4 +1,4 @@
-nodeJs-rest-client-library
+nodeJs client library
 ==========================
 
-A nodeJS REST client library for VisualVault
+A nodeJS client library for VisualVault
