@@ -93,7 +93,7 @@ If you did not install IISNode the vvnodeserver directory may be created in any 
     npm install q@0.9.7
     npm install request@2.27.0
     npm install node-uuid@1.4.1
-    npm install winston
+    npm install winston@0.7.3
 
 
 ###Create subdirectory structure in the vvnodeserver directory
