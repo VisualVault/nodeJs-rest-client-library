@@ -9,6 +9,7 @@ AutheticateUri: /OAuth/Token
 ResourceUri:
   FormTemplates: /formtemplates
   Forms: /formtemplates/{id}/forms
+  FormInstance: /forminstance/{id}
   Sites: /sites
   Users: /sites/{id}/users
   Groups: /sites/{id}/groups
