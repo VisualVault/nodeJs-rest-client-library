@@ -16,3 +16,4 @@ ResourceUri:
   Folders: /folders
   Documents: /folders/{id}/documents
   Emails: /emails
+  ScheduledProcess: /scheduledProcess
