@@ -64,7 +64,7 @@ x64 - http://go.microsoft.com/?linkid=9722532
     C:\windows\system32\icacls.exe "c:\program files\iisnode\www" /grant IIS_IUSRS:(OI)(CI)F
 
 
-***-Create an IIS virtual directory***  
+***-Create an IIS Site***  
    
     Using Command prompt with running in administrator mode:
     C:\windows\system32\inetsrv\appcmd.exe add app /site.name:"Default Web Site" /path:/node /physicalPath:"c:\program files\iisnode\www"
@@ -107,8 +107,7 @@ If you did not install IISNode the vvnodeserver directory may be created in any 
 ####vvnodeserver\
     app.js
     config.yml
-    VVClient.js
-    VVEntities.js
+    VVRestApi.js
     web.config
 
 ####vvnodeserver\routes
