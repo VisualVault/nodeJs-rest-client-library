@@ -17,6 +17,7 @@ ResourceUri:
   Users: /sites/{id}/users
   Groups: /sites/{id}/groups
   GroupsUsers: /groups/{id}/users
+  GroupsAddUser: /groups/{groupId}/users/{userId}
   Folders: /folders
   Documents: /folders/{id}/documents
   Emails: /emails
