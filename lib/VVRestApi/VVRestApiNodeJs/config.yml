@@ -14,6 +14,7 @@ ResourceUri:
   FormInstance: /forminstance/{id}
   FormInstanceRelatedDocs: /forminstance/{id}/documents
   Sites: /sites
+  User: /users
   Users: /sites/{id}/users
   Groups: /sites/{id}/groups
   GroupsUsers: /groups/{id}/users
