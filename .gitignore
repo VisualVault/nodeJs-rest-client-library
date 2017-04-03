@@ -152,3 +152,9 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
+# local nodeJS dev
+.vscode
+lib/VVRestApi/VVRestApiNodeJS/node_modules
+lib/VVRestApi/VVRestApiNodeJS/files
+lib/VVRestApi/VVRestApiNodeJS/DCFPLADS
