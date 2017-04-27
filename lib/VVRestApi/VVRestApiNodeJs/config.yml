@@ -16,6 +16,7 @@ ResourceUri:
   Sites: /sites
   User: /users
   Users: /sites/{id}/users
+  GetGroups: /groups
   Groups: /sites/{id}/groups
   GroupsUsers: /groups/{id}/users
   GroupsAddUser: /groups/{groupId}/users/{userId}
