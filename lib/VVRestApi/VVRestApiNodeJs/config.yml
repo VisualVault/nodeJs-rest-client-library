@@ -25,3 +25,4 @@ ResourceUri:
   Emails: /emails
   ScheduledProcess: /scheduledProcess
   CustomQuery: /customquery
+  Scripts: /scripts
