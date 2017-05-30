@@ -13,6 +13,7 @@ ResourceUri:
   Forms: /formtemplates/{id}/forms
   FormInstance: /forminstance/{id}
   FormInstanceRelatedDocs: /forminstance/{id}/documents
+  FormInstanceRelatedForms: /forminstance/{id}/forms
   Sites: /sites
   User: /users
   Users: /sites/{id}/users
