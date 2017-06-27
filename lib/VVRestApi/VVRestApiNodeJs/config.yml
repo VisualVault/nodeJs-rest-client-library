@@ -7,10 +7,14 @@ AutheticateUri: /OAuth/Token
 
 # VisualVault endpoints
 ResourceUri:
+  DocumentsPost: /documents
+  Files: /files
   FilesQuery: /files?q=
   FilesId: /files/{id}
   FormTemplates: /formtemplates
   Forms: /formtemplates/{id}/forms
+  FormId: /formtemplates/{id}/forms/{formId}
+  FormIdPdf: /formtemplates/{id}/forms/{formId}/pdf
   FormInstance: /forminstance/{id}
   FormInstanceRelatedDocs: /forminstance/{id}/documents
   FormInstanceRelatedForms: /forminstance/{id}/forms
