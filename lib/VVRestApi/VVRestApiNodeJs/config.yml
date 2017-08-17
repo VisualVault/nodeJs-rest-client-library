@@ -8,6 +8,7 @@ AutheticateUri: /OAuth/Token
 # VisualVault endpoints
 ResourceUri:
   DocumentsPost: /documents
+  DocumentIndexFields: /documents/{id}/indexfields
   Files: /files
   FilesQuery: /files?q=
   FilesId: /files/{id}
