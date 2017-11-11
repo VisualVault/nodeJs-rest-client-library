@@ -27,7 +27,7 @@ There is a good tutorial with platform specific installation instructions locate
 
 https://code.visualstudio.com/docs/nodejs/nodejs-tutorial
 
-The VisualVault node.js client library requires node version 4.2.6 which is not the latest version of node.  Prior node release downloads can be found here:  https://nodejs.org/en/download/releases/
+**The VisualVault node.js client library requires node version 4.2.6 which is not the latest version of node.  Prior node release downloads can be found here:  https://nodejs.org/en/download/releases/**
 
 After installing node.js on your development machine you will need to install NPM packages required by the VisualVault node.js client library.  Install the following node packages using node package manager.  
 
