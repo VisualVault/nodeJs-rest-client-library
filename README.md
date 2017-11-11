@@ -7,15 +7,23 @@ VisualVault allows you to define Outside Services which may be called from Form 
 
 VisualVault Node.js integration allows you to store and execute JavaScript files capable of interacting with the VisualVault API. The scripts are stored and executed server-side allowing you to build a re-useable script library of business processes and automation.
 
-Getting Started
------------
- ***(1) Tell VisualVault where to find the node.js server***.
+How node.js scripts are used with VisualVault
+------
 
-For production use no action is required, VisualVault will select an available node.js server which has been pre-configured for you. 
+If you create node.js scripts that you wish to be executed by VisualVault Servers these scripts must be uploaded into the VisualVault microservices library (Outside Process library) from within the VisualVault control panel.
 
- ***(2) Setup your development machine with a JavaScript IDE and node.js***
+For production use, VisualVault will select an available node.js server and transmit your script to the node server for execution when required.  VisualVault can execute a node.js script on a scheduled basis or as the result of a VisualVault iForm event handler function.
 
-For development, install node.js on your dev machine there is a good tutorial with platform specific installation instructions located here:
+For development and debugging you can instruct VisualVault to send scripts to be executed to your development machine.  A public IP or DNS host name is required.  To specify a node.js debugging server address, log into VisualVault and click on the User menu (top right), next select the "My Preferences" menu option.  Within the preferences screen scroll down to locate the node.js server option.  Enable the debugging server and enter your node.js server URL where scripts will be posted to.
+
+Note:  The node.js server option will only be displayed on the my preferences screen if your account has developer access.
+
+Setup your development machine with a JavaScript IDE and node.js
+------
+
+Install node.js on your dev machine.  
+
+There is a good tutorial with platform specific installation instructions located here:
 
 https://code.visualstudio.com/docs/nodejs/nodejs-tutorial
 
@@ -25,16 +33,19 @@ After installing node.js on your development machine you will need to install NP
 
 Note: the packages must be installed using the optional version number for each package for compatibility.
 
+    npm install aws-sdk@2.63.0
     npm install express@3.4.1
     npm install js-yaml@2.1.3
     npm install q@0.9.7
     npm install request@2.27.0
     npm install node-uuid@1.4.1
-    npm install winston@0.7.3
+    npm install winston@2.3.1
+    npm install winston-cloudwatch-transport@1.0.8
 
- ***(3) Copy the files from the VisualVault node.js client library into your node project folder***.
+ Copy the files from the VisualVault node.js client library into your node project folder
+ ------
 
- ###Create the following subdirectory structure in your project
+ **Create the following subdirectory structure in your project**
 
 ####vvnodeserver\
     \files
@@ -52,11 +63,13 @@ Note: the packages must be installed using the optional version number for each 
     scheduledscripts.js
     scripts.js
 
-***(3) How to publish script files to VisualVault and debug***
+How to publish script files to VisualVault and debug
+------
 
 coming soon
 
-***(4) How to execute script files on your Development machine***
+How to execute script files on your Development machine
+------
 
 VisualVault will execute node scripts using Form buttons, Form scripts, or the script scheduler which executes a script at pre-defined intervals.
 
@@ -64,7 +77,8 @@ You can also execute a script directly on your development machine by following 
 
 coming soon
     
- ***(5) Example node.js script using VisualVault node.js client library***   
+ Example node.js script using VisualVault node.js client library
+ ------
 
 Additional examples available at [http:/developer.visualvault.com]
 
@@ -150,7 +164,8 @@ Q
     });
 ```
 
-  ***(6) Example of script executed by VisualVault servers***  
+  Example of script executed by VisualVault servers
+  ------
   
   coming soon
 
