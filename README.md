@@ -68,6 +68,7 @@ coming soon
 
 Additional examples available at [http:/developer.visualvault.com]
 
+```javascript
 //Example of a script which authenticates with VisualVault API, sends an email, gets a list of VisualVault folders, and gets a list of VisualVault sites
 
 //This script can be executed within your IDE.  Note:  When VisualVault servers invoke your script (vs. you executing the script) a specific function name and parameter list is required.  See the "Script invoked by VisualVault" example below.
@@ -143,6 +144,7 @@ Q
         //VisualVault node client library 
         console.log("Error response: " + tokenError.message);
     });
+```
 
   ***(6) Example of script executed by VisualVault servers***  
   
