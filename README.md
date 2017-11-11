@@ -51,7 +51,7 @@ Note: the packages must be installed using the optional version number for each 
     \files
     \routes
 
-**Place VisualVault node.js client library files in the \vvnodeserver and \vvnodeserver\routes directories
+**Place VisualVault node.js client library files in the \vvnodeserver and \vvnodeserver\routes directories**
 
 \vvnodeserver
     app.js
