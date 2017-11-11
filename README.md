@@ -42,24 +42,24 @@ Note: the packages must be installed using the optional version number for each 
     npm install winston@2.3.1
     npm install winston-cloudwatch-transport@1.0.8
 
- Copy the files from the VisualVault node.js client library into your node project folder
+ Clone or download this repository and copy the files into your node project folder
  ------
 
  **Create the following subdirectory structure in your project**
 
-####vvnodeserver\
+\vvnodeserver
     \files
     \routes
 
-###Place VisualVault node.js client library files in the \vvnodeserver and \vvnodeserver\routes directories
+**Place VisualVault node.js client library files in the \vvnodeserver and \vvnodeserver\routes directories
 
-####vvnodeserver\
+\vvnodeserver
     app.js
     config.yml
     VVRestApi.js
     web.config
 
-####vvnodeserver\routes
+\vvnodeserver\routes
     scheduledscripts.js
     scripts.js
 
