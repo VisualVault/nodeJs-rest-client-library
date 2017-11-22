@@ -27,6 +27,7 @@ ResourceUri:
   GroupsUsers: /groups/{id}/users
   GroupsAddUser: /groups/{groupId}/users/{userId}
   Folders: /folders
+  FolderIndexFields: /folders/{id}/indexfields
   Documents: /folders/{id}/documents
   Emails: /emails
   ScheduledProcess: /scheduledProcess
