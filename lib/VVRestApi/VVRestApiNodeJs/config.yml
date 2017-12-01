@@ -9,6 +9,7 @@ AutheticateUri: /OAuth/Token
 ResourceUri:
   DocumentsPost: /documents
   DocumentIndexFields: /documents/{id}/indexfields
+  DocumentAlertsId: /documents/{documentId}/alerts/{eventId}
   Files: /files
   FilesQuery: /files?q=
   FilesId: /files/{id}
@@ -28,8 +29,10 @@ ResourceUri:
   GroupsAddUser: /groups/{groupId}/users/{userId}
   Folders: /folders
   FolderIndexFields: /folders/{id}/indexfields
+  FolderAlertsId: /folders/{folderId}/alerts/{eventId}
   Documents: /folders/{id}/documents
   Emails: /emails
   ScheduledProcess: /scheduledProcess
   CustomQuery: /customquery
   Scripts: /scripts
+  ProjectAlertsId: /projects/{projectId}/alerts/{eventId}
