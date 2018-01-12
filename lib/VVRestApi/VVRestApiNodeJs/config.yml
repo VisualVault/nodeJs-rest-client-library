@@ -30,6 +30,8 @@ ResourceUri:
   Folders: /folders
   FolderIndexFields: /folders/{id}/indexfields
   FolderAlertsId: /folders/{folderId}/alerts/{eventId}
+  FolderSecurity: /folders/{folderId}/securitymembers
+  FolderSecurityId: /folders/{folderId}/securitymembers/{memberId}
   Documents: /folders/{id}/documents
   Emails: /emails
   ScheduledProcess: /scheduledProcess
