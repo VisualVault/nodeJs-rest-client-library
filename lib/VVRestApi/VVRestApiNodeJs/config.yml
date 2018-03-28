@@ -8,6 +8,7 @@ AutheticateUri: /OAuth/Token
 # VisualVault endpoints
 ResourceUri:
   DocumentsPost: /documents
+  DocumentsId: /documents/{id}
   DocumentIndexFields: /documents/{id}/indexfields
   DocumentAlertsId: /documents/{documentId}/alerts/{eventId}
   Files: /files
