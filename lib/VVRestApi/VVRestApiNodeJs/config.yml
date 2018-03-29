@@ -30,6 +30,7 @@ ResourceUri:
   GroupsUsers: /groups/{id}/users
   GroupsAddUser: /groups/{groupId}/users/{userId}
   Folders: /folders
+  FoldersId: /folders/{id}
   FolderIndexFields: /folders/{id}/indexfields
   FolderAlertsId: /folders/{folderId}/alerts/{eventId}
   FolderSecurity: /folders/{folderId}/securitymembers
