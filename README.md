@@ -29,10 +29,14 @@ https://code.visualstudio.com/docs/nodejs/nodejs-tutorial
 
 **The VisualVault node.js client library requires node version 4.2.6 which is not the latest version of node.  Prior node release downloads can be found here:  https://nodejs.org/en/download/releases/**
 
+**If you have a newer version of node.js on your development machine and don't wish to downgrade we suggest using the Node Version Manager**
+
+
+
 After installing node.js on your development machine you will need to install NPM packages required by the VisualVault node.js client library.  Install the following node packages using node package manager.  
 
 Note: the packages must be installed using the optional version number for each package for compatibility.
-
+```javascript
     npm install aws-sdk@2.63.0
     npm install express@3.4.1
     npm install js-yaml@2.1.3
@@ -41,8 +45,8 @@ Note: the packages must be installed using the optional version number for each 
     npm install node-uuid@1.4.1
     npm install winston@2.3.1
     npm install winston-cloudwatch-transport@1.0.8
-
- Clone or download this repository and copy the files into your node project folder
+```
+Clone or download this repository and copy the files into your node project folder
  ------
 
  **Create the following subdirectory structure in your project**
@@ -79,8 +83,6 @@ coming soon
     
  Example node.js script using VisualVault node.js client library
  ------
-
-Additional examples available at [http:/developer.visualvault.com]
 
 ```javascript
 //Example of a script which authenticates with VisualVault API, sends an email, 
