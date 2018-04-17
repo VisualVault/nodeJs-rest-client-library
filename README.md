@@ -88,7 +88,7 @@ If you go back to the File Explorer view (Ctrl+Shift+E), you'll see that VS Code
 
 ![Default launch.json file](https://code.visualstudio.com/assets/docs/editor/debugging/launch-json-in-explorer.png)
 
-**Example launch configuration to launch Node.js and execute a specific script file**
+**Example launch configuration to launch Node.js and execute the VisualVault node.js client library.  This launch configuration will startup the debugger listenting on port 3001.**
 
 ```json
 {    
@@ -118,6 +118,20 @@ If you go back to the File Explorer view (Ctrl+Shift+E), you'll see that VS Code
 }
 
 ```
+ 
+ How to publish script files to VisualVault and debug
+------
+
+coming soon
+
+How to execute script files on your Development machine
+------
+
+VisualVault will execute node scripts using Form buttons, Form scripts, or the script scheduler which executes a script at pre-defined intervals.
+
+You can also execute a script directly on your development machine by following these instructions:
+
+coming soon
  
  Example node.js script using VisualVault node.js client library
  ------
@@ -203,18 +217,6 @@ Q
         console.log("Error response: " + tokenError.message);
     });
 ```
-How to publish script files to VisualVault and debug
-------
 
-coming soon
-
-How to execute script files on your Development machine
-------
-
-VisualVault will execute node scripts using Form buttons, Form scripts, or the script scheduler which executes a script at pre-defined intervals.
-
-You can also execute a script directly on your development machine by following these instructions:
-
-coming soon
 
 
