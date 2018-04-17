@@ -21,19 +21,25 @@ Note:  The node.js server option will only be displayed on the my preferences sc
 Setup your development machine with a JavaScript IDE and node.js
 ------
 
-Install node.js on your dev machine.  
-
-There is a good tutorial with platform specific installation instructions located here:
-
-https://code.visualstudio.com/docs/nodejs/nodejs-tutorial
+Install node.js version 4.2.6 on your dev machine.  
 
 **The VisualVault node.js client library requires node version 4.2.6 which is not the latest version of node.  Prior node release downloads can be found here:  https://nodejs.org/en/download/releases/**
 
 **If you have a newer version of node.js on your development machine and don't wish to downgrade we suggest using the Node Version Manager available for [Linux / Mac](https://github.com/creationix/nvm) and [Windows](https://github.com/coreybutler/nvm-windows)**
 
+Download and install Visual Studio Code (or your favorite JavaScript IDE)
+------
 
+There is a good Node.js tutorial for Visual Studio code with platform specific installation instructions located here:
 
-After installing node.js on your development machine you will need to install NPM packages required by the VisualVault node.js client library.  Install the following node packages using node package manager.  
+https://code.visualstudio.com/docs/nodejs/nodejs-tutorial
+
+Install required NPM packages in your project folder
+------
+
+After installing node.js on your development machine you will need to install NPM packages required by the VisualVault node.js client library.  
+
+Navgiate to the root of your project folderr and execute the following NPM install commands from the command line.  
 
 Note: the packages must be installed using the optional version number for each package for compatibility.
 ```shell
@@ -49,13 +55,13 @@ Note: the packages must be installed using the optional version number for each 
 Clone this repository OR copy the following files into your node project folder
  ------
 
- **If adding the node.js client library to your project, create the following subdirectory structure**
+ **If adding the node.js client library to your existing project, create the following subdirectory structure**
 
 \vvnodeserver
     \files
     \routes
 
-**If adding the node.js client library to your project, include the following files**
+**If adding the node.js client library to your existing project, include the following files**
 
 \vvnodeserver\app.js
 \vvnodeserver\config.yml
@@ -65,6 +71,49 @@ Clone this repository OR copy the following files into your node project folder
 \vvnodeserver\routes\scheduledscripts.js
 \vvnodeserver\routes\scripts.js
 
+Configure your IDE for debugging
+ ------
+If using Visual Studio Code, create a "launch configuration" file which instructs VS Code that you wish to launch a Node.js script. By launching the \vvnodeserver\app.js script, you will have a debug environment which is listening for http requests on port 3001.
+
+To create a launch.json file, open your project folder in VS Code (File > Open Folder) and then click on the Configure gear icon on the Debug view top bar.
+
+![Configure launch.json](https://code.visualstudio.com/assets/docs/editor/debugging/launch-configuration.png)
+
+
+VS Code will try to automatically detect your debug environment but if this fails, you will have to choose your debug environment manually:
+
+![If prompted select Node.js](https://code.visualstudio.com/assets/docs/editor/debugging/debug-environments.png)
+
+**Example launch configuration to launch Node.js and execute a specific script file**
+
+```json
+{    
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "type": "node",
+        "request": "attach",
+        "name": "Attach to Process",
+        "processId": "${command:PickProcess}",
+        "port": 5858
+    },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceRoot}/lib/VVRestApi/VVRestApiNodeJS/app.js"
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Process",
+            "address": "localhost",
+            "port": 5858
+        }
+    ]
+}
+
+```
  
  Example node.js script using VisualVault node.js client library
  ------
