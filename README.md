@@ -3,7 +3,7 @@
 NodeJs Client Library for VisualVault
 =====================================
 
-VisualVault allows you to define Outside Services which may be called from Form Buttons, Form Scripts, event handlers, and on a scheduled basis.  Two types of Outside Services you can create are Web services or NodeJs Scripts.  The Web service type of outside service is discussed on our developer site at [http:/developer.visualvault.com][1].  
+VisualVault allows you to define microservices (Outside Services) which may be called from Form Buttons, Form Scripts, event handlers, and on a scheduled basis.  Two types of Outside Services you can create are Web services or NodeJs Scripts.  The Web service type of outside service is discussed on our developer site at [http:/developer.visualvault.com][1].  
 
 VisualVault Node.js integration allows you to store and execute JavaScript files capable of interacting with the VisualVault API. The scripts are stored and executed server-side allowing you to build a re-useable script library of business processes and automation.
 
@@ -46,41 +46,26 @@ Note: the packages must be installed using the optional version number for each 
     npm install winston@2.3.1
     npm install winston-cloudwatch-transport@1.0.8
 ```
-Clone or download this repository and copy the files into your node project folder
+Clone this repository OR copy the following files into your node project folder
  ------
 
- **Create the following subdirectory structure in your project**
+ **If adding the node.js client library to your project, create the following subdirectory structure**
 
 \vvnodeserver
     \files
     \routes
 
-**Place VisualVault node.js client library files in the \vvnodeserver and \vvnodeserver\routes directories**
+**If adding the node.js client library to your project, include the following files**
 
-\vvnodeserver
-    app.js
-    config.yml
-    VVRestApi.js
-    web.config
+\vvnodeserver\app.js
+\vvnodeserver\config.yml
+\vvnodeserver\VVRestApi.js
+\vvnodeserver\web.config
 
-\vvnodeserver\routes
-    scheduledscripts.js
-    scripts.js
+\vvnodeserver\routes\scheduledscripts.js
+\vvnodeserver\routes\scripts.js
 
-How to publish script files to VisualVault and debug
-------
-
-coming soon
-
-How to execute script files on your Development machine
-------
-
-VisualVault will execute node scripts using Form buttons, Form scripts, or the script scheduler which executes a script at pre-defined intervals.
-
-You can also execute a script directly on your development machine by following these instructions:
-
-coming soon
-    
+ 
  Example node.js script using VisualVault node.js client library
  ------
 
@@ -165,6 +150,18 @@ Q
         console.log("Error response: " + tokenError.message);
     });
 ```
+How to publish script files to VisualVault and debug
+------
 
- 
+coming soon
+
+How to execute script files on your Development machine
+------
+
+VisualVault will execute node scripts using Form buttons, Form scripts, or the script scheduler which executes a script at pre-defined intervals.
+
+You can also execute a script directly on your development machine by following these instructions:
+
+coming soon
+
 
