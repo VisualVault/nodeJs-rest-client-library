@@ -84,6 +84,10 @@ VS Code will try to automatically detect your debug environment but if this fail
 
 ![If prompted select Node.js](https://code.visualstudio.com/assets/docs/editor/debugging/debug-environments.png)
 
+If you go back to the File Explorer view (Ctrl+Shift+E), you'll see that VS Code has created a .vscode folder in the root of your project and added the launch.json file to your workspace.
+
+![Default launch.json file](https://code.visualstudio.com/assets/docs/editor/debugging/launch-json-in-explorer.png)
+
 **Example launch configuration to launch Node.js and execute a specific script file**
 
 ```json
