@@ -9,6 +9,7 @@ AutheticateUri: /OAuth/Token
 ResourceUri:
   DocumentsPost: /documents
   DocumentsId: /documents/{id}
+  DocumentsIdMove: /documents/{id}/move
   DocumentIndexFields: /documents/{id}/indexfields
   DocumentAlertsId: /documents/{documentId}/alerts/{eventId}
   Files: /files
