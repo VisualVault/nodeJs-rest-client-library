@@ -36,8 +36,16 @@ https://code.visualstudio.com/docs/nodejs/nodejs-tutorial
 
 Clone this repository
  ------
-
- **If adding the node.js client library to your existing project, create the following subdirectory structure**
+ 
+ **If using Visual Studio Code**
+ 
+ (1) Navigate to the View menu and select the 'Command Palette" option.  
+ (2) Enter GIT:Clone into the Command Palette text box, press enter.
+ (3) You will be prompted for the URL of a GIT repository. Paste in: https://github.com/VisualVault/nodeJs-rest-client-library
+ (4) You will be prompted for a local folder path where the respository files will be placed.  Select a folder path.
+ (5) Repository will be cloned to your local workspace.  Open the Repository folder, continue followng the instructions below.
+ 
+ **If adding the node.js client library to an existing project, create the following subdirectory structure in the existing project**
 
 \lib
     \VVRestApi
@@ -45,7 +53,7 @@ Clone this repository
             \files
             \routes
 
-**If adding the node.js client library to your existing project, include the following files**
+**If adding the node.js client library to an existing project, copy the following files into the existing project**
 
 \lib\VVRestApi\VVRestApiNodeJs\app.js
 \lib\VVRestApi\VVRestApiNodeJs\config.yml
