@@ -7,7 +7,7 @@ VisualVault allows you to define microservices (Outside Services) which may be c
 
 VisualVault Node.js integration allows you to store and execute JavaScript files capable of interacting with the VisualVault API. The scripts are stored and executed server-side allowing you to build a re-useable script library of business processes and automation.
 
-How node.js scripts are used with VisualVault
+How node.js scripts are integrated with VisualVault
 ------
 
 If you create node.js scripts that you wish to be executed by VisualVault Servers these scripts must be uploaded into the VisualVault microservices library (Outside Process library) from within the VisualVault control panel.
@@ -16,7 +16,9 @@ For production use, VisualVault will select an available node.js server and tran
 
 For development and debugging you can instruct VisualVault to send scripts to be executed to your development machine.  A public IP or DNS host name is required.  To specify a node.js debugging server address, log into VisualVault and click on the User menu (top right), next select the "My Preferences" menu option.  Within the preferences screen scroll down to locate the node.js server option.  Enable the debugging server and enter your node.js server URL where scripts will be posted to.
 
-Note:  The node.js server option will only be displayed on the my preferences screen if your account has developer access.
+Note:  The node.js server option will only be displayed on the my preferences screen if your account has admin access.
+
+When a script it sent to server hosting the VisualVault Node.Js Client Library (the library is an express app), the app will execute the script's Main function and provide parameter values.
 
 Setup your development machine with a JavaScript IDE and node.js
 ------
@@ -131,7 +133,9 @@ How to execute script files on your Development machine
 
 VisualVault will execute node scripts using Form buttons, Form scripts, or the script scheduler which executes a script at pre-defined intervals.
 
-If you have not already read the section "How node.js scripts are used with VisualVault" please take a moment to read.  VisualVault sends a script to execute to a node server which invokes the script's "Main" function.
+If you have not already read the section above "How node.js scripts are integrated with VisualVault" please take a moment to read.  
+
+VisualVault sends a script to execute to a server hosting the VisualVault node client library app; the app then invokes the script's "Main" function.
 
 When developing scripts, you can instruct VisualVault to send scripts to your development machine vs. sending the scripts to servers located within the VisualVault cloud.
 
