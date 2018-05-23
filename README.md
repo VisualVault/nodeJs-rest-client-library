@@ -46,12 +46,13 @@ Clone this repository
 5 Repository will be cloned to your local workspace.  Open the Repository folder, continue followng the instructions below.
  
  **If adding the node.js client library to an existing project, create the following subdirectory structure in the existing project**
-
+```shell
 \lib
-    \VVRestApi
-        \VVRestApiNodeJs
-            \files
-            \routes
+\lib\VVRestApi
+\lib\VVRestApi\VVRestApiNodeJs
+\lib\VVRestApi\files
+\lib\VVRestApi\routes
+```
 
 **If adding the node.js client library to an existing project, copy the following files into the existing project**
 
