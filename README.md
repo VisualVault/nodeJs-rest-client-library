@@ -7,7 +7,7 @@ VisualVault allows you to define microservices (Outside Services) which may be c
 
 VisualVault Node.js integration allows you to store and execute JavaScript files capable of interacting with the VisualVault API. The scripts are stored and executed server-side allowing you to build a re-useable script library of business processes and automation.
 
-How node.js scripts are used with VisualVault
+How node.js scripts are integrated with VisualVault
 ------
 
 If you create node.js scripts that you wish to be executed by VisualVault Servers these scripts must be uploaded into the VisualVault microservices library (Outside Process library) from within the VisualVault control panel.
@@ -16,7 +16,9 @@ For production use, VisualVault will select an available node.js server and tran
 
 For development and debugging you can instruct VisualVault to send scripts to be executed to your development machine.  A public IP or DNS host name is required.  To specify a node.js debugging server address, log into VisualVault and click on the User menu (top right), next select the "My Preferences" menu option.  Within the preferences screen scroll down to locate the node.js server option.  Enable the debugging server and enter your node.js server URL where scripts will be posted to.
 
-Note:  The node.js server option will only be displayed on the my preferences screen if your account has developer access.
+Note:  The node.js server option will only be displayed on the my preferences screen if your account has admin access.
+
+When a script it sent to server hosting the VisualVault Node.Js Client Library (the library is an express app), the app will execute the script's Main function and provide parameter values.
 
 Setup your development machine with a JavaScript IDE and node.js
 ------
@@ -34,42 +36,49 @@ There is a good Node.js tutorial for Visual Studio code with platform specific i
 
 https://code.visualstudio.com/docs/nodejs/nodejs-tutorial
 
-Install required NPM packages in your project folder
+Clone this repository
+ ------
+ 
+ **If using Visual Studio Code**
+ 
+1. Navigate to the View menu and select the 'Command Palette" option.  
+2. Enter GIT:Clone into the Command Palette text box, press enter.
+3. You will be prompted for the URL of a GIT repository. Paste in: https://github.com/VisualVault/nodeJs-rest-client-library
+4. You will be prompted for a local folder path where the respository files will be placed.  Select a folder path.
+5. Repository will be cloned to your local workspace.  Open the Repository folder, continue followng the instructions below.
+ 
+ **If adding the node.js client library to an existing project, create the following subdirectory structure in the existing project**
+```shell
+\lib
+\lib\VVRestApi
+\lib\VVRestApi\VVRestApiNodeJs
+\lib\VVRestApi\VVRestApiNodeJs\files
+\lib\VVRestApi\VVRestApiNodeJs\routes
+```
+
+**If adding the node.js client library to an existing project, copy the following files into the existing project**
+
+```shell
+\lib\VVRestApi\VVRestApiNodeJs\app.js
+\lib\VVRestApi\VVRestApiNodeJs\config.yml
+\lib\VVRestApi\VVRestApiNodeJs\VVRestApi.js
+\lib\VVRestApi\VVRestApiNodeJs\log.js
+\lib\VVRestApi\VVRestApiNodeJs\package.json
+
+\lib\VVRestApi\VVRestApiNodeJs\routes\scheduledscripts.js
+\lib\VVRestApi\VVRestApiNodeJs\routes\scripts.js
+```
+
+Install required NPM packages
 ------
 
-After installing node.js on your development machine you will need to install NPM packages required by the VisualVault node.js client library.  
+After cloning the repository OR copying the repository files to your existing project, you will need to install the NPM packages required by the VisualVault node.js client library.  
 
-Navgiate to the root of your project folderr and execute the following NPM install commands from the command line.  
+Navgiate to the directory containting \lib\VVRestApi\VVRestApiNodeJs\package.json file and execute the following the npm install command  from a terminal window.  npm install will use the Package.json file to determine which packages and package versions to install.
 
-Note: the packages must be installed using the optional version number for each package for compatibility.
 ```shell
-    npm install aws-sdk@2.63.0
-    npm install express@3.4.1
-    npm install js-yaml@2.1.3
-    npm install q@0.9.7
-    npm install request@2.27.0
-    npm install node-uuid@1.4.1
-    npm install winston@2.3.1
-    npm install winston-cloudwatch-transport@1.0.8
+    npm install
 ```
-Clone this repository OR copy the following files into your node project folder
- ------
-
- **If adding the node.js client library to your existing project, create the following subdirectory structure**
-
-\vvnodeserver
-    \files
-    \routes
-
-**If adding the node.js client library to your existing project, include the following files**
-
-\vvnodeserver\app.js
-\vvnodeserver\config.yml
-\vvnodeserver\VVRestApi.js
-\vvnodeserver\web.config
-
-\vvnodeserver\routes\scheduledscripts.js
-\vvnodeserver\routes\scripts.js
 
 Configure your IDE for debugging
  ------
@@ -88,7 +97,7 @@ If you go back to the File Explorer view (Ctrl+Shift+E), you'll see that VS Code
 
 ![Default launch.json file](https://code.visualstudio.com/assets/docs/editor/debugging/launch-json-in-explorer.png)
 
-**Example launch configuration to launch Node.js and execute the VisualVault node.js client library.  This launch configuration will startup the debugger listenting on port 3001.**
+**Example launch configuration to launch Node.js and execute the VisualVault node.js client library.**
 
 ```json
 {    
@@ -105,7 +114,7 @@ If you go back to the File Explorer view (Ctrl+Shift+E), you'll see that VS Code
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceRoot}/lib/VVRestApi/VVRestApiNodeJS/app.js"
+            "program": "${workspaceRoot}/lib/VVRestApi/VVRestApiNodeJs/app.js"
         },
         {
             "type": "node",
@@ -119,19 +128,35 @@ If you go back to the File Explorer view (Ctrl+Shift+E), you'll see that VS Code
 
 ```
  
- How to publish script files to VisualVault and debug
-------
-
-coming soon
-
 How to execute script files on your Development machine
 ------
 
 VisualVault will execute node scripts using Form buttons, Form scripts, or the script scheduler which executes a script at pre-defined intervals.
 
-You can also execute a script directly on your development machine by following these instructions:
+If you have not already read the section above "How node.js scripts are integrated with VisualVault" please take a moment to read.  
 
-coming soon
+VisualVault sends a script to execute to a server hosting the VisualVault node client library app; the app then invokes the script's "Main" function.
+
+When developing scripts, you can instruct VisualVault to send scripts to your development machine vs. sending the scripts to servers located within the VisualVault cloud.
+
+The redirection of scripts to your development machine is enabled on a per user basis and does not affect all users.  
+
+Redirection steps:
+
+1. Authenticate with the VisualVault Web user interface using an admin account (member of the VaultAdmin or VaultAccess role).
+2. Navigate to your user preferences screen (user drop down menu in top right corner of screen)
+3. Scroll down to the bottom of the user preferences screen and enter your development machine's public URL
+
+   If you do not have a public URL for your development machine, follow steps 4-5 below and use the free service provided by NGROK to create one.
+
+4. Install NGROK using the instructions for your OS
+5. From a terminal window in the NGROK directory, enter the command below which assumes your VisualVault Node.Js Client Library app is listening on port 3000 which is the default.  The port number can be changed within the app.js file.
+
+```shell
+    ngrok http 3000
+```
+6. If using NGROK as a secure reverse proxy to your machine, copy the NGROK Public URL generated by the command.
+7. Past the public development machine URL into your VisualVault user preferences screen's Development Node Server field and save.
  
  Example node.js script using VisualVault node.js client library
  ------
