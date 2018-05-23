@@ -50,8 +50,8 @@ Clone this repository
 \lib
 \lib\VVRestApi
 \lib\VVRestApi\VVRestApiNodeJs
-\lib\VVRestApi\files
-\lib\VVRestApi\routes
+\lib\VVRestApi\VVRestApiNodeJs\files
+\lib\VVRestApi\VVRestApiNodeJs\routes
 ```
 
 **If adding the node.js client library to an existing project, copy the following files into the existing project**
