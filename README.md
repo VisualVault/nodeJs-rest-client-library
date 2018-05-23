@@ -114,7 +114,7 @@ If you go back to the File Explorer view (Ctrl+Shift+E), you'll see that VS Code
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceRoot}/lib/VVRestApi/VVRestApiNodeJS/app.js"
+            "program": "${workspaceRoot}/lib/VVRestApi/VVRestApiNodeJs/app.js"
         },
         {
             "type": "node",
