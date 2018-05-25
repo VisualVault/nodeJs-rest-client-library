@@ -21,13 +21,13 @@ module.exports.getCredentials = function () {
     //baseUrl is optional
     //if script is sent from VV server, the baseUrl is provided
     //if executing the script via HTTP GET for testing then provide the baseUrl here
-    options.baseUrl = "https://sandbox2.visualvault.com";
-    options.customerAlias = "PierceCounty";
-    options.databaseAlias = "Default";
-    options.userId = "tod.test";
-    options.password = "P@ssw0rd11";
-    options.clientId = "2cf2ec18-dbe4-4ee7-b506-f9e89922efec";
-    options.clientSecret = "yiC94W4XeZGKm04/Na2FnaQRsaZFdc3bu743BMFyvVg=";
+    options.baseUrl = "https:/demo.visualvault.com";
+    options.customerAlias = "YOUR Customer Name";
+    options.databaseAlias = "YOUR Database Name";
+    options.userId = "YOUR User Id";
+    options.password = "YOUR PASSWORD";
+    options.clientId = "YOUR API KEY";
+    options.clientSecret = "YOUR API KEY";
     return options;
 };
 
@@ -88,7 +88,7 @@ module.exports.main = function (vvClient, response, scriptId) {
                     userid: GenerateUserId(),
                     firstname: 'Test',
                     lastname: 'User',
-                    emailaddress: 'tod.olsen@visualvault.com',
+                    emailaddress: 'user@something.com',
                     password: GeneratePassword(),
                     passwordNeverExpires: 'false',
                     mustChangePassword: 'true',
