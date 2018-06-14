@@ -1,11 +1,11 @@
 /*
-    Script Name:   CreateUser   
+    Script Name:   GetUserLoginToken   
 
     Example of a Scheduled Script 
     
-    Creates a user account
+    Gets a user's web UI login token (useful for constructing a URI that provides one click access to a resource for trusted user)
 
-    Script may be run manually by http://localhost:3000/TestScripts/Scheduled/CreateUser
+    Script may be run manually by http://localhost:3000/TestScripts/Scheduled/GetUserLoginToken
 */
 
 //import Q NPM to assist with complex async promise patterns
@@ -43,26 +43,6 @@ module.exports.main = function (vvClient, response, scriptId) {
     siteParams.fields = "id, name, sitetype";
     siteParams.q = "name eq 'home'";
 
-    var PasswordLength = 8;
-    var GeneratePassword = function () {
-        var text = "";
-        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
-
-        for (var i = 0; i < PasswordLength; i++)
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-        return text;
-    };
-
-    var GenerateUserId = function () {
-        var text = "";
-        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-        for (var i = 0; i < PasswordLength; i++)
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-        return text;
-    };
 
     //we need a site Id to create a user account
     //fetch the home site and get its Id.  
@@ -76,34 +56,49 @@ module.exports.main = function (vvClient, response, scriptId) {
             //VisualVault API response always contains a 'data' property and a 'meta' property
             //data property will contain the data requested as either an object or an array of objects. In this case, we get an array of user site objects
             //Meta property will contain an object with two or more properties. If the "code" property is not = 200 then the "error" property will typically have a message
-                
-            
+
             var siteRecords = siteData['data'];
 
             if (siteRecords.length > 0) {
                 //we only requested the home site so assume first item in array is the home site
                 var siteId = siteRecords[0]['id']
 
-                var newUserData = {
-                    userid: GenerateUserId(),
-                    firstname: 'Test',
-                    lastname: 'User',
-                    emailaddress: 'user@something.com',
-                    password: GeneratePassword(),
-                    passwordNeverExpires: 'false',
-                    mustChangePassword: 'true',
-                    sendEmail: 'true'
-                };
+                //configure parameters for fetching a specific user from VisualVault
+                //We are asking for three fields and defining a query to filter the list where userid = userId
+                var userParams = {};
+                userParams.fields = "id, name, userid, emailaddress";
+                userParams.q = "userid eq 'demo.api'";
 
-                //first parameter for postUsers is ignored but must be empty array
-                //second parameter is the user data
-                //third parameter is the siteId GUID value
-                vvClient.users.postUsers({}, newUserData, siteId)
-                    .then(function (sitesResponse) {
+                vvClient.users.getUsers(userParams, siteId)
+                    .then(function (userResponse) {
+                        //convert response from VisualVault API to an object
+                        var userData = JSON.parse(userResponse);
 
-                        //respons back to http client (typically a VisualVault form or the process scheduler)
-                        response.json(200, "User account created");
+                        //VisualVault API response always contains a 'data' property and a 'meta' property
+                        //data property will contain the data requested as either an object or an array of objects. In this case, we get an array of user objects
+                        //Meta property will contain an object with two or more properties. If the "code" property is not = 200 then the "error" property will typically have a message
+                        var userRecords = userData['data'];
 
+                        //get the Id of first user in the array of users
+                        //we requested one user so assume only one item in the array at position 0
+
+                        var userId = userRecords[0]['id'];
+
+                        //now that we have userId we can request a web login token
+                        vvClient.users.getUserLoginToken(userId)
+                            .then(function (loginTokenResponse) {
+                                //VisualVault API response always contains a 'data' property and a 'meta' property
+                                //data property will contain the data requested as either an object or an array of objects.
+                                var tokenData = JSON.parse(loginTokenResponse)['data'];
+
+                                var webToken = tokenData['webToken'];
+
+                                console.log(webToken);
+                            }).fail(
+                                function (error) {
+                                    console.log(error);
+                                }
+                            );
                     }).fail(
                         function (error) {
                             console.log(error);
@@ -112,24 +107,24 @@ module.exports.main = function (vvClient, response, scriptId) {
                             //The name assigned to each of the values is not important
                             //value 1 should be a boolean (true/false)
                             //value 2 is an optional string value which will be written to the history log for the scheduled script
-                            
+
                             //If value 1 = true, this signals to the VisualVault scheduler that the script ran successfully.  
-                            
+
                             //In the example below, { 'success': false, 'message':"Scheduled script finished with error" }
                             //value 1 = false, value 2 = "Scheduled script finished with error" 
-                            
+
                             //respond back to http client (typically the VisualVault process scheduler)
                             //first parameter is the http status code (should be 200 unless unexpected error ocurred)
                             //second parameter should be an object with two properties
-                            response.json(200, { 'success': false, 'message':"Scheduled script finished with error " + error });
+                            response.json(200, { 'success': false, 'message': "GetUserLoginToken script finished with error " + error });
                         }
                     );
             }
             else {
-                response.json(200,{ 'success': false });
+                response.json(200, { 'success': false });
             }
         })
         .catch(function (err) {
-            response.json(200,{ 'success': false, 'message': err });
+            response.json(200, { 'success': false, 'message': err });
         });
 };
