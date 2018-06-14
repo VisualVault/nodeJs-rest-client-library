@@ -290,13 +290,13 @@ module.exports.main = function (vvClient, response, scriptId) {
                             
                             //If value 1 = true, this signals to the VisualVault scheduler that the script ran successfully.  
                             
-                            //In the example below, { 'success': true, 'message':"Scheduled script finished without error" }
-                            //value 1 = true, value 2 = "Scheduled script finished without error" 
+                            //In the example below, { 'success': false, 'message':"Scheduled script finished with error" }
+                            //value 1 = false, value 2 = "Scheduled script finished with error" 
                             
                             //respond back to http client (typically the VisualVault process scheduler)
                             //first parameter is the http status code (should be 200 unless unexpected error ocurred)
                             //second parameter should be an object with two properties
-                            response.json(200, { 'success': true, 'message':"Scheduled script finished without error" });
+                            response.json(200, { 'success': false, 'message':"Scheduled script finished with error " + error });
                         }
                     );
             }
