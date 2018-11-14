@@ -12,6 +12,7 @@ ResourceUri:
   DocumentsIdMove: /documents/{id}/move
   DocumentIndexFields: /documents/{id}/indexfields
   DocumentAlertsId: /documents/{documentId}/alerts/{eventId}
+  DocumentsIdOcr: /documents/{id}/ocr
   Files: /files
   FilesQuery: /files?q=
   FilesId: /files/{id}
