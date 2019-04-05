@@ -20,6 +20,7 @@ ResourceUri:
   Forms: /formtemplates/{id}/forms
   FormId: /formtemplates/{id}/forms/{formId}
   FormIdPdf: /formtemplates/{id}/forms/{formId}/pdf
+  FormIdFields: /formtemplates/{id}/fields
   FormsId: /forms/{id}
   FormInstance: /forminstance/{id}
   FormInstanceRelatedDocs: /forminstance/{id}/documents
@@ -45,3 +46,4 @@ ResourceUri:
   CustomQuery: /customquery
   Scripts: /scripts
   ProjectAlertsId: /projects/{projectId}/alerts/{eventId}
+  IndexFields: /indexfields
