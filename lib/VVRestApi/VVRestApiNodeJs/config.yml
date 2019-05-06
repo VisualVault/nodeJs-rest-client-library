@@ -43,3 +43,6 @@ ResourceUri:
   CustomQuery: /customquery
   Scripts: /scripts
   ProjectAlertsId: /projects/{projectId}/alerts/{eventId}
+  Customers: /customers
+  CustomerInvite: /customers/invite
+  CustomerInviteId: /customers/invite/{inviteCode}
