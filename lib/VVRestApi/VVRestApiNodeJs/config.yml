@@ -12,6 +12,7 @@ ResourceUri:
   DocumentsIdMove: /documents/{id}/move
   DocumentIndexFields: /documents/{id}/indexfields
   DocumentAlertsId: /documents/{documentId}/alerts/{eventId}
+  DocumentsIdOcr: /documents/{id}/ocr
   Files: /files
   FilesQuery: /files?q=
   FilesId: /files/{id}
@@ -19,9 +20,12 @@ ResourceUri:
   Forms: /formtemplates/{id}/forms
   FormId: /formtemplates/{id}/forms/{formId}
   FormIdPdf: /formtemplates/{id}/forms/{formId}/pdf
+  FormIdFields: /formtemplates/{id}/fields
+  FormsId: /forms/{id}
   FormInstance: /forminstance/{id}
   FormInstanceRelatedDocs: /forminstance/{id}/documents
   FormInstanceRelatedForms: /forminstance/{id}/forms
+  FormDesignerFormsTemplatesIdFields: /formdesigner/forms/formtemplates/{id}/fields
   Sites: /sites
   User: /users
   Users: /sites/{id}/users
@@ -46,3 +50,4 @@ ResourceUri:
   Customers: /customers
   CustomerInvite: /customers/invite
   CustomerInviteId: /customers/invite/{inviteCode}
+  IndexFields: /indexfields

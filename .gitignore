@@ -158,3 +158,4 @@ $RECYCLE.BIN/
 node_modules/
 lib/VVRestApi/VVRestApiNodeJS/node_modules/
 lib/VVRestApi/VVRestApiNodeJS/files
+scripts/test-scripts

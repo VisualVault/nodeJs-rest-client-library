@@ -12,7 +12,7 @@
 var Q = require('q');
 
 //import logging script
-var logger = require("../../../lib/VVRestApi/VVRestApiNodeJs/log");
+var logger = require(require('path').dirname(require.main.filename) + "/log");
 
 //getCredentials function will be called by the VisualVault NodeJs client library (/lib/VVRestApi/VVRestAiNodeJs/VVRestApi.js) when appropriate
 //Use this as a template and replace with your API credentials and VisualVault Customer/Database alias values
@@ -35,7 +35,6 @@ module.exports.getCredentials = function () {
 //main function parameters (vvClient, response, scriptId) are provided when a Scheduled Script is called
 module.exports.main = function (vvClient, response, scriptId) {
     logger.info("Start of TestScript on " + new Date());
-
 
     //configure parameters for fetching a list of user sites from VisualVault
     //We are asking for three fields and defining a query to filter the list where site name = "home"
