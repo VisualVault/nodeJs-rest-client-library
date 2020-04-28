@@ -51,3 +51,4 @@ ResourceUri:
   CustomerInvite: /customers/invite
   CustomerInviteId: /customers/invite/{inviteCode}
   IndexFields: /indexfields
+  OutsideProcesses: /outsideprocesses
