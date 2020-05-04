@@ -30,6 +30,7 @@ ResourceUri:
   User: /users
   Users: /sites/{id}/users
   UserWebToken: /users/{id}/webToken
+  UsersGetJwt: /users/getjwt
   UserGroups: /users/{id}/groups
   GetGroups: /groups
   Groups: /sites/{id}/groups
