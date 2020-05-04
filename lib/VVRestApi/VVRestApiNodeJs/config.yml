@@ -27,6 +27,7 @@ ResourceUri:
   FormInstanceRelatedForms: /forminstance/{id}/forms
   FormDesignerFormsTemplatesIdFields: /formdesigner/forms/formtemplates/{id}/fields
   Sites: /sites
+  ChangeUserSite: /sites/changeusersite
   User: /users
   Users: /sites/{id}/users
   UserWebToken: /users/{id}/webToken
