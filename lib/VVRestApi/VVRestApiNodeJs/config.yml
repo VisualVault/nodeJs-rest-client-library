@@ -48,6 +48,7 @@ ResourceUri:
   ScheduledProcess: /scheduledProcess
   CustomQuery: /customquery
   Scripts: /scripts
+  ScriptsCompleteWf: /scripts/CompleteWorkflowScript
   ProjectAlertsId: /projects/{projectId}/alerts/{eventId}
   Customers: /customers
   CustomerInvite: /customers/invite
