@@ -3,6 +3,7 @@
 
 # VisualVault URIs
 ApiUri: /api/v1/{custalias}/{custdbalias}
+ApiSiteUri: /api/v1
 AutheticateUri: /OAuth/Token
 
 # VisualVault endpoints
@@ -55,3 +56,4 @@ ResourceUri:
   CustomerInviteId: /customers/invite/{inviteCode}
   IndexFields: /indexfields
   OutsideProcesses: /outsideprocesses
+  SecurityMembers: /securitymembers
