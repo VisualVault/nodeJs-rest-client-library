@@ -56,3 +56,4 @@ ResourceUri:
   IndexFields: /indexfields
   OutsideProcesses: /outsideprocesses
   SecurityMembers: /securitymembers
+  Layout: /layout
