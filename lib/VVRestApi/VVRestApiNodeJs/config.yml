@@ -9,6 +9,7 @@ AutheticateUri: /OAuth/Token
 ResourceUri:
   DocumentsPost: /documents
   DocumentsId: /documents/{id}
+  DocumentsIdCopy: /documents/{id}/copy
   DocumentsIdMove: /documents/{id}/move
   DocumentIndexFields: /documents/{id}/indexfields
   DocumentAlertsId: /documents/{documentId}/alerts/{eventId}
@@ -39,6 +40,8 @@ ResourceUri:
   GroupsAddUser: /groups/{groupId}/users/{userId}
   Folders: /folders
   FoldersId: /folders/{id}
+  FoldersCopy: /folders/copy
+  FoldersMove: /folders/move
   FolderIndexFields: /folders/{id}/indexfields
   FolderAlertsId: /folders/{folderId}/alerts/{eventId}
   FolderSecurity: /folders/{folderId}/securitymembers
