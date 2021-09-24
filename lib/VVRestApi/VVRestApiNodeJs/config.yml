@@ -34,6 +34,8 @@ ResourceUri:
   UserWebToken: /users/{id}/webToken
   UsersGetJwt: /users/getjwt
   UserGroups: /users/{id}/groups
+  UserSupervisors: /users/{id}/supervisors
+  UserSupervisees: /users/{id}/supervisees
   GetGroups: /groups
   Groups: /sites/{id}/groups
   GroupsUsers: /groups/{id}/users
