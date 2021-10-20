@@ -23,9 +23,9 @@ When a script it sent to server hosting the VisualVault Node.Js Client Library (
 Setup your development machine with a JavaScript IDE and node.js
 ------
 
-Install node.js version 4.2.6 on your dev machine.  
+Install node.js version 14.18.0 on your dev machine.  
 
-**The VisualVault node.js client library requires node version 10.5.1 which may not the latest version of node.  Newer version of node may work but have not been tested.  Prior node release downloads can be found here:  https://nodejs.org/en/download/releases/**
+**The VisualVault node.js client library requires node version 14.18.0 which may not the latest version of node.  Newer version of node may work but have not been tested.  Prior node release downloads can be found here:  https://nodejs.org/en/download/releases/**
 
 **If you have a newer version of node.js on your development machine and don't wish to downgrade we suggest using the Node Version Manager available for [Linux / Mac](https://github.com/creationix/nvm) and [Windows](https://github.com/coreybutler/nvm-windows)**
 
