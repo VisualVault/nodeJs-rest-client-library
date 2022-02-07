@@ -58,6 +58,8 @@ ResourceUri:
   Customers: /customers
   CustomerInvite: /customers/invite
   CustomerInviteId: /customers/invite/{inviteCode}
+  CustomerAssignUser: /customer/{customerId}/assignuser
+  CustomerDatabaseAssignUser: /customerdatabase/{databaseId}/assignuser
   IndexFields: /indexfields
   OutsideProcesses: /outsideprocesses
   SecurityMembers: /securitymembers
