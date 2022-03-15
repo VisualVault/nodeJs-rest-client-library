@@ -26,6 +26,7 @@ ResourceUri:
   FormInstance: /forminstance/{id}
   FormInstanceRelatedDocs: /forminstance/{id}/documents
   FormInstanceRelatedForms: /forminstance/{id}/forms
+  FormInstanceUpdateOriginator: /forminstance/{id}/updateOriginator
   FormDesignerFormsTemplatesIdFields: /formdesigner/forms/formtemplates/{id}/fields
   Sites: /sites
   ChangeUserSite: /sites/changeusersite
