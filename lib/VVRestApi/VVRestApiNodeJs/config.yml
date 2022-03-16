@@ -37,6 +37,7 @@ ResourceUri:
   UserGroups: /users/{id}/groups
   UserSupervisors: /users/{id}/supervisors
   UserSupervisees: /users/{id}/supervisees
+  UserById: /users/{id}
   GetGroups: /groups
   Groups: /sites/{id}/groups
   GroupsUsers: /groups/{id}/users
