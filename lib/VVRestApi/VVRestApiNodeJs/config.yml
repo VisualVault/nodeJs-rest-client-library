@@ -3,10 +3,12 @@
 
 # VisualVault URIs
 ApiUri: /api/v1/{custalias}/{custdbalias}
+FormsApiUri: /api/v1
 AutheticateUri: /OAuth/Token
 
 # VisualVault endpoints
 ResourceUri:
+  ConfigurationFormsApi: /configuration/formsapi
   DocumentsPost: /documents
   DocumentsId: /documents/{id}
   DocumentsIdCopy: /documents/{id}/copy
@@ -66,3 +68,5 @@ ResourceUri:
   OutsideProcesses: /outsideprocesses
   SecurityMembers: /securitymembers
   Layout: /layout
+  FormsApi:
+    FormInstance: /forminstance
