@@ -3,10 +3,12 @@
 
 # VisualVault URIs
 ApiUri: /api/v1/{custalias}/{custdbalias}
+FormsApiUri: /api/v1
 AutheticateUri: /OAuth/Token
 
 # VisualVault endpoints
 ResourceUri:
+  ConfigurationFormsApi: /configuration/formsapi
   DocumentsPost: /documents
   DocumentsId: /documents/{id}
   DocumentsIdCopy: /documents/{id}/copy
@@ -26,6 +28,7 @@ ResourceUri:
   FormInstance: /forminstance/{id}
   FormInstanceRelatedDocs: /forminstance/{id}/documents
   FormInstanceRelatedForms: /forminstance/{id}/forms
+  FormInstanceUpdateOriginator: /forminstance/{id}/updateOriginator
   FormDesignerFormsTemplatesIdFields: /formdesigner/forms/formtemplates/{id}/fields
   Sites: /sites
   ChangeUserSite: /sites/changeusersite
@@ -36,6 +39,7 @@ ResourceUri:
   UserGroups: /users/{id}/groups
   UserSupervisors: /users/{id}/supervisors
   UserSupervisees: /users/{id}/supervisees
+  UserById: /users/{id}
   GetGroups: /groups
   Groups: /sites/{id}/groups
   GroupsUsers: /groups/{id}/users
@@ -64,3 +68,5 @@ ResourceUri:
   OutsideProcesses: /outsideprocesses
   SecurityMembers: /securitymembers
   Layout: /layout
+  FormsApi:
+    FormInstance: /forminstance
