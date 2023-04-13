@@ -41,6 +41,7 @@ ResourceUri:
   UserSupervisees: /users/{id}/supervisees
   UserById: /users/{id}
   UserDelete: /customerdatabase/{databaseId}/deleteuser/{authenticationUserId}
+  UsersPassword: /users/{id}/password
   GetGroups: /groups
   Groups: /sites/{id}/groups
   GroupsUsers: /groups/{id}/users
