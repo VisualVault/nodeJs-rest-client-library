@@ -52,6 +52,7 @@ ResourceUri:
   FoldersCopy: /folders/copy
   FoldersMove: /folders/move
   FolderIndexFields: /folders/{id}/indexfields
+  FoldersIdIndexFieldsId: /folders/{id}/indexfields/{indexFieldId}
   FolderAlertsId: /folders/{folderId}/alerts/{eventId}
   FolderSecurity: /folders/{folderId}/securitymembers
   FolderSecurityId: /folders/{folderId}/securitymembers/{memberId}
