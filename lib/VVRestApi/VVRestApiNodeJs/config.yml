@@ -43,6 +43,7 @@ ResourceUri:
   UserById: /users/{id}
   UserDelete: /customerdatabase/{databaseId}/deleteuser/{authenticationUserId}
   UsersPassword: /users/{id}/password
+  UsersIdUserId: /users/{id}/userId
   GetGroups: /groups
   Groups: /sites/{id}/groups
   GroupsUsers: /groups/{id}/users
