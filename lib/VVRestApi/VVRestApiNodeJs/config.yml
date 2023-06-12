@@ -72,5 +72,6 @@ ResourceUri:
   OutsideProcesses: /outsideprocesses
   SecurityMembers: /securitymembers
   Layout: /layout
+  ReportServerPDF: /ReportServer/{id}/PDF
   FormsApi:
     FormInstance: /forminstance
