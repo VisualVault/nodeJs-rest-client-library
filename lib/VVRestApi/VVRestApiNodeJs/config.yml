@@ -43,6 +43,7 @@ ResourceUri:
   UserById: /users/{id}
   UserDelete: /customerdatabase/{databaseId}/deleteuser/{authenticationUserId}
   UsersPassword: /users/{id}/password
+  UsersIdUserId: /users/{id}/userId
   GetGroups: /groups
   Groups: /sites/{id}/groups
   GroupsUsers: /groups/{id}/users
@@ -72,5 +73,6 @@ ResourceUri:
   OutsideProcesses: /outsideprocesses
   SecurityMembers: /securitymembers
   Layout: /layout
+  ReportServerPDF: /ReportServer/{id}/PDF
   FormsApi:
     FormInstance: /forminstance
