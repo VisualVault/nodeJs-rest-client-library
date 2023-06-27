@@ -9,6 +9,7 @@ module.exports.getCredentials = function () {
     options.password = "[API User Secret]";
     options.clientId = "[API User Key]";
     options.clientSecret = "[API User Secret]";
+    options.audience = "[Optional Audience Key]";
     return options;
 };
 

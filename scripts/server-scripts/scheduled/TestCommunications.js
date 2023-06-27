@@ -24,6 +24,7 @@ module.exports.getCredentials = function () {
     options.password = "password";
     options.clientId = "29e48740-75b6-401e-91f9-1c0b760bb06c";
     options.clientSecret = "JU3XtoUoBxgAQWjrfLu6jP31CBT66VPtZQ5L0ABa50Q=";
+    options.audience = "";
     return options;
 };
 
