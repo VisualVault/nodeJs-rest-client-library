@@ -17,6 +17,7 @@ ResourceUri:
   DocumentAlertsId: /documents/{documentId}/alerts/{eventId}
   DocumentsIdOcr: /documents/{id}/ocr
   DocumentsIdRelateDocument: /documents/{id}/relateDocument
+  DocumentsIdExpiration: /documents/{id}/expiration
   Files: /files
   FilesQuery: /files?q=
   FilesId: /files/{id}
