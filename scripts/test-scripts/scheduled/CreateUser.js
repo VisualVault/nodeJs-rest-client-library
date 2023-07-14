@@ -28,6 +28,7 @@ module.exports.getCredentials = function () {
     options.password = "YOUR PASSWORD";
     options.clientId = "YOUR API KEY";
     options.clientSecret = "YOUR API KEY";
+    options.audience = "OPTIONAL AUDIENCE KEY";
     return options;
 };
 
