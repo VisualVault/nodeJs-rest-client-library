@@ -4,10 +4,12 @@
 # VisualVault URIs
 ApiUri: /api/v1/{custalias}/{custdbalias}
 FormsApiUri: /api/v1
+DocApiUri: /api/v1
 AutheticateUri: /OAuth/Token
 
 # VisualVault endpoints
 ResourceUri:
+  ConfigurationDocApi: /configuration/docapi
   ConfigurationFormsApi: /configuration/formsapi
   DocumentsPost: /documents
   DocumentsId: /documents/{id}
@@ -77,3 +79,6 @@ ResourceUri:
   ReportServerPDF: /ReportServer/{id}/PDF
   FormsApi:
     FormInstance: /forminstance
+  DocApi:
+    GetRevision: /Documents/revisions/{id}
+    OcrStatus: /Documents/ocr/{id}
