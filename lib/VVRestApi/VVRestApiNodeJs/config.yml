@@ -22,6 +22,7 @@ ResourceUri:
   FilesQuery: /files?q=
   FilesId: /files/{id}
   FormTemplates: /formtemplates
+  FormTemplatesImport: /formtemplates/{id}/import
   Forms: /formtemplates/{id}/forms
   FormId: /formtemplates/{id}/forms/{formId}
   FormIdPdf: /formtemplates/{id}/forms/{formId}/pdf
