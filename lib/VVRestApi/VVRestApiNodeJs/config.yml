@@ -83,3 +83,4 @@ ResourceUri:
   DocApi:
     GetRevision: /Documents/revisions/{id}
     OcrStatus: /Documents/ocr/{id}
+    AdvancedSearch: /Search/Advanced
