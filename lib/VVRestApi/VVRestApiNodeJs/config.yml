@@ -11,6 +11,7 @@ AutheticateUri: /OAuth/Token
 ResourceUri:
   ConfigurationDocApi: /configuration/docapi
   ConfigurationFormsApi: /configuration/formsapi
+  ConfigurationStudioApi: /configuration/studioapi
   DocumentsPost: /documents
   DocumentsId: /documents/{id}
   DocumentsIdCopy: /documents/{id}/copy
@@ -78,9 +79,14 @@ ResourceUri:
   SecurityMembers: /securitymembers
   Layout: /layout
   ReportServerPDF: /ReportServer/{id}/PDF
-  FormsApi:
-    FormInstance: /forminstance
   DocApi:
     GetRevision: /Documents/revisions/{id}
     OcrStatus: /Documents/ocr/{id}
     AdvancedSearch: /Search/Advanced
+  FormsApi:
+    FormInstance: /forminstance
+  StudioApi:
+    WorkflowLatestPublished: /workflows/latest/published
+    WorkflowLatestPublishedId: /workflows/latest/published/{id}
+    WorkflowVariables: /workflows/{id}/variables
+    WorkflowRun: /workflows/{id}/revisions/{revision}/run
