@@ -90,3 +90,4 @@ ResourceUri:
     WorkflowLatestPublishedId: /workflows/latest/published/{id}
     WorkflowVariables: /workflows/{id}/variables
     WorkflowRun: /workflows/{id}/revisions/{revision}/run
+    WorkflowTerminate: /workflows/{workflowId}/instances/{instanceId}/complete
