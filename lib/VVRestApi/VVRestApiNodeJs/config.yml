@@ -91,3 +91,5 @@ ResourceUri:
     WorkflowVariables: /workflows/{id}/variables
     WorkflowRun: /workflows/{id}/revisions/{revision}/run
     WorkflowTerminate: /workflows/{workflowId}/instances/{instanceId}/complete
+    WorkflowHistoryObject: /workflowhistories/{workflowId}/objects/{objectId}
+    WorkflowHistoryRunningObject: /workflowhistories/{workflowId}/objects/{objectId}/running
