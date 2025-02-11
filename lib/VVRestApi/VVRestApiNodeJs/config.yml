@@ -5,6 +5,7 @@
 ApiUri: /api/v1/{custalias}/{custdbalias}
 FormsApiUri: /api/v1
 DocApiUri: /api/v1
+NotificationsApiUri: /api/v1
 AutheticateUri: /OAuth/Token
 
 # VisualVault endpoints
@@ -12,6 +13,7 @@ ResourceUri:
   ConfigurationDocApi: /configuration/docapi
   ConfigurationFormsApi: /configuration/formsapi
   ConfigurationStudioApi: /configuration/studioapi
+  ConfigurationNotificationApi: /configuration/notificationapi
   DocumentsPost: /documents
   DocumentsId: /documents/{id}
   DocumentsIdCopy: /documents/{id}/copy
@@ -93,3 +95,5 @@ ResourceUri:
     WorkflowTerminate: /workflows/{workflowId}/instances/{instanceId}/complete
     WorkflowHistoryObject: /workflowhistories/{workflowId}/objects/{objectId}
     WorkflowHistoryRunningObject: /workflowhistories/{workflowId}/objects/{objectId}/running
+  NotificationsApi:
+    ForceUIRefresh: /Users/{id}/ForceUIRefresh
