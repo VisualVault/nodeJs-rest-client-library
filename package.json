@@ -3,6 +3,12 @@
   "version": "1.1.0",
   "description": "Simplifies the use of VisualVault REST APIs from a Node.Js app",
   "main": "app.js",
+  "_comments": [
+    {
+      "checkout-node-sdk-v5": "file:checkout-node-sdk-v5-5.4.0.tgz",
+      "comment": "This dependency has been removed from the dependencies. It may be required to support a specific customer feature."
+    }
+  ],
   "dependencies": {
     "@aws-sdk/client-comprehend": "^3.418.0",
     "@esri/arcgis-rest-request": "^4.5.0",
@@ -10,7 +16,6 @@
     "aws-sdk": "^2.1472.0",
     "axios": "^1.9.0",
     "body-parser": "^1.18.3",
-    "checkout-node-sdk-v5": "file:checkout-node-sdk-v5-5.4.0.tgz",
     "cors": "^2.8.5",
     "cross-fetch": "^3.1.4",
     "csv": "^4.0.0",
