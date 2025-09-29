@@ -2,7 +2,7 @@
 Notes on using Puppeteer NPM with Unbuntu
 ------
 
-**Must use Node version 14.1 or higher.  Tested with node version 14.18
+**Must use Node version 20.0 or higher.  Tested with node version 18.
 
 **If you encounter an error about loading shared libraries execute the command below to install all dependencies required by chromium
 

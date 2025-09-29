@@ -254,6 +254,8 @@ client.documents.getDocuments(params, folderId)
 
 For more information about the VisualVault API, visit the [VisualVault documentation](https://docs.visualvault.com/).
 
+For VisualVault micro service debugging assistance see [Readme-microservices](https://github.com/VisualVault/nodeJs-rest-client-library/blob/master/Readme-microservices.md).
+
 ## License
 
 Use of the VisualVault API requires a customer hosting contract which defines all license terms.
