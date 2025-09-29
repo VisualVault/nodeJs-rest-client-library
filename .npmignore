@@ -1,0 +1,44 @@
+# Development files
+.git/
+.vscode/
+node_modules/
+scripts/
+*.log
+
+# Build artifacts
+.DS_Store
+Thumbs.db
+
+# Documentation that's not needed in package
+Puppeteer.md
+_config.yml
+
+# Test files
+test/
+tests/
+spec/
+
+# Development configuration
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

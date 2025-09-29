@@ -1,8 +1,8 @@
 {
-  "name": "visualvault-nodejs-client-library",
+  "name": "visualvault-api",
   "version": "1.1.0",
   "description": "Simplifies the use of VisualVault REST APIs from a Node.Js app",
-  "main": "app.js",
+  "main": "lib/VVRestApi/VVRestApiNodeJs/VVRestApi.js",
   "_comments": [
     {
       "checkout-node-sdk-v5": "file:checkout-node-sdk-v5-5.4.0.tgz",
@@ -64,8 +64,27 @@
     "winston-cloudwatch-transport": "^1.0.8"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "echo \"Ready to publish VVRestApi library\""
   },
+  "keywords": [
+    "visualvault",
+    "api",
+    "rest",
+    "client",
+    "document",
+    "management",
+    "forms",
+    "nodejs"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "lib/VVRestApi/**/*",
+    "README.md",
+    "package.json"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/VisualVault/nodeJs-rest-client-library.git"
