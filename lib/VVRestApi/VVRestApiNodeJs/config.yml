@@ -12,6 +12,7 @@ AutheticateUri: /OAuth/Token
 ResourceUri:
   ConfigurationDocApi: /configuration/docapi
   ConfigurationFormsApi: /configuration/formsapi
+  ConfigurationObjectsApi: /configuration/objectsapi
   ConfigurationStudioApi: /configuration/studioapi
   ConfigurationNotificationApi: /configuration/notificationapi
   DocumentsPost: /documents
@@ -88,6 +89,12 @@ ResourceUri:
     AdvancedSearch: /Search/Advanced
   FormsApi:
     FormInstance: /forminstance
+  ObjectsApi:
+    Models: /models
+    ModelById: /models/{id}
+    Object: /object
+    ObjectById: /object/{id}
+    ObjectSearchByModelId: /object/search/{modelId}
   StudioApi:
     WorkflowLatestPublished: /workflows/latest/published
     WorkflowLatestPublishedId: /workflows/latest/published/{id}
