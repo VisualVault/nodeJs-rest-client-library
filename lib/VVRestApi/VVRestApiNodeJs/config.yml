@@ -97,6 +97,7 @@ ResourceUri:
     ObjectById: /object/{id}
     ObjectSearchByModelId: /object/search/{modelId}
   StudioApi:
+    ResourceUserFeatures: /resources/userFeatures
     WorkflowLatestPublished: /workflows/latest/published
     WorkflowLatestPublishedId: /workflows/latest/published/{id}
     WorkflowVariables: /workflows/{id}/variables
