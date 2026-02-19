@@ -88,6 +88,8 @@ ResourceUri:
     GetRevision: /Documents/revisions/{id}
     OcrStatus: /Documents/ocr/{id}
     AdvancedSearch: /Search/Advanced
+    WebDavUrl: /documents/{id}/webdavurl
+    WopiUrl: /documents/{id}/wopiurl
   FormsApi:
     FormInstance: /forminstance
   ObjectsApi:
