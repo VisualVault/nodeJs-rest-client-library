@@ -24,6 +24,8 @@ ResourceUri:
   DocumentsIdOcr: /documents/{id}/ocr
   DocumentsIdRelateDocument: /documents/{id}/relateDocument
   DocumentsIdExpiration: /documents/{id}/expiration
+  DocumentsWebDavUrl: /documents/{id}/webdavurl
+  DocumentsWopiUrl: /documents/{id}/wopiurl
   Files: /files
   FilesQuery: /files?q=
   FilesId: /files/{id}
@@ -88,6 +90,7 @@ ResourceUri:
     GetRevision: /Documents/revisions/{id}
     OcrStatus: /Documents/ocr/{id}
     AdvancedSearch: /Search/Advanced
+
   FormsApi:
     FormInstance: /forminstance
   ObjectsApi:
