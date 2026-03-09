@@ -80,6 +80,7 @@ ResourceUri:
   CustomerAssignUser: /customer/{customerId}/assignuser
   CustomerDatabaseAssignUser: /customerdatabase/{databaseId}/assignuser
   IndexFields: /indexfields
+  IndexFieldsFolder: /indexfields/{id}/folders/{folderId}
   OutsideProcesses: /outsideprocesses
   SecurityMembers: /securitymembers
   Layout: /layout
