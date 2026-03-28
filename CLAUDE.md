@@ -11,6 +11,7 @@ Fork of [VisualVault/nodeJs-rest-client-library](https://github.com/VisualVault/
 
 ```
 nodeV2/
+  CHANGELOG.md                       # Server/library changes (lib/ scope only)
   lib/VVRestApi/VVRestApiNodeJs/     # The Node.js microservices server
     app.js                           # Express entry point (port 3000)
     VVRestApi.js                     # Main REST API client wrapper
