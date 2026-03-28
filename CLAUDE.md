@@ -47,6 +47,7 @@ This is a **microservices execution environment** — middleware between VisualV
 3. The script runs and sends results back to VisualVault
 
 **Three execution modes:**
+
 - **Event scripts** (`/scripts`) — triggered by form buttons/events. Script gets `vvClient`, `response`, `ffColl` (form field collection)
 - **Scheduled scripts** (`/scheduledscripts`) — triggered by cron. Script must export `getCredentials()` and `main(vvClient, response, scriptId)`
 - **Test scripts** (`/testscripts/scheduled/:name`) — local dev. Reads from `scripts/test-scripts/scheduled/`
@@ -55,24 +56,25 @@ This is a **microservices execution environment** — middleware between VisualV
 
 `VVRestApi.js` provides managers for VisualVault services:
 
-| Manager | Purpose |
-|---------|---------|
-| `documents` | Document CRUD, revisions |
-| `forms` | Form templates, instances, field operations |
-| `library` | Folders, folder documents |
-| `users` / `groups` | User and group management |
-| `sites` | Site/workspace operations |
-| `files` | File upload/download |
-| `email` | Send email |
-| `scripts` | Web service execution |
-| `customQuery` | Custom query execution |
-| `scheduledProcess` | Process scheduling |
-| `reports` | Report generation |
-| `projects` | Project management |
+| Manager            | Purpose                                     |
+| ------------------ | ------------------------------------------- |
+| `documents`        | Document CRUD, revisions                    |
+| `forms`            | Form templates, instances, field operations |
+| `library`          | Folders, folder documents                   |
+| `users` / `groups` | User and group management                   |
+| `sites`            | Site/workspace operations                   |
+| `files`            | File upload/download                        |
+| `email`            | Send email                                  |
+| `scripts`          | Web service execution                       |
+| `customQuery`      | Custom query execution                      |
+| `scheduledProcess` | Process scheduling                          |
+| `reports`          | Report generation                           |
+| `projects`         | Project management                          |
 
 ## Authentication
 
 OAuth token-based via `common.js`:
+
 - Scripts provide credentials via `getCredentials()`
 - `common.js` handles token acquisition and auto-refresh (30s before expiry)
 - All API calls use Bearer token in Authorization header
@@ -88,14 +90,28 @@ curl http://localhost:3000/TestScripts/Scheduled/ScriptName
 
 # Run tests
 npm test
+
+# Lint
+npm run lint              # Check for issues
+npm run lint:fix          # Auto-fix issues
+
+# Format
+npm run format            # Format all JS files
+npm run format:check      # Check formatting without writing
 ```
+
+## Code Quality
+
+- **ESLint** (`eslint.config.js`) — flat config, CommonJS, integrated with Prettier
+- **Prettier** (`.prettierrc`) — single quotes, 4-space tabs, 120 print width
+- **Husky + lint-staged** — pre-commit hook runs ESLint fix + Prettier on staged files
 
 ## Active Tasks
 
 See `tasks/` folder. Each task gets its own subfolder with analysis, test results, and working notes.
 
-| Task | Status | Description |
-|------|--------|-------------|
+| Task                                  | Status      | Description                                                                                               |
+| ------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
 | [date-handling](tasks/date-handling/) | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Reports, Workflows |
 
 ## Upstream Sync

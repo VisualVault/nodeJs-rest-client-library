@@ -18,6 +18,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Documentation folder structure (`docs/`) for platform knowledge
 - Task workspace (`tasks/`) for structured investigation tracking
 - CHANGELOG.md for tracking server and project changes
+- ESLint (flat config) + Prettier + Husky + lint-staged for code quality and pre-commit formatting
+- Claude Code custom commands (`[@]-update-docs`, `[@]-smart-commit-push`, `[@]-sync-with-develop`)
 
 ### Changed
 
