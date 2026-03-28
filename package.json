@@ -64,7 +64,7 @@
     "winston-cloudwatch-transport": "^1.0.8"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "prepublishOnly": "echo \"Ready to publish VVRestApi library\""
   },
   "keywords": [
@@ -94,5 +94,8 @@
   "bugs": {
     "url": "https://github.com/VisualVault/nodeJs-rest-client-library/issues"
   },
-  "homepage": "https://github.com/VisualVault/nodeJs-rest-client-library#readme"
+  "homepage": "https://github.com/VisualVault/nodeJs-rest-client-library#readme",
+  "devDependencies": {
+    "jest": "^30.3.0"
+  }
 }
