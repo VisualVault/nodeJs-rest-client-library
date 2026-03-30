@@ -19,9 +19,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Task workspace (`tasks/`) for structured investigation tracking
 - CHANGELOG.md for tracking server and project changes
 - ESLint (flat config) + Prettier + Husky + lint-staged for code quality and pre-commit formatting
-- Claude Code custom commands (`[@]-update-docs`, `[@]-smart-commit-push`, `[@]-sync-with-develop`)
+- Claude Code custom commands (`[@]-update-docs`, `[@]-smart-commit-push`, `[@]-sync-with-develop`, `[@]-create-date-test`, `[@]-vv-learn`)
 
 ### Changed
+
+- `[@]-create-date-test` command: parameter changed from execution test IDs (`1.2`) to category test IDs (`7-D-isoZ-BRT`); command now reads from `matrix.md` instead of `results.md`, derives field config from the Config letter, generates TC filenames as `tc-{category-id}.md`, and updates the matrix row (Actual/Status/Evidence) after writing the file
 
 ### Fixed
 
