@@ -4,7 +4,7 @@ const globals = require('globals');
 
 module.exports = [
     {
-        ignores: ['node_modules/', 'scripts/test-scripts/'],
+        ignores: ['node_modules/', 'scripts/test-scripts/', 'tasks/**/main.js'],
     },
     js.configs.recommended,
     prettier,
