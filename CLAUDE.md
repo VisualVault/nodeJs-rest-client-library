@@ -114,6 +114,13 @@ See `tasks/` folder. Each task gets its own subfolder with analysis, test result
 | ------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
 | [date-handling](tasks/date-handling/) | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Reports, Workflows |
 
+## Platform Documentation
+
+Architecture and reference docs for the VisualVault platform itself (URL patterns, navigation, admin sections, how the Node.js server integrates) are in `docs/`:
+
+- **[Platform Architecture](docs/architecture/visualvault-platform.md)** — URL anatomy, all navigation sections and their paths, Enterprise Tools (Microservices/Scheduled Services/Queries), demo environment GUIDs, how nodeV2 connects to VV
+- **[Form Fields Reference](docs/reference/form-fields.md)** — Calendar field config properties, popup modal behavior, V1/V2 code path, VV.Form console API, known bugs summary
+
 ## Upstream Sync
 
 ```bash

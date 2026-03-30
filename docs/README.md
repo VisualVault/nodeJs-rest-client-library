@@ -14,4 +14,10 @@ docs/
 
 ## Contents
 
-*No documents yet. Add folders and files as needed.*
+### Architecture
+
+- [visualvault-platform.md](architecture/visualvault-platform.md) — URL structure, navigation map, Enterprise Tools (Microservices, Scheduled Services, Queries), how nodeV2 integrates, demo environment reference
+
+### Reference
+
+- [form-fields.md](reference/form-fields.md) — Calendar field config properties, popup modal behavior, V1/V2 code path, VV.Form console API, known bugs summary
