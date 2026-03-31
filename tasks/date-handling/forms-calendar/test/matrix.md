@@ -42,7 +42,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | Category                 |  Total  |  PASS  |  FAIL  | PENDING | BLOCKED | PARTIAL | SKIP  |
 | ------------------------ | :-----: | :----: | :----: | :-----: | :-----: | :-----: | :---: |
 | 1. Calendar Popup        |   20    |   8    |   12   |    0    |    0    |    0    |   0   |
-| 2. Typed Input           |   16    |   6    |   4    |    6    |    0    |    0    |   0   |
+| 2. Typed Input           |   16    |   7    |   4    |    5    |    0    |    0    |   0   |
 | 3. Server Reload         |   18    |   4    |   0    |   14    |    0    |    0    |   0   |
 | 4. URL Parameters        |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
 | 5. Preset Date           |   18    |   1    |   0    |   17    |    0    |    0    |   0   |
@@ -54,7 +54,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 11. Cross-Timezone       |   14    |   0    |   0    |   13    |    0    |    1    |   0   |
 | 12. Edge Cases           |   20    |   4    |   5    |   10    |    0    |    0    |   1   |
 | 13. Database             |   10    |   2    |   0    |    8    |    0    |    0    |   0   |
-| **TOTAL**                | **225** | **42** | **33** | **148** |  **0**  |  **1**  | **1** |
+| **TOTAL**                | **225** | **43** | **33** | **147** |  **0**  |  **1**  | **1** |
 
 ---
 
@@ -117,11 +117,11 @@ Type a date directly in the input field (segment-by-segment keyboard entry).
 | 2-E-IST |   E    | IST | 03/15/2026          | `"2026-03-14"` (Bug #7 -1 day — same path as A/B-IST; confirms Bug #7 in legacy typed)                        | `"2026-03-14"`                          | FAIL    | 2026-03-31 | [summary](summaries/tc-2-E-IST.md) |
 | 2-F-IST |   F    | IST | 03/15/2026          | `"2026-03-14"` (same as E-IST — ignoreTZ no effect on date-only)                                              | `"2026-03-14"`                          | FAIL    | 2026-03-31 | [summary](summaries/tc-2-F-IST.md) |
 | 2-G-IST |   G    | IST | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (local midnight stored — getSaveValue formats local; prediction corrected 2026-03-31) | `"2026-03-15T00:00:00"`                 | PASS    | 2026-03-31 | [summary](summaries/tc-2-G-IST.md) |
-| 2-H-IST |   H    | IST | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (same as G-IST; GFV: no fake Z — useLegacy=true; prediction corrected 2026-03-31)     | —                                       | PENDING | —          | —                                  |
+| 2-H-IST |   H    | IST | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (same as G-IST; GFV: no fake Z — useLegacy=true; prediction corrected 2026-03-31)     | `"2026-03-15T00:00:00"`                 | PASS    | 2026-04-01 | [summary](summaries/tc-2-H-IST.md) |
 
 > **IST note (corrected 2026-03-31)**: Typed input confirmed (Test 8.1): stores `"2026-03-14"` (-1 day, Bug #7) — same result as popup (Test 5.1). Bug #2 asymmetry (popup → -2 days, typed → -1 day) not observed; both go through single-shift path in V1 with useLegacy=false.
 > **C/D IST note (prediction corrected 2026-03-31)**: `"2026-03-14T18:30:00"` prediction likely wrong. Based on confirmed 1-C-IST / 1-D-IST behavior, `getSaveValue()` formats as LOCAL time → expect `"2026-03-15T00:00:00"` (same as BRT) for DateTime typed IST. Needs live confirmation.
-> **G/H IST note (confirmed 2026-03-31)**: 2-G-IST live test confirms typed input stores `"2026-03-15T00:00:00"` (local midnight, no Z). Original prediction `"2026-03-14T18:30:00"` was wrong — `getSaveValue()` uses `moment().format()` which outputs local time. Bug #2 confirmed: popup (1-G-IST) stores `"2026-03-14T18:30:00.000Z"` (raw UTC), typed stores `"2026-03-15T00:00:00"` (local). H-IST prediction updated accordingly.
+> **G/H IST note (confirmed 2026-03-31)**: 2-G-IST live test confirms typed input stores `"2026-03-15T00:00:00"` (local midnight, no Z). Original prediction `"2026-03-14T18:30:00"` was wrong — `getSaveValue()` uses `moment().format()` which outputs local time. Bug #2 confirmed: popup (1-G-IST) stores `"2026-03-14T18:30:00.000Z"` (raw UTC), typed stores `"2026-03-15T00:00:00"` (local). H-IST prediction updated accordingly. 2-H-IST confirmed 2026-04-01 — same result as G-IST, `ignoreTZ` no-op on typed path.
 
 ---
 

@@ -1508,3 +1508,4 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 **Key outcomes**: PASS — typed input stores local midnight correctly; Bug #2 confirmed (popup vs typed inconsistency).
 
 - 2026-03-31 [TC-2-G-IST Run 1](runs/tc-2-G-IST-run-1.md) — IST — PASS — legacy DateTime typed stores local midnight; Bug #2 confirmed vs popup
+- 2026-04-01 [TC-2-H-IST Run 1](runs/tc-2-H-IST-run-1.md) — IST — PASS — legacy DateTime typed stores local midnight "2026-03-15T00:00:00"; confirms G-IST finding
