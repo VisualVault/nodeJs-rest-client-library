@@ -1514,7 +1514,8 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 
 ## Session 2026-03-31 (BRT — Typed Input Legacy)
 
-**Purpose**: Verify Config F (useLegacy=true, ignoreTimezone=true) typed input in BRT — confirm ignoreTZ no-op on date-only storage.
-**Key outcomes**: PASS — stores date-only `"2026-03-15"`, same as Config E; Bug #2 format inconsistency confirmed vs popup.
+**Purpose**: Verify legacy typed input in BRT — Config F (date-only) and Config G (DateTime); confirm getSaveValue formats local time; compare against popup path.
+**Key outcomes**: PASS — both configs store correctly via getSaveValue; Bug #2 confirmed (popup vs typed format inconsistency).
 
 - 2026-03-31 [TC-2-F-BRT Run 1](runs/tc-2-F-BRT-run-1.md) — BRT — PASS — legacy typed Config F stores date-only; ignoreTZ no-op; Bug #2 confirmed vs popup
+- 2026-03-31 [TC-2-G-BRT Run 1](runs/tc-2-G-BRT-run-1.md) — BRT — PASS — legacy DateTime typed stores local midnight "2026-03-15T00:00:00"; Bug #2 confirmed vs popup
