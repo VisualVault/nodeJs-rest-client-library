@@ -1492,6 +1492,8 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-03-31 [TC-1-G-IST Run 1](runs/tc-1-G-IST-run-1.md) — IST — FAIL-1 — legacy DateTime popup stores UTC datetime; IST midnight = prev-day UTC date
 - 2026-03-31 [TC-1-H-IST Run 1](runs/tc-1-H-IST-run-1.md) — IST — FAIL-1 — Config H = Config G; ignoreTZ no-op confirmed; all legacy IST popup slots complete
 - 2026-03-31 [TC-2-E-IST Run 1](runs/tc-2-E-IST-run-1.md) — IST — FAIL-1 — Bug #7 in legacy typed input; stores "2026-03-14" (-1 day); Bug #2 format diff confirmed
+- 2026-03-31 [TC-2-C-IST Run 1](runs/tc-2-C-IST-run-1.md) — IST — PASS — Config C typed input stores local midnight; same as popup; matrix prediction corrected
+- 2026-03-31 [TC-2-D-IST Run 1](runs/tc-2-D-IST-run-1.md) — IST — FAIL-1 — Config D typed input: same storage as C-IST; Bug #5 fake Z in GFV confirmed
 - 2026-03-31 [TC-2-F-IST Run 1](runs/tc-2-F-IST-run-1.md) — IST — FAIL-1 — legacy typed Config F stores date-only `"2026-03-14"` (Bug #7); differs from popup format (Bug #2)
 
 ## Session 2026-03-31 (UTC+0)
