@@ -118,7 +118,7 @@ Do not proceed to Phase 2 until all required files are read.
 
     Take a screenshot to capture the display value in the form input.
 
-7. Compare captured values against the Expected column from Phase 1. If they differ, note the discrepancy — it means the form or codebase changed since the matrix was last updated. The test file documents the **observed** behavior from this run. Update the matrix row (Actual + Status + Run Date) after writing the TC file.
+7. Compare captured values against the Expected column from Phase 1. Note any discrepancy — it means the live system differs from predicted/intended behavior. Observed values go into `results.md` (Phase 5) and the matrix Actual column. The TC file's Expected column always reflects **correct/intended** behavior regardless of what Phase 2 observed. Update the matrix row (Actual + Status + Run Date) after writing the TC file.
 
 ---
 
@@ -257,17 +257,21 @@ A single table merging actions and expected results. Every row that produces a m
 
 Table columns: `#` | `Action` | `Test Data` | `Expected Result` | `✓`
 
+**Expected Results always reflect correct/intended behavior** — not what a buggy system produces. If a known bug affects a step and causes the observed value to differ from Expected, do NOT change the Expected Result to match the buggy output. The test step is intended to FAIL when a bug is present. Document the buggy value in the Fail Conditions section (Section 6) instead.
+
+**Determining correct Expected values:** Use Phase 1 source material (analysis.md bug descriptions, the matrix's intended semantics) to establish what the system _should_ do — not what Phase 2 observed. For storage steps: the correct raw value is the date formatted as intended for this config (e.g., date-only string for `enableTime=false`, local midnight datetime without Z for non-legacy `enableTime=true`). For `GetFieldValue()`: the correct return is always the raw stored value with no added transformation.
+
 Rules:
 
 - Row 1 is always: `| 1 | Complete setup | See Preconditions P1–P6 | All P1–P6 checks pass | ☐ |`
 - Reference the target field as "the target field (identified in P6)" in the Action column; use `<FIELD_NAME>` in Test Data cells
 - For UI interaction steps (click, type, key): Action column is the verb phrase; Input / Command is the value typed or `—`; Expected Result is the immediately observable UI state
-- For console capture steps: Action column is a short label (e.g., "Capture raw stored value"); Input / Command is the full inline JS command in backticks; Expected Result is the exact string returned
+- For console capture steps: Action column is a short label (e.g., "Capture raw stored value"); Input / Command is the full inline JS command in backticks; Expected Result is the exact correct string
 - For typed-input scenarios: include one row per segment typed (month, day, year, hour, minute), with the progressive field display state as Expected Result
 - For calendar popup scenarios: include rows for opening popup, navigating to month, clicking day, verifying time header, clicking Set
 - Every Expected Result is an exact string — no ranges, no "approximately", no "contains"
 - Display assertions must include the time component when `enableTime=true` (e.g., `03/15/2026 12:00 AM`)
-- `GetFieldValue()` row: if Bug #5 applies (enableTime=true, ignoreTimezone=true, useLegacy=false), append `— fake Z (Bug #5)` to the Expected Result cell
+- `GetFieldValue()` row: Expected Result is the raw stored value with no added transformation. If Bug #5 is active (enableTime=true, ignoreTimezone=true, useLegacy=false), the observed value will differ — document the buggy observed value as FAIL-N in the Fail Conditions section, not here.
 - `toISOString()` row: append `— confirms <TZ> active` to the Expected Result cell
 - The `toISOString()` row is always the last row
 - The `✓` column uses `☐` in every row
@@ -287,10 +291,11 @@ Each entry has three parts:
 
 Derive from:
 
-- Bugs identified in Phase 1 that affect this field config (each bug → one FAIL condition)
+- Bugs identified in Phase 1 that affect this field config — each bug becomes one FAIL condition. For each bug, the FAIL condition must include: (a) the exact value the tester will observe when the bug is present, and (b) what the Expected Result shows (correct behavior). This gives the tester a complete picture: Expected tells them what should happen; the FAIL condition tells them what the buggy system produces instead.
 - The toISOString environment check (always → FAIL pattern: returns UTC midnight with no shift)
 - Any pre-existing state issues (round-trip drift → FAIL pattern if Bug #5 is relevant)
 - Any step-execution issues observed during Phase 2 (e.g., wrong time selected, wrong segment clicked)
+- For scenarios where no bugs apply, Fail Conditions cover only environmental/setup issues (wrong TZ, V2 active, wrong field) — not bug symptoms.
 
 ---
 
@@ -317,7 +322,7 @@ After writing the TC file, update `matrix.md` in two places:
 - **Actual** column: fill with the observed value from Phase 2
 - **Status** column: set to `PASS` or `FAIL` based on whether Actual matches Expected
 - **Run Date** column: today's date (YYYY-MM-DD)
-- **Evidence** column: link to the newly created TC file — `[tc-{category-id}](tc-{category-id}.md)`
+- **Evidence** column: link to the summary file created in Phase 5B — `[summary](summaries/tc-{category-id}.md)`. For PENDING rows where this is the first run, create the summary first (Phase 5B), then set this link.
 
 If the live result differs from the Expected column prediction, also update Expected to reflect the observed value and add a parenthetical note (e.g., `(prediction corrected 2026-03-30)`). Do the same for any sibling rows whose Expected was derived from the now-disproven prediction.
 
@@ -327,77 +332,105 @@ Update the PASS/FAIL/PENDING/BLOCKED counts for the affected category row to ref
 
 ---
 
-## Phase 5 — Update results.md
+## Phase 5A — Generate the run file
 
-`results.md` is the source-of-truth live test log. Every run of this command must add a test block to it.
+Create `tasks/date-handling/forms-calendar/test/runs/tc-{category-id}-run-{N}.md` from the Phase 2 observations. N is the next sequential integer for this TC (check whether previous run files exist first).
 
-### Step 1 — Determine the session
+**Run files are immutable after creation.** Never modify a run file — create a new one for each re-run.
 
-Read the end of `results.md` to find the most recent Session block. Append to the current session if **both** of these are true:
+```markdown
+# TC-{ID} — Run {N} | {YYYY-MM-DD} | {TZ short} | {PASS / FAIL-N}
 
-- The session's TZ matches today's active timezone
-- The session date is today
+**Spec**: [tc-{id}.md](../tc-{id}.md) | **Summary**: [summary](../summaries/tc-{id}.md)
 
-Otherwise, create a new Session block with the next session number. Session headers follow this format:
+## Environment
+
+| Parameter | Value                                                |
+| --------- | ---------------------------------------------------- |
+| Date      | {YYYY-MM-DD}                                         |
+| Tester TZ | {IANA name} — UTC±X ({short})                        |
+| Code path | V{1 or 2} (`useUpdatedCalendarValueLogic = {value}`) |
+| Platform  | VisualVault FormViewer, Build {N}                    |
+
+## Preconditions Verified
+
+| Check        | Command                                                     | Result                                        |
+| ------------ | ----------------------------------------------------------- | --------------------------------------------- |
+| TZ           | `new Date().toString()`                                     | `"{actual output}"` — contains GMT{±HHMM} ✓/✗ |
+| V1/V2        | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic` | `{value}` → V{N} active ✓/✗                   |
+| Field lookup | filter snippet                                              | `["{field name}"]` ✓/✗                        |
+
+## Step Results
+
+Include only steps that have an Expected value in the spec (skip pure UI navigation rows):
+
+| Step # | Expected       | Actual       | Match           |
+| ------ | -------------- | ------------ | --------------- |
+| {N}    | `"{expected}"` | `"{actual}"` | PASS / **FAIL** |
+
+## Outcome
+
+**{PASS / FAIL-N}** — {one line referencing the Fail Condition label from the spec and what it means}
+
+## Findings
+
+- Whether actual matched matrix prediction; if not, what the correct behavior is
+- Which bugs confirmed or ruled out (reference bug number)
+- Knock-on corrections to sibling matrix rows if prediction was wrong
+- Recommended next action
+```
+
+---
+
+## Phase 5B — Create or update the summary file
+
+**Path:** `tasks/date-handling/forms-calendar/test/summaries/tc-{category-id}.md`
+
+If this is the **first run** for the TC (file does not exist): create it.
+If this is a **re-run** (file exists): open it and append a row to the Run History table + update Current Status and Current Interpretation.
+
+```markdown
+# TC-{ID} — Summary
+
+**Spec**: [tc-{id}.md](../tc-{id}.md)
+**Current status**: {PASS / FAIL-N} — last run {YYYY-MM-DD} ({TZ short})
+**Bug surface**: {Bug #N name, or "none — control/passing scenario"}
+
+## Run History
+
+| Run | Date         | TZ         | Outcome         | File                              |
+| --- | ------------ | ---------- | --------------- | --------------------------------- |
+| 1   | {YYYY-MM-DD} | {TZ short} | {PASS / FAIL-N} | [run-1](../runs/tc-{id}-run-1.md) |
+
+## Current Interpretation
+
+{One paragraph: what the run history implies. Examples: "Bug #7 confirmed in IST. Awaiting fix verification." / "Passes consistently — no bug in UTC+0 control." / "Run 2 (PASS) confirms Bug #7 fix works for Config A IST."}
+
+## Next Action
+
+{One line: what happens next. E.g., "Re-run after Bug #7 fix deployed." / "No further action — closed PASS." / "Run 1-F-IST (sibling) next."}
+```
+
+---
+
+## Phase 5C — Update results.md session index
+
+`results.md` is now a **frozen historical archive** for sessions run before 2026-04-01. New runs are recorded in run files (5A) and summaries (5B).
+
+The only update to results.md for new runs is a **one-line index entry** in the session log section at the end of the file. Find the current session heading (date + TZ match) or create a new one, then append:
 
 ```
-## Session N: {Short Description} ({TZ short name}, UTC±X)
-
-**Date**: {YYYY-MM-DD} | **TZ**: {IANA name} (UTC±X) — {how TZ was set, e.g., macOS TZ changed + Chrome restarted} | **Form**: {form name/number used}
-**Purpose**: {one sentence — what this session tests}
-**Key outcomes**: {comma-separated findings, written after the test completes}
+- {YYYY-MM-DD} [TC-{id} Run {N}](runs/tc-{id}-run-N.md) — {TZ short} — {PASS / FAIL-N} — {one-phrase description}
 ```
 
-### Step 2 — Write the test block
+Session heading format (create only if none exists for today's date + TZ):
 
-Add a sub-section under the session. Test IDs are sequential within the session (e.g., if the session has Tests 5.1 and 5.2 already, the next is 5.3). Use the format:
+```markdown
+## Session {YYYY-MM-DD} ({TZ short})
 
+**Purpose**: {one sentence}
+**Key outcomes**: {fill in after all tests for the session are done}
 ```
-### Test {N.M}: {Scenario description} ({Category ID})
-```
-
-The block must contain:
-
-**Precondition verification table** — one row per check run in Phase 2:
-
-| Check        | Command                                                     | Result                       |
-| ------------ | ----------------------------------------------------------- | ---------------------------- |
-| TZ           | `new Date().toString()`                                     | `"{actual output}"` ✓/✗      |
-| V1/V2        | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic` | `{value}` → V1/V2 active ✓/✗ |
-| Field lookup | filter snippet                                              | `["{field name}"]` ✓         |
-
-**Action description** — one paragraph: what was clicked/typed/executed, which field, what the popup/form showed.
-
-**Captured values** — inline JS result block + a table:
-
-```javascript
-// the exact JS call used and its return value
-```
-
-| Metric           | Value          | Notes                               |
-| ---------------- | -------------- | ----------------------------------- |
-| Display in input | `{display}`    |                                     |
-| Raw stored value | `"{raw}"`      |                                     |
-| GetFieldValue()  | `"{api}"`      | note fake Z / Bug ref if applicable |
-| isoRef           | `"{isoRef}"`   | confirms {TZ} active                |
-| Matrix Expected  | `"{expected}"` | MATCH or **prediction was wrong**   |
-
-**Findings** — bullet points or short paragraphs covering:
-
-- Whether the result matched the matrix prediction, and if not, what the correct behavior is
-- Which bugs were confirmed or disproved
-- Any knock-on corrections to sibling row predictions (e.g., other PENDING rows that relied on the same assumption)
-- What the next test should verify (e.g., "Run 2-A-IST to confirm typed input independently")
-
-**TC file link** — end with: `**TC file**: [tc-{category-id}.md](tc-{category-id}.md)`
-
-### Step 3 — Update the Coverage Matrix tables in results.md
-
-results.md has its own Category tables (after the Session blocks). Find the table for the relevant category and update the row for this category ID:
-
-- Change `NOT TESTED` to `PASS ✓` or `FAIL — Bug #{N} (Test {N.M})`
-- Correct the Expected Raw column if the prediction was wrong
-- Update the IST/cross-TZ note below the table if the live result contradicts or confirms it
 
 ---
 
@@ -410,7 +443,10 @@ results.md has its own Category tables (after the Session blocks). Find the tabl
 - **Pass criteria are exact string matches** — binary, not approximate.
 - **Fail Conditions carry all risk reasoning** and live in their own `## Fail Conditions` section.
 - **Display assertions include time** when `enableTime=true`.
-- **Source values come from Phase 2 observations**, not from prior sessions or assumptions.
-- **Matrix is updated after the TC file is written** — the TC file and the matrix row stay in sync.
-- **results.md is always updated** — every run adds a test block and updates the coverage tables. No exceptions.
-- **No Findings or Key Finding section in TC files.** TC files are test procedures, not analytical records. Observations about whether the matrix prediction was right or wrong, which bugs were confirmed, and what sibling rows imply belong exclusively in `results.md` Phase 5. The title encodes the behavioral finding; Fail Conditions encode the risk reasoning. Do not add any other analytical sections to TC files.
+- **Expected Results in the TC file come from correct/intended behavior**, derived from analysis.md bug descriptions and the matrix's intended semantics — not from what the buggy system currently produces. Phase 2 observed values go into the run file (Phase 5A) and the matrix Actual column. Never copy a buggy observed value into the TC file's Expected Result column.
+- **TC spec files are immutable after creation.** Never modify a TC file to record execution results, update actual values, or add findings. All execution data goes into run files (5A) and summaries (5B). The only legitimate reason to edit a TC file is to correct a spec error.
+- **Run files are immutable after creation.** Never modify a run file. Create a new run file (`run-2`, `run-3`) for each re-execution.
+- **Checkbox (☐) column is a transient execution aid.** Fill checkboxes during a run session to track progress, but do NOT commit TC files with filled checkboxes. The permanent execution record is the run file, not the ☐ column state.
+- **Matrix Evidence column links to the summary file**, not the TC spec. Format: `[summary](summaries/tc-{id}.md)`. For PENDING slots with no summary yet, link to the spec: `[spec](tc-{id}.md)`.
+- **results.md is a frozen archive** for sessions before 2026-04-01. New runs append only a one-line index entry (Phase 5C). Do not add narrative blocks to results.md for new tests.
+- **No Findings or Key Finding section in TC files.** TC files are test procedures, not analytical records. Observations about whether the matrix prediction was right or wrong, which bugs were confirmed, and what sibling rows imply belong exclusively in run files (Phase 5A). The title encodes the behavioral finding; Fail Conditions encode the risk reasoning. Do not add any other analytical sections to TC files.

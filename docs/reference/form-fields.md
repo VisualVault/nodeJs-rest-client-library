@@ -15,7 +15,7 @@ Each calendar field has the following boolean config flags. These are readable a
 | Property             | Type         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | -------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `enableTime`         | boolean      | If `true`, the field stores and displays a datetime (date + time). If `false`, date only.                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `ignoreTimezone`     | boolean      | If `true`, VV does not apply timezone conversion when storing/retrieving the value. **No-op for date-only fields** (`enableTime=false`) — storage behavior is identical to `ignoreTimezone=false` for those configs. Only affects the DateTime code path (`enableTime=true`).                                                                                                                                                                                                                    |
+| `ignoreTimezone`     | boolean      | If `true`, VV does not apply timezone conversion when storing/retrieving the value. **No-op for date-only fields** (`enableTime=false`) — storage behavior is identical to `ignoreTimezone=false` for those configs, on both the modern path (`useLegacy=false`) and the legacy popup path (`useLegacy=true`). Live-confirmed: Config E and Config F produce identical stored values on the legacy popup (2026-03-31). Only affects the DateTime code path (`enableTime=true`).                  |
 | `useLegacy`          | boolean      | If `true`, activates the legacy calendar control. Changes save/read pipeline. The field renders as a **plain HTML text input** (not the Kendo masked DatePicker used by modern configs) — type the full `MM/dd/yyyy` string in one pass; there are no auto-advancing date segments. The popup path stores a full UTC ISO datetime string (e.g., `"2026-03-15T03:00:00.000Z"`) even when `enableTime=false`, unlike the modern path which stores a date-only string (`"2026-03-15"`). See Bug #2. |
 | `enableInitialValue` | boolean      | If `true`, the field pre-populates with an initial value (current date or preset date) on form load.                                                                                                                                                                                                                                                                                                                                                                                             |
 | `initialValueMode`   | number       | `0` = CurrentDate (uses live `new Date()` at load time); `1` = Preset (uses a configured fixed date). Only relevant when `enableInitialValue=true`.                                                                                                                                                                                                                                                                                                                                              |
@@ -66,6 +66,26 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
     .filter((f) => f.fieldType === 13 && f.enableTime === true && f.ignoreTimezone === true && f.useLegacy === false)
     .map((f) => ({ name: f.name, enableInitialValue: f.enableInitialValue }));
 ```
+
+### Locating calendar field elements in the DOM
+
+Calendar field inputs are rendered by Kendo and use **Kendo-internal GUIDs** as their `name` attribute (e.g., `k-c8505310-993b-4929-...`). They do **not** use the VV field name (`DataField11`) or the VV field GUID from `fieldMaster`. You cannot find a field's input via `document.querySelector('input[name="DataField11"]')`.
+
+To locate the correct `fd-cal-container` for a known field name:
+
+```javascript
+// Sort all calendar fields by layout position, then match index to DOM order
+const calFields = Object.values(VV.Form.VV.FormPartition.fieldMaster)
+    .filter((f) => f.fieldType === 13)
+    .sort((a, b) => a.layoutTop - b.layoutTop || a.layoutLeft - b.layoutLeft);
+
+const idx = calFields.findIndex((f) => f.name === 'DataField11');
+const containers = document.querySelectorAll('.fd-cal-container');
+const icon = containers[idx]?.querySelector('.k-icon.k-i-calendar');
+icon?.click(); // opens the calendar popup for DataField11
+```
+
+The `fd-cal-container` NodeList order matches the `layoutTop`/`layoutLeft` sort order of fields in `fieldMaster`. Confirmed on the DateTest form (26 calendar fields, 2026-03-31).
 
 ### Reading field values
 
