@@ -1519,3 +1519,4 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 
 - 2026-03-31 [TC-2-F-BRT Run 1](runs/tc-2-F-BRT-run-1.md) — BRT — PASS — legacy typed Config F stores date-only; ignoreTZ no-op; Bug #2 confirmed vs popup
 - 2026-03-31 [TC-2-G-BRT Run 1](runs/tc-2-G-BRT-run-1.md) — BRT — PASS — legacy DateTime typed stores local midnight "2026-03-15T00:00:00"; Bug #2 confirmed vs popup
+- 2026-03-31 [TC-2-H-BRT Run 1](runs/tc-2-H-BRT-run-1.md) — BRT — PASS — legacy DateTime+ignoreTZ typed stores local midnight; identical to G-BRT; Category 2 complete (16/16)

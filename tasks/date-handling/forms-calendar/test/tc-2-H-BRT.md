@@ -1,4 +1,4 @@
-# TC-2-G-BRT — Config G, Typed Input, BRT: local midnight stored; typed vs popup inconsistent (Bug #2)
+# TC-2-H-BRT — Config H, Typed Input, BRT: local midnight stored; GFV returns raw unchanged (Bug #2 vs popup)
 
 ## Environment Specs
 
@@ -8,7 +8,7 @@
 | **System Timezone**     | `America/Sao_Paulo` — UTC-3, BRT (Brasilia Standard Time). No DST active (Brazil abolished DST in 2019). |
 | **Platform**            | VisualVault FormViewer, Build 20260304.1                                                                 |
 | **VV Code Path**        | V1 — `useUpdatedCalendarValueLogic = false` (verified at runtime via P5)                                 |
-| **Target Field Config** | `enableTime=true`, `ignoreTimezone=false`, `useLegacy=true`, `enableInitialValue=false`                  |
+| **Target Field Config** | `enableTime=true`, `ignoreTimezone=true`, `useLegacy=true`, `enableInitialValue=false`                   |
 | **Scenario**            | 2026-03-15, BRT midnight — `2026-03-15T00:00:00-03:00` = `2026-03-15T03:00:00Z` UTC                      |
 
 ## Preconditions
@@ -73,12 +73,12 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
         (f) =>
             f.fieldType === 13 &&
             f.enableTime === true &&
-            f.ignoreTimezone === false &&
+            f.ignoreTimezone === true &&
             f.useLegacy === true &&
             f.enableInitialValue === false
     )
     .map((f) => f.name);
-// Expected: ["DataField14"]
+// Expected: ["DataField13"]
 // Record the returned name — use it as <FIELD_NAME> in all console steps
 ```
 
@@ -97,16 +97,18 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 | 6   | Capture GetFieldValue output                                | `` `VV.Form.GetFieldValue('<FIELD_NAME>')` ``                        | `"2026-03-15T00:00:00"`                                                | ☐   |
 | 7   | Capture isoRef and confirm timezone                         | `` `new Date(2026, 2, 15, 0, 0, 0).toISOString()` ``                 | `"2026-03-15T03:00:00.000Z"` — confirms BRT active                     | ☐   |
 
-> **Legacy input note**: Config G (`useLegacy=true`, `enableTime=true`) uses a legacy Kendo DateTimePicker that accepts typed input as a plain text string (no segment-by-segment editing). Type the full date-time string `03/15/2026 12:00 AM` in one pass, then Tab to confirm. The Kendo widget parses the string on blur and creates a Date object for local midnight, which then flows through `calChange()` → `getSaveValue()`.
+> **Legacy input note**: Config H (`useLegacy=true`, `enableTime=true`, `ignoreTimezone=true`) uses a legacy Kendo DateTimePicker that accepts typed input as a plain text string (no segment-by-segment editing). Type the full date-time string `03/15/2026 12:00 AM` in one pass, then Tab to confirm. The Kendo widget parses the string on blur and creates a Date object for local midnight, which then flows through `calChange()` → `getSaveValue()`.
 
-> **Typed vs popup path difference**: The legacy popup (tc-1-G-BRT) bypasses `getSaveValue()` and stores the raw `toISOString()` output (`"2026-03-15T03:00:00.000Z"`). Typed input goes through `getSaveValue()` which formats as local time without Z suffix (`"2026-03-15T00:00:00"`). This is Bug #2 — the two input methods produce structurally different stored values for the same intended date.
+> **Typed vs popup path difference**: The legacy popup (tc-1-H-BRT) bypasses `getSaveValue()` and stores the raw `toISOString()` output (`"2026-03-15T03:00:00.000Z"`). Typed input goes through `getSaveValue()` which formats as local time without Z suffix (`"2026-03-15T00:00:00"`). This is Bug #2 — the two input methods produce structurally different stored values for the same intended date.
+
+> **ignoreTZ no-op**: Config H differs from Config G only by `ignoreTimezone=true`. For the typed input path, `ignoreTZ` has no effect — both configs produce identical stored values (`"2026-03-15T00:00:00"`). The `ignoreTimezone` flag only affects `getCalendarFieldValue()` output for non-legacy configs (Bug #5 surface).
 
 ## Fail Conditions
 
 **FAIL-1 (Bug #2 absent — typed stores same as popup):**
 Raw value is `"2026-03-15T03:00:00.000Z"` (UTC datetime with Z suffix) instead of `"2026-03-15T00:00:00"`.
 
-- Interpretation: The typed input path is bypassing `getSaveValue()` and storing raw `toISOString()` — same as the popup path. This would mean Bug #2 is NOT present for legacy DateTime typed input in BRT. Compare against tc-1-G-BRT (popup) to confirm both paths produce the same result.
+- Interpretation: The typed input path is bypassing `getSaveValue()` and storing raw `toISOString()` — same as the popup path. This would mean Bug #2 is NOT present for legacy DateTime typed input in BRT. Compare against tc-1-H-BRT (popup) to confirm both paths produce the same result.
 
 **FAIL-2 (TZ not BRT):**
 `new Date(2026, 2, 15, 0, 0, 0).toISOString()` returns a value other than `"2026-03-15T03:00:00.000Z"`.
@@ -121,7 +123,7 @@ Raw value is `"2026-03-15T03:00:00.000Z"` (UTC datetime with Z suffix) instead o
 **FAIL-4 (GetFieldValue transforms the value):**
 `GetFieldValue` returns a value different from the raw stored value.
 
-- Interpretation: Config G (`useLegacy=true`, `enableTime=true`, `ignoreTimezone=false`) should return the raw value unchanged — `getCalendarFieldValue()` falls through to `return value` when `useLegacy=true`. If a transformation is seen, verify P6 returned a field with `useLegacy=true`.
+- Interpretation: Config H (`useLegacy=true`, `enableTime=true`, `ignoreTimezone=true`) should return the raw value unchanged — `getCalendarFieldValue()` enters the `!useLegacy && enableTime` branch only when `useLegacy=false`. With `useLegacy=true`, no fake Z is added. If a transformation is seen, verify P6 returned a field with `useLegacy=true`.
 
 **FAIL-5 (date shifted):**
 Raw value contains `"2026-03-14"` or `"2026-03-16"`.
@@ -130,14 +132,14 @@ Raw value contains `"2026-03-14"` or `"2026-03-16"`.
 
 ## Related
 
-| Reference                                               | Location                                                                     |
-| ------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Matrix row                                              | `matrix.md` — row `2-G-BRT`                                                  |
-| Run 1 results                                           | `runs/tc-2-G-BRT-run-1.md`                                                   |
-| Summary                                                 | `summaries/tc-2-G-BRT.md`                                                    |
-| Bug #2 (inconsistent popup vs typed handlers)           | `analysis.md` § Bug #2                                                       |
-| Bug #4 (legacy save format strips Z)                    | `analysis.md` § Bug #4                                                       |
-| Sibling — Config G, popup, BRT                          | [`tc-1-G-BRT.md`](tc-1-G-BRT.md) — FAIL-3 (legacy popup stores UTC datetime) |
-| Sibling — Config G, typed, IST                          | [`tc-2-G-IST.md`](tc-2-G-IST.md) — PASS (same storage as BRT)                |
-| Sibling — Config H, typed, BRT (same legacy + ignoreTZ) | [`tc-2-H-BRT.md`](tc-2-H-BRT.md) — PASS (identical result, ignoreTZ no-op)   |
-| Field config reference                                  | `tasks/date-handling/CLAUDE.md` — Test Form Fields                           |
+| Reference                                                    | Location                                                                   |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Matrix row                                                   | `matrix.md` — row `2-H-BRT`                                                |
+| Run 1 results                                                | `runs/tc-2-H-BRT-run-1.md`                                                 |
+| Summary                                                      | `summaries/tc-2-H-BRT.md`                                                  |
+| Bug #2 (inconsistent popup vs typed handlers)                | `analysis.md` § Bug #2                                                     |
+| Bug #4 (legacy save format strips Z)                         | `analysis.md` § Bug #4                                                     |
+| Sibling — Config H, popup, BRT                               | [`tc-1-H-BRT.md`](tc-1-H-BRT.md) — FAIL (legacy popup stores UTC datetime) |
+| Sibling — Config H, typed, IST                               | [`tc-2-H-IST.md`](tc-2-H-IST.md) — PASS (same storage as BRT)              |
+| Sibling — Config G, typed, BRT (same legacy, ignoreTZ=false) | [`tc-2-G-BRT.md`](tc-2-G-BRT.md) — PASS (identical result, ignoreTZ no-op) |
+| Field config reference                                       | `tasks/date-handling/CLAUDE.md` — Test Form Fields                         |
