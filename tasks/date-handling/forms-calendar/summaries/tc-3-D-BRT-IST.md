@@ -1,19 +1,21 @@
 # TC-3-D-BRT-IST — Summary
 
-**Spec**: [tc-2-4-cross-tz-brt.md](../test-cases/tc-2-4-cross-tz-brt.md)
-**Current status**: PASS — last run 2026-03-27 (IST)
-**Bug surface**: Bug #5 (fake Z in GetFieldValue) — present but not triggered on reload path; Config D TZ-invariant on reload
+**Spec**: [tc-3-D-BRT-IST.md](../test-cases/tc-3-D-BRT-IST.md)
+**Current status**: FAIL-3 — last run 2026-04-01 (IST)
+**Bug surface**: Bug #5 (fake Z in GetFieldValue) — confirmed active on IST reload across two records
 
 ## Run History
 
 | Run | Date       | TZ  | Outcome | File                                     |
 | --- | ---------- | --- | ------- | ---------------------------------------- |
 | 1   | 2026-03-27 | IST | PASS    | [run-1](../runs/tc-3-D-BRT-IST-run-1.md) |
+| 2   | 2026-04-01 | IST | FAIL-3  | [run-2](../runs/tc-3-D-BRT-IST-run-2.md) |
+| 3   | 2026-04-01 | IST | FAIL-3  | [run-3](../runs/tc-3-D-BRT-IST-run-3.md) |
 
 ## Current Interpretation
 
-Config D (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) saved from BRT and reloaded in IST shows no shift on reload. The raw stored value `"2026-03-15T00:00:00"` is TZ-invariant: `ignoreTimezone=true` suppresses all offset-based conversions in both the save and load paths, so the value and display are the same regardless of the reader's timezone. Display `03/15/2026 12:00 AM` is correct in IST. GFV returned the clean value — Bug #5 (fake Z appended by `getCalendarFieldValue()`) was not observed during reload. The cross-TZ reload for Config D is safe; the danger zone for IST users is the subsequent `SetFieldValue(GetFieldValue())` round-trip, which would introduce +5:30h drift per trip (see 9-D-IST-1).
+Bug #5 is consistently reproducible on IST reload. Runs 2 and 3 both show `GetFieldValue()` returning `"2026-03-15T00:00:00.000Z"` (fake Z) instead of the raw stored value. Run 1 (2026-03-27) was anomalous — likely the GFV path hadn't fully initialized during that early session. Display and date content are correct and TZ-invariant; only the GFV output is buggy. Run 3 also revealed a raw format change on the fresh record (`"03/15/2026 00:00:00"` instead of ISO `"2026-03-15T00:00:00"`), but the date content is correct — no timezone shift.
 
 ## Next Action
 
-Run 3-D-IST-BRT (save from IST, reload in BRT) when an IST-saved record is available. This is the inverse of the current run and completes the cross-TZ matrix for Config D reload. Predicted outcome: also PASS (TZ-invariant), same raw value returned regardless of save TZ.
+Re-run 3-D-BRT-BRT on the fresh record (DateTest-000080) to confirm Bug #5 is also active on same-TZ reload. Then run 3-D-IST-BRT when an IST-saved record is available.
