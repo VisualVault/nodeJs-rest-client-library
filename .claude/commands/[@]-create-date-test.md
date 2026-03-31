@@ -301,7 +301,7 @@ Table columns: Reference | Location
 Always include:
 
 - Link to the matrix row: `matrix.md` — row `{category-id}`
-- Link to results.md evidence block only if the Evidence column from Phase 1 referenced one
+- Link to the results.md test block added in Phase 5 — `results.md § Test {N.M}`
 - Link to the relevant bug section(s) in `analysis.md`
 - Links to sibling TC files if they exist (same category, adjacent configs or TZs)
 - Link to the field config reference in `CLAUDE.md`
@@ -310,12 +310,94 @@ Always include:
 
 ## Phase 4 — Update the matrix
 
-After writing the TC file, update the matrix row for this category ID in `matrix.md`:
+After writing the TC file, update `matrix.md` in two places:
+
+**1. The category row:**
 
 - **Actual** column: fill with the observed value from Phase 2
 - **Status** column: set to `PASS` or `FAIL` based on whether Actual matches Expected
 - **Run Date** column: today's date (YYYY-MM-DD)
 - **Evidence** column: link to the newly created TC file — `[tc-{category-id}](tc-{category-id}.md)`
+
+If the live result differs from the Expected column prediction, also update Expected to reflect the observed value and add a parenthetical note (e.g., `(prediction corrected 2026-03-30)`). Do the same for any sibling rows whose Expected was derived from the now-disproven prediction.
+
+**2. The Coverage Summary table** (top of the matrix):
+
+Update the PASS/FAIL/PENDING/BLOCKED counts for the affected category row to reflect the new status. The totals row does not need updating unless you want to keep it precise.
+
+---
+
+## Phase 5 — Update results.md
+
+`results.md` is the source-of-truth live test log. Every run of this command must add a test block to it.
+
+### Step 1 — Determine the session
+
+Read the end of `results.md` to find the most recent Session block. Append to the current session if **both** of these are true:
+
+- The session's TZ matches today's active timezone
+- The session date is today
+
+Otherwise, create a new Session block with the next session number. Session headers follow this format:
+
+```
+## Session N: {Short Description} ({TZ short name}, UTC±X)
+
+**Date**: {YYYY-MM-DD} | **TZ**: {IANA name} (UTC±X) — {how TZ was set, e.g., macOS TZ changed + Chrome restarted} | **Form**: {form name/number used}
+**Purpose**: {one sentence — what this session tests}
+**Key outcomes**: {comma-separated findings, written after the test completes}
+```
+
+### Step 2 — Write the test block
+
+Add a sub-section under the session. Test IDs are sequential within the session (e.g., if the session has Tests 5.1 and 5.2 already, the next is 5.3). Use the format:
+
+```
+### Test {N.M}: {Scenario description} ({Category ID})
+```
+
+The block must contain:
+
+**Precondition verification table** — one row per check run in Phase 2:
+
+| Check        | Command                                                     | Result                       |
+| ------------ | ----------------------------------------------------------- | ---------------------------- |
+| TZ           | `new Date().toString()`                                     | `"{actual output}"` ✓/✗      |
+| V1/V2        | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic` | `{value}` → V1/V2 active ✓/✗ |
+| Field lookup | filter snippet                                              | `["{field name}"]` ✓         |
+
+**Action description** — one paragraph: what was clicked/typed/executed, which field, what the popup/form showed.
+
+**Captured values** — inline JS result block + a table:
+
+```javascript
+// the exact JS call used and its return value
+```
+
+| Metric           | Value          | Notes                               |
+| ---------------- | -------------- | ----------------------------------- |
+| Display in input | `{display}`    |                                     |
+| Raw stored value | `"{raw}"`      |                                     |
+| GetFieldValue()  | `"{api}"`      | note fake Z / Bug ref if applicable |
+| isoRef           | `"{isoRef}"`   | confirms {TZ} active                |
+| Matrix Expected  | `"{expected}"` | MATCH or **prediction was wrong**   |
+
+**Findings** — bullet points or short paragraphs covering:
+
+- Whether the result matched the matrix prediction, and if not, what the correct behavior is
+- Which bugs were confirmed or disproved
+- Any knock-on corrections to sibling row predictions (e.g., other PENDING rows that relied on the same assumption)
+- What the next test should verify (e.g., "Run 2-A-IST to confirm typed input independently")
+
+**TC file link** — end with: `**TC file**: [tc-{category-id}.md](tc-{category-id}.md)`
+
+### Step 3 — Update the Coverage Matrix tables in results.md
+
+results.md has its own Category tables (after the Session blocks). Find the table for the relevant category and update the row for this category ID:
+
+- Change `NOT TESTED` to `PASS ✓` or `FAIL — Bug #{N} (Test {N.M})`
+- Correct the Expected Raw column if the prediction was wrong
+- Update the IST/cross-TZ note below the table if the live result contradicts or confirms it
 
 ---
 
@@ -330,3 +412,5 @@ After writing the TC file, update the matrix row for this category ID in `matrix
 - **Display assertions include time** when `enableTime=true`.
 - **Source values come from Phase 2 observations**, not from prior sessions or assumptions.
 - **Matrix is updated after the TC file is written** — the TC file and the matrix row stay in sync.
+- **results.md is always updated** — every run adds a test block and updates the coverage tables. No exceptions.
+- **No Findings or Key Finding section in TC files.** TC files are test procedures, not analytical records. Observations about whether the matrix prediction was right or wrong, which bugs were confirmed, and what sibling rows imply belong exclusively in `results.md` Phase 5. The title encodes the behavioral finding; Fail Conditions encode the risk reasoning. Do not add any other analytical sections to TC files.
