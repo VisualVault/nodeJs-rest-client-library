@@ -1511,3 +1511,10 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 
 - 2026-03-31 [TC-2-G-IST Run 1](runs/tc-2-G-IST-run-1.md) — IST — PASS — legacy DateTime typed stores local midnight; Bug #2 confirmed vs popup
 - 2026-04-01 [TC-2-H-IST Run 1](runs/tc-2-H-IST-run-1.md) — IST — PASS — legacy DateTime typed stores local midnight "2026-03-15T00:00:00"; confirms G-IST finding
+
+## Session 2026-03-31 (BRT — Typed Input Legacy)
+
+**Purpose**: Verify Config F (useLegacy=true, ignoreTimezone=true) typed input in BRT — confirm ignoreTZ no-op on date-only storage.
+**Key outcomes**: PASS — stores date-only `"2026-03-15"`, same as Config E; Bug #2 format inconsistency confirmed vs popup.
+
+- 2026-03-31 [TC-2-F-BRT Run 1](runs/tc-2-F-BRT-run-1.md) — BRT — PASS — legacy typed Config F stores date-only; ignoreTZ no-op; Bug #2 confirmed vs popup
