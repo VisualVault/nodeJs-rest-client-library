@@ -215,18 +215,46 @@ https://vvdemo.visualvault.com/FormViewer/app?DataID=2ae985b5-1892-4d26-94da-388
 
 ### Test Form Fields
 
-| Field       | enableTime | ignoreTZ | useLegacy | Config ID | Purpose                                            |
-| ----------- | :--------: | :------: | :-------: | :-------: | -------------------------------------------------- |
-| DataField1  |    OFF     |   OFF    |    OFF    |     A     | Current Date default                               |
-| DataField2  |    OFF     |   OFF    |    OFF    |     A     | Preset 3/1/2026 default                            |
-| DataField3  |    OFF     |   OFF    |    OFF    |     A     | Current Date default (duplicate)                   |
-| DataField4  |    OFF     |   OFF    |    OFF    |     A     | Preset 3/1/2026 (duplicate)                        |
-| DataField5  |   **ON**   |  **ON**  |    OFF    |     D     | **Bug #5 vulnerable** — DateTime + ignoreTZ        |
-| DataField6  |   **ON**   |   OFF    |    OFF    |     C     | DateTime, proper UTC — stable control              |
-| DataField7  |    OFF     |   OFF    |    OFF    |     A     | Date-only baseline (**Bug #7 vulnerable in UTC+**) |
-| DataField10 |    OFF     |  **ON**  |    OFF    |     B     | Date-only + ignoreTZ (no effect on date-only)      |
+Full harness: 8 configs × 3 initial-value modes. DataField3 (duplicate of DataField1) and DataField4 (duplicate of DataField2) exist on the form but are not used in formal test cases. DataField8/9 do not exist (naming gap from 7 to 10).
 
-DataField8/9 do not exist (naming jumped from 7 to 10).
+**No initial value** — base fields for user-input and API tests (Categories 1–4, 7–12)
+
+| Field       | Config | enableTime | ignoreTZ | useLegacy | Purpose                             |
+| ----------- | :----: | :--------: | :------: | :-------: | ----------------------------------- |
+| DataField7  |   A    |    OFF     |   OFF    |    OFF    | Date-only baseline (Bug #7 in UTC+) |
+| DataField10 |   B    |    OFF     |    ON    |    OFF    | Date-only + ignoreTZ                |
+| DataField6  |   C    |     ON     |   OFF    |    OFF    | DateTime UTC — control              |
+| DataField5  |   D    |     ON     |    ON    |    OFF    | **Bug #5/#6 surface**               |
+| DataField12 |   E    |    OFF     |   OFF    |    ON     | Legacy date-only                    |
+| DataField11 |   F    |    OFF     |    ON    |    ON     | Legacy date-only + ignoreTZ         |
+| DataField14 |   G    |     ON     |   OFF    |    ON     | Legacy DateTime                     |
+| DataField13 |   H    |     ON     |    ON    |    ON     | Legacy DateTime + ignoreTZ          |
+
+**Preset date initial value** — for Category 5 tests
+
+| Field       | Config | enableTime | ignoreTZ | useLegacy | Notes                        |
+| ----------- | :----: | :--------: | :------: | :-------: | ---------------------------- |
+| DataField2  |   A    |    OFF     |   OFF    |    OFF    | Preset 3/1/2026              |
+| DataField27 |   B    |    OFF     |    ON    |    OFF    | Preset 3/1/2026 + ignoreTZ   |
+| DataField15 |   C    |     ON     |   OFF    |    OFF    | Preset DateTime              |
+| DataField16 |   D    |     ON     |    ON    |    OFF    | Preset DateTime + ignoreTZ   |
+| DataField19 |   E    |    OFF     |   OFF    |    ON     | Legacy preset date-only      |
+| DataField20 |   F    |    OFF     |    ON    |    ON     | Legacy preset date-only + TZ |
+| DataField21 |   G    |     ON     |   OFF    |    ON     | Legacy preset DateTime       |
+| DataField22 |   H    |     ON     |    ON    |    ON     | Legacy preset DateTime + TZ  |
+
+**Current Date initial value** — for Category 6 tests
+
+| Field       | Config | enableTime | ignoreTZ | useLegacy | Notes                            |
+| ----------- | :----: | :--------: | :------: | :-------: | -------------------------------- |
+| DataField1  |   A    |    OFF     |   OFF    |    OFF    | Current Date                     |
+| DataField28 |   B    |    OFF     |    ON    |    OFF    | Current Date + ignoreTZ          |
+| DataField17 |   C    |     ON     |   OFF    |    OFF    | Current Date DateTime            |
+| DataField18 |   D    |     ON     |    ON    |    OFF    | Current Date DateTime + ignoreTZ |
+| DataField23 |   E    |    OFF     |   OFF    |    ON     | Legacy current date-only         |
+| DataField24 |   F    |    OFF     |    ON    |    ON     | Legacy current date-only + TZ    |
+| DataField25 |   G    |     ON     |   OFF    |    ON     | Legacy current DateTime          |
+| DataField26 |   H    |     ON     |    ON    |    ON     | Legacy current DateTime + TZ     |
 
 ### Key JavaScript for Inspecting Field State
 
@@ -252,6 +280,11 @@ Tests run via **Claude-in-Chrome MCP extension**. The extension tab must be crea
     ```bash
     sudo systemsetup -settimezone Asia/Calcutta   # IST (UTC+5:30)
     sudo systemsetup -settimezone America/Sao_Paulo  # BRT (UTC-3, restore)
+    sudo systemsetup -settimezone GMT                 # UTC+0 — always UTC+0, no DST
+    # WARNING: Europe/London is NOT equivalent to UTC+0 — it observes BST (UTC+1) from
+    # late March through October. UK clocks move forward last Sunday of March.
+    # Use GMT (or Africa/Abidjan, Africa/Accra) for a fixed UTC+0 zone.
+    # Also: 'UTC' and 'Etc/UTC' are NOT valid timezone names for systemsetup on macOS.
     ```
 - Verify active timezone in browser: `new Date().toString()` — check the GMT offset
 
