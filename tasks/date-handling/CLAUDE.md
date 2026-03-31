@@ -6,15 +6,15 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 
 ## Scope
 
-| Component                                | Status                            | Folder                      |
-| ---------------------------------------- | --------------------------------- | --------------------------- |
-| **Forms — Calendar Fields**              | IN PROGRESS (~57/108+ tests done) | `forms-calendar/`           |
-| **Web Services (REST API)**              | NOT STARTED                       | `web-services/` (to create) |
-| **Analytic Dashboards**                  | NOT STARTED                       | `dashboards/` (to create)   |
-| **VisualVault Reports**                  | NOT STARTED                       | `reports/` (to create)      |
-| **Files (document dates)**               | NOT STARTED                       | `files/` (to create)        |
-| **Workflows (date triggers, deadlines)** | NOT STARTED                       | `workflows/` (to create)    |
-| **Node.js Client Library**               | NOT STARTED                       | `node-client/` (to create)  |
+| Component                                | Status                           | Folder                      |
+| ---------------------------------------- | -------------------------------- | --------------------------- |
+| **Forms — Calendar Fields**              | IN PROGRESS (~71/225 tests done) | `forms-calendar/`           |
+| **Web Services (REST API)**              | NOT STARTED                      | `web-services/` (to create) |
+| **Analytic Dashboards**                  | NOT STARTED                      | `dashboards/` (to create)   |
+| **VisualVault Reports**                  | NOT STARTED                      | `reports/` (to create)      |
+| **Files (document dates)**               | NOT STARTED                      | `files/` (to create)        |
+| **Workflows (date triggers, deadlines)** | NOT STARTED                      | `workflows/` (to create)    |
+| **Node.js Client Library**               | NOT STARTED                      | `node-client/` (to create)  |
 
 ## Folder Structure
 
@@ -47,7 +47,7 @@ tasks/date-handling/
 
 ### Progress
 
-**~57 of ~108+ test cases completed.** 7 bugs confirmed (5 from original analysis + 2 new). Testing done across two timezones: BRT (UTC-3) and IST (UTC+5:30).
+**~71 of ~225 test cases completed** (40 PASS, 31 FAIL). 7 bugs confirmed (5 from original analysis + 2 new). Testing done across three timezones: BRT (UTC-3), IST (UTC+5:30), and UTC+0 (GMT). **Category 1 (Calendar Popup) is 100% complete** (20/20: 8 PASS, 12 FAIL).
 
 ### Files
 
@@ -193,7 +193,7 @@ Initial value fields (Current Date, Preset) store UTC; user-input fields store l
 
 With `useLegacy=false` in BRT, popup and typed input produce identical values. May only exist with `useLegacy=true` (no access to test).
 
-**Untested in IST**: Code analysis predicts they will differ in UTC+ timezones — popup creates a Date object (normalizeCalValue Date path → double-shift, -2 days in IST) while typed creates a string (string path → single-shift, -1 day). Same intended date, different stored values. See Categories 1-A-IST and 2-A-IST.
+**Tested in IST (2026-03-30)**: The predicted -2 day double-shift was wrong. Both popup (1-A-IST) and typed input (2-A-IST) store `"2026-03-14"` — single -1 day shift (Bug #7). Bug #2 asymmetry absent for non-legacy configs in IST. Legacy configs (useLegacy=true) store raw `toISOString()` which is a different format entirely — Bug #2 is moot for legacy.
 
 ### Test Forms
 
@@ -290,24 +290,20 @@ Tests run via **Claude-in-Chrome MCP extension**. The extension tab must be crea
 
 ### What Has NOT Been Tested (Forms)
 
-- `useLegacy=true` — no access to enable
 - `useUpdatedCalendarValueLogic=true` — V2 code path never exercised; flag confirmed `false` via live `CalendarValueService` instance scan (`__ngContext__` approach) on 2026-03-30. Re-verify if testing on a different account or with `?ObjectID=` URL param.
-- **Popup vs typed input in IST for date-only fields** (Categories 1-A-IST, 2-A-IST) — code predicts popup → -2 days (Date object double-shift), typed → -1 day (string single-shift) — different stored values for same intended date; needs live test
 - **V1 load path Bug #7 in IST** — `initCalendarValueV1` uses `moment(e).toDate()` for saved data and preset dates; UTC+ users should get wrong day on form load; code-confirmed but no live test (DateTest-000009 was not saved)
 - URL parameter input — needs `enableQListener=true` fields
 - Web service / scheduled script input — needs server-side execution (Category 10)
 - Preset/Current Date with `enableTime=true` fields — needs new test form fields
 - Save from IST timezone, reload from BRT (Category 3-D-IST-BRT) — IST record not saved
-- Legacy configs E–H (useLegacy=true)
+- Category 2 legacy typed input (E–H) across all TZs — popup is complete, typed input pending
 
 ### Next Steps (Forms)
 
-1. **Verify active code path** (if account/URL changes): Run the `__ngContext__` snippet from the Key JavaScript section in DevTools. Returns `false` = V1. Already confirmed `false` on 2026-03-30 for this account/form.
-2. **Category 1/2 IST — popup vs typed for Config A**: In IST, pick March 15 from popup on DataField7, then type 03/15/2026. Expected: popup → `"2026-03-13"`, typed → `"2026-03-14"`. Confirms Bug #7 asymmetry between Date object (popup) and string (typed) paths.
-3. **Category 10 — Web service input**: How production scripts set dates. Write a Node.js test script.
-4. **Category 3-D-IST-BRT**: Save a record from IST, switch back to BRT, reload and observe.
-5. **Category 5/6 — Preset/Current Date on DateTime fields**: Requires new test form fields with `enableTime=true` + initial value configuration.
-6. **Category 4 — URL parameters**: Requires `enableQListener=true` fields.
-7. **Legacy configs (E–H)**: When `useLegacy=true` access is available.
+1. **Category 2 — Typed Input legacy (E–H)**: Calendar popup is fully characterized; typed input for legacy configs is next across BRT, IST, UTC+0.
+2. **Category 10 — Web service input**: How production scripts set dates. Write a Node.js test script.
+3. **Category 3-D-IST-BRT**: Save a record from IST, switch back to BRT, reload and observe.
+4. **Category 5/6 — Preset/Current Date on DateTime fields**: Requires new test form fields with `enableTime=true` + initial value configuration.
+5. **Category 4 — URL parameters**: Requires `enableQListener=true` fields.
 
-See `forms-calendar/test/results.md` for the full ~108+ test case matrix and detailed session results. See `forms-calendar/test/index.md` for the summary dashboard — confirmed bugs, coverage counts, and formal TC file index.
+See `forms-calendar/test/matrix.md` for the full 225-slot test matrix. See `forms-calendar/test/results.md` for archived session results and new run index. See `forms-calendar/test/index.md` for the summary dashboard.
