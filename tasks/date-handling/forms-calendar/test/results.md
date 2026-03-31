@@ -1499,3 +1499,10 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 
 - 2026-03-31 [TC-1-E-UTC0 Run 1](runs/tc-1-E-UTC0-run-1.md) — UTC+0 — FAIL-1 — legacy stores UTC datetime; date correct (no shift at UTC+0); prediction corrected
 - 2026-03-31 [TC-1-F-UTC0 Run 1](runs/tc-1-F-UTC0-run-1.md) — UTC+0 — FAIL-1 — Config F = Config E; ignoreTZ no-op; Category 1 complete (20/20)
+
+## Session 2026-03-31 (IST — Typed Input)
+
+**Purpose**: Verify legacy DateTime typed input behavior in IST — confirm getSaveValue formats local time; compare against popup path.
+**Key outcomes**: PASS — typed input stores local midnight correctly; Bug #2 confirmed (popup vs typed inconsistency).
+
+- 2026-03-31 [TC-2-G-IST Run 1](runs/tc-2-G-IST-run-1.md) — IST — PASS — legacy DateTime typed stores local midnight; Bug #2 confirmed vs popup
