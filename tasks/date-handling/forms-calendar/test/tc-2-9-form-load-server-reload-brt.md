@@ -160,7 +160,7 @@ VV.Form.calendarValueService.useUpdatedCalendarValueLogic;
 | 7   | Capture GetFieldValue — Config A, Preset                                               | `VV.Form.GetFieldValue('<FIELD_A_P>')`                         | `"03/01/2026 03:00:00"`                                                    | ☐   |
 | 8   | Verify display — Config D field (identified as `<FIELD_D>` in P6)                      | —                                                              | `03/15/2026 12:00 AM`                                                      | ☐   |
 | 9   | Capture raw stored value — Config D                                                    | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_D>')`    | `"2026-03-15T00:00:00"` — no shift from server reload                      | ☐   |
-| 10  | Capture GetFieldValue — Config D                                                       | `VV.Form.GetFieldValue('<FIELD_D>')`                           | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5)                             | ☐   |
+| 10  | Capture GetFieldValue — Config D                                                       | `VV.Form.GetFieldValue('<FIELD_D>')`                           | `"2026-03-15T00:00:00"` — same as raw, no transformation                   | ☐   |
 | 11  | Verify display — Config C field (identified as `<FIELD_C>` in P6)                      | —                                                              | `03/15/2026 12:00 AM`                                                      | ☐   |
 | 12  | Capture raw stored value — Config C                                                    | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_C>')`    | `"2026-03-15T00:00:00"` — no shift from server reload                      | ☐   |
 | 13  | Capture GetFieldValue — Config C                                                       | `VV.Form.GetFieldValue('<FIELD_C>')`                           | `"2026-03-15T03:00:00.000Z"` — proper UTC conversion (no Bug #5)           | ☐   |
@@ -184,10 +184,10 @@ Step 9 or step 12 returns a value other than `"2026-03-15T00:00:00"`.
 
 - Interpretation: The server load path shifted the stored value. In BRT (UTC-3), Bug #3 (hardcoded `enableTime=true` in `initCalendarValueV2()` for the server path) does not produce a visible shift because UTC-3 midnight still lands on the same local date. If a shift is observed in BRT, the code path has changed or V2 is active. Verify P5 returns `false`.
 
-**FAIL-2 (Bug #5 absent — Config D GetFieldValue returns proper UTC):**
-Step 10 returns `"2026-03-15T03:00:00.000Z"` (proper UTC for BRT midnight) instead of `"2026-03-15T00:00:00.000Z"`.
+**FAIL-2 (Bug #5 active — fake Z in Config D GetFieldValue):**
+Step 10 returns `"2026-03-15T00:00:00.000Z"` — fake Z appended to local time.
 
-- Interpretation: `getCalendarFieldValue()` no longer appends a fake `Z` to the local time string. Verify the build number matches `20260304.1`. If the build changed, Bug #5 may have been fixed.
+- Interpretation: `getCalendarFieldValue()` is appending a literal `Z` to the local time string. Correct return is `"2026-03-15T00:00:00"` matching the raw stored value. This is Bug #5. Round-trip drift will occur if this value is fed back via `SetFieldValue()` — each trip shifts the stored time by −3h in BRT (see TC-2.3).
 
 **FAIL-3 (Config A initial-value fields still show Date objects — not reloaded from server):**
 Step 3 returns a Date object string such as `"Fri Mar 27 2026 17:02:51 GMT-0300 (Brasilia Standard Time)"` instead of `"03/27/2026 20:02:51"`.

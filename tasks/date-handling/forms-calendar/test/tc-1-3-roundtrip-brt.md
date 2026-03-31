@@ -91,42 +91,42 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Test Steps
 
-| #   | Action                                           | Test Data                                                                      | Expected Result                                                 | ✓   |
-| --- | ------------------------------------------------ | ------------------------------------------------------------------------------ | --------------------------------------------------------------- | --- |
-| 1   | Complete setup                                   | See Preconditions P1–P6                                                        | All P1–P6 checks pass                                           | ☐   |
-| 2   | Establish initial field value via console        | `VV.Form.SetFieldValue('<FIELD_NAME>', '2026-03-15T00:00:00')`                 | No error returned; field updates                                | ☐   |
-| 3   | Record display value (before round-trip)         | —                                                                              | `03/15/2026 12:00 AM`                                           | ☐   |
-| 4   | Capture raw stored value (before round-trip)     | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')`                 | `"2026-03-15T00:00:00"`                                         | ☐   |
-| 5   | Capture GetFieldValue return (before round-trip) | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                        | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5)                  | ☐   |
-| 6   | Execute round-trip via console                   | `VV.Form.SetFieldValue('<FIELD_NAME>', VV.Form.GetFieldValue('<FIELD_NAME>'))` | No error returned; field display changes                        | ☐   |
-| 7   | Record display value (after round-trip)          | —                                                                              | `03/14/2026 09:00 PM`                                           | ☐   |
-| 8   | Capture raw stored value (after round-trip)      | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')`                 | `"2026-03-14T21:00:00"`                                         | ☐   |
-| 9   | Capture GetFieldValue return (after round-trip)  | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                        | `"2026-03-14T21:00:00.000Z"` — fake Z (Bug #5) on shifted value | ☐   |
-| 10  | Confirm shift magnitude                          | `new Date('2026-03-15T00:00:00.000Z') - new Date('2026-03-14T21:00:00.000Z')`  | `10800000` (3 hours in milliseconds = UTC-3 offset)             | ☐   |
-| 11  | Capture timezone reference                       | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                                 | `"2026-03-15T03:00:00.000Z"` — confirms BRT active              | ☐   |
+| #   | Action                                           | Test Data                                                                                                                      | Expected Result                                           | ✓   |
+| --- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- | --- |
+| 1   | Complete setup                                   | See Preconditions P1–P6                                                                                                        | All P1–P6 checks pass                                     | ☐   |
+| 2   | Establish initial field value via console        | `VV.Form.SetFieldValue('<FIELD_NAME>', '2026-03-15T00:00:00')`                                                                 | No error returned; field updates                          | ☐   |
+| 3   | Record display value (before round-trip)         | —                                                                                                                              | `03/15/2026 12:00 AM`                                     | ☐   |
+| 4   | Capture raw stored value (before round-trip)     | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')`                                                                 | `"2026-03-15T00:00:00"`                                   | ☐   |
+| 5   | Capture GetFieldValue return (before round-trip) | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                                                                        | `"2026-03-15T00:00:00"` — same as raw, no transformation  | ☐   |
+| 6   | Execute round-trip via console                   | `VV.Form.SetFieldValue('<FIELD_NAME>', VV.Form.GetFieldValue('<FIELD_NAME>'))`                                                 | No error returned; field display unchanged                | ☐   |
+| 7   | Record display value (after round-trip)          | —                                                                                                                              | `03/15/2026 12:00 AM` — unchanged, no drift               | ☐   |
+| 8   | Capture raw stored value (after round-trip)      | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')`                                                                 | `"2026-03-15T00:00:00"` — unchanged, no drift             | ☐   |
+| 9   | Capture GetFieldValue return (after round-trip)  | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                                                                        | `"2026-03-15T00:00:00"` — same as raw, no transformation  | ☐   |
+| 10  | Confirm round-trip is idempotent                 | `new Date(VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')).getTime() - new Date('2026-03-15T00:00:00').getTime()` | `0` — no drift, round-trip did not alter the stored value | ☐   |
+| 11  | Capture timezone reference                       | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                                                                                 | `"2026-03-15T03:00:00.000Z"` — confirms BRT active        | ☐   |
 
 > **Note on Step 2:** Run in DevTools console (F12 → Console tab). The raw string `'2026-03-15T00:00:00'` has no timezone suffix — the browser treats it as local time, which stores correctly as BRT midnight.
 >
-> **Note on Step 6:** The round-trip feeds `GetFieldValue` output back into `SetFieldValue`. Because `GetFieldValue` returns a fake Z suffix (Bug #5), JS parses the value as UTC midnight on receipt, which in BRT is 9:00 PM on March 14 — hence the -3h shift.
+> **Note on Step 6:** The round-trip feeds `GetFieldValue` output back into `SetFieldValue`. Correct behavior: `GetFieldValue` returns the raw value (no Z suffix), `SetFieldValue` re-stores it unchanged. If Bug #5 is active, `GetFieldValue` returns a fake Z suffix, JS parses it as UTC midnight, and in BRT that re-stores as 9:00 PM March 14 — a -3h shift. That is the FAIL condition, not the expected outcome.
 
 ---
 
 ## Fail Conditions
 
-**FAIL-1 (Bug #5 patched):**
-Step 5 returns `"2026-03-15T00:00:00"` without `.000Z`.
+**FAIL-1 (Bug #5 active — fake Z in GetFieldValue):**
+Step 5 returns `"2026-03-15T00:00:00.000Z"` — fake Z appended.
 
-- Interpretation: `getCalendarFieldValue()` was fixed between build 20260304.1 and the currently tested build. Verify the VV build number. If the build is newer, update the test and the bug tracker.
+- Interpretation: `getCalendarFieldValue()` is appending a literal `[Z]` to the local time string (Bug #5). Correct return is `"2026-03-15T00:00:00"`. This fake Z will cause the round-trip in Step 6 to shift the stored value by -3h.
 
-**FAIL-2 (no drift after round-trip):**
-Step 8 returns `"2026-03-15T00:00:00"` — same as before.
+**FAIL-2 (Bug #5 drift in round-trip):**
+Step 8 returns `"2026-03-14T21:00:00"` — stored value shifted -3h from original.
 
-- Interpretation: Bug #5 is patched, or the SetFieldValue path no longer parses the Z suffix as UTC. Re-confirm Step 5 result: if Step 5 still shows fake Z, investigate the normalizeCalValue path in main.js.
+- Interpretation: Bug #5 fake Z caused `SetFieldValue` to interpret the value as UTC midnight, storing it as 21:00 BRT on March 14. Each additional round-trip shifts another -3h. Correct stored value after round-trip is `"2026-03-15T00:00:00"` (unchanged).
 
-**FAIL-3 (wrong shift magnitude):**
-Step 8 returns a value other than `"2026-03-14T21:00:00"`, or Step 10 returns a value other than `10800000`.
+**FAIL-3 (unexpected shift magnitude):**
+Step 8 returns a value other than `"2026-03-15T00:00:00"` (correct) or `"2026-03-14T21:00:00"` (Bug #5 in BRT), or Step 10 returns a value other than `0` or `-10800000`.
 
-- Interpretation: The active timezone is not BRT (UTC-3). Abort, re-check P1 and P2, verify Step 11 returns `"2026-03-15T03:00:00.000Z"` before rerunning.
+- Interpretation: The active timezone is not BRT (UTC-3), or a different code path was triggered. Abort, re-check P1 and P2, verify Step 11 returns `"2026-03-15T03:00:00.000Z"` before rerunning.
 
 **FAIL-4 (timezone environment invalid):**
 Step 11 returns `"2026-03-15T00:00:00.000Z"` (no 3h offset shift).

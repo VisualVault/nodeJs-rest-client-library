@@ -105,7 +105,7 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 | 6   | Click Set                                                           | Set button at bottom of time picker                            | Popup closes; target field input shows `03/15/2026 12:00 AM`                    | ☐   |
 | 7   | Verify display value                                                | Screenshot or read the field input                             | `03/15/2026 12:00 AM`                                                           | ☐   |
 | 8   | Capture raw stored value                                            | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` | `"2026-03-15T00:00:00"`                                                         | ☐   |
-| 9   | Capture GetFieldValue                                               | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5)                                  | ☐   |
+| 9   | Capture GetFieldValue                                               | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00"` — same as raw, no transformation                        | ☐   |
 | 10  | Verify environment (isoRef)                                         | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                 | `"2026-03-15T03:00:00.000Z"` — confirms BRT active                              | ☐   |
 
 > **Set button visibility**: The Set button is at the bottom of the time picker modal. If the viewport is short, the button may be cut off. Do NOT scroll inside the time picker columns (that changes the selected time). Instead, scroll the PAGE using the browser scrollbar or by clicking outside the modal area and scrolling, then click Set. Alternatively, use DevTools console: `document.querySelector('kendo-popup button[class*="set"], kendo-popup button').click()` to click Set without scrolling.
@@ -114,10 +114,10 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Fail Conditions
 
-**FAIL-1 (Bug #5 absent — GetFieldValue returns proper UTC instead of fake Z):**
-Step 9 returns `"2026-03-15T03:00:00.000Z"` instead of `"2026-03-15T00:00:00.000Z"`.
+**FAIL-1 (Bug #5 active — fake Z in GetFieldValue):**
+Step 9 returns `"2026-03-15T00:00:00.000Z"` — fake Z appended to local time.
 
-- Interpretation: The `getCalendarFieldValue()` fake-Z path was fixed or the code was updated. Verify the VV build number matches `20260304.1`. If the build changed, re-run P5 and update the TC accordingly.
+- Interpretation: `getCalendarFieldValue()` is appending a literal `[Z]` to the local time string. Correct return is `"2026-03-15T00:00:00"` matching the raw stored value. This is Bug #5. Round-trip drift will occur if this value is fed back via `SetFieldValue()` — each trip shifts the stored time by -3h (BRT offset).
 
 **FAIL-2 (V2 active — wrong code path):**
 P5 returns `true`.

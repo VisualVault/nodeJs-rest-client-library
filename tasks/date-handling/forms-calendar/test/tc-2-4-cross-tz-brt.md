@@ -103,7 +103,7 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 | 2   | Set initial value on the target field (identified in P6) | `VV.Form.SetFieldValue('<FIELD_NAME>', '2026-03-15T00:00:00')`                                                                                                                                                                   | No error returned                                                                                  | ☐   |
 | 3   | Verify display shows correct date (BRT)                  | Read the target field input                                                                                                                                                                                                      | `03/15/2026 12:00 AM`                                                                              | ☐   |
 | 4   | Capture raw stored value                                 | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')`                                                                                                                                                                   | `"2026-03-15T00:00:00"`                                                                            | ☐   |
-| 5   | Capture GetFieldValue (fake Z)                           | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                                                                                                                                                                          | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5)                                                     | ☐   |
+| 5   | Capture GetFieldValue (fake Z)                           | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                                                                                                                                                                          | `"2026-03-15T00:00:00"` — same as raw, no transformation                                           | ☐   |
 | 6   | Verify no-Z string is parsed as local time               | `new Date("2026-03-15T00:00:00").toISOString()`                                                                                                                                                                                  | `"2026-03-15T03:00:00.000Z"` — no-Z treated as BRT local midnight (+3h to UTC)                     | ☐   |
 | 7   | Verify fake-Z parses as UTC midnight (the drift source)  | `new Date("2026-03-15T00:00:00.000Z").toString()`                                                                                                                                                                                | `"Sat Mar 14 2026 21:00:00 GMT-0300 (Brasilia Standard Time)"` — UTC midnight = March 14 21:00 BRT | ☐   |
 | 8   | Verify drifted storage value (BRT round-trip result)     | ``(()=>{const d=new Date("2026-03-15T00:00:00.000Z");const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;})()`` | `"2026-03-14T21:00:00"`                                                                            | ☐   |
@@ -132,10 +132,10 @@ Step 6 returns `"2026-03-15T00:00:00.000Z"` (no shift — UTC).
 
 - Interpretation: The browser is running in UTC, not BRT. In UTC, no-Z strings are treated as UTC midnight, and isoRef would also return `"2026-03-15T00:00:00.000Z"`. Abort, re-do P1–P3, and restart the test.
 
-**FAIL-2 (No drift in BRT — Bug #5 absent or fixed):**
-Step 7 returns a string showing March 15 00:00 in local time (no shift from midnight).
+**FAIL-2 (Bug #5 active — fake Z in GetFieldValue):**
+Step 5 returns `"2026-03-15T00:00:00.000Z"` — fake Z appended to local time.
 
-- Interpretation: `getCalendarFieldValue()` no longer appends a fake Z. Step 5 would also return `"2026-03-15T03:00:00.000Z"` (proper UTC) instead of fake midnight Z. Verify the build number matches `20260304.1` and re-run P5.
+- Interpretation: `getCalendarFieldValue()` is appending a literal `Z` to the local time string. Correct return is `"2026-03-15T00:00:00"` matching the raw stored value. This is Bug #5. Steps 6–8 in this TC demonstrate analytically how that fake Z causes the −3h drift when fed back into `SetFieldValue` — see TC-2.3 for the live round-trip test.
 
 **FAIL-3 (V2 active — wrong code path):**
 P5 returns `true`.

@@ -101,7 +101,7 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 | 6   | Click **Set**                                                       | —                                                              | Popup closes; field input updates                          | ☐   |
 | 7   | Record display value shown in field                                 | —                                                              | `03/15/2026 12:00 AM`                                      | ☐   |
 | 8   | Capture raw stored value                                            | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` | `"2026-03-15T00:00:00"`                                    | ☐   |
-| 9   | Capture GetFieldValue return                                        | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5)             | ☐   |
+| 9   | Capture GetFieldValue return                                        | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00"` — same as raw, no transformation   | ☐   |
 | 10  | Capture timezone reference                                          | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                 | `"2026-03-15T03:00:00.000Z"` — confirms BRT active         | ☐   |
 
 > **Note on Step 5:** If the time header is not `12:00 AM`, click the `00` value in the minute column to reset it before clicking Set.
@@ -117,10 +117,10 @@ Raw stored value is `"2026-03-15T03:00:00.000Z"` — UTC time bled into storage.
 
 - Interpretation: `getSaveValue()` was bypassed; `calChangeSetValue()` stored the raw `toISOString()` output directly. Contradicts live test evidence from 2026-03-27. Re-investigate the popup pipeline in `main.js`.
 
-**FAIL-2 (Bug #5 patched):**
-`GetFieldValue()` returns `"2026-03-15T00:00:00"` without `.000Z`.
+**FAIL-2 (Bug #5 active):**
+`GetFieldValue()` returns `"2026-03-15T00:00:00.000Z"` — fake Z appended.
 
-- Interpretation: `getCalendarFieldValue()` was fixed between build 20260304.1 and the currently tested build. Verify the VV build number and update the bug tracker.
+- Interpretation: `getCalendarFieldValue()` is appending a literal `[Z]` to the local time string. Correct return is `"2026-03-15T00:00:00"` matching the raw stored value. This is Bug #5: the fake Z makes the value appear UTC-anchored when it is not. Round-trip drift will occur if this value is fed back via `SetFieldValue()` — each trip shifts the stored time by -3h (BRT offset).
 
 **FAIL-3 (timezone environment invalid):**
 Step 10 returns `"2026-03-15T00:00:00.000Z"` (no offset shift).

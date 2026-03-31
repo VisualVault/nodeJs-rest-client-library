@@ -91,25 +91,25 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Test Steps
 
-| #   | Action                                                                                                         | Test Data                                                            | Expected Result                                                                            | ✓   |
-| --- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | --- |
-| 1   | Complete setup                                                                                                 | See Preconditions P1–P6                                              | All P1–P6 checks pass                                                                      | ☐   |
-| 2   | Click the calendar icon next to the target field (identified in P6)                                            | —                                                                    | Date picker popup opens on March 2026, Date tab active                                     | ☐   |
-| 3   | Navigate to March 2026 if not already shown                                                                    | —                                                                    | March 2026 calendar grid displayed                                                         | ☐   |
-| 4   | Scroll the page (using scrollbar or scroll within the date grid) to reveal the full popup including Set button | —                                                                    | Full calendar grid (days 1–31) and Set/Cancel buttons visible                              | ☐   |
-| 5   | Click day **15**                                                                                               | —                                                                    | Popup advances to Time tab; time header shows `12:00 AM`                                   | ☐   |
-| 6   | Verify time header before clicking Set                                                                         | —                                                                    | Time header reads `12:00 AM` — do not click Set if any other time is shown                 | ☐   |
-| 7   | Click **Set**                                                                                                  | —                                                                    | Popup closes; field input shows `03/15/2026 12:00 AM`                                      | ☐   |
-| 8   | Record display value shown in field                                                                            | —                                                                    | `03/15/2026 12:00 AM`                                                                      | ☐   |
-| 9   | Capture raw stored value                                                                                       | `` `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` `` | `"2026-03-15T00:00:00"` — local midnight IST stored (same as Config C)                     | ☐   |
-| 10  | Capture GetFieldValue return                                                                                   | `` `VV.Form.GetFieldValue('<FIELD_NAME>')` ``                        | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5): local midnight with Z suffix, NOT real UTC | ☐   |
-| 11  | Capture timezone reference                                                                                     | `` `new Date(2026, 2, 15, 0, 0, 0).toISOString()` ``                 | `"2026-03-14T18:30:00.000Z"` — confirms IST active; real UTC of IST midnight               | ☐   |
+| #   | Action                                                                                                         | Test Data                                                            | Expected Result                                                              | ✓   |
+| --- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --- |
+| 1   | Complete setup                                                                                                 | See Preconditions P1–P6                                              | All P1–P6 checks pass                                                        | ☐   |
+| 2   | Click the calendar icon next to the target field (identified in P6)                                            | —                                                                    | Date picker popup opens on March 2026, Date tab active                       | ☐   |
+| 3   | Navigate to March 2026 if not already shown                                                                    | —                                                                    | March 2026 calendar grid displayed                                           | ☐   |
+| 4   | Scroll the page (using scrollbar or scroll within the date grid) to reveal the full popup including Set button | —                                                                    | Full calendar grid (days 1–31) and Set/Cancel buttons visible                | ☐   |
+| 5   | Click day **15**                                                                                               | —                                                                    | Popup advances to Time tab; time header shows `12:00 AM`                     | ☐   |
+| 6   | Verify time header before clicking Set                                                                         | —                                                                    | Time header reads `12:00 AM` — do not click Set if any other time is shown   | ☐   |
+| 7   | Click **Set**                                                                                                  | —                                                                    | Popup closes; field input shows `03/15/2026 12:00 AM`                        | ☐   |
+| 8   | Record display value shown in field                                                                            | —                                                                    | `03/15/2026 12:00 AM`                                                        | ☐   |
+| 9   | Capture raw stored value                                                                                       | `` `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` `` | `"2026-03-15T00:00:00"` — local midnight IST stored (same as Config C)       | ☐   |
+| 10  | Capture GetFieldValue return                                                                                   | `` `VV.Form.GetFieldValue('<FIELD_NAME>')` ``                        | `"2026-03-15T00:00:00"` — same as raw, no transformation                     | ☐   |
+| 11  | Capture timezone reference                                                                                     | `` `new Date(2026, 2, 15, 0, 0, 0).toISOString()` ``                 | `"2026-03-14T18:30:00.000Z"` — confirms IST active; real UTC of IST midnight | ☐   |
 
 > **Note on Step 4 — popup scroll behavior:** The Set button is below the time picker columns and may not be visible without scrolling. Scroll the PAGE (not inside the time picker) by scrolling within the date grid area of the popup or using the browser scrollbar. Do NOT scroll inside the Hour/Minute/AM-PM columns — that changes the selected time.
 >
 > **Note on Step 5:** After clicking a day, the popup automatically switches to the Time tab. The default time is 12:00 AM. Do not interact with the time columns unless the header shows something other than `12:00 AM`.
 >
-> **Note on Step 10 — Bug #5 fake Z:** GetFieldValue returns `"2026-03-15T00:00:00.000Z"` which appears to be UTC midnight March 15, but is actually a misinterpretation. The real UTC equivalent of IST midnight March 15 is `"2026-03-14T18:30:00.000Z"` (confirmed by Step 11). The fake Z shifts the apparent UTC time forward by +5:30h.
+> **Note on Step 10 — Bug #5 fake Z:** If Bug #5 is active, GetFieldValue returns `"2026-03-15T00:00:00.000Z"` which appears to be UTC midnight March 15, but is actually local midnight with a falsely appended Z. The real UTC equivalent of IST midnight March 15 is `"2026-03-14T18:30:00.000Z"` (confirmed by Step 11). See FAIL-1 for the full interpretation.
 >
 > **Note on Step 9 — storage confirmed same as Config C:** `getSaveValue()` formats dates as local time using `moment(input).format("YYYY-MM-DD[T]HH:mm:ss")`. The `ignoreTimezone` flag does not affect `getSaveValue()`. Both Configs C and D store `"2026-03-15T00:00:00"` in IST. The only observable difference between C and D is in GetFieldValue output.
 
@@ -117,10 +117,10 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Fail Conditions
 
-**FAIL-1 (Bug #5 not triggered — real UTC returned instead of fake Z):**
-`GetFieldValue()` returns `"2026-03-14T18:30:00.000Z"` (the real UTC equivalent of IST midnight).
+**FAIL-1 (Bug #5 active — fake Z in GetFieldValue):**
+Step 10 returns `"2026-03-15T00:00:00.000Z"` — fake Z appended to local midnight.
 
-- Interpretation: Bug #5 is no longer triggering on Config D. This would indicate a code fix — `getCalendarFieldValue()` no longer appends a fake Z for `ignoreTimezone=true` fields. Verify the VV build number matches 20260304.1. If the build is newer, Bug #5 may have been patched — update the bug tracker.
+- Interpretation: `getCalendarFieldValue()` is appending a literal `Z` to the local time string. Correct return is `"2026-03-15T00:00:00"` matching the raw stored value. This is Bug #5. The fake Z makes the value appear as UTC midnight March 15, but the real UTC equivalent of IST midnight is `"2026-03-14T18:30:00.000Z"` (confirmed by Step 11). Round-trip drift will occur if this value is fed back via `SetFieldValue()` — each trip shifts the stored time by +5:30h in IST (see TC-2.5).
 
 **FAIL-2 (Wrong storage format — UTC offset stored instead of local midnight):**
 Raw stored value is `"2026-03-14T18:30:00"` (the UTC equivalent of IST midnight).

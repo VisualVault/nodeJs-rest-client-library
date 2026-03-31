@@ -107,7 +107,7 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 | 8   | Type AM/PM                                      | `a`                                                            | AM/PM sets to `AM`; input shows `03/15/2026 12:00 AM`                            | ☐   |
 | 9   | Press Tab to confirm                            | `Tab`                                                          | Focus moves to next field; target field input finalizes as `03/15/2026 12:00 AM` | ☐   |
 | 10  | Capture raw stored value                        | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` | `"2026-03-15T00:00:00"`                                                          | ☐   |
-| 11  | Capture GetFieldValue                           | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5)                                   | ☐   |
+| 11  | Capture GetFieldValue                           | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00"` — same as raw, no transformation                         | ☐   |
 | 12  | Verify environment (isoRef)                     | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                 | `"2026-03-15T03:00:00.000Z"` — confirms BRT active                               | ☐   |
 
 > **Kendo DateTimePicker segment entry**: After clicking the input, the cursor lands on the month segment. Each two-digit segment (month, day, hour, minute) auto-advances when filled. The year segment requires all four digits before advancing. The AM/PM segment accepts `a` (AM) or `p` (PM). Do not type slashes, colons, or spaces — the format mask handles separators automatically. Press Tab once all segments are filled to commit the value to the form field and trigger the change handler.
@@ -123,10 +123,10 @@ Step 10 returns a value other than `"2026-03-15T00:00:00"` — e.g., `"2026-03-1
 
 - Interpretation: The `calChange()` handler (typed input) is using a different code path than `calChangeSetValue()` (calendar popup), producing a divergent stored value. This confirms Bug #2. Verify the build number matches `20260304.1`. If the build matches, document the discrepancy — Bug #2 may manifest in specific configurations not covered by this test.
 
-**FAIL-2 (Bug #5 absent — GetFieldValue returns proper UTC):**
-Step 11 returns `"2026-03-15T03:00:00.000Z"` (proper UTC for BRT midnight) instead of `"2026-03-15T00:00:00.000Z"`.
+**FAIL-2 (Bug #5 active — fake Z in GetFieldValue):**
+Step 11 returns `"2026-03-15T00:00:00.000Z"` — fake Z appended to local time.
 
-- Interpretation: `getCalendarFieldValue()` no longer appends a fake `Z` to the local midnight string. Verify the build number matches `20260304.1`. If the build changed, re-run P5 and update expected results accordingly.
+- Interpretation: `getCalendarFieldValue()` is appending a literal `Z` to the local time string. Correct return is `"2026-03-15T00:00:00"` matching the raw stored value. This is Bug #5. Round-trip drift will occur if this value is fed back via `SetFieldValue()` — each trip shifts the stored time by −3h in BRT (see TC-2.3).
 
 **FAIL-3 (V2 active — wrong code path):**
 P5 returns `true`.

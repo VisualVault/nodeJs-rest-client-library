@@ -95,17 +95,17 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Test Steps
 
-| #   | Action                                                                     | Test Data                                                      | Expected Result                                               | ✓   |
-| --- | -------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------- | --- |
-| 1   | Complete setup                                                             | See Preconditions P1–P6                                        | All P1–P6 checks pass                                         | ☐   |
-| 2   | Set initial value on the target field (identified in P6) — Trip 0 baseline | `VV.Form.SetFieldValue('<FIELD_NAME>', '2026-03-15T00:00:00')` | No error returned                                             | ☐   |
-| 3   | Capture Trip 0 raw stored value                                            | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` | `"2026-03-15T00:00:00"`                                       | ☐   |
-| 4   | Capture Trip 0 GetFieldValue                                               | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5)                | ☐   |
-| 5   | Execute 10 sequential round-trips; capture raw value after each            | JS loop (see blockquote below)                                 | 10-element array matches trip sequence (see blockquote below) | ☐   |
-| 6   | Verify display value at Trip 10                                            | Read the target field input                                    | `03/13/2026 06:00 PM`                                         | ☐   |
-| 7   | Capture raw stored value at Trip 10                                        | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` | `"2026-03-13T18:00:00"`                                       | ☐   |
-| 8   | Capture GetFieldValue at Trip 10                                           | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-13T18:00:00.000Z"` — fake Z (Bug #5)                | ☐   |
-| 9   | Verify environment (isoRef)                                                | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                 | `"2026-03-15T03:00:00.000Z"` — confirms BRT active            | ☐   |
+| #   | Action                                                                     | Test Data                                                      | Expected Result                                          | ✓   |
+| --- | -------------------------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------- | --- |
+| 1   | Complete setup                                                             | See Preconditions P1–P6                                        | All P1–P6 checks pass                                    | ☐   |
+| 2   | Set initial value on the target field (identified in P6) — Trip 0 baseline | `VV.Form.SetFieldValue('<FIELD_NAME>', '2026-03-15T00:00:00')` | No error returned                                        | ☐   |
+| 3   | Capture Trip 0 raw stored value                                            | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` | `"2026-03-15T00:00:00"`                                  | ☐   |
+| 4   | Capture Trip 0 GetFieldValue                                               | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00"` — same as raw, no transformation | ☐   |
+| 5   | Execute 10 sequential round-trips; capture raw value after each            | JS loop (see blockquote below)                                 | 10-element array: all `"2026-03-15T00:00:00"` — no drift | ☐   |
+| 6   | Verify display value at Trip 10                                            | Read the target field input                                    | `03/15/2026 12:00 AM` — unchanged, no drift              | ☐   |
+| 7   | Capture raw stored value at Trip 10                                        | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` | `"2026-03-15T00:00:00"` — unchanged, no drift            | ☐   |
+| 8   | Capture GetFieldValue at Trip 10                                           | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00"` — same as raw, no transformation | ☐   |
+| 9   | Verify environment (isoRef)                                                | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                 | `"2026-03-15T03:00:00.000Z"` — confirms BRT active       | ☐   |
 
 > **Step 5 — JS snippet** (paste into DevTools console after step 2):
 >
@@ -120,40 +120,40 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 > })();
 > ```
 >
-> **Expected 10-element array (Trips 1–10)**:
+> **Correct 10-element array (Trips 1–10, no drift)**:
 >
 > ```
-> ["2026-03-14T21:00:00","2026-03-14T18:00:00","2026-03-14T15:00:00","2026-03-14T12:00:00",
->  "2026-03-14T09:00:00","2026-03-14T06:00:00","2026-03-14T03:00:00","2026-03-14T00:00:00",
->  "2026-03-13T21:00:00","2026-03-13T18:00:00"]
+> ["2026-03-15T00:00:00","2026-03-15T00:00:00","2026-03-15T00:00:00","2026-03-15T00:00:00",
+>  "2026-03-15T00:00:00","2026-03-15T00:00:00","2026-03-15T00:00:00","2026-03-15T00:00:00",
+>  "2026-03-15T00:00:00","2026-03-15T00:00:00"]
 > ```
 >
-> **Full trip-by-trip reference** (raw stored value and display after each round-trip):
+> **Bug #5 drift reference** (values produced when Bug #5 is active — see FAIL-1):
 >
-> | Trip         | Raw Stored Value      | Display                                   |
-> | ------------ | --------------------- | ----------------------------------------- |
-> | 0 (baseline) | `2026-03-15T00:00:00` | `03/15/2026 12:00 AM`                     |
-> | 1            | `2026-03-14T21:00:00` | `03/14/2026 09:00 PM`                     |
-> | 2            | `2026-03-14T18:00:00` | `03/14/2026 06:00 PM`                     |
-> | 3            | `2026-03-14T15:00:00` | `03/14/2026 03:00 PM`                     |
-> | 4            | `2026-03-14T12:00:00` | `03/14/2026 12:00 PM`                     |
-> | 5            | `2026-03-14T09:00:00` | `03/14/2026 09:00 AM`                     |
-> | 6            | `2026-03-14T06:00:00` | `03/14/2026 06:00 AM`                     |
-> | 7            | `2026-03-14T03:00:00` | `03/14/2026 03:00 AM`                     |
-> | **8**        | `2026-03-14T00:00:00` | `03/14/2026 12:00 AM` ← **full day lost** |
-> | 9            | `2026-03-13T21:00:00` | `03/13/2026 09:00 PM`                     |
-> | **10**       | `2026-03-13T18:00:00` | `03/13/2026 06:00 PM`                     |
+> | Trip         | Raw Stored Value (Bug #5) | Display (Bug #5)                          |
+> | ------------ | ------------------------- | ----------------------------------------- |
+> | 0 (baseline) | `2026-03-15T00:00:00`     | `03/15/2026 12:00 AM`                     |
+> | 1            | `2026-03-14T21:00:00`     | `03/14/2026 09:00 PM`                     |
+> | 2            | `2026-03-14T18:00:00`     | `03/14/2026 06:00 PM`                     |
+> | 3            | `2026-03-14T15:00:00`     | `03/14/2026 03:00 PM`                     |
+> | 4            | `2026-03-14T12:00:00`     | `03/14/2026 12:00 PM`                     |
+> | 5            | `2026-03-14T09:00:00`     | `03/14/2026 09:00 AM`                     |
+> | 6            | `2026-03-14T06:00:00`     | `03/14/2026 06:00 AM`                     |
+> | 7            | `2026-03-14T03:00:00`     | `03/14/2026 03:00 AM`                     |
+> | **8**        | `2026-03-14T00:00:00`     | `03/14/2026 12:00 AM` ← **full day lost** |
+> | 9            | `2026-03-13T21:00:00`     | `03/13/2026 09:00 PM`                     |
+> | **10**       | `2026-03-13T18:00:00`     | `03/13/2026 06:00 PM`                     |
 >
-> **Drift mechanism per trip**: `GetFieldValue` appends a literal `Z` to the stored local time (`"2026-03-15T00:00:00"` → `"2026-03-15T00:00:00.000Z"`). When passed back into `SetFieldValue`, JavaScript interprets the `Z` as real UTC midnight and converts to local time: UTC midnight in BRT (UTC-3) = March 14 21:00 local. Each trip compounds this -3h shift. After 8 trips the time reaches the next midnight boundary (March 14 00:00) — the calendar date has moved back by one full day.
+> **Drift mechanism per trip (Bug #5)**: `GetFieldValue` appends a literal `Z` to the stored local time (`"2026-03-15T00:00:00"` → `"2026-03-15T00:00:00.000Z"`). When passed back into `SetFieldValue`, JavaScript interprets the `Z` as real UTC midnight and converts to local time: UTC midnight in BRT (UTC-3) = March 14 21:00 local. Each trip compounds this −3h shift. After 8 trips the time reaches the next midnight boundary (March 14 00:00) — the calendar date has moved back by one full day.
 
 ---
 
 ## Fail Conditions
 
-**FAIL-1 (No drift — Bug #5 absent or fixed):**
-Step 5 array returns all identical values: `["2026-03-15T00:00:00","2026-03-15T00:00:00",...]`.
+**FAIL-1 (Bug #5 cumulative drift):**
+Step 5 array returns drifting values: `["2026-03-14T21:00:00","2026-03-14T18:00:00",...]`. Step 7 returns `"2026-03-13T18:00:00"`. Step 6 display reads `03/13/2026 06:00 PM`.
 
-- Interpretation: `getCalendarFieldValue()` no longer appends a fake `Z`. `GetFieldValue` is returning the proper UTC representation, so each round-trip passes the correct value back in and no drift occurs. Verify the build number matches `20260304.1` and re-run P5. If the build changed, the fake-Z path may have been fixed.
+- Interpretation: `getCalendarFieldValue()` is appending a fake `Z` to the stored local time, causing each round-trip to shift the stored value by −3h. After 8 trips the date crosses to March 14; after 10 trips it has drifted to March 13 18:00. This is Bug #5. See the Bug #5 drift reference table in the Test Steps blockquote for the full trip-by-trip breakdown.
 
 **FAIL-2 (Wrong drift magnitude — different timezone):**
 Step 5 array shows a shift other than -3h per trip — e.g., `"2026-03-14T16:00:00"` after Trip 1 (-8h, PST) or `"2026-03-15T05:30:00"` (+5:30h, IST).

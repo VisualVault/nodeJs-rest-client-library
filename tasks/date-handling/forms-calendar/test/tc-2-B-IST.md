@@ -91,17 +91,17 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Test Steps
 
-| #   | Action                                                                                                          | Test Data                                                            | Expected Result                                                        | ✓   |
-| --- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------- | --- |
-| 1   | Complete setup                                                                                                  | See Preconditions P1–P6                                              | All P1–P6 checks pass                                                  | ☐   |
-| 2   | Click the input area of the target field (identified in P6) — click to the left of the calendar icon, not on it | `<FIELD_NAME>`                                                       | Field enters segment-edit mode; "month" segment is highlighted         | ☐   |
-| 3   | Type month segment                                                                                              | `03`                                                                 | Field displays `03/day/year`; cursor advances to "day" segment         | ☐   |
-| 4   | Type day segment                                                                                                | `15`                                                                 | Field displays `03/15/year`; cursor advances to "year" segment         | ☐   |
-| 5   | Type year segment                                                                                               | `2026`                                                               | Field displays `03/15/2026`; year segment is highlighted               | ☐   |
-| 6   | Press Tab to confirm                                                                                            | —                                                                    | Focus moves to next field; target field displays `03/15/2026`          | ☐   |
-| 7   | Capture raw stored value                                                                                        | `` `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` `` | `"2026-03-14"` — Bug #7: -1 day shift                                  | ☐   |
-| 8   | Capture GetFieldValue output                                                                                    | `` `VV.Form.GetFieldValue('<FIELD_NAME>')` ``                        | `"2026-03-14"` — same as raw; no transformation for date-only Config B | ☐   |
-| 9   | Capture isoRef                                                                                                  | `` `new Date(2026, 2, 15, 0, 0, 0).toISOString()` ``                 | `"2026-03-14T18:30:00.000Z"` — confirms IST active                     | ☐   |
+| #   | Action                                                                                                          | Test Data                                                            | Expected Result                                                | ✓   |
+| --- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------- | --- |
+| 1   | Complete setup                                                                                                  | See Preconditions P1–P6                                              | All P1–P6 checks pass                                          | ☐   |
+| 2   | Click the input area of the target field (identified in P6) — click to the left of the calendar icon, not on it | `<FIELD_NAME>`                                                       | Field enters segment-edit mode; "month" segment is highlighted | ☐   |
+| 3   | Type month segment                                                                                              | `03`                                                                 | Field displays `03/day/year`; cursor advances to "day" segment | ☐   |
+| 4   | Type day segment                                                                                                | `15`                                                                 | Field displays `03/15/year`; cursor advances to "year" segment | ☐   |
+| 5   | Type year segment                                                                                               | `2026`                                                               | Field displays `03/15/2026`; year segment is highlighted       | ☐   |
+| 6   | Press Tab to confirm                                                                                            | —                                                                    | Focus moves to next field; target field displays `03/15/2026`  | ☐   |
+| 7   | Capture raw stored value                                                                                        | `` `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` `` | `"2026-03-15"` — correct date, no shift                        | ☐   |
+| 8   | Capture GetFieldValue output                                                                                    | `` `VV.Form.GetFieldValue('<FIELD_NAME>')` ``                        | `"2026-03-15"` — same as raw, no transformation                | ☐   |
+| 9   | Capture isoRef                                                                                                  | `` `new Date(2026, 2, 15, 0, 0, 0).toISOString()` ``                 | `"2026-03-14T18:30:00.000Z"` — confirms IST active             | ☐   |
 
 > **Segment targeting note**: Click the input portion of the field (left side), not the calendar icon (right side). The Kendo DatePicker activates segment-edit mode on the first click. Config B is at row 8 of the form — the last field. If the field shows a full date already (e.g., from a prior interaction), click once to focus, then click again on the month segment to restart entry.
 >
@@ -111,10 +111,10 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Fail Conditions
 
-**FAIL-1 (Bug #7 absent — wrong date stored):**
-Raw stored value is `"2026-03-15"` instead of `"2026-03-14"`.
+**FAIL-1 (Bug #7 active — -1 day shift):**
+Step 7 returns `"2026-03-14"` — stored one day earlier than typed.
 
-- **Interpretation**: `normalizeCalValue()` did not apply a local-midnight conversion, or the conversion happened to land on the correct UTC day. Verify isoRef returns `"2026-03-14T18:30:00.000Z"` to confirm IST is active. If isoRef shows `"2026-03-15T00:00:00.000Z"` instead, the system timezone is UTC+0, not IST — abort and fix P1/P2.
+- **Interpretation**: `normalizeCalValue()` parsed the typed date string as local IST midnight; `getSaveValue()` extracted the UTC date, which in IST (UTC+5:30) falls on March 14. The display still shows `03/15/2026` while storage holds `"2026-03-14"`. This is Bug #7.
 
 **FAIL-2 (isoRef shows non-IST offset):**
 `new Date(2026, 2, 15, 0, 0, 0).toISOString()` returns any value other than `"2026-03-14T18:30:00.000Z"`.
@@ -122,9 +122,9 @@ Raw stored value is `"2026-03-15"` instead of `"2026-03-14"`.
 - **Interpretation**: The browser timezone is not IST (UTC+5:30). The test is running under the wrong timezone. Abort, fix P1/P2, reload the form from the template URL and rerun.
 
 **FAIL-3 (Config B result differs from Config A — unexpected asymmetry):**
-Raw stored value is `"2026-03-13"` (two days earlier) or `"2026-03-15"` (no shift) instead of `"2026-03-14"`.
+Raw stored value differs from what Config A (2-A-IST) produced for the same typed input in IST.
 
-- **Interpretation**: Config A (2-A-IST, Test 8.1) and Config B should produce identical storage behavior — `ignoreTimezone` has no effect on the date-only save path. If Config B produces a different shift from Config A (both run in IST), the code path for `ignoreTimezone=true` date-only fields differs unexpectedly. Re-run 2-A-IST in the same session to directly compare.
+- **Interpretation**: Config A and Config B should produce identical storage behavior — `ignoreTimezone` has no effect on the date-only save path. If Config B produces a different result from Config A (both run in IST), the code path for `ignoreTimezone=true` date-only fields differs unexpectedly. Re-run 2-A-IST in the same session to directly compare.
 
 **FAIL-4 (GetFieldValue transforms the value):**
 `GetFieldValue` returns a value different from the raw stored value.

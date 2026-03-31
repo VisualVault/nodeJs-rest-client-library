@@ -107,18 +107,18 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Test Steps
 
-| #   | Action                                                   | Test Data                                                                      | Expected Result                                    | ✓   |
-| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------- | --- |
-| 1   | Complete setup                                           | See Preconditions P1–P6                                                        | All P1–P6 checks pass                              | ☐   |
-| 2   | Set initial value on the target field (identified in P6) | `VV.Form.SetFieldValue('<FIELD_NAME>', '2026-03-15T00:00:00')`                 | No error returned                                  | ☐   |
-| 3   | Verify initial display                                   | Read the target field input                                                    | `03/15/2026 12:00 AM`                              | ☐   |
-| 4   | Capture initial raw stored value                         | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')`                 | `"2026-03-15T00:00:00"`                            | ☐   |
-| 5   | Capture initial GetFieldValue                            | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                        | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5)     | ☐   |
-| 6   | Execute round-trip                                       | `VV.Form.SetFieldValue('<FIELD_NAME>', VV.Form.GetFieldValue('<FIELD_NAME>'))` | No error returned                                  | ☐   |
-| 7   | Verify display after round-trip                          | Read the target field input                                                    | `03/15/2026 05:30 AM`                              | ☐   |
-| 8   | Capture raw stored value after round-trip                | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')`                 | `"2026-03-15T05:30:00"`                            | ☐   |
-| 9   | Capture GetFieldValue after round-trip                   | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                        | `"2026-03-15T05:30:00.000Z"` — fake Z (Bug #5)     | ☐   |
-| 10  | Verify environment (isoRef)                              | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                                 | `"2026-03-14T18:30:00.000Z"` — confirms IST active | ☐   |
+| #   | Action                                                   | Test Data                                                                      | Expected Result                                          | ✓   |
+| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------- | --- |
+| 1   | Complete setup                                           | See Preconditions P1–P6                                                        | All P1–P6 checks pass                                    | ☐   |
+| 2   | Set initial value on the target field (identified in P6) | `VV.Form.SetFieldValue('<FIELD_NAME>', '2026-03-15T00:00:00')`                 | No error returned                                        | ☐   |
+| 3   | Verify initial display                                   | Read the target field input                                                    | `03/15/2026 12:00 AM`                                    | ☐   |
+| 4   | Capture initial raw stored value                         | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')`                 | `"2026-03-15T00:00:00"`                                  | ☐   |
+| 5   | Capture initial GetFieldValue                            | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                        | `"2026-03-15T00:00:00"` — same as raw, no transformation | ☐   |
+| 6   | Execute round-trip                                       | `VV.Form.SetFieldValue('<FIELD_NAME>', VV.Form.GetFieldValue('<FIELD_NAME>'))` | No error returned; field display unchanged               | ☐   |
+| 7   | Verify display after round-trip                          | Read the target field input                                                    | `03/15/2026 12:00 AM` — unchanged, no drift              | ☐   |
+| 8   | Capture raw stored value after round-trip                | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')`                 | `"2026-03-15T00:00:00"` — unchanged, no drift            | ☐   |
+| 9   | Capture GetFieldValue after round-trip                   | `VV.Form.GetFieldValue('<FIELD_NAME>')`                                        | `"2026-03-15T00:00:00"` — same as raw, no transformation | ☐   |
+| 10  | Verify environment (isoRef)                              | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                                 | `"2026-03-14T18:30:00.000Z"` — confirms IST active       | ☐   |
 
 > **Drift mechanism in IST**: `GetFieldValue` appends a literal `Z` to the stored local midnight (`"2026-03-15T00:00:00"` → `"2026-03-15T00:00:00.000Z"`). In IST, `new Date("2026-03-15T00:00:00.000Z")` = UTC midnight = **March 15 05:30 AM IST** (UTC+5:30 ahead). Each round-trip advances the stored time by 5 hours and 30 minutes. After ~4–5 trips the time crosses midnight and the **calendar date shifts to March 16**.
 >
@@ -128,10 +128,10 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Fail Conditions
 
-**FAIL-1 (No drift — Bug #5 absent or fixed):**
-Step 8 returns `"2026-03-15T00:00:00"` (unchanged). Step 7 display still reads `03/15/2026 12:00 AM`.
+**FAIL-1 (Bug #5 drift in round-trip):**
+Step 8 returns `"2026-03-15T05:30:00"` — stored value shifted +5:30h from original. Step 7 display reads `03/15/2026 05:30 AM`.
 
-- Interpretation: `getCalendarFieldValue()` no longer appends fake Z. Verify build matches `20260304.1` and re-run P5.
+- Interpretation: `getCalendarFieldValue()` appended a fake `Z` to `"2026-03-15T00:00:00"`, producing `"2026-03-15T00:00:00.000Z"`. When passed to `SetFieldValue`, JavaScript parsed it as UTC midnight and converted to IST local time: 2026-03-15 05:30 AM (UTC+5:30). This is Bug #5. Each additional round-trip shifts another +5:30h — after ~4–5 trips the date advances to March 16. Correct stored value after round-trip is `"2026-03-15T00:00:00"` (unchanged).
 
 **FAIL-2 (Drift is backward, not forward):**
 Step 8 returns a value earlier than `"2026-03-15T00:00:00"` — e.g., `"2026-03-14T21:00:00"` (-3h).

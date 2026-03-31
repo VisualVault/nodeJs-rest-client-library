@@ -98,8 +98,8 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 | 3   | Navigate to March 2026 in the popup calendar if not already shown   | —                                                                    | March 2026 calendar grid displayed                 | ☐   |
 | 4   | Click day **15**                                                    | —                                                                    | Popup closes; field input shows `03/15/2026`       | ☐   |
 | 5   | Record display value shown in field                                 | —                                                                    | `03/15/2026`                                       | ☐   |
-| 6   | Capture raw stored value                                            | `` `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` `` | `"2026-03-14"` — Bug #7: -1 day shift              | ☐   |
-| 7   | Capture GetFieldValue return                                        | `` `VV.Form.GetFieldValue('<FIELD_NAME>')` ``                        | `"2026-03-14"` — same as raw; no fake Z            | ☐   |
+| 6   | Capture raw stored value                                            | `` `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` `` | `"2026-03-15"` — correct date, no shift            | ☐   |
+| 7   | Capture GetFieldValue return                                        | `` `VV.Form.GetFieldValue('<FIELD_NAME>')` ``                        | `"2026-03-15"` — same as raw, no transformation    | ☐   |
 | 8   | Capture timezone reference                                          | `` `new Date(2026, 2, 15, 0, 0, 0).toISOString()` ``                 | `"2026-03-14T18:30:00.000Z"` — confirms IST active | ☐   |
 
 > **Note on Step 4:** Config A has `enableTime=false`. The popup closes immediately after clicking a day — it does **not** advance to a time tab. No Set button interaction is needed.
@@ -110,10 +110,10 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Fail Conditions
 
-**FAIL-1 (Bug #7 not triggered — storage correct):**
-Raw stored value is `"2026-03-15"`.
+**FAIL-1 (Bug #7 active — -1 day shift):**
+Step 6 returns `"2026-03-14"` — stored one day earlier than selected.
 
-- Interpretation: `normalizeCalValue()` was fixed or the code path changed. Verify the VV build number matches 20260304.1. If the build is newer, Bug #7 may have been patched — update the bug tracker.
+- Interpretation: `normalizeCalValue()` parsed the date string as local IST midnight; `getSaveValue()` then extracted the UTC date, which in IST (UTC+5:30) falls on March 14. The display still shows `03/15/2026` (the correct selected date) while storage holds `"2026-03-14"`. This is Bug #7. Each subsequent `SetFieldValue` call with the date-only string will repeat the −1 day shift.
 
 **FAIL-2 (Double-shift observed — stored -2 days):**
 Raw stored value is `"2026-03-13"`.

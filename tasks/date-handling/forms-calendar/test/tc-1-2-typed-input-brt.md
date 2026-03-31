@@ -104,7 +104,7 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 | 9   | Press Tab                                                            | —                                                              | Field displays `03/15/2026 12:00 AM`; focus moves to next field | ☐   |
 | 10  | Record display value shown in field                                  | —                                                              | `03/15/2026 12:00 AM`                                           | ☐   |
 | 11  | Capture raw stored value                                             | `VV.Form.VV.FormPartition.getValueObjectValue('<FIELD_NAME>')` | `"2026-03-15T00:00:00"`                                         | ☐   |
-| 12  | Capture GetFieldValue return                                         | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00.000Z"` — fake Z (Bug #5)                  | ☐   |
+| 12  | Capture GetFieldValue return                                         | `VV.Form.GetFieldValue('<FIELD_NAME>')`                        | `"2026-03-15T00:00:00"` — same as raw, no transformation        | ☐   |
 | 13  | Capture timezone reference                                           | `new Date(2026, 2, 15, 0, 0, 0).toISOString()`                 | `"2026-03-15T03:00:00.000Z"` — confirms BRT active              | ☐   |
 
 > **Note on Step 2:** Click the leftmost area of the field input to ensure the cursor lands on the `month` segment, not a middle segment. If a segment other than `month` is highlighted after clicking, press `Home` or click further left.
@@ -113,10 +113,10 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ## Fail Conditions
 
-**FAIL-1 (Bug #5 patched):**
-`GetFieldValue()` returns `"2026-03-15T00:00:00"` without `.000Z`.
+**FAIL-1 (Bug #5 active):**
+`GetFieldValue()` returns `"2026-03-15T00:00:00.000Z"` — fake Z appended.
 
-- Interpretation: `getCalendarFieldValue()` was fixed between build 20260304.1 and the currently tested build. Verify the VV build number and update the bug tracker.
+- Interpretation: `getCalendarFieldValue()` is appending a literal `[Z]` to the local time string. Correct return is `"2026-03-15T00:00:00"` matching the raw stored value. This is Bug #5. Round-trip drift will occur if this value is fed back via `SetFieldValue()` — each trip shifts the stored time by -3h (BRT offset).
 
 **FAIL-2 (wrong time stored):**
 Raw stored value contains a non-zero time component (e.g., `"2026-03-15T00:03:00"`).
