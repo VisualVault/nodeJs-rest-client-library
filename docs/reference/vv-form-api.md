@@ -29,28 +29,28 @@ The primary developer interface. Contains both own properties (form state) and p
 
 ### State Properties
 
-| Property                           | Type       | Description                                                                                                                      | Example                                  |
-| ---------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `DataID`                           | `string`   | GUID of the current form instance. Before first save, equals the form template ID. After save, changes to the saved record GUID. | `"2c2e9776-fecd-4c3e-8cc1-f0cfdec12d98"` |
-| `DhDocID`                          | `string`   | Human-readable form instance name                                                                                                | `"DateTest-000079"`                      |
-| `IsFormSaved`                      | `boolean`  | `true` after a successful save                                                                                                   | `true`                                   |
-| `UnsavedChanges`                   | `number`   | Count of unsaved field changes                                                                                                   | `0` after save, `21` before              |
-| `FormSaved`                        | `string`   | Empty string observed; purpose unclear                                                                                           | `""`                                     |
-| `IsFormFillin`                     | `boolean`  | Whether the form is in fill-in mode                                                                                              | `true`                                   |
-| `IsFormTemplatePreview`            | `boolean`  | Whether viewing a template preview                                                                                               | `false`                                  |
-| `IsOfflineMode`                    | `boolean`  | Whether running in offline mode                                                                                                  | `false`                                  |
-| `IsReadOnly`                       | `boolean`  | Whether the form is read-only                                                                                                    | `false`                                  |
-| `CurrentPageId`                    | `string`   | GUID of the currently visible page                                                                                               | `"cb339446-b869-..."`                    |
-| `CurrentLanguageCode`              | `string`   | Active language                                                                                                                  | `"en-US"`                                |
-| `FormLanguage`                     | `string`   | Configured form language (empty = default)                                                                                       | `""`                                     |
-| `FormUserID`                       | `string`   | Email/username of the current user                                                                                               | `"emanuel.jofre@onetree.com"`            |
-| `FormUsID`                         | `string`   | GUID of the current user                                                                                                         | `"54c4dd9c-5ec8-..."`                    |
-| `FormUserSiteID`                   | `string`   | GUID of the user's site                                                                                                          | `"fb726e8a-036c-..."`                    |
-| `FormUserSiteName`                 | `string`   | Name of the user's site                                                                                                          | `"Home"`                                 |
-| `FormUserGroups`                   | `string[]` | Groups the current user belongs to                                                                                               | `["VaultAccess", "VaultAdmins"]`         |
-| `RefreshParentWindowWhenUnloading` | `boolean`  | Whether parent window refreshes on close                                                                                         | `true`                                   |
-| `SuppressExtraMessages`            | `boolean`  | Suppresses additional UI messages                                                                                                | `false`                                  |
-| `CalendarConditionalGroups`        | `array`    | Calendar conditional group definitions                                                                                           | `[]`                                     |
+| Property                           | Type       | Description                                                                                                                                                                                              | Example                                  |
+| ---------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `DataID`                           | `string`   | GUID identifying the form context. When opened via `?DataID=` URL, this is the saved record GUID. When opened from a template (`?formid=`), this is the template form ID and does NOT update after save. | `"2c2e9776-fecd-4c3e-8cc1-f0cfdec12d98"` |
+| `DhDocID`                          | `string`   | Human-readable form instance name                                                                                                                                                                        | `"DateTest-000079"`                      |
+| `IsFormSaved`                      | `boolean`  | `true` after a successful save                                                                                                                                                                           | `true`                                   |
+| `UnsavedChanges`                   | `number`   | Count of unsaved field changes                                                                                                                                                                           | `0` after save, `21` before              |
+| `FormSaved`                        | `string`   | Empty string observed; purpose unclear                                                                                                                                                                   | `""`                                     |
+| `IsFormFillin`                     | `boolean`  | Whether the form is in fill-in mode                                                                                                                                                                      | `true`                                   |
+| `IsFormTemplatePreview`            | `boolean`  | Whether viewing a template preview                                                                                                                                                                       | `false`                                  |
+| `IsOfflineMode`                    | `boolean`  | Whether running in offline mode                                                                                                                                                                          | `false`                                  |
+| `IsReadOnly`                       | `boolean`  | Whether the form is read-only                                                                                                                                                                            | `false`                                  |
+| `CurrentPageId`                    | `string`   | GUID of the currently visible page                                                                                                                                                                       | `"cb339446-b869-..."`                    |
+| `CurrentLanguageCode`              | `string`   | Active language                                                                                                                                                                                          | `"en-US"`                                |
+| `FormLanguage`                     | `string`   | Configured form language (empty = default)                                                                                                                                                               | `""`                                     |
+| `FormUserID`                       | `string`   | Email/username of the current user                                                                                                                                                                       | `"emanuel.jofre@onetree.com"`            |
+| `FormUsID`                         | `string`   | GUID of the current user                                                                                                                                                                                 | `"54c4dd9c-5ec8-..."`                    |
+| `FormUserSiteID`                   | `string`   | GUID of the user's site                                                                                                                                                                                  | `"fb726e8a-036c-..."`                    |
+| `FormUserSiteName`                 | `string`   | Name of the user's site                                                                                                                                                                                  | `"Home"`                                 |
+| `FormUserGroups`                   | `string[]` | Groups the current user belongs to                                                                                                                                                                       | `["VaultAccess", "VaultAdmins"]`         |
+| `RefreshParentWindowWhenUnloading` | `boolean`  | Whether parent window refreshes on close                                                                                                                                                                 | `true`                                   |
+| `SuppressExtraMessages`            | `boolean`  | Suppresses additional UI messages                                                                                                                                                                        | `false`                                  |
+| `CalendarConditionalGroups`        | `array`    | Calendar conditional group definitions                                                                                                                                                                   | `[]`                                     |
 
 ### Sub-Objects on `VV.Form`
 
@@ -497,13 +497,31 @@ VV.Form.UnsavedChanges; // 0 = no pending changes
 ### Get the DataID for constructing reload URLs
 
 ```javascript
-VV.Form.DataID; // GUID — changes from template ID to instance ID after save
+VV.Form.DataID; // GUID — but see caveat below
 ```
+
+**Caveat:** When a form is opened from a template URL (`?formid=`), `VV.Form.DataID` retains the **template form ID** even after save — it does NOT update to the saved record's DataID. To get the actual DataID after saving from a template, intercept the save response from `POST preformsapi.visualvault.com/api/v1/FormInstance`, which returns `{data: {formId: "<DataID>", revision: N}}`. When opened via `?DataID=` URL, `VV.Form.DataID` correctly reflects the record's DataID.
 
 ### Construct a saved record URL
 
 ```javascript
+// Only reliable when form was opened via ?DataID= URL, not from template
 `${VV.BaseAppUrl}FormViewer/app?DataID=${VV.Form.DataID}&hidemenu=true&rOpener=1&xcid=${VV.Form.VV.currentUser.Xcid}&xcdid=${VV.Form.VV.currentUser.Xcdid}`;
+```
+
+### FormInstance Save API
+
+The FormViewer uses a separate API domain for form instance persistence:
+
+```
+POST https://preformsapi.visualvault.com/api/v1/FormInstance
+→ {data: {formId: "<DataID>", revision: 2.0, confirmationPage: null}, meta: {status: 200}}
+
+POST https://preformsapi.visualvault.com/api/v1/FormInstance/lock
+→ {data: {id: "<DataID>"}, meta: {status: 200}}
+
+PUT https://vvdemo.visualvault.com/api/v1/{CustomerAlias}/{DatabaseAlias}/formentity/{formTemplateId}/evaluateGroupsAndConditions
+→ Re-evaluates field visibility/readonly conditions after save
 ```
 
 ### Read all raw field values at once

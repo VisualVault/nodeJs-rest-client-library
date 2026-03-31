@@ -205,15 +205,17 @@ With `useLegacy=false` in BRT, popup and typed input produce identical values. M
 https://vvdemo.visualvault.com/FormViewer/app?hidemenu=true&formid=6be0265c-152a-f111-ba23-0afff212cc87&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939
 ```
 
-**Saved record — DateTest-000004 Rev 1** (saved from BRT, has all field configs):
+**Saved record — DateTest-000080 Rev 2** (saved from BRT 2026-03-31, Config A + D set to 03/15/2026):
+
+```
+https://vvdemo.visualvault.com/FormViewer/app?DataID=901ce05d-b2f7-42e9-8569-7f9d4caf258d&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939
+```
+
+**Old saved record — DateTest-000004 Rev 1** (saved from BRT, used in early tests — prefer DateTest-000080):
 
 ```
 https://vvdemo.visualvault.com/FormViewer/app?DataID=2ae985b5-1892-4d26-94da-388121b0907e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939
 ```
-
-**IST test record — DateTest-000009** (created during IST session, unsaved):
-
-- New record created from template during IST timezone testing session
 
 ### Test Form Fields
 

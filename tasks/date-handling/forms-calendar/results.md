@@ -1533,3 +1533,13 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-03-31 [TC-3-A-BRT-BRT Run 3](runs/tc-3-A-BRT-BRT-run-3.md) — BRT — PASS — full save-then-reload on fresh form (DateTest-000079); Config A stable
 - 2026-03-31 [TC-3-C-BRT-BRT Run 3](runs/tc-3-C-BRT-BRT-run-3.md) — BRT — PASS — full save-then-reload on fresh form; Config C DateTime stable
 - 2026-03-31 [TC-3-D-BRT-BRT Run 3](runs/tc-3-D-BRT-BRT-run-3.md) — BRT — PASS (FAIL-3) — full save-then-reload on fresh form; Bug #5 active pre-save and post-reload
+
+## Session 2026-04-01 (IST)
+
+**Purpose**: Cross-TZ reload verification — BRT-saved records opened in IST.
+**Key outcomes**: Config D raw TZ-invariant (Bug #5 on GFV); Config A date-only survives cross-TZ reload (Bug #7 prediction disproved).
+
+- 2026-04-01 [TC-3-D-BRT-IST Run 2](runs/tc-3-D-BRT-IST-run-2.md) — IST — FAIL-3 — Config D cross-TZ reload: raw value stable, display correct; Bug #5 fake Z on GFV (corrects Run 1 PASS)
+- 2026-04-01 [TC-3-A-BRT-IST Run 1](runs/tc-3-A-BRT-IST-run-1.md) — IST — PASS — Config A cross-TZ reload: date-only "2026-03-15" survives IST reload; Bug #7 prediction disproved
+- 2026-04-01 [TC-3-A-BRT-IST Run 2](runs/tc-3-A-BRT-IST-run-2.md) — IST — PASS — Config A on fresh record (DateTest-000080); confirms Run 1
+- 2026-04-01 [TC-3-D-BRT-IST Run 3](runs/tc-3-D-BRT-IST-run-3.md) — IST — FAIL-3 — Config D on fresh record (DateTest-000080); Bug #5 confirmed; raw format changed to US on reload
