@@ -20,12 +20,12 @@ Live browser testing of date handling defects in the VisualVault Forms calendar 
 
 ## Related Files
 
-- **Draft analysis**: `../analysis.md` (same folder) — initial code review, treat as hypothesis
+- **Draft analysis**: `analysis.md` — initial code review, treat as hypothesis
 - **This file**: `results.md` — live test evidence (source of truth for confirmed findings)
 - **Overall context**: `../CLAUDE.md` — full investigation scope across all VV components
-- **Dashboard**: `index.md` — confirmed bugs, bug×config matrix, failing/passing IDs, formal TC index, coverage counts
+- **Test matrix**: `matrix.md` — authoritative coverage tracker (~242 slots)
 
-**Test ID namespaces** (two coexist — never mix): session execution IDs like `1.1`, `2.3` identify actual test runs and map to H3 headings below; category test IDs like `7-D-isoNoZ`, `12-year-boundary` identify planned test slots in the Coverage Matrix. Full convention table: `index.md § ID Conventions`.
+**Test ID namespaces** (two coexist — never mix): session execution IDs like `1.1`, `2.3` identify actual test runs and map to H3 headings below; category test IDs like `7-D-isoNoZ`, `12-year-boundary` identify planned test slots in `matrix.md`.
 
 ## Form URLs
 
@@ -193,7 +193,7 @@ _DataField8/9 do not exist — naming jumped from 7 to 10._
 
 ---
 
-_For confirmed bug status and coverage dashboard, see [index.md](index.md)._
+_For coverage status, see [matrix.md](matrix.md). For bug analysis, see [analysis.md](analysis.md)._
 
 ### Test 2.4: Cross-Timezone Impact Analysis (Simulated)
 

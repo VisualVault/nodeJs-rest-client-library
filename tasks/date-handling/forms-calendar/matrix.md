@@ -1,7 +1,7 @@
 # Forms Calendar — Test Matrix
 
 Authoritative permutation tracker for the forms calendar date-handling investigation.
-Full test evidence → `results.md` | Bug analysis → `../analysis.md` | Dashboard → `index.md`
+Full test evidence → `results.md` | Bug analysis → `analysis.md`
 
 Last updated: 2026-03-31 | Total slots: ~242 | Done: ~81 | Blocked: 0
 
@@ -11,7 +11,7 @@ Last updated: 2026-03-31 | Total slots: ~242 | Done: ~81 | Blocked: 0
 
 Category test IDs (`1-A-BRT`, `7-D-isoNoZ`) identify **planned test slots** — a Config × TZ × input combination that may or may not have been run. They map to rows in this file.
 
-Execution test IDs (`1.1`, `2.3`) identify **session run blocks** in `results.md`. One execution block may cover multiple category IDs. See `index.md § ID Conventions` for the full mapping.
+Execution test IDs (`1.1`, `2.3`) identify **session run blocks** in `results.md`. One execution block may cover multiple category IDs.
 
 ---
 

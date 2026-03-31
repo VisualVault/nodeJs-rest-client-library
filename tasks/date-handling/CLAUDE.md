@@ -51,15 +51,14 @@ tasks/date-handling/
 
 ### Files
 
-| File                         | Purpose                                                                                                                            |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `forms-calendar/analysis.md` | Code review — 5 original bugs + 2 confirmed new bugs. Appendix has extracted source functions.                                     |
-| `forms-calendar/results.md`  | Live browser test evidence — source of truth for confirmed behavior.                                                               |
-| `forms-calendar/index.md`    | Quick-reference dashboard — confirmed bugs, bug × config matrix, coverage summary, failing/passing test IDs, formal TC file index. |
-| `forms-calendar/matrix.md`   | Full test matrix (~242 slots) — authoritative permutation tracker.                                                                 |
-| `forms-calendar/test-cases/` | Individual TC spec files — one per test scenario, browser-verified before writing.                                                 |
-| `forms-calendar/runs/`       | Immutable run files — one per test execution.                                                                                      |
-| `forms-calendar/summaries/`  | Per-TC summary files — current status, run history, interpretation.                                                                |
+| File                         | Purpose                                                                                        |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- |
+| `forms-calendar/analysis.md` | Code review — 5 original bugs + 2 confirmed new bugs. Appendix has extracted source functions. |
+| `forms-calendar/results.md`  | Live browser test evidence — source of truth for confirmed behavior.                           |
+| `forms-calendar/matrix.md`   | Full test matrix (~242 slots) — authoritative permutation tracker, coverage summary.           |
+| `forms-calendar/test-cases/` | Individual TC spec files — one per test scenario, browser-verified before writing.             |
+| `forms-calendar/runs/`       | Immutable run files — one per test execution.                                                  |
+| `forms-calendar/summaries/`  | Per-TC summary files — current status, run history, interpretation.                            |
 
 ### V1 vs V2 Code Path — Critical Note
 
@@ -309,4 +308,4 @@ Tests run via **Claude-in-Chrome MCP extension**. The extension tab must be crea
 4. **Category 5/6 — Preset/Current Date on DateTime fields**: Requires new test form fields with `enableTime=true` + initial value configuration.
 5. **Category 4 — URL parameters**: Requires `enableQListener=true` fields.
 
-See `forms-calendar/matrix.md` for the full ~242-slot test matrix. See `forms-calendar/results.md` for archived session results and new run index. See `forms-calendar/index.md` for the summary dashboard.
+See `forms-calendar/matrix.md` for the full ~242-slot test matrix. See `forms-calendar/results.md` for archived session results and new run index.
