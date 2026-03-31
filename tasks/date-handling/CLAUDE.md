@@ -47,7 +47,7 @@ tasks/date-handling/
 
 ### Progress
 
-**~71 of ~225 test cases completed** (40 PASS, 31 FAIL). 7 bugs confirmed (5 from original analysis + 2 new). Testing done across three timezones: BRT (UTC-3), IST (UTC+5:30), and UTC+0 (GMT). **Category 1 (Calendar Popup) is 100% complete** (20/20: 8 PASS, 12 FAIL).
+**~81 of ~242 test cases completed** (47 PASS, 34 FAIL). 7 bugs confirmed (5 from original analysis + 2 new). Testing done across three timezones: BRT (UTC-3), IST (UTC+5:30), and UTC+0 (GMT). **Category 1 (Calendar Popup) is 100% complete** (20/20: 8 PASS, 12 FAIL). **Category 2 (Typed Input) is 100% complete** (16/16: 11 PASS, 5 FAIL). Category 3 (Server Reload) has 4 PASS with formal TC specs. Categories 8B (GetDateObjectFromCalendar) and 9-GDOC (GDOC round-trip) added — 17 new slots.
 
 ### Files
 

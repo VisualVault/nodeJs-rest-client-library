@@ -113,6 +113,7 @@ See `tasks/` folder. Each task gets its own subfolder with analysis, test result
 | Task                                  | Status      | Description                                                                                               |
 | ------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
 | [date-handling](tasks/date-handling/) | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Reports, Workflows |
+| [workflow-test](tasks/workflow-test/) | Not Started | Workflow microservice test script template for scheduled process testing                                  |
 
 ## Platform Documentation
 
