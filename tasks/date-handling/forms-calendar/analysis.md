@@ -680,7 +680,7 @@ When a `Date` object is passed, `normalizeCalValue` converts it to ISO via `toIS
 
 Both paths call `getSaveValue()` which strips the Z, but the upstream time representation differs: UTC object vs local-time ISO string.
 
-**Evidence:** `tasks/date-handling/forms-calendar/test/tc-2-10-db-storage-mixed-tz-brt.md`
+**Evidence:** `tasks/date-handling/forms-calendar/test-cases/tc-2-10-db-storage-mixed-tz-brt.md`
 
 ---
 

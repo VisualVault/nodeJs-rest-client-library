@@ -10,7 +10,7 @@ Generates a verified, deterministic test case file for a VisualVault Forms calen
 
 Example: `/create-date-test 7-D-isoZ-BRT`
 
-The category ID identifies a row in `tasks/date-handling/forms-calendar/test/matrix.md` (e.g., `1-A-IST`, `9-D-BRT-8`, `7-C-isoNoZ`).
+The category ID identifies a row in `tasks/date-handling/forms-calendar/matrix.md` (e.g., `1-A-IST`, `9-D-BRT-8`, `7-C-isoNoZ`).
 
 ---
 
@@ -18,7 +18,7 @@ The category ID identifies a row in `tasks/date-handling/forms-calendar/test/mat
 
 Read the following files before doing anything else:
 
-1. `tasks/date-handling/forms-calendar/test/matrix.md` — find the row matching the given category ID. Extract:
+1. `tasks/date-handling/forms-calendar/matrix.md` — find the row matching the given category ID. Extract:
     - The category section (1–13) and its scenario type (popup, typed input, SFV, GFV, round-trip, reload, etc.)
     - The Config column (A/B/C/D) — used to derive field flags in step 2
     - The TZ column — determines which timezone to set in preconditions
@@ -27,17 +27,17 @@ Read the following files before doing anything else:
     - The Status (PASS/FAIL/PENDING) and any existing Actual value
     - The Evidence column — if a TC file or results.md link is listed, note it
 
-2. `tasks/date-handling/forms-calendar/test/matrix.md` — **Field Configurations table** (top of file). Map the Config letter from step 1 to its flag values: `enableTime`, `ignoreTimezone`, `useLegacy`. Also note the Test Field name (e.g., DataField5 for Config D) as a cross-check — but the field will be located dynamically in Phase 2 via P6.
+2. `tasks/date-handling/forms-calendar/matrix.md` — **Field Configurations table** (top of file). Map the Config letter from step 1 to its flag values: `enableTime`, `ignoreTimezone`, `useLegacy`. Also note the Test Field name (e.g., DataField5 for Config D) as a cross-check — but the field will be located dynamically in Phase 2 via P6.
 
 3. `tasks/date-handling/forms-calendar/analysis.md` — identify every bug whose trigger conditions match the field config extracted above. For each matching bug, note: its number, name, the exact function where it lives, and what the observable symptom is.
 
-4. `tasks/date-handling/forms-calendar/test/matrix.md` — check the CLAUDE.md section for:
+4. `tasks/date-handling/forms-calendar/matrix.md` — check the CLAUDE.md section for:
     - The DateTest form template URL
     - The Key JavaScript section (console snippets)
 
     If the Key JavaScript section is not in matrix.md, read `tasks/date-handling/CLAUDE.md` to get it.
 
-5. **If the Evidence column in step 1 references a `results.md` block** (e.g., `results.md § Test 2.5`): read that block in `tasks/date-handling/forms-calendar/test/results.md` to extract any additional context — exact console output, session notes, observed discrepancies. This supplements Phase 2 but does not replace it.
+5. **If the Evidence column in step 1 references a `results.md` block** (e.g., `results.md § Test 2.5`): read that block in `tasks/date-handling/forms-calendar/results.md` to extract any additional context — exact console output, session notes, observed discrepancies. This supplements Phase 2 but does not replace it.
 
 Do not proceed to Phase 2 until all required files are read.
 
@@ -130,7 +130,7 @@ Do not proceed to Phase 2 until all required files are read.
 - `category-id`: the exact category ID passed as the command argument, with no modification
 - Examples: `tc-7-D-isoZ-BRT.md`, `tc-1-A-IST.md`, `tc-9-D-BRT-8.md`
 
-**Output path:** `tasks/date-handling/forms-calendar/test/`
+**Output path:** `tasks/date-handling/forms-calendar/test-cases/`
 
 ---
 
@@ -334,14 +334,14 @@ Update the PASS/FAIL/PENDING/BLOCKED counts for the affected category row to ref
 
 ## Phase 5A — Generate the run file
 
-Create `tasks/date-handling/forms-calendar/test/runs/tc-{category-id}-run-{N}.md` from the Phase 2 observations. N is the next sequential integer for this TC (check whether previous run files exist first).
+Create `tasks/date-handling/forms-calendar/runs/tc-{category-id}-run-{N}.md` from the Phase 2 observations. N is the next sequential integer for this TC (check whether previous run files exist first).
 
 **Run files are immutable after creation.** Never modify a run file — create a new one for each re-run.
 
 ```markdown
 # TC-{ID} — Run {N} | {YYYY-MM-DD} | {TZ short} | {PASS / FAIL-N}
 
-**Spec**: [tc-{id}.md](../tc-{id}.md) | **Summary**: [summary](../summaries/tc-{id}.md)
+**Spec**: [tc-{id}.md](../test-cases/tc-{id}.md) | **Summary**: [summary](../summaries/tc-{id}.md)
 
 ## Environment
 
@@ -384,7 +384,7 @@ Include only steps that have an Expected value in the spec (skip pure UI navigat
 
 ## Phase 5B — Create or update the summary file
 
-**Path:** `tasks/date-handling/forms-calendar/test/summaries/tc-{category-id}.md`
+**Path:** `tasks/date-handling/forms-calendar/summaries/tc-{category-id}.md`
 
 If this is the **first run** for the TC (file does not exist): create it.
 If this is a **re-run** (file exists): open it and append a row to the Run History table + update Current Status and Current Interpretation.
@@ -392,7 +392,7 @@ If this is a **re-run** (file exists): open it and append a row to the Run Histo
 ```markdown
 # TC-{ID} — Summary
 
-**Spec**: [tc-{id}.md](../tc-{id}.md)
+**Spec**: [tc-{id}.md](../test-cases/tc-{id}.md)
 **Current status**: {PASS / FAIL-N} — last run {YYYY-MM-DD} ({TZ short})
 **Bug surface**: {Bug #N name, or "none — control/passing scenario"}
 
