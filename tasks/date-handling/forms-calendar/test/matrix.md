@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the forms calendar date-handling investigation.
 Full test evidence → `results.md` | Bug analysis → `../analysis.md` | Dashboard → `index.md`
 
-Last updated: 2026-03-31 | Total slots: ~230+ | Done: ~78 | Blocked: 0
+Last updated: 2026-03-31 | Total slots: ~230+ | Done: ~79 | Blocked: 0
 
 ---
 
@@ -42,7 +42,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | Category                 |  Total  |  PASS  |  FAIL  | PENDING | BLOCKED | PARTIAL | SKIP  |
 | ------------------------ | :-----: | :----: | :----: | :-----: | :-----: | :-----: | :---: |
 | 1. Calendar Popup        |   20    |   8    |   12   |    0    |    0    |    0    |   0   |
-| 2. Typed Input           |   16    |   8    |   5    |    3    |    0    |    0    |   0   |
+| 2. Typed Input           |   16    |   9    |   5    |    2    |    0    |    0    |   0   |
 | 3. Server Reload         |   18    |   4    |   0    |   14    |    0    |    0    |   0   |
 | 4. URL Parameters        |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
 | 5. Preset Date           |   18    |   1    |   0    |   17    |    0    |    0    |   0   |
@@ -54,7 +54,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 11. Cross-Timezone       |   14    |   0    |   0    |   13    |    0    |    1    |   0   |
 | 12. Edge Cases           |   20    |   4    |   5    |   10    |    0    |    0    |   1   |
 | 13. Database             |   10    |   2    |   0    |    8    |    0    |    0    |   0   |
-| **TOTAL**                | **225** | **44** | **34** | **145** |  **0**  |  **1**  | **1** |
+| **TOTAL**                | **225** | **45** | **34** | **144** |  **0**  |  **1**  | **1** |
 
 ---
 
@@ -109,10 +109,10 @@ Type a date directly in the input field (segment-by-segment keyboard entry).
 | 2-A-IST |   A    | IST | 03/15/2026          | `"2026-03-14"` (-1 day — string path, same as popup; Bug #2 absent)                                           | `"2026-03-14"`                          | FAIL    | 2026-03-31 | [summary](summaries/tc-2-A-IST.md) |
 | 2-B-IST |   B    | IST | 03/15/2026          | `"2026-03-14"` (same as A-IST — ignoreTZ no effect on date-only)                                              | `"2026-03-14"`                          | FAIL    | 2026-03-31 | [summary](summaries/tc-2-B-IST.md) |
 | 2-C-IST |   C    | IST | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (local midnight stored — same as BRT/popup; prediction corrected 2026-03-31)          | `"2026-03-15T00:00:00"`                 | PASS    | 2026-03-31 | [summary](summaries/tc-2-C-IST.md) |
-| 2-D-IST |   D    | IST | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (same storage as C-IST; GFV adds fake Z → Bug #5; prediction corrected 2026-03-31)    | `"2026-03-15T00:00:00"` (GFV: fake Z)  | FAIL    | 2026-03-31 | [summary](summaries/tc-2-D-IST.md) |
+| 2-D-IST |   D    | IST | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (same storage as C-IST; GFV adds fake Z → Bug #5; prediction corrected 2026-03-31)    | `"2026-03-15T00:00:00"` (GFV: fake Z)   | FAIL    | 2026-03-31 | [summary](summaries/tc-2-D-IST.md) |
 | 2-E-BRT |   E    | BRT | 03/15/2026          | `"2026-03-15"` (legacy typed path stores date-only; differs from popup — Bug #2 confirmed)                    | `"2026-03-15"`                          | PASS    | 2026-03-31 | [summary](summaries/tc-2-E-BRT.md) |
 | 2-F-BRT |   F    | BRT | 03/15/2026          | `"2026-03-15"` (same as E-BRT — ignoreTZ no effect on date-only)                                              | —                                       | PENDING | —          | —                                  |
-| 2-G-BRT |   G    | BRT | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (legacy DateTime; predict same as C-BRT)                                              | —                                       | PENDING | —          | —                                  |
+| 2-G-BRT |   G    | BRT | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (legacy DateTime typed; getSaveValue formats local; Bug #2 confirmed vs popup)        | `"2026-03-15T00:00:00"`                 | PASS    | 2026-03-31 | [summary](summaries/tc-2-G-BRT.md) |
 | 2-H-BRT |   H    | BRT | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (legacy DateTime + ignoreTZ; GFV: no fake Z)                                          | —                                       | PENDING | —          | —                                  |
 | 2-E-IST |   E    | IST | 03/15/2026          | `"2026-03-14"` (Bug #7 -1 day — same path as A/B-IST; confirms Bug #7 in legacy typed)                        | `"2026-03-14"`                          | FAIL    | 2026-03-31 | [summary](summaries/tc-2-E-IST.md) |
 | 2-F-IST |   F    | IST | 03/15/2026          | `"2026-03-14"` (same as E-IST — ignoreTZ no effect on date-only)                                              | `"2026-03-14"`                          | FAIL    | 2026-03-31 | [summary](summaries/tc-2-F-IST.md) |
