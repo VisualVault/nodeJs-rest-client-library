@@ -542,6 +542,373 @@ Bug only affects UTC+ users. BRT (UTC-3) is unaffected because local midnight �
 
 ---
 
+## Session 4: Calendar Popup — Configs A/B/C/D, IST (UTC+5:30)
+
+**Date**: 2026-03-30 | **TZ**: Asia/Calcutta (UTC+5:30) — macOS TZ changed + Chrome restarted | **Form**: DateTest-000024/000026/000029/000030 (fresh template instances)
+**Purpose**: Live confirmation of IST behavior for calendar popup across date-only (A/B) and DateTime (C/D) configs; validate or disprove the double-shift and UTC-offset storage predictions
+**Key outcomes**: Bug #7 confirmed for Configs A/B (-1 day stored); double-shift prediction wrong; getSaveValue() stores local midnight (NOT UTC offset) — matrix prediction for C/D corrected; Config C GetFieldValue correctly returns UTC (no bugs); Config D GetFieldValue appends fake Z Bug #5 confirmed (+5:30h drift per round-trip in IST)
+
+**Precondition verification:**
+
+| Check                   | Command                                                                                                  | Result                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| TZ                      | `new Date().toString()`                                                                                  | `"Tue Mar 31 2026 05:27:52 GMT+0530 (India Standard Time)"` ✓ |
+| V1/V2                   | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                              | `false` → V1 active ✓                                         |
+| Field lookup (Config A) | filter `fieldType=13, enableTime=false, ignoreTimezone=false, useLegacy=false, enableInitialValue=false` | `["DataField7"]` ✓                                            |
+
+### Test 5.1: Calendar Popup — Config A, IST (Category 1-A-IST)
+
+**Action**: Clicked calendar icon on DataField7 (Config A: `enableTime=false`, `ignoreTimezone=false`, `useLegacy=false`) → March 2026 popup opened → clicked day 15 → popup closed immediately (no time tab — date-only field).
+
+**Display after selection**: `03/15/2026` — field shows the user-intended date correctly.
+
+**Captured values (single JS call):**
+
+```javascript
+({
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField7'),
+    api: VV.Form.GetFieldValue('DataField7'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { raw: "2026-03-14", api: "2026-03-14", isoRef: "2026-03-14T18:30:00.000Z" }
+```
+
+| Metric                                       | Value                        | Notes                                                    |
+| -------------------------------------------- | ---------------------------- | -------------------------------------------------------- |
+| Display in input                             | `03/15/2026`                 | Shows user-intended date ✓                               |
+| Raw stored value                             | `"2026-03-14"`               | **-1 day from intended March 15**                        |
+| GetFieldValue()                              | `"2026-03-14"`               | Same as raw — no fake Z (Config A unaffected by Bug #5)  |
+| isoRef (`new Date(2026,2,15).toISOString()`) | `"2026-03-14T18:30:00.000Z"` | Confirms IST active: local midnight = UTC 18:30 prev day |
+| Matrix Expected                              | `"2026-03-13"` (-2 days)     | **Prediction was wrong**                                 |
+
+**Bug #7 confirmed**: Popup on date-only Config A in IST stores one day early. Display is correct (`03/15/2026`); stored value is `"2026-03-14"`.
+
+**Double-shift prediction disproved**: The matrix predicted -2 days based on the theory that the calendar popup sends a `Date` object through `normalizeCalValue()`, causing a second midnight re-interpretation. In practice, the popup for a date-only field goes through a path that produces a single UTC offset shift (IST midnight → UTC 18:30 → UTC date = March 14), not a double shift. The stored value is -1 day, not -2 days.
+
+**Bug #2 asymmetry NOT confirmed for Config A IST**: Both popup and typed input produce the same shift (-1 day = `"2026-03-14"`). The predicted divergence (popup → -2 days, typed → -1 day) does not materialize. Run test 2-A-IST to confirm typed input independently.
+
+**Updated matrix prediction for 1-B-IST**: By the same reasoning, Config B (ignoreTZ=true, date-only) should also store -1 day in IST from popup, not -2 days. The `ignoreTimezone` flag has no effect on date-only storage.
+
+**TC file**: [tc-1-A-IST.md](tc-1-A-IST.md)
+
+### Test 5.2: Calendar Popup — Config B, IST (Category 1-B-IST)
+
+**Precondition verification:**
+
+| Check                   | Command                                                                                                 | Result                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| TZ                      | `new Date().toString()`                                                                                 | `"Tue Mar 31 2026 05:45:39 GMT+0530 (India Standard Time)"` ✓ |
+| V1/V2                   | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                             | `false` → V1 active ✓                                         |
+| Field lookup (Config B) | filter `fieldType=13, enableTime=false, ignoreTimezone=true, useLegacy=false, enableInitialValue=false` | `["DataField10"]` ✓                                           |
+
+**Action**: Clicked calendar icon on DataField10 (Config B: `enableTime=false`, `ignoreTimezone=true`, `useLegacy=false`) on form DateTest-000026 (fresh template instance) → March 2026 popup opened → clicked day 15 → popup closed immediately (no time tab — date-only field). Display showed `03/15/2026`.
+
+**Captured values:**
+
+```javascript
+({
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField10'),
+    api: VV.Form.GetFieldValue('DataField10'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { raw: "2026-03-14", api: "2026-03-14", isoRef: "2026-03-14T18:30:00.000Z" }
+```
+
+| Metric                                       | Value                        | Notes                                                               |
+| -------------------------------------------- | ---------------------------- | ------------------------------------------------------------------- |
+| Display in input                             | `03/15/2026`                 | Shows user-intended date ✓                                          |
+| Raw stored value                             | `"2026-03-14"`               | **-1 day from intended March 15**                                   |
+| GetFieldValue()                              | `"2026-03-14"`               | Same as raw — no fake Z (`enableTime=false`, Bug #5 not applicable) |
+| isoRef (`new Date(2026,2,15).toISOString()`) | `"2026-03-14T18:30:00.000Z"` | Confirms IST active: local midnight = UTC 18:30 prev day            |
+| Matrix Expected                              | `"2026-03-14"`               | **MATCH**                                                           |
+
+**Findings:**
+
+- **Bug #7 confirmed for Config B in IST**: Popup on date-only Config B stores one day early (`"2026-03-14"` for intended March 15). Identical result to Config A (Test 5.1).
+- **`ignoreTimezone` has no effect on date-only storage**: Config B (`ignoreTimezone=true`) and Config A (`ignoreTimezone=false`) produce identical raw stored values and GetFieldValue returns. The `ignoreTimezone` flag only affects the `getCalendarFieldValue()` output path when `enableTime=true` (Bug #5 surface, Config D). For date-only fields, both configs go through the same `normalizeCalValue()` → `moment(input).toDate()` path.
+- **Bug #5 confirmed absent**: GetFieldValue returns `"2026-03-14"` with no fake Z suffix. As expected — Bug #5 requires `enableTime=true`, which Config B does not have.
+- **Matrix prediction correct**: The predicted `"2026-03-14"` was derived from the 1-A-IST live result (Test 5.1) — confirmed accurate.
+- **Next test**: Run 2-B-IST (typed input, Config B, IST) to confirm typed input produces the same -1 day shift independently. Expected: `"2026-03-14"` — same as popup, consistent with 2-A-IST prediction.
+
+**TC file**: [tc-1-B-IST.md](tc-1-B-IST.md)
+
+### Test 5.3: Calendar Popup — Config C, IST (Category 1-C-IST)
+
+**Precondition verification:**
+
+| Check                   | Command                                                                                                 | Result                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| TZ                      | `new Date().toString()`                                                                                 | `"Tue Mar 31 2026 05:54:03 GMT+0530 (India Standard Time)"` ✓ |
+| V1/V2                   | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                             | `false` → V1 active ✓                                         |
+| Field lookup (Config C) | filter `fieldType=13, enableTime=true, ignoreTimezone=false, useLegacy=false, enableInitialValue=false` | `["DataField6"]` ✓                                            |
+
+**Action**: Clicked calendar icon on DataField6 (Config C: `enableTime=true`, `ignoreTimezone=false`, `useLegacy=false`) on form DateTest-000029 (fresh template instance) → March 2026 Date tab opened → scrolled page within date grid to reveal Set button → clicked day 15 → popup advanced to Time tab showing `12:00 AM` → clicked Set → popup closed. Display showed `03/15/2026 12:00 AM`.
+
+**Captured values:**
+
+```javascript
+({
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField6'),
+    api: VV.Form.GetFieldValue('DataField6'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { raw: "2026-03-15T00:00:00", api: "2026-03-14T18:30:00.000Z", isoRef: "2026-03-14T18:30:00.000Z" }
+```
+
+| Metric                                       | Value                        | Notes                                                     |
+| -------------------------------------------- | ---------------------------- | --------------------------------------------------------- |
+| Display in input                             | `03/15/2026 12:00 AM`        | Shows user-intended date and time ✓                       |
+| Raw stored value                             | `"2026-03-15T00:00:00"`      | **Local midnight IST stored** — same string as BRT        |
+| GetFieldValue()                              | `"2026-03-14T18:30:00.000Z"` | Correct UTC conversion: IST midnight = UTC 18:30 prev day |
+| isoRef (`new Date(2026,2,15).toISOString()`) | `"2026-03-14T18:30:00.000Z"` | Confirms IST active ✓                                     |
+| Matrix Expected                              | `"2026-03-14T18:30:00"`      | **Prediction was wrong**                                  |
+
+**Findings:**
+
+- **Matrix prediction corrected**: The matrix predicted `"2026-03-14T18:30:00"` (UTC offset of IST midnight) as the raw stored value. The live result is `"2026-03-15T00:00:00"` — local midnight in IST, formatted as a local datetime string. `getSaveValue()` uses `moment(input).format("YYYY-MM-DD[T]HH:mm:ss")` which formats as **local time**, not UTC. Config C stores the same string regardless of timezone — the date/time as the user sees it.
+- **GetFieldValue correct**: `getCalendarFieldValue()` for Config C (ignoreTimezone=false) does `new Date(value).toISOString()`. The stored `"2026-03-15T00:00:00"` (no Z) is parsed as IST local time → UTC 18:30 prev day → returns `"2026-03-14T18:30:00.000Z"`. This is the correct UTC equivalent of IST midnight on March 15.
+- **Round-trip stable**: SetFieldValue with `"2026-03-14T18:30:00.000Z"` → JS parses as UTC → IST local = March 15 00:00 → getSaveValue → `"2026-03-15T00:00:00"`. No drift.
+- **No bugs triggered**: Config C behaves correctly in IST. PASS.
+- **1-D-IST prediction corrected**: The matrix also predicted `"2026-03-14T18:30:00"` for Config D raw storage. Based on this result, Config D will store `"2026-03-15T00:00:00"` (same local midnight storage). The difference between C and D is only in GetFieldValue: Config D adds fake Z → `"2026-03-15T00:00:00.000Z"` (Bug #5), which causes +5:30h drift per round-trip.
+- **Next test**: Run 1-D-IST (Config D, IST popup) to confirm `"2026-03-15T00:00:00"` storage and observe Bug #5 fake Z in GetFieldValue.
+
+**TC file**: [tc-1-C-IST.md](tc-1-C-IST.md)
+
+---
+
+### Test 5.4: Calendar Popup — Config D, IST (Category 1-D-IST)
+
+**Precondition verification:**
+
+| Check                   | Command                                                                                                | Result                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| TZ                      | `new Date().toString()`                                                                                | `"Tue Mar 31 2026 06:02:28 GMT+0530 (India Standard Time)"` ✓ |
+| V1/V2                   | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                            | `false` → V1 active ✓                                         |
+| Field lookup (Config D) | filter `fieldType=13, enableTime=true, ignoreTimezone=true, useLegacy=false, enableInitialValue=false` | `["DataField5"]` ✓                                            |
+
+**Action**: Clicked calendar icon on DataField5 (Config D: `enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) on form DateTest-000030 (fresh template instance) → March 2026 Date tab opened → scrolled page to reveal Set button → clicked day 15 → popup advanced to Time tab showing `12:00 AM` → clicked Set → popup closed. Display showed `03/15/2026 12:00 AM`.
+
+**Captured values:**
+
+```javascript
+({
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField5'),
+    api: VV.Form.GetFieldValue('DataField5'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { raw: "2026-03-15T00:00:00", api: "2026-03-15T00:00:00.000Z", isoRef: "2026-03-14T18:30:00.000Z" }
+```
+
+| Metric                                       | Value                        | Notes                                                                                  |
+| -------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------- |
+| Display in input                             | `03/15/2026 12:00 AM`        | Shows user-intended date and time ✓                                                    |
+| Raw stored value                             | `"2026-03-15T00:00:00"`      | Local midnight IST stored — same as Config C                                           |
+| GetFieldValue()                              | `"2026-03-15T00:00:00.000Z"` | **Bug #5 confirmed**: fake Z appended; real UTC should be `"2026-03-14T18:30:00.000Z"` |
+| isoRef (`new Date(2026,2,15).toISOString()`) | `"2026-03-14T18:30:00.000Z"` | Confirms IST active ✓                                                                  |
+| Matrix Expected (corrected)                  | `"2026-03-15T00:00:00"`      | MATCH                                                                                  |
+
+**Findings:**
+
+- **Raw storage matches corrected prediction**: Config D stores `"2026-03-15T00:00:00"` — local midnight IST — identical to Config C. The `ignoreTimezone` flag has no effect on `getSaveValue()`. Both configs go through `moment(input).format("YYYY-MM-DD[T]HH:mm:ss")` which formats as local time, not UTC.
+- **Bug #5 confirmed in IST**: `getCalendarFieldValue()` appends fake Z to the local time string. The real UTC equivalent of IST midnight March 15 is `"2026-03-14T18:30:00.000Z"` (confirmed by isoRef), but GetFieldValue returns `"2026-03-15T00:00:00.000Z"` — UTC midnight March 15, which is 5:30h ahead of the correct value.
+- **Round-trip drift in IST**: Each `SetFieldValue(GetFieldValue())` cycle advances the stored time by +5:30h (Bug #5). After ~4.4 trips, the date rolls over to the next day. This is the IST-specific variant of the +5:30h drift documented in Bug #5.
+- **Config C vs Config D comparison complete**: Only difference is in GetFieldValue — Config C returns real UTC (`"2026-03-14T18:30:00.000Z"`), Config D returns fake Z (`"2026-03-15T00:00:00.000Z"`). Storage is identical. Result: FAIL (Bug #5).
+
+**TC file**: [tc-1-D-IST.md](tc-1-D-IST.md)
+
+---
+
+## Session 5: Calendar Popup — Config A, UTC+0 (GMT+0000)
+
+**Date**: 2026-03-30 | **TZ**: GMT (UTC+0) — macOS TZ changed to `GMT` + Chrome restarted | **Form**: DateTest-000033 (fresh template instance)
+**Purpose**: UTC+0 control test — confirm zero-drift behavior for Config A calendar popup; validates that Bug #7 shift is zero at UTC+0 (local midnight = UTC midnight)
+**Key outcomes**: `"2026-03-15"` stored and returned — correct date, no shift; isoRef `"2026-03-15T00:00:00.000Z"` confirms UTC+0 active; Bug #7 zero-drift control confirmed
+
+### Test 6.1: Calendar Popup — Config A, UTC+0 (Category 1-A-UTC0)
+
+**Precondition verification:**
+
+| Check                   | Command                                                                                                  | Result                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| TZ                      | `new Date().toString()`                                                                                  | `"Tue Mar 31 2026 00:46:10 GMT+0000 (Greenwich Mean Time)"` ✓ |
+| V1/V2                   | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                              | `false` → V1 active ✓                                         |
+| Field lookup (Config A) | filter `fieldType=13, enableTime=false, ignoreTimezone=false, useLegacy=false, enableInitialValue=false` | `["DataField7"]` ✓                                            |
+
+**Action**: Clicked calendar icon on the Config A field (identified via P6 — `enableTime=false`, `ignoreTimezone=false`, `useLegacy=false`, `enableInitialValue=false`) on form DateTest-000033 (fresh template instance). March 2026 calendar popup opened (today March 31 highlighted). Clicked day 15. Popup closed immediately — no time tab, as expected for a date-only field. Field displayed `03/15/2026`.
+
+**Captured values:**
+
+```javascript
+({
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField7'),
+    api: VV.Form.GetFieldValue('DataField7'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { raw: "2026-03-15", api: "2026-03-15", isoRef: "2026-03-15T00:00:00.000Z" }
+```
+
+| Metric                                       | Value                        | Notes                                                       |
+| -------------------------------------------- | ---------------------------- | ----------------------------------------------------------- |
+| Display in input                             | `03/15/2026`                 | Shows user-intended date ✓                                  |
+| Raw stored value                             | `"2026-03-15"`               | Correct — no shift                                          |
+| GetFieldValue()                              | `"2026-03-15"`               | Same as raw — no transformation, no fake Z                  |
+| isoRef (`new Date(2026,2,15).toISOString()`) | `"2026-03-15T00:00:00.000Z"` | Confirms UTC+0 (GMT) active — local midnight = UTC midnight |
+| Matrix Expected                              | `"2026-03-15"`               | MATCH                                                       |
+
+**Findings:**
+
+- **Bug #7 zero-drift control confirmed**: At UTC+0, `normalizeCalValue()` converts local midnight (2026-03-15 00:00 GMT) to a Date object whose `toISOString()` produces `"2026-03-15T00:00:00.000Z"`. Stripping the Z and extracting the date yields `"2026-03-15"` — the correct value. No day shift.
+- **Why UTC-3 (BRT) also passes**: BRT midnight = `"2026-03-15T03:00:00.000Z"` (same UTC calendar date). `getSaveValue()` strips Z and formats as local time → `"2026-03-15"`. Correct for the same reason: the UTC date part matches the local date.
+- **Why UTC+5:30 (IST) fails**: IST midnight = `"2026-03-14T18:30:00.000Z"` — UTC date is March 14. Stored as `"2026-03-14"`. The control/fail asymmetry is entirely explained by whether UTC midnight falls on the same calendar day as local midnight.
+- **GetFieldValue Config A**: Returns the raw stored value unchanged. No `getCalendarFieldValue()` transformation applies to `enableTime=false` fields. Config A is not in the Bug #5 surface.
+- **Note on GMT vs Europe/London**: During first attempt, `Europe/London` was set (GMT in the system), but Chrome was reporting `GMT+0100 (British Summer Time)` — UK clocks moved forward March 29, 2026. Used `GMT` timezone (always UTC+0, no DST) instead.
+- **Next tests**: Run `1-D-UTC0` (Config D popup at UTC+0) to confirm fake Z in GetFieldValue is "coincidentally correct" at UTC+0 and round-trips are stable. Run `2-A-IST` to confirm typed input produces same -1 day shift as popup independently.
+
+**TC file**: [tc-1-A-UTC0.md](tc-1-A-UTC0.md)
+
+---
+
+## Session 6: Calendar Popup — Config D, UTC+0 (GMT+0000)
+
+**Date**: 2026-03-31 | **TZ**: GMT (UTC+0) — macOS TZ set to `GMT` + Chrome restarted | **Form**: DateTest-000036 (fresh template instance)
+**Purpose**: UTC+0 control test for Config D (enableTime=true, ignoreTimezone=true) — confirm fake Z (Bug #5) is coincidentally correct at UTC+0 and raw storage is correct; validate round-trip stability claim
+**Key outcomes**: `"2026-03-15T00:00:00"` stored (local midnight = UTC midnight at UTC+0); GetFieldValue returns `"2026-03-15T00:00:00.000Z"` (Bug #5 present but coincidentally correct); isoRef confirms UTC+0 active; PASS
+
+### Test 7.1: Calendar Popup — Config D, UTC+0 (Category 1-D-UTC0)
+
+**Precondition verification:**
+
+| Check                   | Command                                                                                                | Result                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| TZ                      | `new Date().toString()`                                                                                | `"Tue Mar 31 2026 10:36:32 GMT+0000 (Greenwich Mean Time)"` ✓ |
+| V1/V2                   | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                            | `false` → V1 active ✓                                         |
+| Field lookup (Config D) | filter `fieldType=13, enableTime=true, ignoreTimezone=true, useLegacy=false, enableInitialValue=false` | `["DataField5"]` ✓                                            |
+
+**Action**: Clicked calendar icon on the Config D field (identified via P6 — `enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`, `enableInitialValue=false`) on form DateTest-000036 (fresh template instance). The calendar icon is a `.k-select` span at row 5 of the form (the first DateTime field). March 2026 calendar popup opened (today March 31 highlighted). Clicked day 15. Popup automatically advanced to the Time tab — time header showed `12:00 AM`. Scrolled the page to bring Set button into view (modal was cut off below fold). Clicked Set. Field displayed `03/15/2026 12:00 AM`.
+
+**Captured values:**
+
+```javascript
+({
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField5'),
+    api: VV.Form.GetFieldValue('DataField5'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { raw: "2026-03-15T00:00:00", api: "2026-03-15T00:00:00.000Z", isoRef: "2026-03-15T00:00:00.000Z" }
+```
+
+| Metric                                       | Value                        | Notes                                                                                      |
+| -------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------ |
+| Display in input                             | `03/15/2026 12:00 AM`        | Shows user-intended date and time ✓                                                        |
+| Raw stored value                             | `"2026-03-15T00:00:00"`      | Local midnight UTC+0 stored — correct                                                      |
+| GetFieldValue()                              | `"2026-03-15T00:00:00.000Z"` | **Bug #5 present**: fake Z appended; at UTC+0 this is coincidentally the real UTC midnight |
+| isoRef (`new Date(2026,2,15).toISOString()`) | `"2026-03-15T00:00:00.000Z"` | Confirms UTC+0 (GMT) active — local midnight = UTC midnight ✓                              |
+| Matrix Expected                              | `"2026-03-15T00:00:00"`      | MATCH                                                                                      |
+
+**Findings:**
+
+- **Matrix prediction confirmed**: Config D at UTC+0 stores `"2026-03-15T00:00:00"` — local midnight stored correctly. At UTC+0, `getSaveValue()` converts local midnight via `toISOString()` → `"2026-03-15T00:00:00.000Z"` → strips Z → `"2026-03-15T00:00:00"`. Same UTC calendar date as local date. No shift.
+- **Bug #5 present but coincidentally correct**: `getCalendarFieldValue()` appends fake Z → `"2026-03-15T00:00:00.000Z"`. At UTC+0, local midnight IS UTC midnight, so the fake Z produces a valid timestamp. Contrast: at BRT (UTC-3), GetFieldValue would return `"2026-03-15T00:00:00.000Z"` for a field that is actually `"2026-03-14T21:00:00.000Z"` UTC — off by 3 hours. At IST (UTC+5:30), it would be off by 5:30 hours (confirmed in Test 5.4). At UTC+0: no drift.
+- **Round-trip stability confirmed (theoretical)**: `SetFieldValue(GetFieldValue())` sets `"2026-03-15T00:00:00.000Z"` → `normalizeCalValue()` parses this as UTC midnight → local midnight at UTC+0 → stores `"2026-03-15T00:00:00"`. No change per trip. The round-trip is stable at UTC+0 because the fake Z happens to be the real UTC midnight.
+- **Config C vs Config D comparison at UTC+0**: Config C `GetFieldValue` uses `new Date(value).toISOString()` → also returns `"2026-03-15T00:00:00.000Z"` at UTC+0. Both configs return the same value at UTC+0. The difference only becomes visible at other timezones.
+- **Note on GMT vs Europe/London**: `Europe/London` is NOT UTC+0 after March 29, 2026 (UK BST begins). `GMT` timezone was used — confirmed by `GMT+0000` in TZ check.
+
+**TC file**: [tc-1-D-UTC0.md](tc-1-D-UTC0.md)
+
+---
+
+## Session 7: Typed Input — Configs A and B, IST (UTC+5:30)
+
+**Date**: 2026-03-31 | **TZ**: Asia/Calcutta (UTC+5:30) — macOS TZ changed to `Asia/Calcutta`; Chrome picked up new TZ without restart (verified) | **Forms**: DateTest-000037 (Config A), DateTest-000039 (Config B)
+**Purpose**: Confirm typed input for date-only Configs A and B in IST stores -1 day (Bug #7); verify Bug #2 asymmetry (popup vs typed) is absent; confirm ignoreTZ no-op for date-only storage
+**Key outcomes**: Both configs store `"2026-03-14"` (-1 day, Bug #7); GetFieldValue returns raw unchanged; Bug #2 absent; ignoreTZ no effect on date-only; isoRef confirms IST active
+
+### Test 8.1: Typed Input — Config A, IST (Category 2-A-IST)
+
+**Precondition verification:**
+
+| Check                   | Command                                                                                                  | Result                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| TZ                      | `new Date().toString()`                                                                                  | `"Tue Mar 31 2026 16:14:57 GMT+0530 (India Standard Time)"` ✓ |
+| V1/V2                   | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                              | `false` → V1 active ✓                                         |
+| Field lookup (Config A) | filter `fieldType=13, enableTime=false, ignoreTimezone=false, useLegacy=false, enableInitialValue=false` | `["DataField7"]` ✓                                            |
+
+**Action**: Clicked the input area (row 7) of the Config A field (identified via P6 — `enableTime=false`, `ignoreTimezone=false`, `useLegacy=false`, `enableInitialValue=false`) on form DateTest-000037 (fresh template instance). Field entered segment-edit mode with "month" highlighted. Typed `03` → field showed `03/day/year`, "day" highlighted. Typed `15` → field showed `03/15/year`, "year" highlighted. Typed `2026` → field showed `03/15/2026`. Pressed Tab — focus moved to row 8, field confirmed `03/15/2026`, Changes counter incremented to 5.
+
+**Captured values:**
+
+```javascript
+({
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField7'),
+    api: VV.Form.GetFieldValue('DataField7'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { raw: "2026-03-14", api: "2026-03-14", isoRef: "2026-03-14T18:30:00.000Z" }
+```
+
+| Metric                                       | Value                        | Notes                                                                           |
+| -------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------- |
+| Display in input                             | `03/15/2026`                 | Shows user-intended date ✓                                                      |
+| Raw stored value                             | `"2026-03-14"`               | **Bug #7**: -1 day shift                                                        |
+| GetFieldValue()                              | `"2026-03-14"`               | Same as raw — no transformation for date-only Config A                          |
+| isoRef (`new Date(2026,2,15).toISOString()`) | `"2026-03-14T18:30:00.000Z"` | Confirms IST (UTC+5:30) active — local midnight March 15 = March 14 18:30 UTC ✓ |
+| Matrix Expected                              | `"2026-03-14"`               | MATCH                                                                           |
+
+**Findings:**
+
+- **Bug #7 confirmed via typed input**: Typed `03/15/2026` → `normalizeCalValue()` receives the string `"03/15/2026"` → `moment("03/15/2026").toDate()` creates a Date at local midnight IST (`2026-03-15T00:00:00+05:30` = `2026-03-14T18:30:00Z`) → `getSaveValue()` calls `moment(date).format("YYYY-MM-DD")` on this Date object → extracts the UTC date `"2026-03-14"` → -1 day stored.
+- **Bug #2 absent**: Typed input produces `"2026-03-14"` — identical to the popup result (Test 5.1: `"2026-03-14"`). The predicted asymmetry (popup = -2 days via Date path, typed = -1 day via string path) was not observed. Both paths store the same value in V1 with `useLegacy=false`. The single-shift theory (not double-shift) is now confirmed by two independent input methods.
+- **GetFieldValue unchanged**: Config A (`enableTime=false`) is outside the `getCalendarFieldValue()` transformation surface. GFV returns the raw stored value directly. No fake Z, no format change.
+- **Knock-on note for 2-B-IST**: Config B (`enableTime=false, ignoreTimezone=true`) should behave identically to Config A for typed input — `ignoreTimezone` has no effect on the date-only save path. Predict `"2026-03-14"` for 2-B-IST as well.
+- **Knock-on note for 2-C-IST / 2-D-IST**: Matrix predicts `"2026-03-14T18:30:00"` for DateTime configs in IST. This was the same wrong prediction as 1-C-IST / 1-D-IST (corrected 2026-03-30). `getSaveValue()` formats as LOCAL time, not UTC. Expect `"2026-03-15T00:00:00"` — the same string as BRT. These rows should be corrected when tested.
+
+**TC file**: [tc-2-A-IST.md](tc-2-A-IST.md)
+
+---
+
+### Test 8.2: Typed Input — Config B, IST (Category 2-B-IST)
+
+**Precondition verification:**
+
+| Check                   | Command                                                                                                 | Result                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| TZ                      | `new Date().toString()`                                                                                 | `"Tue Mar 31 2026 16:31:53 GMT+0530 (India Standard Time)"` ✓ |
+| V1/V2                   | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                             | `false` → V1 active ✓                                         |
+| Field lookup (Config B) | filter `fieldType=13, enableTime=false, ignoreTimezone=true, useLegacy=false, enableInitialValue=false` | `["DataField10"]` ✓                                           |
+
+**Action**: Opened DateTest-000039 (fresh template instance). Clicked the input area of DataField10 (row 8, Config B — `enableTime=false, ignoreTimezone=true`). Field entered segment-edit mode with "month" highlighted. Typed `03` → day segment; typed `15` → year segment; typed `2026` → pressed Tab. Field display after Tab: `03/15/2026`.
+
+**Captured values:**
+
+```javascript
+({
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField10'),
+    api: VV.Form.GetFieldValue('DataField10'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { raw: "2026-03-14", api: "2026-03-14", isoRef: "2026-03-14T18:30:00.000Z" }
+```
+
+| Metric                                       | Value                        | Notes                                                                                                                     |
+| -------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Display in input                             | `03/15/2026`                 | Shows user-intended date — Kendo picker renders from its internal Date object (IST local midnight), not from stored value |
+| Raw stored value                             | `"2026-03-14"`               | **Bug #7**: -1 day shift                                                                                                  |
+| GetFieldValue()                              | `"2026-03-14"`               | Same as raw — no transformation for date-only Config B                                                                    |
+| isoRef (`new Date(2026,2,15).toISOString()`) | `"2026-03-14T18:30:00.000Z"` | Confirms IST (UTC+5:30) active ✓                                                                                          |
+| Matrix Expected                              | `"2026-03-14"`               | MATCH                                                                                                                     |
+
+**Findings:**
+
+- **Bug #7 confirmed for Config B**: Typed `03/15/2026` → stored `"2026-03-14"` (-1 day). Same result as Config A (Test 8.1). `ignoreTimezone=true` has no effect on the date-only storage path — `normalizeCalValue()` and `getSaveValue()` behave identically for both configs when `enableTime=false`.
+- **Config A and Config B confirmed equivalent for date-only typed input**: Both store `"2026-03-14"` when `03/15/2026` is typed in IST. The `ignoreTimezone` flag only affects the DateTime (`enableTime=true`) code path. For date-only fields, it is a no-op at the storage layer.
+- **GetFieldValue unchanged**: Config B (`enableTime=false`) is outside the Bug #5 surface. No fake Z, no transformation — GFV returns raw value directly.
+- **Display shows intended date, not stored value**: The field displays `03/15/2026` while storing `"2026-03-14"`. The Kendo picker renders from its internal Date object (set at the moment of Tab), not from the stored value. The discrepancy is only visible after form reload. This behavior is identical to Config A (Test 8.1).
+- **Knock-on note for Category 1/2 IST matrix**: Both popup (1-B-IST) and typed (2-B-IST) for Config B produce `"2026-03-14"`. Bug #2 asymmetry absent for Config B as well — consistent with Config A findings.
+
+**TC file**: [tc-2-B-IST.md](tc-2-B-IST.md)
+
+---
+
 ## Test Coverage Matrix
 
 ### Field Configuration Combinations
@@ -563,39 +930,43 @@ All tests should be run against each of these 8 configurations:
 
 Select a date via popup calendar. For DateTime fields, select time then click Set.
 
-| Test ID | Config | TZ  | Date Selected   | Expected Raw                               | Status              |
-| ------- | :----: | :-: | --------------- | ------------------------------------------ | ------------------- |
-| 1-A-BRT |   A    | BRT | Mar 15          | `"2026-03-15"`                             | DONE ✓              |
-| 1-B-BRT |   B    | BRT | Mar 15          | `"2026-03-15"`                             | DONE ✓              |
-| 1-C-BRT |   C    | BRT | Mar 15 12:00 AM | `"2026-03-15T00:00:00"`                    | DONE ✓              |
-| 1-D-BRT |   D    | BRT | Mar 15 12:00 AM | `"2026-03-15T00:00:00"`                    | DONE ✓              |
-| 1-A-IST |   A    | IST | Mar 15          | `"2026-03-13"` (Date obj → -2 days in IST) | NOT TESTED          |
-| 1-B-IST |   B    | IST | Mar 15          | `"2026-03-13"`                             | NOT TESTED          |
-| 1-E-BRT |   E    | BRT | Mar 15          |                                            | NOT TESTED (legacy) |
-| 1-F-BRT |   F    | BRT | Mar 15          |                                            | NOT TESTED (legacy) |
-| 1-G-BRT |   G    | BRT | Mar 15 12:00 AM |                                            | NOT TESTED (legacy) |
-| 1-H-BRT |   H    | BRT | Mar 15 12:00 AM |                                            | NOT TESTED (legacy) |
+| Test ID  | Config |  TZ   | Date Selected   | Expected Raw                                                                                              | Status                             |
+| -------- | :----: | :---: | --------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| 1-A-BRT  |   A    |  BRT  | Mar 15          | `"2026-03-15"`                                                                                            | DONE ✓                             |
+| 1-B-BRT  |   B    |  BRT  | Mar 15          | `"2026-03-15"`                                                                                            | DONE ✓                             |
+| 1-C-BRT  |   C    |  BRT  | Mar 15 12:00 AM | `"2026-03-15T00:00:00"`                                                                                   | DONE ✓                             |
+| 1-D-BRT  |   D    |  BRT  | Mar 15 12:00 AM | `"2026-03-15T00:00:00"`                                                                                   | DONE ✓                             |
+| 1-A-UTC0 |   A    | UTC+0 | Mar 15          | `"2026-03-15"` (UTC+0 midnight = UTC midnight; zero drift — control)                                      | PASS ✓ (Test 6.1)                  |
+| 1-D-UTC0 |   D    | UTC+0 | Mar 15 12:00 AM | `"2026-03-15T00:00:00"` (fake Z coincidentally correct at UTC+0; Bug #5 present, no drift)                | PASS ✓ (Test 7.1)                  |
+| 1-A-IST  |   A    |  IST  | Mar 15          | `"2026-03-14"` (-1 day — single shift, popup = typed path)                                                | FAIL — Bug #7 (Test 5.1)           |
+| 1-B-IST  |   B    |  IST  | Mar 15          | `"2026-03-14"` (-1 day — ignoreTZ no effect on date-only)                                                 | FAIL — Bug #7 (Test 5.2)           |
+| 1-C-IST  |   C    |  IST  | Mar 15 12:00 AM | `"2026-03-15T00:00:00"` (local midnight stored — same as BRT; prediction corrected 2026-03-30)            | PASS ✓ (Test 5.3)                  |
+| 1-D-IST  |   D    |  IST  | Mar 15 12:00 AM | `"2026-03-15T00:00:00"` (local midnight stored — GFV adds fake Z Bug #5; prediction corrected 2026-03-30) | FAIL — Bug #5 (Test 5.4)           |
+| 1-E-BRT  |   E    |  BRT  | Mar 15          | `"2026-03-15T03:00:00.000Z"` (legacy UTC datetime; corrected 2026-03-31)                                  | FAIL — prediction wrong (Test 9.1) |
+| 1-F-BRT  |   F    |  BRT  | Mar 15          |                                                                                                           | NOT TESTED (legacy)                |
+| 1-G-BRT  |   G    |  BRT  | Mar 15 12:00 AM |                                                                                                           | NOT TESTED (legacy)                |
+| 1-H-BRT  |   H    |  BRT  | Mar 15 12:00 AM |                                                                                                           | NOT TESTED (legacy)                |
 
-_IST note: Calendar popup creates a `Date` object at local midnight. `normalizeCalValue()` V1 Date-object branch converts to ISO (`"2026-03-14T18:30:00.000Z"`), strips T to `"2026-03-14"`, re-parses as local midnight → `"2026-03-13T18:30:00.000Z"` — double shift, -2 days. Compare with Category 2 IST (typed string → single shift, -1 day). These are expected to differ — needs live test to confirm._
+_IST note (updated 2026-03-30): Two key findings from IST testing: (1) Date-only configs A/B — calendar popup stores `"2026-03-14"` (-1 day, Bug #7). The -2 day double-shift prediction was wrong; popup and typed input produce the same single shift. (2) DateTime config C — `getSaveValue()` formats as LOCAL time, not UTC offset. Stores `"2026-03-15T00:00:00"` (same string as BRT). The matrix prediction of `"2026-03-14T18:30:00"` was wrong. Same correction applies to 1-D-IST raw storage prediction. See Tests 5.1 (1-A-IST), 5.2 (1-B-IST), 5.3 (1-C-IST) for full evidence._
 
 ### Category 2: User Input — Typed Input (Scenario 2)
 
 Type a date directly in the input field.
 
-| Test ID | Config | TZ  | Date Typed          | Expected Raw                                        | Status                 |
-| ------- | :----: | :-: | ------------------- | --------------------------------------------------- | ---------------------- |
-| 2-A-BRT |   A    | BRT | 03/15/2026          | `"2026-03-15"`                                      | DONE ✓ (matches popup) |
-| 2-B-BRT |   B    | BRT | 03/15/2026          | `"2026-03-15"`                                      | DONE ✓ (matches popup) |
-| 2-C-BRT |   C    | BRT | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"`                             | DONE ✓ (matches popup) |
-| 2-D-BRT |   D    | BRT | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"`                             | DONE ✓ (matches popup) |
-| 2-A-IST |   A    | IST | 03/15/2026          | `"2026-03-14"` (-1 day — string path, single shift) | NOT TESTED             |
-| 2-B-IST |   B    | IST | 03/15/2026          | `"2026-03-14"`                                      | NOT TESTED             |
-| 2-E-BRT |   E    | BRT | 03/15/2026          |                                                     | NOT TESTED (legacy)    |
-| 2-F-BRT |   F    | BRT | 03/15/2026          |                                                     | NOT TESTED (legacy)    |
-| 2-G-BRT |   G    | BRT | 03/15/2026 12:00 AM |                                                     | NOT TESTED (legacy)    |
-| 2-H-BRT |   H    | BRT | 03/15/2026 12:00 AM |                                                     | NOT TESTED (legacy)    |
+| Test ID | Config | TZ  | Date Typed          | Expected Raw                                                                   | Status                   |
+| ------- | :----: | :-: | ------------------- | ------------------------------------------------------------------------------ | ------------------------ |
+| 2-A-BRT |   A    | BRT | 03/15/2026          | `"2026-03-15"`                                                                 | DONE ✓ (matches popup)   |
+| 2-B-BRT |   B    | BRT | 03/15/2026          | `"2026-03-15"`                                                                 | DONE ✓ (matches popup)   |
+| 2-C-BRT |   C    | BRT | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"`                                                        | DONE ✓ (matches popup)   |
+| 2-D-BRT |   D    | BRT | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"`                                                        | DONE ✓ (matches popup)   |
+| 2-A-IST |   A    | IST | 03/15/2026          | `"2026-03-14"` (-1 day — string path, same as popup; Bug #2 absent)            | FAIL — Bug #7 (Test 8.1) |
+| 2-B-IST |   B    | IST | 03/15/2026          | `"2026-03-14"` (same as 2-A-IST — ignoreTZ no effect on date-only)             | FAIL — Bug #7 (Test 8.2) |
+| 2-E-BRT |   E    | BRT | 03/15/2026          | `"2026-03-15"` (typed path — date-only; differs from popup — Bug #2 confirmed) | PASS ✓ (Test 9.2)        |
+| 2-F-BRT |   F    | BRT | 03/15/2026          |                                                                                | NOT TESTED (legacy)      |
+| 2-G-BRT |   G    | BRT | 03/15/2026 12:00 AM |                                                                                | NOT TESTED (legacy)      |
+| 2-H-BRT |   H    | BRT | 03/15/2026 12:00 AM |                                                                                | NOT TESTED (legacy)      |
 
-_IST note: Typed input creates a string, going through `normalizeCalValue()` string path → single local-midnight conversion → -1 day. Expected to produce `"2026-03-14"` while popup (1-A-IST) produces `"2026-03-13"` for the same intended date. This is Bug #7's asymmetric effect — needs live test to confirm._
+_IST note (updated 2026-03-31): Typed input confirmed via Test 8.1 (2-A-IST): stores `"2026-03-14"` (-1 day, Bug #7) — identical to popup result (Test 5.1). Bug #2 asymmetry (popup -2 days, typed -1 day) not observed in V1 with useLegacy=false. Both input methods go through the same single local-midnight conversion. Predicted 2-C-IST / 2-D-IST values of `"2026-03-14T18:30:00"` are likely wrong — expect `"2026-03-15T00:00:00"` (same as BRT) based on getSaveValue() formatting as local time (confirmed for 1-C-IST, 1-D-IST)._
 
 ### Category 3: Server Reload (Scenario 3)
 
@@ -775,7 +1146,7 @@ Simulates a scheduled script, form button event, or web service call setting dat
 
 ## Session Context (All Sessions)
 
-Sessions 1–3 (2026-03-27 and 2026-03-30). System TZ returned to BRT after Session 3.
+Sessions 1–5 (2026-03-27 and 2026-03-30). Session 4 (IST) ran Tests 5.1–5.4: 1-A-IST and 1-B-IST confirmed Bug #7 (-1 day) for Configs A and B; 1-C-IST confirmed Config C stores local midnight (getSaveValue() formats as local time, not UTC offset); 1-D-IST confirmed Bug #5 fake Z in IST (+5:30h drift per round-trip). System TZ returned to BRT after Session 4. Session 5 (UTC+0/GMT) ran Test 6.1: 1-A-UTC0 confirmed zero-drift control — Config A popup stores correct date at UTC+0. Note: `Europe/London` is NOT equivalent to UTC+0 in March (BST = UTC+1 since March 29, 2026); use `GMT` timezone for UTC+0 testing on macOS.
 
 ### What was tested
 
@@ -785,7 +1156,7 @@ Tests were run interactively using Chrome browser automation (Claude-in-Chrome M
 
 - **`useLegacy=true`** — Emanuel does not currently have access to enable this setting. This is the main gap — the analysis document's Bug #2 (inconsistent popup vs typed handlers) may only manifest with legacy mode.
 - **`useUpdatedCalendarValueLogic` confirmed `false` via live `__ngContext__` scan (2026-03-30)** — V1 is the active path on this form/account. Re-verify if testing on a different account or if `?ObjectID=` is ever added to the URL.
-- **Popup vs typed input in IST for date-only fields (1-A-IST, 2-A-IST)** — In BRT both produce the same result; in IST, code analysis predicts popup → `"2026-03-13"` (-2 days, Date object path) vs typed → `"2026-03-14"` (-1 day, string path). These are expected to diverge. Needs live test.
+- **Popup vs typed input in IST for date-only fields** — 1-A-IST (Test 5.1) and 1-B-IST (Test 5.2) confirmed popup stores `"2026-03-14"` (-1 day) for Configs A and B. The double-shift prediction (-2 days) was wrong. Run 2-A-IST and 2-B-IST to confirm typed input independently — expected also `"2026-03-14"`.
 - **URL parameter input (Scenario 4)** — Requires `enableQListener=true` on fields.
 - **Web service / scheduled script input** — Requires running a server-side script to set values via the API.
 - **Preset/Current Date with DateTime fields** — DataField1-4 are all date-only. Need DateTime fields with initial value configs to test Scenarios 5/6 with `enableTime=true`.
@@ -812,3 +1183,98 @@ VV.Form.SetFieldValue('DataField5', value); // set value
 
 Tests were written in execution order, not numerical order. The sequence in the document is:
 2.0 (baseline) → 2.1 (popup) → 2.2 (round-trip) → 2.8 (cross-TZ analysis) → 2.9 (live Mumbai) → 2.7 (typed input) → 2.5 (DataField10) → 2.6 (multiple trips) → 2.3 (reload) → 2.4 (DB evidence). This reflects the actual testing progression.
+
+---
+
+## Session 8: Calendar Popup — Legacy Configs (BRT, UTC-3)
+
+**Date**: 2026-03-31 | **TZ**: America/Sao_Paulo (UTC-3) — Brasilia Standard Time, no DST | **Form**: DateTest-000046 (fresh template instance)
+**Purpose**: First live tests of useLegacy=true field configs (E/F/G/H). Confirms whether legacy popup path stores full UTC datetime strings or date-only strings.
+**Key outcomes**: Legacy popup path (Config E) stores full UTC datetime ISO string `"2026-03-15T03:00:00.000Z"` — NOT the date-only `"2026-03-15"` predicted from A/B-BRT. Prediction corrected. 1-F-BRT prediction updated as knock-on. Typed input (2-E-BRT) stores `"2026-03-15"` (date-only) — different format from popup on same field, **Bug #2 confirmed** for useLegacy=true. Legacy fields use plain text input widget (not Kendo masked DatePicker).
+
+### Test 9.1: Calendar popup Config E (useLegacy=true), BRT (1-E-BRT)
+
+**Precondition verification:**
+
+| Check        | Command                                                                                    | Result                                                           |
+| ------------ | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| TZ           | `new Date().toString()`                                                                    | `"Tue Mar 31 2026 08:58:20 GMT-0300 (Brasilia Standard Time)"` ✓ |
+| V1/V2        | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                | `false` → V1 active ✓                                            |
+| Field lookup | `filter(enableTime=false, ignoreTimezone=false, useLegacy=true, enableInitialValue=false)` | `["DataField12"]` ✓                                              |
+
+**Action:** Clicked calendar icon (`.k-icon.k-i-calendar` inside `.fd-cal-container`) adjacent to DataField12. Popup opened showing March 2026. Clicked the cell with title "Sunday, March 15, 2026". Popup closed immediately (no time tab — `enableTime=false`). Field input displayed `03/15/2026`.
+
+**Captured values:**
+
+```javascript
+({
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField12'),
+    api: VV.Form.GetFieldValue('DataField12'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { raw: "2026-03-15T03:00:00.000Z", api: "2026-03-15T03:00:00.000Z", isoRef: "2026-03-15T03:00:00.000Z" }
+```
+
+| Metric           | Value                        | Notes                                                                      |
+| ---------------- | ---------------------------- | -------------------------------------------------------------------------- |
+| Display in input | `03/15/2026`                 | Correct — date-only display despite datetime stored                        |
+| Raw stored value | `"2026-03-15T03:00:00.000Z"` | Full UTC ISO datetime with Z — NOT date-only                               |
+| GetFieldValue()  | `"2026-03-15T03:00:00.000Z"` | Same as raw; no fake Z issue (enableTime=false, so fake-Z branch inactive) |
+| isoRef           | `"2026-03-15T03:00:00.000Z"` | Confirms BRT (UTC-3) active: local midnight = 03:00:00 UTC                 |
+| Matrix Expected  | `"2026-03-15"`               | **MISMATCH — prediction was wrong**                                        |
+
+**Findings:**
+
+- **Prediction failure**: The matrix predicted `"2026-03-15"` (date-only, same as Config A/B-BRT). Actual: `"2026-03-15T03:00:00.000Z"`. The legacy popup path stores a full UTC ISO datetime string even for `enableTime=false` fields. This is functionally different from the modern path which stores just the date string.
+- **Date is correct**: `"2026-03-15T03:00:00.000Z"` = March 15, 2026 00:00:00 BRT — the selected date is preserved correctly. No date drift. Bug #7 is absent in BRT as expected.
+- **Z suffix present**: Bug #4 (Legacy Save Format — removes Z) appears inert on the calendar popup path for useLegacy=true fields. The stored value retains the Z. Whether getSaveValue() is bypassed or whether it handles the value differently needs further code analysis.
+- **Knock-on correction**: 1-F-BRT was predicted `"2026-03-15"` (same as E-BRT). Now corrected to `"2026-03-15T03:00:00.000Z"`. All legacy date-only BRT popup tests (1-F-BRT, 1-E-IST, 1-F-IST) should assume UTC datetime format, not date-only.
+- **CLAUDE.md outdated note**: The "What Has NOT Been Tested" section listed `useLegacy=true` as inaccessible. DataField12/11/14/13 ARE accessible on the test form. That note should be removed in a future CLAUDE.md update.
+- **Next test**: Run 2-E-BRT (typed input, Config E, BRT) — the paired test for Bug #2. If typed input stores `"2026-03-15"` (date-only string path) while popup stores `"2026-03-15T03:00:00.000Z"`, Bug #2 is confirmed for useLegacy=true.
+
+**TC file**: [tc-1-E-BRT.md](tc-1-E-BRT.md)
+
+---
+
+### Test 9.2: Typed input Config E (useLegacy=true), BRT (2-E-BRT)
+
+**Precondition verification:**
+
+| Check        | Command                                                                                    | Result                                                           |
+| ------------ | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| TZ           | `new Date().toString()`                                                                    | `"Tue Mar 31 2026 09:21:13 GMT-0300 (Brasilia Standard Time)"` ✓ |
+| V1/V2        | `VV.Form.calendarValueService.useUpdatedCalendarValueLogic`                                | `false` → V1 active ✓                                            |
+| Field lookup | `filter(enableTime=false, ignoreTimezone=false, useLegacy=true, enableInitialValue=false)` | `["DataField12"]` ✓                                              |
+
+**Action:** Discovered that Config E fields (`useLegacy=true`) render as a **plain HTML text input**, not the Kendo masked DatePicker used by modern configs (A/B/C/D). There are no separate month/day/year segments. Clicked DataField12 at its center coordinate (scrolled into view via JS to resolve click-landing issues at the bottom of the form). Typed `03/15/2026` as a continuous string. Pressed Tab. Field retained display value `03/15/2026`.
+
+**Captured values:**
+
+```javascript
+({
+    displayValue: document.getElementById('DataField12').value,
+    raw: VV.Form.VV.FormPartition.getValueObjectValue('DataField12'),
+    api: VV.Form.GetFieldValue('DataField12'),
+    isoRef: new Date(2026, 2, 15, 0, 0, 0).toISOString(),
+});
+// → { displayValue: "03/15/2026", raw: "2026-03-15", api: "2026-03-15", isoRef: "2026-03-15T03:00:00.000Z" }
+```
+
+| Metric           | Value                        | Notes                                |
+| ---------------- | ---------------------------- | ------------------------------------ |
+| Display in input | `03/15/2026`                 | Correct                              |
+| Raw stored value | `"2026-03-15"`               | Date-only string — no time component |
+| GetFieldValue()  | `"2026-03-15"`               | Same as raw                          |
+| isoRef           | `"2026-03-15T03:00:00.000Z"` | Confirms BRT (UTC-3) active          |
+| Matrix Expected  | `"2026-03-15"`               | **MATCH**                            |
+
+**Findings:**
+
+- **PASS — matrix prediction correct**: Typed input for Config E stores `"2026-03-15"` (date-only string), matching the matrix prediction.
+- **Bug #2 CONFIRMED for useLegacy=true**: This test paired with Test 9.1 (popup) directly demonstrates the inconsistency: the same field (Config E, BRT) stores `"2026-03-15T03:00:00.000Z"` from the popup but `"2026-03-15"` from typed input. Two different internal handlers produce two different storage formats for the same intended date. Analysis.md Bug #2 was labelled "NOT REPRODUCED with useLegacy=false in BRT — may only exist with useLegacy=true." It now has live evidence with useLegacy=true.
+- **Plain text input widget**: Legacy config fields (`useLegacy=true`) use a plain HTML text input, not the Kendo masked DatePicker. This means the typing interaction is different — full `MM/dd/yyyy` string typed in one pass, no segment auto-advance. TC file documents this.
+- **No Bug #7**: BRT (UTC-3) is not affected by Bug #7 for date-only fields. The stored `"2026-03-15"` is correct.
+- **Knock-on**: 2-F-BRT prediction `"2026-03-15"` remains valid — ignoreTZ has no effect on date-only typed input. 2-F-BRT will also confirm Bug #2 when paired with 1-F-BRT popup result.
+- **Next test**: 1-F-BRT (popup, Config F) and 2-F-BRT (typed, Config F) to confirm Bug #2 holds for ignoreTZ=true legacy fields as well.
+
+**TC file**: [tc-2-E-BRT.md](tc-2-E-BRT.md)
