@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the forms calendar date-handling investigation.
 Full test evidence → `results.md` | Bug analysis → `../analysis.md` | Dashboard → `index.md`
 
-Last updated: 2026-03-31 | Total slots: ~230+ | Done: ~59 | Blocked: 0
+Last updated: 2026-03-31 | Total slots: ~230+ | Done: ~60 | Blocked: 0
 
 ---
 
@@ -42,7 +42,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | Category                 |  Total  |  PASS  |  FAIL  | PENDING | BLOCKED | PARTIAL | SKIP  |
 | ------------------------ | :-----: | :----: | :----: | :-----: | :-----: | :-----: | :---: |
 | 1. Calendar Popup        |   20    |   8    |   12   |    0    |    0    |    0    |   0   |
-| 2. Typed Input           |   16    |   5    |   2    |    9    |    0    |    0    |   0   |
+| 2. Typed Input           |   16    |   5    |   3    |    8    |    0    |    0    |   0   |
 | 3. Server Reload         |   18    |   4    |   0    |   14    |    0    |    0    |   0   |
 | 4. URL Parameters        |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
 | 5. Preset Date           |   18    |   1    |   0    |   17    |    0    |    0    |   0   |
@@ -54,7 +54,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 11. Cross-Timezone       |   14    |   0    |   0    |   13    |    0    |    1    |   0   |
 | 12. Edge Cases           |   20    |   4    |   5    |   10    |    0    |    0    |   1   |
 | 13. Database             |   10    |   2    |   0    |    8    |    0    |    0    |   0   |
-| **TOTAL**                | **225** | **40** | **31** | **152** |  **0**  |  **1**  | **1** |
+| **TOTAL**                | **225** | **40** | **32** | **151** |  **0**  |  **1**  | **1** |
 
 ---
 
@@ -114,7 +114,7 @@ Type a date directly in the input field (segment-by-segment keyboard entry).
 | 2-F-BRT |   F    | BRT | 03/15/2026          | `"2026-03-15"` (same as E-BRT — ignoreTZ no effect on date-only)                           | —                                       | PENDING | —          | —                                  |
 | 2-G-BRT |   G    | BRT | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (legacy DateTime; predict same as C-BRT)                           | —                                       | PENDING | —          | —                                  |
 | 2-H-BRT |   H    | BRT | 03/15/2026 12:00 AM | `"2026-03-15T00:00:00"` (legacy DateTime + ignoreTZ; GFV: no fake Z)                       | —                                       | PENDING | —          | —                                  |
-| 2-E-IST |   E    | IST | 03/15/2026          | `"2026-03-14"` (Bug #7 -1 day — same path as A/B-IST; confirms Bug #7 in legacy typed)     | —                                       | PENDING | —          | —                                  |
+| 2-E-IST |   E    | IST | 03/15/2026          | `"2026-03-14"` (Bug #7 -1 day — same path as A/B-IST; confirms Bug #7 in legacy typed)     | `"2026-03-14"`                          | FAIL    | 2026-03-31 | [summary](summaries/tc-2-E-IST.md) |
 | 2-F-IST |   F    | IST | 03/15/2026          | `"2026-03-14"` (same as E-IST — ignoreTZ no effect on date-only)                           | —                                       | PENDING | —          | —                                  |
 | 2-G-IST |   G    | IST | 03/15/2026 12:00 AM | `"2026-03-14T18:30:00"` (IST midnight as UTC-equiv — same as C-IST prediction)             | —                                       | PENDING | —          | —                                  |
 | 2-H-IST |   H    | IST | 03/15/2026 12:00 AM | `"2026-03-14T18:30:00"` (same as G-IST; GFV: no fake Z — useLegacy=true)                   | —                                       | PENDING | —          | —                                  |
