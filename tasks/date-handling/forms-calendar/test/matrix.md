@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the forms calendar date-handling investigation.
 Full test evidence → `results.md` | Bug analysis → `../analysis.md` | Dashboard → `index.md`
 
-Last updated: 2026-03-31 | Total slots: ~230+ | Done: ~81 | Blocked: 0
+Last updated: 2026-03-31 | Total slots: ~242 | Done: ~81 | Blocked: 0
 
 ---
 
@@ -39,22 +39,24 @@ All tests target one of 8 field configurations defined by three boolean flags:
 
 `PASS` = ran, no bug triggered. `FAIL` = ran, bug confirmed. `PENDING` = not yet run, no blocker. `BLOCKED` = requires access/setup not currently available. `PARTIAL` = ran, partial result only (noted in Actual). `SKIP` = intentionally excluded with known reason.
 
-| Category                 |  Total  |  PASS  |  FAIL  | PENDING | BLOCKED | PARTIAL | SKIP  |
-| ------------------------ | :-----: | :----: | :----: | :-----: | :-----: | :-----: | :---: |
-| 1. Calendar Popup        |   20    |   8    |   12   |    0    |    0    |    0    |   0   |
-| 2. Typed Input           |   16    |   11   |   5    |    0    |    0    |    0    |   0   |
-| 3. Server Reload         |   18    |   4    |   0    |   14    |    0    |    0    |   0   |
-| 4. URL Parameters        |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
-| 5. Preset Date           |   18    |   1    |   0    |   17    |    0    |    0    |   0   |
-| 6. Current Date          |   15    |   1    |   0    |   14    |    0    |    0    |   0   |
-| 7. SetFieldValue formats |   39    |   9    |   4    |   26    |    0    |    0    |   0   |
-| 8. GetFieldValue return  |   19    |   3    |   3    |   13    |    0    |    0    |   0   |
-| 9. Round-Trip            |   20    |   4    |   5    |   11    |    0    |    0    |   0   |
-| 10. Web Service          |   11    |   0    |   0    |   11    |    0    |    0    |   0   |
-| 11. Cross-Timezone       |   14    |   0    |   0    |   13    |    0    |    1    |   0   |
-| 12. Edge Cases           |   20    |   4    |   5    |   10    |    0    |    0    |   1   |
-| 13. Database             |   10    |   2    |   0    |    8    |    0    |    0    |   0   |
-| **TOTAL**                | **225** | **47** | **34** | **142** |  **0**  |  **1**  | **1** |
+| Category                  |  Total  |  PASS  |  FAIL  | PENDING | BLOCKED | PARTIAL | SKIP  |
+| ------------------------- | :-----: | :----: | :----: | :-----: | :-----: | :-----: | :---: |
+| 1. Calendar Popup         |   20    |   8    |   12   |    0    |    0    |    0    |   0   |
+| 2. Typed Input            |   16    |   11   |   5    |    0    |    0    |    0    |   0   |
+| 3. Server Reload          |   18    |   4    |   0    |   14    |    0    |    0    |   0   |
+| 4. URL Parameters         |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
+| 5. Preset Date            |   18    |   1    |   0    |   17    |    0    |    0    |   0   |
+| 6. Current Date           |   15    |   1    |   0    |   14    |    0    |    0    |   0   |
+| 7. SetFieldValue formats  |   39    |   9    |   4    |   26    |    0    |    0    |   0   |
+| 8. GetFieldValue return   |   19    |   3    |   3    |   13    |    0    |    0    |   0   |
+| 8B. GetDateObject return  |   12    |   0    |   0    |   12    |    0    |    0    |   0   |
+| 9. Round-Trip (GFV)       |   20    |   4    |   5    |   11    |    0    |    0    |   0   |
+| 9-GDOC. Round-Trip (GDOC) |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
+| 10. Web Service           |   11    |   0    |   0    |   11    |    0    |    0    |   0   |
+| 11. Cross-Timezone        |   14    |   0    |   0    |   13    |    0    |    1    |   0   |
+| 12. Edge Cases            |   20    |   4    |   5    |   10    |    0    |    0    |   1   |
+| 13. Database              |   10    |   2    |   0    |    8    |    0    |    0    |   0   |
+| **TOTAL**                 | **242** | **47** | **34** | **159** |  **0**  |  **1**  | **1** |
 
 ---
 
@@ -67,7 +69,7 @@ Select a date via popup calendar. For DateTime fields, select time then click Se
 
 | Test ID  | Config |  TZ   | Date Selected   | Expected                                                                                                                                                       | Actual                       | Status | Run Date   | Evidence                            |
 | -------- | :----: | :---: | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ------ | ---------- | ----------------------------------- |
-| 1-A-BRT  |   A    |  BRT  | Mar 15          | `"2026-03-15"`                                                                                                                                                 | `"2026-03-15"`               | PASS   | —          | [summary](summaries/tc-1-A-BRT.md)  |
+| 1-A-BRT  |   A    |  BRT  | Mar 15          | `"2026-03-15"`                                                                                                                                                 | `"2026-03-15"`               | PASS   | 2026-03-31 | [summary](summaries/tc-1-A-BRT.md)  |
 | 1-B-BRT  |   B    |  BRT  | Mar 15          | `"2026-03-15"`                                                                                                                                                 | `"2026-03-15"`               | PASS   | —          | [summary](summaries/tc-1-B-BRT.md)  |
 | 1-C-BRT  |   C    |  BRT  | Mar 15 12:00 AM | `"2026-03-15T00:00:00"`                                                                                                                                        | `"2026-03-15T00:00:00"`      | PASS   | —          | [summary](summaries/tc-1-C-BRT.md)  |
 | 1-D-BRT  |   D    |  BRT  | Mar 15 12:00 AM | `"2026-03-15T00:00:00"`                                                                                                                                        | `"2026-03-15T00:00:00"`      | PASS   | —          | [summary](summaries/tc-1-D-BRT.md)  |
@@ -132,26 +134,26 @@ Type a date directly in the input field (segment-by-segment keyboard entry).
 Save form, open saved record in a new tab. Compare displayed dates and GFV return with original.
 **Bugs exercised**: structural DB mixed-TZ storage, Bug #7 (IST load of date-only fields)
 
-| Test ID     | Config | Save TZ | Load TZ | Expected                                                                                    | Actual                                              | Status  | Run Date | Evidence                               |
-| ----------- | :----: | :-----: | :-----: | ------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------- | -------- | -------------------------------------- |
-| 3-A-BRT-BRT |   A    |   BRT   |   BRT   | No shift; display identical on reload                                                       | No shift; display/GFV identical on reload           | PASS    | —        | [summary](summaries/tc-3-A-BRT-BRT.md) |
-| 3-C-BRT-BRT |   C    |   BRT   |   BRT   | No shift; display identical on reload                                                       | No shift; display/GFV identical on reload           | PASS    | —        | [summary](summaries/tc-3-C-BRT-BRT.md) |
-| 3-D-BRT-BRT |   D    |   BRT   |   BRT   | No shift; GFV fake Z same on reload                                                         | No shift; GFV returns same fake Z on reload         | PASS    | —        | [summary](summaries/tc-3-D-BRT-BRT.md) |
-| 3-D-BRT-IST |   D    |   BRT   |   IST   | Display OK; Config D TZ-invariant (stored value unchanged)                                  | Display OK; GFV same fake Z (Config D TZ-invariant) | PASS    | —        | [summary](summaries/tc-3-D-BRT-IST.md) |
-| 3-A-BRT-IST |   A    |   BRT   |   IST   | Bug #7 on load: stored `"2026-03-15"` → IST reload displays `"2026-03-14"`                  | —                                                   | PENDING | —        | —                                      |
-| 3-C-BRT-IST |   C    |   BRT   |   IST   | Config C stores real UTC; IST reload shows correct local time (control)                     | —                                                   | PENDING | —        | —                                      |
-| 3-D-IST-BRT |   D    |   IST   |   BRT   | Display OK; GFV same fake Z (TZ-invariant)                                                  | —                                                   | PENDING | —        | —                                      |
-| 3-B-BRT-BRT |   B    |   BRT   |   BRT   | No shift — same as A-BRT-BRT (ignoreTZ no effect on date-only)                              | —                                                   | PENDING | —        | —                                      |
-| 3-B-BRT-IST |   B    |   BRT   |   IST   | Bug #7 on load — same as A-BRT-IST prediction                                               | —                                                   | PENDING | —        | —                                      |
-| 3-A-IST-BRT |   A    |   IST   |   BRT   | Wrong day permanently stored (Bug #7 baked in during IST save)                              | —                                                   | PENDING | —        | —                                      |
-| 3-C-IST-BRT |   C    |   IST   |   BRT   | Stored IST-offset UTC-equiv; BRT reload shows different time                                | —                                                   | PENDING | —        | —                                      |
-| 3-B-IST-BRT |   B    |   IST   |   BRT   | Same as A-IST-BRT (ignoreTZ no effect on date-only)                                         | —                                                   | PENDING | —        | —                                      |
-| 3-E-BRT-BRT |   E    |   BRT   |   BRT   | No shift — same as A-BRT-BRT (legacy date-only, same reload path)                           | —                                                   | PENDING | —        | —                                      |
-| 3-F-BRT-BRT |   F    |   BRT   |   BRT   | No shift — same as E-BRT-BRT (ignoreTZ no effect on date-only)                              | —                                                   | PENDING | —        | —                                      |
-| 3-G-BRT-BRT |   G    |   BRT   |   BRT   | No shift; display identical — predict same as C-BRT-BRT (legacy DateTime)                   | —                                                   | PENDING | —        | —                                      |
-| 3-H-BRT-BRT |   H    |   BRT   |   BRT   | No shift; GFV returns stored value without fake Z (useLegacy=true)                          | —                                                   | PENDING | —        | —                                      |
-| 3-E-BRT-IST |   E    |   BRT   |   IST   | Bug #7 on IST load: stored `"2026-03-15"` → IST displays `"2026-03-14"` (same as A-BRT-IST) | —                                                   | PENDING | —        | —                                      |
-| 3-H-BRT-IST |   H    |   BRT   |   IST   | Display OK; no fake Z drift (useLegacy=true); compare with 3-D-BRT-IST                      | —                                                   | PENDING | —        | —                                      |
+| Test ID     | Config | Save TZ | Load TZ | Expected                                                                                    | Actual                                              | Status  | Run Date   | Evidence                               |
+| ----------- | :----: | :-----: | :-----: | ------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------- | ---------- | -------------------------------------- |
+| 3-A-BRT-BRT |   A    |   BRT   |   BRT   | No shift; display identical on reload                                                       | No shift; display/GFV identical on reload           | PASS    | 2026-03-31 | [summary](summaries/tc-3-A-BRT-BRT.md) |
+| 3-C-BRT-BRT |   C    |   BRT   |   BRT   | No shift; display identical on reload                                                       | No shift; display/GFV identical on reload           | PASS    | 2026-03-31 | [summary](summaries/tc-3-C-BRT-BRT.md) |
+| 3-D-BRT-BRT |   D    |   BRT   |   BRT   | No shift; GFV fake Z same on reload                                                         | No shift; GFV returns same fake Z on reload         | PASS    | 2026-03-31 | [summary](summaries/tc-3-D-BRT-BRT.md) |
+| 3-D-BRT-IST |   D    |   BRT   |   IST   | Display OK; Config D TZ-invariant (stored value unchanged)                                  | Display OK; GFV same fake Z (Config D TZ-invariant) | PASS    | —          | [summary](summaries/tc-3-D-BRT-IST.md) |
+| 3-A-BRT-IST |   A    |   BRT   |   IST   | Bug #7 on load: stored `"2026-03-15"` → IST reload displays `"2026-03-14"`                  | —                                                   | PENDING | —          | —                                      |
+| 3-C-BRT-IST |   C    |   BRT   |   IST   | Config C stores real UTC; IST reload shows correct local time (control)                     | —                                                   | PENDING | —          | —                                      |
+| 3-D-IST-BRT |   D    |   IST   |   BRT   | Display OK; GFV same fake Z (TZ-invariant)                                                  | —                                                   | PENDING | —          | —                                      |
+| 3-B-BRT-BRT |   B    |   BRT   |   BRT   | No shift — same as A-BRT-BRT (ignoreTZ no effect on date-only)                              | —                                                   | PENDING | —          | —                                      |
+| 3-B-BRT-IST |   B    |   BRT   |   IST   | Bug #7 on load — same as A-BRT-IST prediction                                               | —                                                   | PENDING | —          | —                                      |
+| 3-A-IST-BRT |   A    |   IST   |   BRT   | Wrong day permanently stored (Bug #7 baked in during IST save)                              | —                                                   | PENDING | —          | —                                      |
+| 3-C-IST-BRT |   C    |   IST   |   BRT   | Stored IST-offset UTC-equiv; BRT reload shows different time                                | —                                                   | PENDING | —          | —                                      |
+| 3-B-IST-BRT |   B    |   IST   |   BRT   | Same as A-IST-BRT (ignoreTZ no effect on date-only)                                         | —                                                   | PENDING | —          | —                                      |
+| 3-E-BRT-BRT |   E    |   BRT   |   BRT   | No shift — same as A-BRT-BRT (legacy date-only, same reload path)                           | —                                                   | PENDING | —          | —                                      |
+| 3-F-BRT-BRT |   F    |   BRT   |   BRT   | No shift — same as E-BRT-BRT (ignoreTZ no effect on date-only)                              | —                                                   | PENDING | —          | —                                      |
+| 3-G-BRT-BRT |   G    |   BRT   |   BRT   | No shift; display identical — predict same as C-BRT-BRT (legacy DateTime)                   | —                                                   | PENDING | —          | —                                      |
+| 3-H-BRT-BRT |   H    |   BRT   |   BRT   | No shift; GFV returns stored value without fake Z (useLegacy=true)                          | —                                                   | PENDING | —          | —                                      |
+| 3-E-BRT-IST |   E    |   BRT   |   IST   | Bug #7 on IST load: stored `"2026-03-15"` → IST displays `"2026-03-14"` (same as A-BRT-IST) | —                                                   | PENDING | —          | —                                      |
+| 3-H-BRT-IST |   H    |   BRT   |   IST   | Display OK; no fake Z drift (useLegacy=true); compare with 3-D-BRT-IST                      | —                                                   | PENDING | —          | —                                      |
 
 > **Structural partial**: Tests 3-D-BRT-BRT and 3-A-BRT-BRT show correct display but DB stores UTC for initial-value fields and local time for user-input fields — same logical date has different stored representations. Not a discrete visible failure, but affects SQL range queries.
 
@@ -306,6 +308,32 @@ Return value for each configuration from `VV.Form.GetFieldValue()`.
 
 ---
 
+## 8B — GetDateObjectFromCalendar Return
+
+Return value from `VV.Form.GetDateObjectFromCalendar()` — returns a JS `Date` object, not a string.
+**Key questions**: Does it avoid Bug #5 fake Z? What day does the Date object show in UTC+ for date-only fields? Is the `.toISOString()` output safe for round-trips?
+**Bugs exercised**: Bug #7 (IST date-only — Date shows correct day but UTC representation is prev day), Bug #5 comparison (Config D — Date object may be correct where GFV is wrong)
+
+| Test ID    | Config |  TZ   | Stored Raw              | Expected Date.toString()                           | Expected .toISOString()      | Actual | Status  | Run Date | Evidence |
+| ---------- | :----: | :---: | ----------------------- | -------------------------------------------------- | ---------------------------- | ------ | ------- | -------- | -------- |
+| 8B-A-BRT   |   A    |  BRT  | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT-0300` (BRT midnight)     | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
+| 8B-A-IST   |   A    |  IST  | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT+0530` (IST midnight)     | `"2026-03-14T18:30:00.000Z"` | —      | PENDING | —        | —        |
+| 8B-A-UTC0  |   A    | UTC+0 | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT+0000` (UTC midnight)     | `"2026-03-15T00:00:00.000Z"` | —      | PENDING | —        | —        |
+| 8B-C-BRT   |   C    |  BRT  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT-0300` (BRT midnight)     | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
+| 8B-C-IST   |   C    |  IST  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT+0530` (IST midnight)     | `"2026-03-14T18:30:00.000Z"` | —      | PENDING | —        | —        |
+| 8B-D-BRT   |   D    |  BRT  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT-0300` — no fake Z        | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
+| 8B-D-IST   |   D    |  IST  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT+0530` — no fake Z        | `"2026-03-14T18:30:00.000Z"` | —      | PENDING | —        | —        |
+| 8B-D-UTC0  |   D    | UTC+0 | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT+0000` — matches GFV      | `"2026-03-15T00:00:00.000Z"` | —      | PENDING | —        | —        |
+| 8B-D-empty |   D    |  any  | `""`                    | `null` (expected clean null, not Invalid Date)     | N/A                          | —      | PENDING | —        | —        |
+| 8B-A-empty |   A    |  any  | `""`                    | `null` (expected)                                  | N/A                          | —      | PENDING | —        | —        |
+| 8B-E-BRT   |   E    |  BRT  | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT-0300` (legacy date-only) | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
+| 8B-H-BRT   |   H    |  BRT  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT-0300` (legacy DateTime)  | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
+
+> **Why this matters**: Developers writing form scripts have three ways to read a date: `GetFieldValue()` (string, Bug #5 affected), `getValueObjectValue()` (raw string, internal), and `GetDateObjectFromCalendar()` (Date object). If a developer calls `.toISOString()` on the Date object and passes it to `SetFieldValue()`, a different drift pattern emerges than the GFV round-trip — see 9-GDOC rows below.
+> **IST note for date-only (8B-A-IST)**: The Date object will show `Mar 15` (correct day in local display) but `.toISOString()` returns `"2026-03-14T18:30:00.000Z"` (previous UTC day). This is not a bug in GetDateObjectFromCalendar — it's how JS Date works. The danger is if a developer passes `.toISOString()` to `SetFieldValue()`, which would trigger Bug #7's `moment(input).toDate()` with a Z-suffixed UTC string.
+
+---
+
 ## 9 — Round-Trip (SFV→GFV→SFV)
 
 Call `SetFieldValue(field, GetFieldValue(field))` and measure date drift.
@@ -333,6 +361,20 @@ Call `SetFieldValue(field, GetFieldValue(field))` and measure date drift.
 | 9-G-BRT-1  |   G    |  BRT  |   1   | 0 drift (stable — legacy DateTime ignoreTZ=false; same as C)                        | —                                                         | PENDING | —        | —                                     |
 | 9-H-BRT-1  |   H    |  BRT  |   1   | **0 drift** — useLegacy=true skips fake-Z branch; key comparison vs 9-D-BRT-1 (-3h) | —                                                         | PENDING | —        | —                                     |
 | 9-H-IST-1  |   H    |  IST  |   1   | **0 drift** — no fake Z regardless of TZ; key comparison vs 9-D-IST-1 (+5:30h)      | —                                                         | PENDING | —        | —                                     |
+
+### 9-GDOC — Round-Trip via GetDateObjectFromCalendar
+
+`SetFieldValue(field, GetDateObjectFromCalendar(field).toISOString())` — different drift pattern than GFV round-trip because `.toISOString()` produces real UTC, not fake Z.
+
+| Test ID        | Config | TZ  | Trips | Expected Shift                                                                                                       | Actual | Status  | Run Date | Evidence |
+| -------------- | :----: | :-: | :---: | -------------------------------------------------------------------------------------------------------------------- | ------ | ------- | -------- | -------- |
+| 9-GDOC-A-BRT-1 |   A    | BRT |   1   | 0 (date-only: SFV receives ISO Z string → `normalizeCalValue` → `moment("...Z").toDate()` → BRT midnight → same day) | —      | PENDING | —        | —        |
+| 9-GDOC-A-IST-1 |   A    | IST |   1   | -1 day (`.toISOString()` = `"2026-03-14T18:30:00.000Z"` → SFV parses → stores `"2026-03-14"`)                        | —      | PENDING | —        | —        |
+| 9-GDOC-D-BRT-1 |   D    | BRT |   1   | -3h (`.toISOString()` = `"2026-03-15T03:00:00.000Z"` → SFV parses as UTC → stores `"2026-03-15T03:00:00"` or shifts) | —      | PENDING | —        | —        |
+| 9-GDOC-D-IST-1 |   D    | IST |   1   | +5:30h (`.toISOString()` = `"2026-03-14T18:30:00.000Z"` → SFV → drift in opposite direction from GFV round-trip)     | —      | PENDING | —        | —        |
+| 9-GDOC-C-BRT-1 |   C    | BRT |   1   | 0 (Config C applies real UTC conversion; `.toISOString()` matches GFV; same round-trip as 9-C-BRT-1)                 | —      | PENDING | —        | —        |
+
+> **Why GDOC round-trips differ from GFV round-trips**: GFV for Config D returns `"...T00:00:00.000Z"` (fake Z — local time mislabeled as UTC). `GetDateObjectFromCalendar().toISOString()` returns `"...T03:00:00.000Z"` (real UTC). When fed back into SetFieldValue, the real UTC string triggers a different code path in `normalizeCalValue()` — potentially storing `T03:00:00` instead of `T00:00:00`, a -3h shift in one trip but via a different mechanism than the fake Z drift.
 
 ---
 

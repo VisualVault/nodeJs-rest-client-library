@@ -1520,3 +1520,16 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-03-31 [TC-2-F-BRT Run 1](runs/tc-2-F-BRT-run-1.md) — BRT — PASS — legacy typed Config F stores date-only; ignoreTZ no-op; Bug #2 confirmed vs popup
 - 2026-03-31 [TC-2-G-BRT Run 1](runs/tc-2-G-BRT-run-1.md) — BRT — PASS — legacy DateTime typed stores local midnight "2026-03-15T00:00:00"; Bug #2 confirmed vs popup
 - 2026-03-31 [TC-2-H-BRT Run 1](runs/tc-2-H-BRT-run-1.md) — BRT — PASS — legacy DateTime+ignoreTZ typed stores local midnight; identical to G-BRT; Category 2 complete (16/16)
+
+## Session 2026-03-31 (BRT — TC Spec Creation)
+
+**Purpose**: Create formal TC spec files for existing PASS scenarios; re-verify with fresh run.
+**Key outcomes**: PASS — re-confirmed BRT baseline stability.
+
+- 2026-03-31 [TC-1-A-BRT Run 2](runs/tc-1-A-BRT-run-2.md) — BRT — PASS — Config A calendar popup stores "2026-03-15" correctly; re-confirms run-1
+- 2026-03-31 [TC-3-A-BRT-BRT Run 2](runs/tc-3-A-BRT-BRT-run-2.md) — BRT — PASS — Config A server reload: date-only string survives save/reload; GFV unchanged
+- 2026-03-31 [TC-3-C-BRT-BRT Run 2](runs/tc-3-C-BRT-BRT-run-2.md) — BRT — PASS — Config C server reload: local midnight DateTime survives reload; GFV returns correct UTC
+- 2026-03-31 [TC-3-D-BRT-BRT Run 2](runs/tc-3-D-BRT-BRT-run-2.md) — BRT — PASS (FAIL-3) — Config D server reload: raw value unchanged; Bug #5 fake Z confirmed in GFV on reload
+- 2026-03-31 [TC-3-A-BRT-BRT Run 3](runs/tc-3-A-BRT-BRT-run-3.md) — BRT — PASS — full save-then-reload on fresh form (DateTest-000079); Config A stable
+- 2026-03-31 [TC-3-C-BRT-BRT Run 3](runs/tc-3-C-BRT-BRT-run-3.md) — BRT — PASS — full save-then-reload on fresh form; Config C DateTime stable
+- 2026-03-31 [TC-3-D-BRT-BRT Run 3](runs/tc-3-D-BRT-BRT-run-3.md) — BRT — PASS (FAIL-3) — full save-then-reload on fresh form; Bug #5 active pre-save and post-reload

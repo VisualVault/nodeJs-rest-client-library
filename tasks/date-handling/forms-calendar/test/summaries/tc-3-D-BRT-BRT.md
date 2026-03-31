@@ -1,19 +1,21 @@
 # TC-3-D-BRT-BRT — Summary
 
-**Spec**: [tc-2-9-form-load-server-reload-brt.md](../tc-2-9-form-load-server-reload-brt.md)
-**Current status**: PASS — last run 2026-03-27 (BRT)
-**Bug surface**: Bug #5 (fake Z in GetFieldValue) — present but not triggered on reload path; no extra drift on reload
+**Spec**: [tc-3-D-BRT-BRT.md](../tc-3-D-BRT-BRT.md)
+**Current status**: PASS (FAIL-3) — last run 2026-03-31 (BRT)
+**Bug surface**: Bug #5 (fake Z in GetFieldValue) — confirmed active on reload path in Run 2
 
 ## Run History
 
-| Run | Date       | TZ  | Outcome | File                                     |
-| --- | ---------- | --- | ------- | ---------------------------------------- |
-| 1   | 2026-03-27 | BRT | PASS    | [run-1](../runs/tc-3-D-BRT-BRT-run-1.md) |
+| Run | Date       | TZ  | Outcome       | File                                     |
+| --- | ---------- | --- | ------------- | ---------------------------------------- |
+| 1   | 2026-03-27 | BRT | PASS          | [run-1](../runs/tc-3-D-BRT-BRT-run-1.md) |
+| 2   | 2026-03-31 | BRT | PASS (FAIL-3) | [run-2](../runs/tc-3-D-BRT-BRT-run-2.md) |
+| 3   | 2026-03-31 | BRT | PASS (FAIL-3) | [run-3](../runs/tc-3-D-BRT-BRT-run-3.md) |
 
 ## Current Interpretation
 
-Config D (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) saved in BRT and reloaded in BRT shows no additional drift from the reload path. The server returns the raw stored value `"2026-03-15T00:00:00"` unchanged, and the display remains `03/15/2026 12:00 AM`. GFV returned the clean value in this run — Bug #5 (fake Z appended by `getCalendarFieldValue()`) is structurally present on the Config D GFV path but was not observed to append the fake Z during this specific reload observation. The reload itself is safe; drift only occurs when `SetFieldValue(GetFieldValue())` is subsequently executed, as confirmed by the 9-D-BRT-\* tests.
+Config D (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) raw stored value survives BRT reload consistently across three runs. Run 3 (2026-03-31) performed a full save-then-reload cycle on a fresh form (DateTest-000079, current template) confirming: save does not corrupt Config D values; raw `"2026-03-15T00:00:00"` is preserved. Bug #5 (fake Z in GFV) is confirmed active in both pre-save AND post-reload GFV calls (Runs 2 and 3), establishing it as a persistent GFV-layer defect — not reload-specific. Run 1 (2026-03-27) reported clean GFV, likely a different observation method. Current template produces same results as DateTest-000004.
 
 ## Next Action
 
-No further BRT-BRT reload runs needed. Run 3-D-IST-BRT (save from IST, reload in BRT) when an IST-saved record is available — that scenario is currently untested and would combine the Config D TZ-invariant storage with a reader in a different timezone.
+No further BRT-BRT runs needed. Run 3-D-BRT-IST to verify Config D cross-TZ behavior.

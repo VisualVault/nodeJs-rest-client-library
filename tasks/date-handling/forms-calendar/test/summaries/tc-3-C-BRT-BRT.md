@@ -1,7 +1,7 @@
 # TC-3-C-BRT-BRT — Summary
 
-**Spec**: [tc-2-1-form-load-brt.md](../tc-2-1-form-load-brt.md)
-**Current status**: PASS — last run 2026-03-27 (BRT)
+**Spec**: [tc-3-C-BRT-BRT.md](../tc-3-C-BRT-BRT.md)
+**Current status**: PASS — last run 2026-03-31 (BRT)
 **Bug surface**: none — control/passing scenario
 
 ## Run History
@@ -9,11 +9,13 @@
 | Run | Date       | TZ  | Outcome | File                                     |
 | --- | ---------- | --- | ------- | ---------------------------------------- |
 | 1   | 2026-03-27 | BRT | PASS    | [run-1](../runs/tc-3-C-BRT-BRT-run-1.md) |
+| 2   | 2026-03-31 | BRT | PASS    | [run-2](../runs/tc-3-C-BRT-BRT-run-2.md) |
+| 3   | 2026-03-31 | BRT | PASS    | [run-3](../runs/tc-3-C-BRT-BRT-run-3.md) |
 
 ## Current Interpretation
 
-Config C (`enableTime=true`, `ignoreTimezone=false`, `useLegacy=false`) saved in BRT and reloaded in BRT shows no date drift. The raw stored value `"2026-03-15T00:00:00"` is returned unchanged from the server. `GetFieldValue` correctly returns `"2026-03-15T03:00:00.000Z"` — this is the expected UTC conversion for a `ignoreTimezone=false` DateTime field, not Bug #5 (Bug #5 affects `ignoreTimezone=true` fields only). Display remains `03/15/2026 12:00 AM`. Config C is the UTC control configuration — it stores local time but GFV applies the proper timezone offset on read. The BRT-saved → BRT-reload cycle for Config C is stable.
+Config C (`enableTime=true`, `ignoreTimezone=false`, `useLegacy=false`) passes consistently across three runs. Run 3 (2026-03-31) performed a full save-then-reload cycle on a fresh form (DateTest-000079, current template). Pre-save and post-reload values are identical: raw `"2026-03-15T00:00:00"`, GFV `"2026-03-15T03:00:00.000Z"` (correct UTC conversion). Save does not corrupt Config C DateTime values. Current template produces same results as DateTest-000004.
 
 ## Next Action
 
-Run 3-C-IST-BRT if a cross-TZ reload test is desired (save from IST, reload in BRT). Config C cross-TZ reload should also be stable since the stored value is in local time and GFV applies the reader's offset.
+Run 3-C-BRT-IST to verify cross-TZ reload behavior.
