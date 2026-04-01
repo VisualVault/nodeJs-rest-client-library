@@ -28,6 +28,11 @@ for (const tc of categoryTests) {
         }, testInfo) => {
             // Only run this test in the matching timezone project
             test.skip(!testInfo.project.name.startsWith(tc.tz), `Skipping — test is for ${tc.tz}`);
+            // Legacy fields (Configs E-H) use Angular UI Bootstrap datepicker, not Kendo.
+            // The popup toggle and calendar DOM are completely different from Kendo widgets.
+            // Cat 1 tests the Kendo popup specifically; legacy popup needs its own implementation.
+            const fieldCfg = FIELD_MAP[tc.config];
+            test.skip(fieldCfg.useLegacy, `Skipping — legacy fields use a different popup widget`);
             // Navigate to fresh form and wait for VV.Form ready
             await gotoAndWaitForVVForm(page, FORM_TEMPLATE_URL);
 
@@ -37,7 +42,6 @@ for (const tc of categoryTests) {
 
             // Verify code path (V1 vs V2)
             const isV2 = await getCodePath(page);
-            const fieldCfg = FIELD_MAP[tc.config];
             expect(isV2).toBe(false); // All current tests assume V1
 
             // Verify field exists with expected config flags

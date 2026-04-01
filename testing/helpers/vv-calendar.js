@@ -92,14 +92,22 @@ async function selectDateInDatePicker(page, year, month, day) {
     const targetHeader = `${MONTH_NAMES[month]} ${year}`;
     const monthShort = MONTH_NAMES[month].substring(0, 3);
 
-    // Scope the selector to the calendar popup to avoid matching unrelated <li> elements.
-    const popup = page.locator('.uib-datepicker-popup, [uib-datepicker-popup-wrap]').or(grid.locator('..'));
-    const monthListItem = popup
-        .locator('li')
-        .filter({ hasText: new RegExp(`^${monthShort}$`) })
-        .first();
-    await monthListItem.scrollIntoViewIfNeeded();
-    await monthListItem.click();
+    // Click the target month in the scrollable month list via page.evaluate().
+    // Using DOM-level click avoids Playwright's actionability checks which fail in
+    // WebKit when form elements overlap the popup due to z-index stacking differences.
+    await page.evaluate(
+        ({ monthAbbr }) => {
+            const listItems = document.querySelectorAll('[role="grid"] li, .uib-datepicker-popup li');
+            for (const li of listItems) {
+                if (li.textContent.trim() === monthAbbr) {
+                    li.scrollIntoView();
+                    li.click();
+                    return;
+                }
+            }
+        },
+        { monthAbbr: monthShort }
+    );
 
     // Wait for the target month's tbody to appear
     await page.waitForFunction(
@@ -114,25 +122,33 @@ async function selectDateInDatePicker(page, year, month, day) {
         { timeout: 5000 }
     );
 
-    // Find the correct tbody and click the target day
-    const tbodies = await grid.locator('tbody').all();
-    for (const tbody of tbodies) {
-        const headerText = await tbody
-            .locator('tr')
-            .first()
-            .textContent()
-            .catch(() => '');
-        if (headerText.includes(targetHeader)) {
-            const dayCell = tbody
-                .locator('td')
-                .filter({ hasText: new RegExp(`^${day}$`) })
-                .first();
-            await dayCell.locator('span, div').first().click();
-            return;
-        }
-    }
+    // Click the target day via page.evaluate() — same pattern as selectDateInDateTimePicker.
+    // Bypasses Playwright's pointer-event interception checks which fail in WebKit when
+    // the popup z-index stacking differs from real Safari.
+    const clicked = await page.evaluate(
+        ({ targetDay, targetHeader: th }) => {
+            const tbodies = document.querySelectorAll('[role="grid"] tbody');
+            for (const tbody of tbodies) {
+                const firstRow = tbody.querySelector('tr');
+                if (!firstRow || !firstRow.textContent.includes(th)) continue;
+                const cells = tbody.querySelectorAll('td');
+                for (const cell of cells) {
+                    if (cell.textContent.trim() === String(targetDay)) {
+                        const span = cell.querySelector('span') || cell.querySelector('div');
+                        if (span) span.click();
+                        else cell.click();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        { targetDay: day, targetHeader }
+    );
 
-    throw new Error(`Could not find ${targetHeader} in date-only calendar popup`);
+    if (!clicked) {
+        throw new Error(`Could not find day ${day} in ${targetHeader} in date-only calendar popup`);
+    }
 }
 
 /**

@@ -41,6 +41,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 ### Fixed
 
+- WebKit popup click interception in `selectDateInDatePicker` (`vv-calendar.js`): switched from Playwright locator clicks to `page.evaluate()` DOM clicks for month and day selection, matching the proven pattern in `selectDateInDateTimePicker`. Fixes 4 WebKit-only failures caused by Playwright WebKit z-index stacking differences vs real Safari
+- Cat 1 spec now skips legacy configs (E-H) — legacy fields use Angular UI Bootstrap datepicker, not Kendo; the Kendo popup toggle selector doesn't exist in legacy DOM. Eliminates 10 misleading timeout failures across all browsers
 - Timezone config files (`testing/config/tz-*.json`) updated from flat `{ "timezoneId": "..." }` to nested `{ "browser": { "contextOptions": { "timezoneId": "..." } } }` format required by `playwright-cli` v0.1.3 — previous format was silently ignored, BRT tests only passed because it matched the system timezone
 
 ### Removed
