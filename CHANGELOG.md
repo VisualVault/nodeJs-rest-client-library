@@ -21,6 +21,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - ESLint (flat config) + Prettier + Husky + lint-staged for code quality and pre-commit formatting
 - Claude Code custom commands (`[@]-update-docs`, `[@]-smart-commit-push`, `[@]-sync-with-develop`, `[@]-create-date-test`, `[@]-vv-learn`, `[@]-create-pw-date-test`)
 - `[@]-create-pw-date-test` batch mode: multiple space-separated IDs, grouped by TZ. `--skip-verify` flag: backfill test-data.js entries from existing run files without browser session
+- `[@]-cleanup` command: read-only 6-phase repository maintenance audit (staleness, orphans, bloat, doc consistency, config hygiene, git hygiene)
+- `testing/README.md` — entry-point documentation for testing infrastructure
 - Playwright testing infrastructure under `testing/` (3-TZ projects, global auth, reusable helpers, data-driven specs)
 - `docs/guides/dev-setup.md` — canonical dev environment setup guide (single source of truth for all setup instructions)
 - Playwright helpers: `captureDisplayValue`, `saveFormAndReload`, `roundTripCycle` in `testing/helpers/vv-form.js`
@@ -46,6 +48,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Timezone config files (`testing/config/tz-*.json`) updated from flat `{ "timezoneId": "..." }` to nested `{ "browser": { "contextOptions": { "timezoneId": "..." } } }` format required by `playwright-cli` v0.1.3 — previous format was silently ignored, BRT tests only passed because it matched the system timezone
 
 ### Removed
+
+- `Puppeteer.md` — stale (155 days), fully superseded by `docs/guides/playwright-testing.md`
+- `tasks/date-handling/forms-calendar/test-bak-20260330/` — orphaned backup directory (16 files), superseded by current test structure
+- `tasks/date-handling/forms-calendar/main.js` — untracked from git (13MB minified bundle, added to `.gitignore`)
 
 ## [1.2.0] - 2026-02-19
 

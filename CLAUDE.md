@@ -11,7 +11,7 @@ Fork of [VisualVault/nodeJs-rest-client-library](https://github.com/VisualVault/
 
 ```
 nodeV2/
-  CHANGELOG.md                       # Server/library changes (lib/ scope only)
+  CHANGELOG.md                       # Server/library changes (lib/ scope + project tooling)
   lib/VVRestApi/VVRestApiNodeJs/     # The Node.js microservices server
     app.js                           # Express entry point (port 3000)
     VVRestApi.js                     # Main REST API client wrapper
@@ -29,6 +29,7 @@ nodeV2/
     server-scripts/                  # Scheduled/server-side scripts
     test-scripts/                    # Local test scripts
   testing/                           # Playwright testing infrastructure
+    README.md                        # Testing infrastructure entry point
     playwright.config.js             # 3-project config (BRT, IST, UTC0)
     global-setup.js                  # Auto-login + create saved records before test runs
     config/                          # Credentials, TZ configs, auth state
