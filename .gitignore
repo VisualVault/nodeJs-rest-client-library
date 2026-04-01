@@ -176,3 +176,6 @@ testing/config/screenshots/
 testing/.playwright-cli/
 testing/test-results/
 testing/playwright-report/
+
+# Large generated files
+tasks/date-handling/forms-calendar/main.js
