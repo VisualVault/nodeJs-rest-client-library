@@ -1,6 +1,6 @@
 # TC-2-C-BRT — Summary
 
-**Spec**: [tc-1-2-typed-input-brt.md](../test-cases/tc-1-2-typed-input-brt.md)
+**Spec**: [tc-2-C-BRT.md](../test-cases/tc-2-C-BRT.md)
 **Current status**: PASS — last run 2026-03-27 (BRT)
 **Bug surface**: none
 

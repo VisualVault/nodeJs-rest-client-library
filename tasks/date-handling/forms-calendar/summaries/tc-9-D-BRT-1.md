@@ -1,6 +1,6 @@
 # TC-9-D-BRT-1 — Summary
 
-**Spec**: [tc-1-3-roundtrip-brt.md](../test-cases/tc-1-3-roundtrip-brt.md)
+**Spec**: [tc-9-D-BRT-1.md](../test-cases/tc-9-D-BRT-1.md)
 **Current status**: FAIL-2 — last run 2026-03-27 (BRT)
 **Bug surface**: Bug #5 (fake Z in GetFieldValue), Bug #5 consequence (-3h drift per round-trip in BRT)
 

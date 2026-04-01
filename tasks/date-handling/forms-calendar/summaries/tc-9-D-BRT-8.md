@@ -1,6 +1,6 @@
 # TC-9-D-BRT-8 — Summary
 
-**Spec**: [tc-2-8-roundtrip-cumulative-brt.md](../test-cases/tc-2-8-roundtrip-cumulative-brt.md)
+**Spec**: [tc-9-D-BRT-8.md](../test-cases/tc-9-D-BRT-8.md)
 **Current status**: FAIL-1 — last run 2026-03-27 (BRT)
 **Bug surface**: Bug #5 (fake Z in GetFieldValue), Bug #5 consequence (−3h drift per round-trip in BRT, full day lost after 8 trips)
 

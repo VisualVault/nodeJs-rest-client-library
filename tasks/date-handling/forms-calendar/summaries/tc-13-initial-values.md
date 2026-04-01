@@ -1,6 +1,6 @@
 # TC-13-initial-values — Summary
 
-**Spec**: [tc-2-10-db-storage-mixed-tz-brt.md](../test-cases/tc-2-10-db-storage-mixed-tz-brt.md)
+**Spec**: [tc-13-initial-values.md](../test-cases/tc-13-initial-values.md)
 **Current status**: PASS — last run 2026-03-27 (BRT)
 **Bug surface**: none — confirms expected (but problematic) UTC storage behavior for initial-value fields
 

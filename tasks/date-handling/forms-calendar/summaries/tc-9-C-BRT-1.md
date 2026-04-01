@@ -1,6 +1,6 @@
 # TC-9-C-BRT-1 — Summary
 
-**Spec**: [tc-2-3-roundtrip-brt.md](../test-cases/tc-2-3-roundtrip-brt.md)
+**Spec**: [tc-9-C-BRT-1.md](../test-cases/tc-9-C-BRT-1.md)
 **Current status**: PASS — last run 2026-03-27 (BRT)
 **Bug surface**: none — control/passing scenario
 

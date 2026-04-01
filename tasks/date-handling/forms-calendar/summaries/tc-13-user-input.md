@@ -1,6 +1,6 @@
 # TC-13-user-input — Summary
 
-**Spec**: [tc-2-10-db-storage-mixed-tz-brt.md](../test-cases/tc-2-10-db-storage-mixed-tz-brt.md)
+**Spec**: [tc-13-user-input.md](../test-cases/tc-13-user-input.md)
 **Current status**: PASS — last run 2026-03-27 (BRT)
 **Bug surface**: none — confirms expected (but problematic) local-time storage behavior for user-input fields
 

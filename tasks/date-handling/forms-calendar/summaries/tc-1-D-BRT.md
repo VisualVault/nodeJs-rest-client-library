@@ -1,6 +1,6 @@
 # TC-1-D-BRT — Summary
 
-**Spec**: [tc-1-1-calendar-popup-brt.md](../test-cases/tc-1-1-calendar-popup-brt.md)
+**Spec**: [tc-1-D-BRT.md](../test-cases/tc-1-D-BRT.md)
 **Current status**: FAIL-2 — last run 2026-03-27 (BRT)
 **Bug surface**: Bug #5 — fake Z in GetFieldValue causes -3h drift per round-trip in BRT
 

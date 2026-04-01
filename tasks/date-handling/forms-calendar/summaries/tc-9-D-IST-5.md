@@ -1,6 +1,6 @@
 # TC-9-D-IST-5 — Summary
 
-**Spec**: [tc-2-5-roundtrip-ist.md](../test-cases/tc-2-5-roundtrip-ist.md)
+**Spec**: [tc-9-D-IST-5.md](../test-cases/tc-9-D-IST-5.md)
 **Current status**: FAIL-1 — last run 2026-03-27 (IST)
 **Bug surface**: Bug #5 (fake Z in GetFieldValue), Bug #5 consequence (+5:30h drift per round-trip in IST, day boundary crossed at Trip 5)
 

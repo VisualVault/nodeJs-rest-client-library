@@ -1,6 +1,6 @@
 # TC-2-D-BRT — Summary
 
-**Spec**: [tc-1-2-typed-input-brt.md](../test-cases/tc-1-2-typed-input-brt.md)
+**Spec**: [tc-2-D-BRT.md](../test-cases/tc-2-D-BRT.md)
 **Current status**: PASS — last run 2026-03-27 (BRT)
 **Bug surface**: Bug #5 (GFV path) — not triggered via typed input in this run; Bug #2 — absent
 
