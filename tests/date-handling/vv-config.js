@@ -30,26 +30,86 @@ const FORM_TEMPLATE_URL =
     '&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939' +
     '&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939';
 
-// Field configuration map: Config letter -> VV calendar field name and boolean flags.
+// Field configuration map: Config letter -> VV calendar field names and boolean flags.
 //
-// These map to actual fields on the DateTest form template. Each config is a unique combination
-// of three VV calendar field settings:
+// The DateTest form has 26 fields: 8 configs (A-H) × 3 initial-value modes.
+// Each config is a unique combination of three VV calendar field settings:
 //   - enableTime:      false = date-only (stores "2026-03-15"), true = datetime (stores "2026-03-15T00:00:00")
 //   - ignoreTimezone:  when true + enableTime, triggers Bug #5 (GetFieldValue appends fake "Z" to local times)
 //   - useLegacy:       uses V1 legacy code path; legacy popup stores raw toISOString() (UTC datetime)
 //
-// All entries below use enableInitialValue=false (user-input fields).
-// Preset Date and Current Date fields (enableInitialValue=true) have separate field names
-// documented in the test matrix (tasks/date-handling/forms-calendar/matrix.md).
+// Each config has three field variants:
+//   - base (enableInitialValue=false): empty on form load — used for user-input tests (Cat 1-4, 7-12)
+//   - preset (enableInitialValue=true): pre-populated with a configured date — used for Cat 5
+//   - currentDate (enableInitialValue=true): auto-filled with today's date — used for Cat 6
+//
+// DataField3/4 are duplicates of DataField1/2 (not used in formal tests).
+// DataField8/9 do not exist (naming gap).
 const FIELD_MAP = {
-    A: { field: 'DataField7', enableTime: false, ignoreTimezone: false, useLegacy: false },
-    B: { field: 'DataField10', enableTime: false, ignoreTimezone: true, useLegacy: false },
-    C: { field: 'DataField6', enableTime: true, ignoreTimezone: false, useLegacy: false },
-    D: { field: 'DataField5', enableTime: true, ignoreTimezone: true, useLegacy: false },
-    E: { field: 'DataField12', enableTime: false, ignoreTimezone: false, useLegacy: true },
-    F: { field: 'DataField11', enableTime: false, ignoreTimezone: true, useLegacy: true },
-    G: { field: 'DataField14', enableTime: true, ignoreTimezone: false, useLegacy: true },
-    H: { field: 'DataField13', enableTime: true, ignoreTimezone: true, useLegacy: true },
+    A: {
+        field: 'DataField7',
+        enableTime: false,
+        ignoreTimezone: false,
+        useLegacy: false,
+        preset: 'DataField2',
+        currentDate: 'DataField1',
+    },
+    B: {
+        field: 'DataField10',
+        enableTime: false,
+        ignoreTimezone: true,
+        useLegacy: false,
+        preset: 'DataField27',
+        currentDate: 'DataField28',
+    },
+    C: {
+        field: 'DataField6',
+        enableTime: true,
+        ignoreTimezone: false,
+        useLegacy: false,
+        preset: 'DataField15',
+        currentDate: 'DataField17',
+    },
+    D: {
+        field: 'DataField5',
+        enableTime: true,
+        ignoreTimezone: true,
+        useLegacy: false,
+        preset: 'DataField16',
+        currentDate: 'DataField18',
+    },
+    E: {
+        field: 'DataField12',
+        enableTime: false,
+        ignoreTimezone: false,
+        useLegacy: true,
+        preset: 'DataField19',
+        currentDate: 'DataField23',
+    },
+    F: {
+        field: 'DataField11',
+        enableTime: false,
+        ignoreTimezone: true,
+        useLegacy: true,
+        preset: 'DataField20',
+        currentDate: 'DataField24',
+    },
+    G: {
+        field: 'DataField14',
+        enableTime: true,
+        ignoreTimezone: false,
+        useLegacy: true,
+        preset: 'DataField21',
+        currentDate: 'DataField25',
+    },
+    H: {
+        field: 'DataField13',
+        enableTime: true,
+        ignoreTimezone: true,
+        useLegacy: true,
+        preset: 'DataField22',
+        currentDate: 'DataField26',
+    },
 };
 
 // Saved record URLs for reload tests (Category 3 — Server Reload).
