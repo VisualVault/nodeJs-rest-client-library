@@ -40,9 +40,10 @@ Two completely different popup widgets exist depending on the field type:
 - Time tab: three virtualized columns (hour, minute, AM/PM) + NOW/Cancel/Set buttons
 - Clicking **Set** commits the selected date and time
 
-**Legacy (`useLegacy=true`) — plain text input:**
+**Legacy (`useLegacy=true`) — Angular UI Bootstrap datepicker:**
 
-- No popup widget. The field is a plain `<input>` inside `<div class="d-picker">`. Users type the date directly.
+- The field is a plain `<input>` inside `<div class="d-picker">`. Users can type the date directly.
+- A calendar icon button exists next to the input, but it does NOT have the Kendo `aria-label="Toggle calendar"` or `aria-label="Toggle popup"` attributes. The icon opens an Angular UI Bootstrap popup (`uib-datepicker-popup`), which has completely different DOM from the Kendo popup (no `[role="grid"]` month list, different navigation).
 - The popup (if triggered via icon) stores raw `toISOString()` UTC (see Bug #2).
 
 **Common rules:**
