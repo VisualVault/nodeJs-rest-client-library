@@ -23,11 +23,31 @@ Each calendar field has the following boolean config flags. These are readable a
 
 ### Popup Modal Behavior
 
-- The calendar popup opens on the **Date** tab by default.
-- Clicking a day **automatically advances** to the **Time** tab (when `enableTime=true`). The default time is `12:00 AM`.
-- The modal is **self-contained** — all controls (date grid, time picker, Set button) are in a single non-scrollable panel.
+Two completely different popup widgets exist depending on the field type:
+
+**Date-only (`enableTime=false`, `useLegacy=false`) — `kendo-datepicker`:**
+
+- Scrollable month list sidebar on the left, day grids (one `<tbody>` per month) on the right
+- Toggle button: `<span role="button" aria-label="Toggle calendar">` inside the kendo wrapper
+- Click a day → value is set immediately (no Set button)
+
+**DateTime (`enableTime=true`, `useLegacy=false`) — `kendo-datetimepicker`:**
+
+- Tabbed interface: **Date** tab (active by default) + **Time** tab
+- Date tab: infinite-scroll calendar (`kendo-virtualization`) with month headers in `<tbody role="rowgroup">`
+- Toggle button: `<span aria-label="Toggle popup">` — **no `role="button"` attribute** (unlike date-only)
+- Clicking a day **automatically advances** to the **Time** tab. Default time: `12:00 AM`
+- Time tab: three virtualized columns (hour, minute, AM/PM) + NOW/Cancel/Set buttons
+- Clicking **Set** commits the selected date and time
+
+**Legacy (`useLegacy=true`) — plain text input:**
+
+- No popup widget. The field is a plain `<input>` inside `<div class="d-picker">`. Users type the date directly.
+- The popup (if triggered via icon) stores raw `toISOString()` UTC (see Bug #2).
+
+**Common rules:**
+
 - If the modal is partially off-screen, scroll the **page** to bring it into view. Do NOT scroll inside the time picker column area — that changes the selected time value.
-- Clicking **Set** commits the selected date and time. The button is visible once the full modal fits in the viewport.
 
 ### V1 / V2 Code Path
 
@@ -69,7 +89,9 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ### Locating calendar field elements in the DOM
 
-Calendar field inputs are rendered by Kendo and use **Kendo-internal GUIDs** as their `name` attribute (e.g., `k-c8505310-993b-4929-...`). They do **not** use the VV field name (`DataField11`) or the VV field GUID from `fieldMaster`. You cannot find a field's input via `document.querySelector('input[name="DataField11"]')`.
+Non-legacy calendar fields are rendered by Kendo and use **Kendo-internal GUIDs** as their `name` attribute (e.g., `k-c8505310-993b-4929-...`). They do **not** use the VV field name (`DataField11`) or the VV field GUID from `fieldMaster`. The `aria-label` attribute is on the **Kendo wrapper** element (`<kendo-datepicker aria-label="DataField7">` or `<kendo-datetimepicker aria-label="DataField6">`), with the actual `<input>` nested inside.
+
+**Legacy fields** (`useLegacy=true`) have a completely different DOM structure: the `aria-label` is directly on a plain `<input>` element inside `<div class="d-picker">`. There is no Kendo wrapper. `document.querySelector('[aria-label="DataField13"]')` returns the `<input>` itself, not a container — using `.querySelector('input')` on it would fail.
 
 To locate the correct `fd-cal-container` for a known field name:
 
@@ -105,6 +127,21 @@ VV.Form.SetFieldValue('FieldName', '2026-03-15');
 VV.Form.SetFieldValue('FieldName', '2026-03-15T00:00:00.000Z');
 ```
 
+### Reading as Date object
+
+```javascript
+// Returns a real JS Date object (not a string) — bypasses getCalendarFieldValue() transformation
+VV.Form.GetDateObjectFromCalendar('FieldName');
+
+// .toISOString() produces real UTC (not the fake-Z string from GetFieldValue)
+VV.Form.GetDateObjectFromCalendar('FieldName').toISOString();
+// → "2026-03-15T03:00:00.000Z" in BRT (real UTC = local midnight + 3h)
+// vs GetFieldValue → "2026-03-15T00:00:00.000Z" (fake Z — local time mislabeled as UTC)
+
+// Safe round-trip (zero drift, even for Config D which drifts -3h/trip via GFV):
+VV.Form.SetFieldValue('FieldName', VV.Form.GetDateObjectFromCalendar('FieldName').toISOString());
+```
+
 ### Environment checks
 
 ```javascript
@@ -124,12 +161,12 @@ new Date(2026, 2, 15, 0, 0, 0).toISOString();
 
 Documented in detail in `tasks/date-handling/forms-calendar/analysis.md`. Summary:
 
-| Bug # | Name                                                    | Config                                                      | Severity                                                                                                                                                                                                                                                                                                        |
-| ----- | ------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| #2    | Inconsistent popup vs typed handlers for legacy fields  | `useLegacy=true`, any TZ                                    | Medium — same field, same date: popup stores full UTC datetime (`"2026-03-15T03:00:00.000Z"`), typed input stores date-only string (`"2026-03-15"`); format diverges in `calChangeSetValue()` vs `calChange()`                                                                                                  |
-| #5    | Fake-Z in GetFieldValue                                 | `enableTime=true`, `ignoreTimezone=true`, `useLegacy=false` | High — causes date drift on every SetFieldValue(GetFieldValue()) round-trip                                                                                                                                                                                                                                     |
-| #6    | GetFieldValue returns `"Invalid Date"` for empty fields | Same as #5                                                  | Medium — empty check `if (GetFieldValue('f'))` evaluates true for empty field                                                                                                                                                                                                                                   |
-| #7    | Wrong day stored for UTC+ timezones                     | Date-only fields, all configs (`enableTime=false`)          | High — UTC+ users store previous day on every SetFieldValue call; field display shows the user-typed date, masking the shift until form reload. **Scope (2026-04-01):** does NOT fire on form load/reload path — only on `SetFieldValue`/`normalizeCalValue`. Date-only strings survive cross-TZ reload intact. |
+| Bug # | Name                                                   | Config                                                                 | Severity                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----- | ------------------------------------------------------ | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #2    | Inconsistent popup vs typed handlers for legacy fields | `useLegacy=true`, any TZ                                               | Medium — same field, same date: popup stores full UTC datetime (`"2026-03-15T03:00:00.000Z"`), typed input stores date-only string (`"2026-03-15"`); format diverges in `calChangeSetValue()` vs `calChange()`                                                                                                                                                                                                                                                                                                                                                  |
+| #5    | Fake-Z in GetFieldValue                                | `enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`            | High — causes date drift on every `SetFieldValue(GetFieldValue())` round-trip. **Drift = -(timezone offset) per trip**: BRT -3h/trip, IST +5:30h/trip, UTC+0 0/trip (masked — fake Z coincidentally correct). Workaround: use `SetFieldValue(field, GetDateObjectFromCalendar(field).toISOString())` instead (zero drift, confirmed TC-9-GDOC-D-BRT-1). `useLegacy=true` is immune (TC-8-H-BRT, TC-9-H-BRT-1).                                                                                                                                                  |
+| #6    | GetFieldValue fails for empty DateTime fields          | `enableTime=true`, `useLegacy=false` (ALL non-legacy DateTime configs) | High — **scope expanded (2026-04-01):** affects Config C AND Config D, not just D. Config D (`ignoreTimezone=true`): returns truthy string `"Invalid Date"`. Config C (`ignoreTimezone=false`): **THROWS `RangeError: Invalid time value`** — crashes scripts without try/catch. Root cause: no empty-value guard in `getCalendarFieldValue()`. Config A (`enableTime=false`) returns `""` correctly. `useLegacy=true` predicted safe (untested).                                                                                                               |
+| #7    | Wrong day stored for UTC+ timezones                    | Date-only fields, all configs (`enableTime=false`)                     | High — UTC+ users store previous day on every SetFieldValue call; field display shows the user-typed date, masking the shift until form reload. **Scope (2026-04-01):** ALSO fires on preset form-init path via `initCalendarValueV1` → `moment(e).toDate()` (TC-5-A-IST confirmed — preset shows correct display but internal UTC date is wrong day). Same-TZ reload IS safe (TC-3-A-BRT-BRT, TC-3-G-BRT-BRT confirmed). Current Date default (`new Date()` path) is the only correct initialization — skips `moment` parsing entirely (TC-6-A-IST confirmed). |
 
 ### Calendar Field Mixed Timezone Storage
 
