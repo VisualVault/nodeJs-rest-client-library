@@ -19,7 +19,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Task workspace (`tasks/`) for structured investigation tracking
 - CHANGELOG.md for tracking server and project changes
 - ESLint (flat config) + Prettier + Husky + lint-staged for code quality and pre-commit formatting
-- Claude Code custom commands (`[@]-update-docs`, `[@]-smart-commit-push`, `[@]-sync-with-develop`, `[@]-create-date-test`, `[@]-vv-learn`)
+- Claude Code custom commands (`[@]-update-docs`, `[@]-smart-commit-push`, `[@]-sync-with-develop`, `[@]-create-date-test`, `[@]-vv-learn`, `[@]-create-pw-date-test`)
+- `[@]-create-pw-date-test` batch mode: multiple space-separated IDs, grouped by TZ. `--skip-verify` flag: backfill test-data.js entries from existing run files without browser session
 - Playwright testing infrastructure under `testing/` (3-TZ projects, global auth, reusable helpers, data-driven specs)
 - `docs/guides/dev-setup.md` — canonical dev environment setup guide (single source of truth for all setup instructions)
 - Playwright helpers: `captureDisplayValue`, `saveFormAndReload`, `roundTripCycle` in `testing/helpers/vv-form.js`

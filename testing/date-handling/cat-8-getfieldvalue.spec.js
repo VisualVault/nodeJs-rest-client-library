@@ -54,25 +54,21 @@ for (const tc of categoryTests) {
             }
 
             // Capture and verify stored values
-            // Some configs throw on GetFieldValue for empty fields (Bug #6 variant)
-            if (tc.expectedApi === 'THROWS') {
-                const result = await page.evaluate((name) => {
-                    const raw = VV.Form.VV.FormPartition.getValueObjectValue(name);
-                    let apiThrew = false;
-                    try {
-                        VV.Form.GetFieldValue(name);
-                    } catch (e) {
-                        apiThrew = true;
-                    }
-                    return { raw, apiThrew };
-                }, fieldCfg.field);
-                expect(result.raw).toBe(tc.expectedRaw);
-                expect(result.apiThrew).toBe(true);
-            } else {
-                const values = await captureFieldValues(page, fieldCfg.field);
-                expect(values.raw).toBe(tc.expectedRaw);
-                expect(values.api).toBe(tc.expectedApi);
-            }
+            // Expected values reflect CORRECT behavior. Tests FAIL when bugs are present
+            // (e.g., Bug #6: GetFieldValue throws or returns "Invalid Date" for empty fields).
+            // Use try/catch to capture the API value even if it throws.
+            const result = await page.evaluate((name) => {
+                const raw = VV.Form.VV.FormPartition.getValueObjectValue(name);
+                let api;
+                try {
+                    api = VV.Form.GetFieldValue(name);
+                } catch (e) {
+                    api = 'ERROR: ' + e.message;
+                }
+                return { raw, api };
+            }, fieldCfg.field);
+            expect(result.raw).toBe(tc.expectedRaw);
+            expect(result.api).toBe(tc.expectedApi);
         });
     });
 }
