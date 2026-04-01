@@ -41,7 +41,7 @@ This command:
 
 | File                             | Purpose                                                       |
 | -------------------------------- | ------------------------------------------------------------- |
-| `testing/playwright.config.js`   | 3 timezone projects, Chrome channel, auth state               |
+| `testing/playwright.config.js`   | TZ × browser matrix (9 projects), auth state                  |
 | `testing/fixtures/vv-config.js`  | Form URLs, field config map (A-H), saved records              |
 | `testing/fixtures/test-data.js`  | All test case definitions (data-driven parameterization)      |
 | `testing/helpers/vv-form.js`     | Generic VV form helpers: navigation, field ops, value capture |
@@ -55,7 +55,7 @@ The infrastructure is reusable for testing other VV form behaviors:
 
 1. **Add helpers** to `testing/helpers/` (create new files for new domains, e.g., `vv-workflow.js`)
 2. **Create new test directories** under `testing/` (e.g., `testing/workflow/`, `testing/documents/`)
-3. **Add projects** to `testing/playwright.config.js` if you need different browser configs
+3. **Add projects** to `testing/playwright.config.js` (the TZ × browser matrix auto-generates all combinations)
 4. **Reuse auth** — `global-setup.js` and `storageState` work for any VV page, not just forms
 5. **Update `testDir`** in `playwright.config.js` or use multiple configs
 

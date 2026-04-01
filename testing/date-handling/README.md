@@ -71,11 +71,11 @@ Shared config:
 
 ### External Config
 
-| File                       | Purpose                                                        |
-| -------------------------- | -------------------------------------------------------------- |
-| `../playwright.config.js`  | 3 timezone projects (BRT/IST/UTC0), auth state, Chrome channel |
-| `../config/vv-config.json` | VV credentials (gitignored)                                    |
-| `../config/tz-*.json`      | Timezone overrides for `playwright-cli` (Layer 1 only)         |
+| File                       | Purpose                                                         |
+| -------------------------- | --------------------------------------------------------------- |
+| `../playwright.config.js`  | TZ × browser matrix (9 projects: 3 TZ × 3 browsers), auth state |
+| `../config/vv-config.json` | VV credentials (gitignored)                                     |
+| `../config/tz-*.json`      | Timezone overrides for `playwright-cli` (Layer 1 only)          |
 
 ---
 
@@ -116,13 +116,14 @@ Tests run across 3 timezone contexts to expose timezone-dependent bugs:
 
 Playwright's `timezoneId` context option simulates these timezones at the browser level — no system timezone changes or Chrome restarts needed. `new Date().toString()` inside the page returns the simulated timezone.
 
-All spec files run in all 3 projects. Each test uses `test.skip()` inside the test body to self-filter — it only executes when `testInfo.project.name` matches its `tz` field in `test-data.js`.
+All spec files run in all 9 projects (3 TZ × 3 browsers). Each test uses `test.skip()` inside the test body to self-filter — it only executes when `testInfo.project.name` starts with its `tz` field in `test-data.js` (e.g., a BRT test runs in `BRT-chromium`, `BRT-firefox`, and `BRT-webkit`).
 
-**To add a new timezone:**
+**To add a new timezone or browser:**
 
-1. Add a project to `testing/playwright.config.js` with the `timezoneId`
-2. Add test entries to `testing/fixtures/test-data.js` with the new TZ
-3. Add a TZ config file at `testing/config/tz-{tz}.json` for the CLI workflow
+- **Timezone:** Add an entry to the `timezones` array in `testing/playwright.config.js` — all browser combinations are generated automatically
+- **Browser:** Add an entry to the `browsers` array in `testing/playwright.config.js`
+- Add test entries to `testing/fixtures/test-data.js` with the new TZ
+- For CLI workflow: add a TZ config file at `testing/config/tz-{tz}.json`
 
 ---
 

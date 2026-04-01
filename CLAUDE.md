@@ -127,9 +127,12 @@ Browser automation for VV platform testing. All infrastructure lives under `test
 2. **`npx playwright test`** — headless regression runner for parameterized spec files
 
 ```bash
-npm run test:pw              # All TZ projects (BRT, IST, UTC0)
-npm run test:pw:brt          # BRT tests only
-npm run test:pw:ist          # IST tests only
+npm run test:pw              # All projects (3 TZ × 3 browsers)
+npm run test:pw:brt          # BRT — all browsers
+npm run test:pw:ist          # IST — all browsers
+npm run test:pw:chromium     # Chromium — all TZs
+npm run test:pw:firefox      # Firefox — all TZs
+npm run test:pw:webkit       # WebKit (Safari) — all TZs
 npm run test:pw:headed       # Headed mode (visible browser)
 npm run test:pw:report       # Open HTML report
 ```

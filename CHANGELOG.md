@@ -23,6 +23,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Playwright testing infrastructure under `testing/` (3-TZ projects, global auth, reusable helpers, data-driven specs)
 - `docs/guides/dev-setup.md` — canonical dev environment setup guide (single source of truth for all setup instructions)
 - Playwright helpers: `captureDisplayValue`, `saveFormAndReload`, `roundTripCycle` in `testing/helpers/vv-form.js`
+- Multi-browser Playwright testing: TZ × browser matrix (Chromium, Firefox, WebKit) with per-browser npm scripts (`test:pw:chromium`, `test:pw:firefox`, `test:pw:webkit`)
 
 ### Changed
 

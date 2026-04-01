@@ -5,7 +5,7 @@ Step-by-step guide to set up the nodeV2 development and testing environment from
 ## Prerequisites
 
 - **Node.js** >= 20
-- **Chrome** browser (VV's Angular SPA + Kendo UI require real Chrome, not Chromium)
+- **Chrome** browser (Chromium project uses installed Chrome via `channel: 'chrome'`; Firefox and WebKit use Playwright's bundled engines)
 - **Git**
 
 ## 1. Clone & Install
@@ -54,10 +54,10 @@ curl http://localhost:3000/TestScripts/Scheduled/ScriptName
 
 ## 4. Playwright Testing Setup
 
-### 4.1 Install Playwright Browser
+### 4.1 Install Playwright Browsers
 
 ```bash
-npx playwright install chromium
+npx playwright install chrome firefox webkit
 ```
 
 ### 4.2 Install playwright-cli (optional — for interactive test creation only)
@@ -110,28 +110,45 @@ rm testing/config/auth-state-pw.json
 npm run test:pw:brt
 ```
 
-### 4.5 Timezone Projects
+### 4.5 Project Matrix (TZ × Browser)
 
-Tests run across 3 timezone contexts configured as Playwright projects. Playwright's `timezoneId` context option simulates these at the browser level — no system timezone changes needed.
+Tests run across a matrix of 3 timezones × 3 browsers = 9 Playwright projects. Playwright's `timezoneId` context option simulates timezones at the browser level — no system timezone changes needed.
 
-| Project | IANA Name           | Offset   |
-| ------- | ------------------- | -------- |
-| BRT     | `America/Sao_Paulo` | UTC-3    |
-| IST     | `Asia/Calcutta`     | UTC+5:30 |
-| UTC0    | `Etc/GMT`           | UTC+0    |
+**Timezones:**
 
-Config details: `testing/playwright.config.js` (serial execution, `workers: 1`, `channel: 'chrome'`, 60s timeout).
+| TZ   | IANA Name           | Offset   |
+| ---- | ------------------- | -------- |
+| BRT  | `America/Sao_Paulo` | UTC-3    |
+| IST  | `Asia/Calcutta`     | UTC+5:30 |
+| UTC0 | `Etc/GMT`           | UTC+0    |
+
+**Browsers:**
+
+| Browser  | Engine                                      |
+| -------- | ------------------------------------------- |
+| chromium | System Chrome (`channel: 'chrome'`)         |
+| firefox  | Playwright's bundled Firefox                |
+| webkit   | Playwright's bundled WebKit (Safari engine) |
+
+Project names follow the pattern `{TZ}-{browser}` (e.g., `BRT-chromium`, `IST-firefox`, `UTC0-webkit`).
+
+Config details: `testing/playwright.config.js` (serial execution, `workers: 1`, 60s timeout).
 
 ### 4.6 Run Tests
 
 ```bash
-npm run test:pw              # All TZ projects (BRT, IST, UTC0)
-npm run test:pw:brt          # BRT tests only
-npm run test:pw:ist          # IST tests only
-npm run test:pw:utc0         # UTC+0 tests only
+npm run test:pw              # All projects (3 TZ × 3 browsers)
+npm run test:pw:brt          # BRT — all browsers
+npm run test:pw:ist          # IST — all browsers
+npm run test:pw:utc0         # UTC+0 — all browsers
+npm run test:pw:chromium     # Chromium — all TZs
+npm run test:pw:firefox      # Firefox — all TZs
+npm run test:pw:webkit       # WebKit (Safari) — all TZs
 npm run test:pw:headed       # Headed mode (visible browser)
 npm run test:pw:report       # Open HTML report
 ```
+
+You can also target a single cell: `npx playwright test --config=testing/playwright.config.js --project=BRT-firefox`
 
 ### 4.7 Two Automation Layers
 
