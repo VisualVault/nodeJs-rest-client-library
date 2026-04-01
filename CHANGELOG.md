@@ -34,6 +34,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 ### Fixed
 
+- Timezone config files (`testing/config/tz-*.json`) updated from flat `{ "timezoneId": "..." }` to nested `{ "browser": { "contextOptions": { "timezoneId": "..." } } }` format required by `playwright-cli` v0.1.3 — previous format was silently ignored, BRT tests only passed because it matched the system timezone
+
 ### Removed
 
 ## [1.2.0] - 2026-02-19

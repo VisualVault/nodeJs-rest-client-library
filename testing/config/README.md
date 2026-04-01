@@ -45,10 +45,18 @@ Both are auto-generated on first use. To force re-login, delete the relevant fil
 
 ## Timezone Config Files
 
-The `tz-*.json` files are used by `playwright-cli open --config=testing/config/tz-brt.json` to set the browser's timezone context. They contain a single property:
+The `tz-*.json` files are used by `playwright-cli open --config=testing/config/tz-brt.json` to set the browser's timezone context. They use the nested `browser.contextOptions` format required by `playwright-cli` (v0.1.3+):
 
 ```json
-{ "timezoneId": "America/Sao_Paulo" }
+{
+    "browser": {
+        "contextOptions": {
+            "timezoneId": "America/Sao_Paulo"
+        }
+    }
+}
 ```
+
+The timezone is set at context creation and persists through all navigations and `state-load` calls within the session.
 
 The `@playwright/test` runner does NOT use these files — it sets `timezoneId` directly in `testing/playwright.config.js` project definitions.

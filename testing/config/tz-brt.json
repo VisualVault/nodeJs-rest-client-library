@@ -1,1 +1,7 @@
-{ "timezoneId": "America/Sao_Paulo" }
+{
+    "browser": {
+        "contextOptions": {
+            "timezoneId": "America/Sao_Paulo"
+        }
+    }
+}

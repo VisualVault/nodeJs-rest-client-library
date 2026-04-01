@@ -1,1 +1,7 @@
-{ "timezoneId": "Etc/GMT" }
+{
+    "browser": {
+        "contextOptions": {
+            "timezoneId": "Etc/GMT"
+        }
+    }
+}

@@ -183,7 +183,8 @@ VV's Angular SPA requires `networkidle` before `waitForFunction` can detect `VV.
 
 If `new Date().toString()` doesn't match the expected offset:
 
-- Verify `testing/playwright.config.js` has the correct `timezoneId` for the project
+- **Layer 2** (`npx playwright test`): Verify `testing/playwright.config.js` has the correct `timezoneId` for the project
+- **Layer 1** (`playwright-cli`): Verify TZ config files (`testing/config/tz-*.json`) use the nested format: `{ "browser": { "contextOptions": { "timezoneId": "..." } } }`. The flat `{ "timezoneId": "..." }` format is silently ignored by `playwright-cli`.
 - Ensure test data entry has correct `tz` and `tzOffset` values
 
 ### Auth expired / login redirect

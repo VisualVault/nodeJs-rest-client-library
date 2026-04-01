@@ -1,1 +1,7 @@
-{ "timezoneId": "Asia/Calcutta" }
+{
+    "browser": {
+        "contextOptions": {
+            "timezoneId": "Asia/Calcutta"
+        }
+    }
+}
