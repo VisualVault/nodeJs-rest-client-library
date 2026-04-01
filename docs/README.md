@@ -18,6 +18,12 @@ docs/
 
 - [visualvault-platform.md](architecture/visualvault-platform.md) — URL structure, navigation map, Enterprise Tools (Microservices, Scheduled Services, Queries), how nodeV2 integrates, demo environment reference
 
+### Guides
+
+- [dev-setup.md](guides/dev-setup.md) — **Canonical setup guide** — environment setup, Playwright, credentials, code quality, troubleshooting
+- [playwright-testing.md](guides/playwright-testing.md) — Playwright patterns, architecture, extension guide
+
 ### Reference
 
 - [form-fields.md](reference/form-fields.md) — Calendar field config properties, popup modal behavior, V1/V2 code path, VV.Form console API, known bugs summary
+- [vv-form-api.md](reference/vv-form-api.md) — Full VV.Form object structure: properties, methods, sub-objects, field definitions, automation patterns

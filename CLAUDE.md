@@ -33,7 +33,7 @@ nodeV2/
     global-setup.js                  # Auto-login before test runs
     config/                          # Credentials, TZ configs, auth state
     helpers/                         # Reusable page helpers
-      vv-form.js                     # Generic VV form automation (8 functions)
+      vv-form.js                     # Generic VV form automation (11 functions)
       vv-calendar.js                 # Calendar popup + typed input helpers
     fixtures/                        # Shared test data and config
       vv-config.js                   # FIELD_MAP, form URLs, saved records
@@ -92,6 +92,8 @@ OAuth token-based via `common.js`:
 
 ## Development Commands
 
+> Full environment setup: [Dev Setup Guide](docs/guides/dev-setup.md)
+
 ```bash
 # Start the server
 node lib/VVRestApi/VVRestApiNodeJs/app.js
@@ -113,36 +115,24 @@ npm run format:check      # Check formatting without writing
 
 ## Code Quality
 
-- **ESLint** (`eslint.config.js`) — flat config, CommonJS, integrated with Prettier
-- **Prettier** (`.prettierrc`) — single quotes, 4-space tabs, 120 print width
-- **Husky + lint-staged** — pre-commit hook runs ESLint fix + Prettier on staged files
+ESLint + Prettier + Husky pre-commit hooks. See [Dev Setup Guide](docs/guides/dev-setup.md#2-code-quality-tools) for details.
 
 ## Playwright Testing
 
-Browser automation for VV platform testing. All Playwright infrastructure lives under `testing/` to keep the root clean for upstream sync. Uses two complementary layers:
+> Setup & troubleshooting: [Dev Setup Guide](docs/guides/dev-setup.md#4-playwright-testing-setup)
 
-1. **`/@-create-pw-date-test <id>`** — interactive command using `playwright-cli` to verify behavior live and generate artifacts (TC spec + run file + summary + test-data entry)
+Browser automation for VV platform testing. All infrastructure lives under `testing/`. Two layers:
+
+1. **`/@-create-pw-date-test <id>`** — interactive `playwright-cli` sessions for live verification + artifact generation
 2. **`npx playwright test`** — headless regression runner for parameterized spec files
 
-Key advantage over Chrome MCP: Playwright's `timezoneId` context option simulates timezones without system TZ changes or Chrome restarts.
-
 ```bash
-# Generate a test case (interactive — creates markdown + appends to test-data.js)
-/@-create-pw-date-test 1-A-BRT
-
-# Run generated tests (headless regression)
 npm run test:pw              # All TZ projects (BRT, IST, UTC0)
 npm run test:pw:brt          # BRT tests only
 npm run test:pw:ist          # IST tests only
 npm run test:pw:headed       # Headed mode (visible browser)
 npm run test:pw:report       # Open HTML report
 ```
-
-**Config** (in `testing/config/`):
-
-- `vv-config.json` — VV credentials (gitignored, create from `vv-config.example.json`)
-- `tz-*.json` — timezone overrides for `playwright-cli` sessions
-- `auth-state.json` / `auth-state-pw.json` — saved auth cookies (CLI / test runner, both gitignored)
 
 **Test infrastructure** (in `testing/`):
 
@@ -152,13 +142,6 @@ npm run test:pw:report       # Open HTML report
 - `helpers/vv-calendar.js` — calendar-specific: popup selection, typed input
 - `global-setup.js` — auto-login before test runs
 - `date-handling/cat-*.spec.js` — parameterized test files (one per category, loops over test-data)
-
-**Key implementation learnings:**
-
-- VV Angular SPA requires `networkidle` + `waitForFunction` for reliable form detection
-- Calendar toggle button uses `getByRole('button', { name: 'Toggle calendar' })` (aria-label, not visible text)
-- Scrollable calendar grid needs `tbody` header matching to select days in the correct month section
-- Tests use `test.skip()` inside test body for TZ filtering — all specs run in all projects, each test self-filters
 
 Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
 

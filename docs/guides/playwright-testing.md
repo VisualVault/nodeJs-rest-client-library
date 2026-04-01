@@ -1,6 +1,8 @@
 # Playwright Testing Guide
 
-How to set up and use the Playwright-based testing infrastructure for VisualVault platform testing.
+Patterns, architecture, and extension guide for the Playwright-based testing infrastructure.
+
+> **Initial setup** (installation, credentials, running tests): [Dev Setup Guide](dev-setup.md#4-playwright-testing-setup)
 
 ## Overview
 
@@ -13,53 +15,6 @@ All Playwright infrastructure lives under `testing/` to keep the repo root clean
 1. **`/@-create-pw-date-test` command** (Claude Code) — interactive test case creation using `playwright-cli`. Opens a browser, verifies behavior live, generates documentation + appends test data.
 
 2. **`npx playwright test`** — headless regression runner. Executes parameterized spec files (one per category) that loop over test case definitions in `testing/fixtures/test-data.js`.
-
-## Installation
-
-```bash
-# Install project dependencies (includes @playwright/test)
-npm install
-
-# Install browser binary
-npx playwright install chromium
-
-# Install playwright-cli globally (for the command workflow)
-npm install -g @playwright/cli@latest
-```
-
-## VV Credentials Setup
-
-```bash
-cp testing/config/vv-config.example.json testing/config/vv-config.json
-```
-
-Edit `testing/config/vv-config.json` with your VisualVault credentials:
-
-```json
-{
-    "instance": "vvdemo",
-    "loginUrl": "https://vvdemo.visualvault.com",
-    "username": "your.email@company.com",
-    "password": "your-password",
-    "customerAlias": "YourCustomerAlias",
-    "databaseAlias": "Main"
-}
-```
-
-See `testing/config/README.md` for field descriptions.
-
-## Running Tests
-
-```bash
-npm run test:pw           # All timezone projects (BRT, IST, UTC0)
-npm run test:pw:brt       # BRT (UTC-3) only
-npm run test:pw:ist       # IST (UTC+5:30) only
-npm run test:pw:utc0      # UTC+0 only
-npm run test:pw:headed    # Visible browser (debugging)
-npm run test:pw:report    # Open HTML report
-```
-
-The first run triggers `global-setup.js` which logs into VV and saves auth cookies.
 
 ## Generating New Test Cases
 
@@ -108,11 +63,4 @@ The `gotoAndWaitForVVForm` pattern (networkidle + waitForFunction) applies to an
 
 ## Troubleshooting
 
-| Problem                      | Solution                                                         |
-| ---------------------------- | ---------------------------------------------------------------- |
-| Tests fail with login page   | Delete `testing/config/auth-state-pw.json` and re-run            |
-| Form shows loading spinner   | Increase timeout in `gotoAndWaitForVVForm` or check network      |
-| Wrong timezone in assertions | Verify test data entry has correct `tz` and `tzOffset` fields    |
-| "No field matches config"    | Form didn't load fully, or field config changed on VV side       |
-| Calendar clicks wrong month  | The `selectDateViaPopup` tbody header matching may need updating |
-| `playwright-cli` not found   | `npm install -g @playwright/cli@latest`                          |
+See [Dev Setup Guide — Troubleshooting](dev-setup.md#6-troubleshooting) for common issues (auth, timeouts, timezone mismatches, missing tools).

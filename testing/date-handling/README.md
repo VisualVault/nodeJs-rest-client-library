@@ -18,37 +18,12 @@ Test matrix: `tasks/date-handling/forms-calendar/matrix.md`
 
 ## Quick Start
 
-### Prerequisites
+> Environment setup (Node.js, Playwright, credentials): [Dev Setup Guide](../../docs/guides/dev-setup.md#4-playwright-testing-setup)
 
-- Node.js >= 20
-- `@playwright/test` (already in devDependencies)
-- Chrome browser (Playwright uses `channel: 'chrome'`)
-- `playwright-cli` global install (for the `@-create-pw-date-test` command): `npm install -g @playwright/cli@latest`
-
-### Setup
-
-1. **Install dependencies** (if not already done):
-
-    ```bash
-    npm install
-    npx playwright install chromium
-    ```
-
-2. **Create VV credentials file** — copy the example and fill in your credentials:
-
-    ```bash
-    cp testing/config/vv-config.example.json testing/config/vv-config.json
-    ```
-
-    Edit `testing/config/vv-config.json` with your VisualVault username, password, and customer alias. See `testing/config/README.md` for field descriptions.
-
-3. **Run tests**:
-    ```bash
-    npm run test:pw:brt    # Run BRT timezone tests
-    npm run test:pw        # Run all timezone projects
-    ```
-
-The first run triggers `global-setup.js` which logs into VV and saves auth cookies. Subsequent runs reuse the saved state for up to 1 hour.
+```bash
+npm run test:pw:brt    # Run BRT timezone tests
+npm run test:pw        # Run all timezone projects
+```
 
 ---
 
@@ -148,59 +123,6 @@ All spec files run in all 3 projects. Each test uses `test.skip()` inside the te
 1. Add a project to `testing/playwright.config.js` with the `timezoneId`
 2. Add test entries to `testing/fixtures/test-data.js` with the new TZ
 3. Add a TZ config file at `testing/config/tz-{tz}.json` for the CLI workflow
-
----
-
-## Auth Flow
-
-### How It Works
-
-`global-setup.js` handles VV authentication before tests run:
-
-1. Checks if `testing/config/auth-state-pw.json` exists and is less than 1 hour old
-2. If fresh: skips login (reuses saved cookies)
-3. If missing or stale: launches a browser, navigates to VV login, fills credentials from `testing/config/vv-config.json`, saves cookies after successful login
-
-### Two Auth State Files
-
-| File                                | Used By                                    | Created By                  |
-| ----------------------------------- | ------------------------------------------ | --------------------------- |
-| `testing/config/auth-state.json`    | `playwright-cli` (Layer 1 — the command)   | `playwright-cli state-save` |
-| `testing/config/auth-state-pw.json` | `@playwright/test` (Layer 2 — test runner) | `global-setup.js`           |
-
-They are separate because `playwright-cli` and `@playwright/test` manage browser contexts independently. Both are gitignored.
-
-### Force Re-Login
-
-Delete the auth state file and re-run:
-
-```bash
-rm testing/config/auth-state-pw.json
-npm run test:pw:brt
-```
-
----
-
-## Running Tests
-
-```bash
-# All timezone projects
-npm run test:pw
-
-# Single timezone
-npm run test:pw:brt
-npm run test:pw:ist
-npm run test:pw:utc0
-
-# Headed mode (visible browser — useful for debugging)
-npm run test:pw:headed
-
-# Open HTML report after a run
-npm run test:pw:report
-
-# Run a specific test file
-npx playwright test --config=testing/playwright.config.js cat-1 --project=BRT
-```
 
 ---
 
