@@ -112,22 +112,94 @@ const FIELD_MAP = {
     },
 };
 
-// Saved record URLs for reload tests (Category 3 — Server Reload).
-// These are pre-saved DateTest records with known field values, used to test
-// how VV renders stored dates when loading from the server in different timezones.
-const SAVED_RECORDS = {
-    // Saved from BRT on 2026-03-31, Config A + D set to 03/15/2026
-    'DateTest-000080':
+// Record definitions for global-setup.js to create before tests run.
+// Each entry describes a form record to be saved via the browser UI, using the specified
+// input method per field. The global setup creates these records, extracts DataIDs via
+// VV.Form.DataID, and writes them to testing/config/saved-records.json.
+//
+// Supported methods:
+//   'popup'         — selectDateViaPopup() from vv-calendar.js
+//   'typed'         — typeDateInField() from vv-calendar.js
+//   'setFieldValue' — setFieldValue() from vv-form.js
+const RECORD_DEFINITIONS = [
+    {
+        key: 'cat3-A-BRT',
+        tz: 'America/Sao_Paulo',
+        fields: [
+            { name: 'DataField7', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+            {
+                name: 'DataField5',
+                value: '03/15/2026 12:00 AM',
+                method: 'typed',
+                input: { year: 2026, month: 3, day: 15 },
+            },
+        ],
+        description: 'BRT save, Config A + D = 03/15/2026 via typed input',
+    },
+    {
+        key: 'cat3-AD-IST',
+        tz: 'Asia/Calcutta',
+        fields: [
+            { name: 'DataField7', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+            {
+                name: 'DataField5',
+                value: '03/15/2026 12:00 AM',
+                method: 'typed',
+                input: { year: 2026, month: 3, day: 15 },
+            },
+        ],
+        description: 'IST save, Config A + D = 03/15/2026 via typed input',
+    },
+    {
+        key: 'cat3-C-BRT',
+        tz: 'America/Sao_Paulo',
+        fields: [
+            {
+                name: 'DataField6',
+                value: '03/15/2026 12:00 AM',
+                method: 'popup',
+                input: { year: 2026, month: 3, day: 15 },
+            },
+        ],
+        description: 'BRT save, Config C = 03/15/2026 12:00 AM via popup',
+    },
+    {
+        key: 'cat3-B-BRT',
+        tz: 'America/Sao_Paulo',
+        fields: [
+            { name: 'DataField10', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+        ],
+        description: 'BRT save, Config B = 03/15/2026 via typed input',
+    },
+];
+
+// Fallback saved records for backward compatibility — used when saved-records.json
+// doesn't exist (e.g., running a single test without full setup). These are hardcoded
+// to the vvdemo EmanuelJofre/Main database and won't work in other environments.
+const HARDCODED_SAVED_RECORDS = {
+    'cat3-A-BRT':
         '/FormViewer/app?DataID=901ce05d-b2f7-42e9-8569-7f9d4caf258d&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
-    // Saved from IST on 2026-04-01, Config A + D set to 03/15/2026
-    'DateTest-000084':
+    'cat3-AD-IST':
         '/FormViewer/app?DataID=28e371b7-e4e2-456a-94ab-95105ad97d0e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
-    // Saved from BRT on 2026-04-01, Config C (DataField6) set to 03/15/2026 12:00 AM
-    'DateTest-000106':
+    'cat3-C-BRT':
         '/FormViewer/app?DataID=6d2f720d-8621-4a97-a751-90c4cc8588b6&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
-    // Saved from BRT on 2026-04-01, Config B (DataField10) set to 03/15/2026
-    'DateTest-000107':
+    'cat3-B-BRT':
         '/FormViewer/app?DataID=c63dea33-867e-49e2-b929-fb226b6d3933&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
 };
 
-module.exports = { vvConfig, AUTH_STATE_PATH, FORM_TEMPLATE_URL, FIELD_MAP, SAVED_RECORDS };
+const SAVED_RECORDS_PATH = path.join(__dirname, '..', 'config', 'saved-records.json');
+
+/**
+ * Get saved record URLs. Reads from saved-records.json (created by global-setup.js)
+ * if available, otherwise falls back to hardcoded records for the vvdemo environment.
+ */
+function getSavedRecords() {
+    if (fs.existsSync(SAVED_RECORDS_PATH)) {
+        return JSON.parse(fs.readFileSync(SAVED_RECORDS_PATH, 'utf8'));
+    }
+    return HARDCODED_SAVED_RECORDS;
+}
+
+const SAVED_RECORDS = getSavedRecords();
+
+module.exports = { vvConfig, AUTH_STATE_PATH, FORM_TEMPLATE_URL, FIELD_MAP, SAVED_RECORDS, RECORD_DEFINITIONS };

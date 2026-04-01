@@ -27,7 +27,7 @@
  *   bugs          — Array of bug IDs this test exercises (e.g., ["Bug #5", "Bug #7"])
  *   notes         — Why this test case exists and what it proves
  *   tcRef         — Path to the markdown TC spec in tasks/date-handling/
- *   savedRecord   — (Cat 3 only) Key into SAVED_RECORDS in vv-config.js (e.g., "DateTest-000080")
+ *   savedRecord   — (Cat 3 only) Key into SAVED_RECORDS in vv-config.js (e.g., "cat3-A-BRT")
  *   saveTz        — (Cat 3 cross-TZ only) TZ the record was originally saved in (e.g., "BRT")
  */
 
@@ -107,7 +107,7 @@ const TEST_DATA = [
         inputDateStr: '03/15/2026',
         expectedRaw: '2026-03-15',
         expectedApi: '2026-03-15',
-        savedRecord: 'DateTest-000080',
+        savedRecord: 'cat3-A-BRT',
         bugs: [],
         notes: 'Date-only save/reload in same TZ. Value survives round-trip through server. No shift in BRT.',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-A-BRT-BRT.md',
@@ -124,7 +124,7 @@ const TEST_DATA = [
         inputDateStr: '03/15/2026',
         expectedRaw: '2026-03-15',
         expectedApi: '2026-03-15',
-        savedRecord: 'DateTest-000107',
+        savedRecord: 'cat3-B-BRT',
         bugs: [],
         notes: 'Config B date-only + ignoreTZ save/reload in same TZ. ignoreTZ inert for date-only. Same as 3-A-BRT-BRT.',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-B-BRT-BRT.md',
@@ -141,7 +141,7 @@ const TEST_DATA = [
         inputDateStr: '03/15/2026',
         expectedRaw: '2026-03-15',
         expectedApi: '2026-03-15',
-        savedRecord: 'DateTest-000107',
+        savedRecord: 'cat3-B-BRT',
         saveTz: 'BRT',
         bugs: [],
         notes: 'Config B date-only + ignoreTZ cross-TZ reload (BRT→IST). ignoreTZ inert for date-only. Same as 3-A-BRT-IST.',
@@ -158,11 +158,11 @@ const TEST_DATA = [
         inputDate: { year: 2026, month: 3, day: 15 },
         inputDateStr: '03/15/2026 12:00 AM',
         expectedRaw: '2026-03-15T00:00:00',
-        expectedApi: '2026-03-15T03:00:00.000Z',
-        savedRecord: 'DateTest-000106',
+        expectedApi: '2026-03-14T18:30:00.000Z',
+        savedRecord: 'cat3-C-BRT',
         saveTz: 'BRT',
         bugs: ['Bug #1', 'Bug #4'],
-        notes: 'Config C cross-TZ: BRT-saved DateTime reloaded in IST. Bug #1+#4 cause 8.5h GFV shift.',
+        notes: 'Config C cross-TZ: BRT-saved DateTime (popup) reloaded in IST. Bug #1+#4: GFV runs new Date("2026-03-15T00:00:00") in IST → IST midnight → "2026-03-14T18:30:00.000Z". Previous hardcoded record (SetFieldValue-created) produced different API value due to different save code path.',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-C-BRT-IST.md',
     },
     {
@@ -177,7 +177,7 @@ const TEST_DATA = [
         inputDateStr: '03/15/2026',
         expectedRaw: '2026-03-14',
         expectedApi: '2026-03-14',
-        savedRecord: 'DateTest-000084',
+        savedRecord: 'cat3-AD-IST',
         saveTz: 'IST',
         bugs: ['Bug #7'],
         notes: 'Config A cross-TZ: IST-saved date-only reloaded in BRT. Bug #7 wrong day baked in during IST save (-1 day). BRT reload preserves corrupted value.',
@@ -226,6 +226,30 @@ const TEST_DATA = [
         bugs: [],
         notes: 'Control test: empty Config A field returns "". Confirms Bug #6 is absent for enableTime=false. Bug #6 requires enableTime=true && ignoreTimezone=true (Config D).',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-A-empty.md',
+    },
+    // ═══════════════════════════════════════════════════════════════════════
+    // Category 8B — GetDateObjectFromCalendar Return
+    // Call GetDateObjectFromCalendar() and verify the returned Date object.
+    // Tests whether GDOC avoids Bug #5 fake Z and returns correct UTC.
+    // Uses expectedGdocIso for toISOString() assertion (primary).
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: '8B-D-BRT',
+        category: '8B',
+        categoryName: 'GetDateObject Return',
+        config: 'D',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'getDateObject',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '2026-03-15T00:00:00',
+        expectedRaw: '2026-03-15T00:00:00',
+        expectedApi: '2026-03-15T00:00:00.000Z',
+        expectedGdocIso: '2026-03-15T03:00:00.000Z',
+        expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT-0300',
+        bugs: [],
+        notes: 'GDOC returns real Date object with correct UTC. toISOString() gives real UTC (BRT midnight + 3h). Contrasts Bug #5: GFV returns fake Z "T00:00:00.000Z" while GDOC gives correct "T03:00:00.000Z".',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-D-BRT.md',
     },
 ];
 

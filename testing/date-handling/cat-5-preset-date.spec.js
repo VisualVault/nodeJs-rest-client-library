@@ -43,17 +43,28 @@ for (const tc of categoryTests) {
             const isV2 = await getCodePath(page);
             expect(isV2).toBe(false); // All current tests assume V1
 
-            // Verify preset field exists (enableInitialValue=true for preset fields)
-            const fieldName = await verifyField(page, {
-                enableTime: fieldCfg.enableTime,
-                ignoreTimezone: fieldCfg.ignoreTimezone,
-                useLegacy: fieldCfg.useLegacy,
-                enableInitialValue: true,
-            });
-            expect(fieldName).toBe(fieldCfg.preset);
+            // Verify preset field exists on the form.
+            // Cannot use verifyField() here — Config A has two fields with enableInitialValue=true
+            // (DataField1 = Current Date, DataField2 = Preset Date) and verifyField returns the first match.
+            // Use the known preset field name directly from FIELD_MAP.
+            const presetExists = await page.evaluate((name) => {
+                const fields = Object.values(VV.Form.VV.FormPartition.fieldMaster);
+                return fields.some((f) => f.name === name && f.fieldType === 13);
+            }, fieldCfg.preset);
+            expect(presetExists).toBe(true);
 
-            // Capture preset field values (Date object serialized to ISO string by page.evaluate)
-            const values = await captureFieldValues(page, fieldCfg.preset);
+            // Capture preset field values.
+            // Preset fields store a Date object (not a string) before save — page.evaluate
+            // serializes it as an ISO string, but getValueObjectValue returns the raw Date.
+            // Capture with explicit serialization to ensure string comparison works.
+            const values = await page.evaluate((name) => {
+                const raw = VV.Form.VV.FormPartition.getValueObjectValue(name);
+                const api = VV.Form.GetFieldValue(name);
+                return {
+                    raw: raw instanceof Date ? raw.toISOString() : String(raw),
+                    api: typeof api === 'string' ? api : api instanceof Date ? api.toISOString() : String(api),
+                };
+            }, fieldCfg.preset);
             expect(values.raw).toBe(tc.expectedRaw);
             expect(values.api).toBe(tc.expectedApi);
         });

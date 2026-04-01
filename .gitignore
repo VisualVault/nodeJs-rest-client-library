@@ -171,6 +171,7 @@ playwright-report/
 # Playwright (testing/ directory)
 testing/config/auth-state*.json
 testing/config/vv-config.json
+testing/config/saved-records.json
 testing/config/screenshots/
 testing/.playwright-cli/
 testing/test-results/

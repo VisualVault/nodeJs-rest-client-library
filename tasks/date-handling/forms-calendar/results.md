@@ -1597,3 +1597,10 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 **Key outcomes**: Bug #6 confirmed D-only; Config A empty field returns `""` correctly.
 
 - 2026-04-01 [TC-8-A-empty Run 1](runs/tc-8-A-empty-run-1.md) — BRT — PASS — Config A empty field returns `""` (not "Invalid Date"); Bug #6 absent for enableTime=false
+
+## Session 2026-04-01 (BRT — Playwright CLI, GetDateObject)
+
+**Purpose**: First Category 8B test — verify GetDateObjectFromCalendar returns correct Date object for Config D.
+**Key outcomes**: GDOC correct (real UTC in toISOString); Bug #5 re-confirmed via GFV comparison (fake Z vs real Z, 3h gap).
+
+- 2026-04-01 [TC-8B-D-BRT Run 1](runs/tc-8B-D-BRT-run-1.md) — BRT — PASS + FAIL-1 — Config D GDOC correct; GFV comparison re-confirms Bug #5 fake Z (3h discrepancy)

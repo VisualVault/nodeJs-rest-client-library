@@ -49,7 +49,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 6. Current Date           |   15    |   1    |   0    |   14    |    0    |    0    |   0   |
 | 7. SetFieldValue formats  |   39    |   9    |   4    |   26    |    0    |    0    |   0   |
 | 8. GetFieldValue return   |   19    |   4    |   3    |   12    |    0    |    0    |   0   |
-| 8B. GetDateObject return  |   12    |   0    |   0    |   12    |    0    |    0    |   0   |
+| 8B. GetDateObject return  |   12    |   1    |   0    |   11    |    0    |    0    |   0   |
 | 9. Round-Trip (GFV)       |   20    |   4    |   5    |   11    |    0    |    0    |   0   |
 | 9-GDOC. Round-Trip (GDOC) |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
 | 10. Web Service           |   11    |   0    |   0    |   11    |    0    |    0    |   0   |
@@ -314,20 +314,20 @@ Return value from `VV.Form.GetDateObjectFromCalendar()` — returns a JS `Date` 
 **Key questions**: Does it avoid Bug #5 fake Z? What day does the Date object show in UTC+ for date-only fields? Is the `.toISOString()` output safe for round-trips?
 **Bugs exercised**: Bug #7 (IST date-only — Date shows correct day but UTC representation is prev day), Bug #5 comparison (Config D — Date object may be correct where GFV is wrong)
 
-| Test ID    | Config |  TZ   | Stored Raw              | Expected Date.toString()                           | Expected .toISOString()      | Actual | Status  | Run Date | Evidence |
-| ---------- | :----: | :---: | ----------------------- | -------------------------------------------------- | ---------------------------- | ------ | ------- | -------- | -------- |
-| 8B-A-BRT   |   A    |  BRT  | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT-0300` (BRT midnight)     | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
-| 8B-A-IST   |   A    |  IST  | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT+0530` (IST midnight)     | `"2026-03-14T18:30:00.000Z"` | —      | PENDING | —        | —        |
-| 8B-A-UTC0  |   A    | UTC+0 | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT+0000` (UTC midnight)     | `"2026-03-15T00:00:00.000Z"` | —      | PENDING | —        | —        |
-| 8B-C-BRT   |   C    |  BRT  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT-0300` (BRT midnight)     | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
-| 8B-C-IST   |   C    |  IST  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT+0530` (IST midnight)     | `"2026-03-14T18:30:00.000Z"` | —      | PENDING | —        | —        |
-| 8B-D-BRT   |   D    |  BRT  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT-0300` — no fake Z        | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
-| 8B-D-IST   |   D    |  IST  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT+0530` — no fake Z        | `"2026-03-14T18:30:00.000Z"` | —      | PENDING | —        | —        |
-| 8B-D-UTC0  |   D    | UTC+0 | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT+0000` — matches GFV      | `"2026-03-15T00:00:00.000Z"` | —      | PENDING | —        | —        |
-| 8B-D-empty |   D    |  any  | `""`                    | `null` (expected clean null, not Invalid Date)     | N/A                          | —      | PENDING | —        | —        |
-| 8B-A-empty |   A    |  any  | `""`                    | `null` (expected)                                  | N/A                          | —      | PENDING | —        | —        |
-| 8B-E-BRT   |   E    |  BRT  | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT-0300` (legacy date-only) | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
-| 8B-H-BRT   |   H    |  BRT  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT-0300` (legacy DateTime)  | `"2026-03-15T03:00:00.000Z"` | —      | PENDING | —        | —        |
+| Test ID    | Config |  TZ   | Stored Raw              | Expected Date.toString()                           | Expected .toISOString()      | Actual                                                             | Status  | Run Date   | Evidence                            |
+| ---------- | :----: | :---: | ----------------------- | -------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------ | ------- | ---------- | ----------------------------------- |
+| 8B-A-BRT   |   A    |  BRT  | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT-0300` (BRT midnight)     | `"2026-03-15T03:00:00.000Z"` | —                                                                  | PENDING | —          | —                                   |
+| 8B-A-IST   |   A    |  IST  | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT+0530` (IST midnight)     | `"2026-03-14T18:30:00.000Z"` | —                                                                  | PENDING | —          | —                                   |
+| 8B-A-UTC0  |   A    | UTC+0 | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT+0000` (UTC midnight)     | `"2026-03-15T00:00:00.000Z"` | —                                                                  | PENDING | —          | —                                   |
+| 8B-C-BRT   |   C    |  BRT  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT-0300` (BRT midnight)     | `"2026-03-15T03:00:00.000Z"` | —                                                                  | PENDING | —          | —                                   |
+| 8B-C-IST   |   C    |  IST  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT+0530` (IST midnight)     | `"2026-03-14T18:30:00.000Z"` | —                                                                  | PENDING | —          | —                                   |
+| 8B-D-BRT   |   D    |  BRT  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT-0300` — no fake Z        | `"2026-03-15T03:00:00.000Z"` | `Sun Mar 15 2026 00:00:00 GMT-0300` / `"2026-03-15T03:00:00.000Z"` | PASS    | 2026-04-01 | [summary](summaries/tc-8B-D-BRT.md) |
+| 8B-D-IST   |   D    |  IST  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT+0530` — no fake Z        | `"2026-03-14T18:30:00.000Z"` | —                                                                  | PENDING | —          | —                                   |
+| 8B-D-UTC0  |   D    | UTC+0 | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT+0000` — matches GFV      | `"2026-03-15T00:00:00.000Z"` | —                                                                  | PENDING | —          | —                                   |
+| 8B-D-empty |   D    |  any  | `""`                    | `null` (expected clean null, not Invalid Date)     | N/A                          | —                                                                  | PENDING | —          | —                                   |
+| 8B-A-empty |   A    |  any  | `""`                    | `null` (expected)                                  | N/A                          | —                                                                  | PENDING | —          | —                                   |
+| 8B-E-BRT   |   E    |  BRT  | `"2026-03-15"`          | `Mar 15 2026 00:00:00 GMT-0300` (legacy date-only) | `"2026-03-15T03:00:00.000Z"` | —                                                                  | PENDING | —          | —                                   |
+| 8B-H-BRT   |   H    |  BRT  | `"2026-03-15T00:00:00"` | `Mar 15 2026 00:00:00 GMT-0300` (legacy DateTime)  | `"2026-03-15T03:00:00.000Z"` | —                                                                  | PENDING | —          | —                                   |
 
 > **Why this matters**: Developers writing form scripts have three ways to read a date: `GetFieldValue()` (string, Bug #5 affected), `getValueObjectValue()` (raw string, internal), and `GetDateObjectFromCalendar()` (Date object). If a developer calls `.toISOString()` on the Date object and passes it to `SetFieldValue()`, a different drift pattern emerges than the GFV round-trip — see 9-GDOC rows below.
 > **IST note for date-only (8B-A-IST)**: The Date object will show `Mar 15` (correct day in local display) but `.toISOString()` returns `"2026-03-14T18:30:00.000Z"` (previous UTC day). This is not a bug in GetDateObjectFromCalendar — it's how JS Date works. The danger is if a developer passes `.toISOString()` to `SetFieldValue()`, which would trigger Bug #7's `moment(input).toDate()` with a Z-suffixed UTC string.

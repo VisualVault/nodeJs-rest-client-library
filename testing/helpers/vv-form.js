@@ -189,27 +189,54 @@ async function captureDisplayValue(page, fieldName) {
 }
 
 /**
+ * Save the current VV form without reloading. Returns the DataID and saved record URL.
+ *
+ * Clicks the Save button and waits for VV.Form.DataID to be populated — this is
+ * the reliable indicator that the save completed (the page URL does NOT reliably
+ * update with the DataID, but the JS property does).
+ *
+ * Used by global-setup.js to create records for cross-TZ tests without the overhead
+ * of a full page reload.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {number} [timeout=60000] - max wait in ms (VV saves can take 5-10s)
+ * @returns {Promise<{dataId: string, url: string}>} the DataID GUID and saved record URL path
+ */
+async function saveFormOnly(page, timeout = 60000) {
+    // Capture the pre-save DataID — on template forms, this is the formId (e.g., "6be0265c-...").
+    // After save, VV.Form.DataID changes to the new record's DataID.
+    const preSaveId = await page.evaluate(() => VV.Form.DataID || '');
+
+    const saveBtn = page.locator('button.btn-save[aria-label="Save"]');
+    await saveBtn.click();
+
+    // Wait for DataID to change from its pre-save value — this confirms the save completed
+    // and VV assigned a new DataID to the saved record.
+    await page.waitForFunction((oldId) => VV.Form.DataID && VV.Form.DataID !== oldId, preSaveId, { timeout });
+
+    return page.evaluate(() => ({
+        dataId: VV.Form.DataID,
+        url:
+            `/FormViewer/app?DataID=${VV.Form.DataID}&hidemenu=true&rOpener=1` +
+            `&xcid=${VV.Form.VV.currentUser.Xcid}&xcdid=${VV.Form.VV.currentUser.Xcdid}`,
+    }));
+}
+
+/**
  * Save the current VV form and reload the saved record.
  *
- * Clicks the Save button, waits for the URL to change (DataID appears when
- * VV redirects from template to saved record), then performs a full page reload
- * and waits for VV.Form to be ready again. Returns the saved record URL.
+ * Clicks Save, waits for VV.Form.DataID to confirm the save, then performs
+ * a full page reload and waits for VV.Form to be ready again.
  *
  * The reload clears Angular SPA state, simulating a fresh page load — this is
  * what Categories 3, 5, 6, 9, 11 need to test server round-trip behavior.
  *
  * @param {import('@playwright/test').Page} page
  * @param {number} [timeout=60000] - max wait in ms (VV saves can take 5-10s)
- * @returns {Promise<string>} the saved record URL
+ * @returns {Promise<{savedUrl: string, dataId: string}>}
  */
 async function saveFormAndReload(page, timeout = 60000) {
-    const saveBtn = page.getByRole('button', { name: 'Save' });
-    await saveBtn.click();
-
-    // Wait for URL to change — DataID appears when VV redirects to the saved record
-    await page.waitForFunction(() => document.location.href.includes('DataID='), { timeout });
-
-    const savedUrl = page.url();
+    const { dataId, url: savedUrl } = await saveFormOnly(page, timeout);
 
     // Full reload to clear Angular SPA state and simulate a fresh page load
     await page.reload({ waitUntil: 'networkidle', timeout });
@@ -223,7 +250,7 @@ async function saveFormAndReload(page, timeout = 60000) {
         { timeout }
     );
 
-    return savedUrl;
+    return { savedUrl, dataId };
 }
 
 /**
@@ -265,6 +292,7 @@ module.exports = {
     getFieldValue,
     getBrowserTimezone,
     captureDisplayValue,
+    saveFormOnly,
     saveFormAndReload,
     roundTripCycle,
 };
