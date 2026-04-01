@@ -27,7 +27,7 @@ for (const tc of categoryTests) {
             page,
         }, testInfo) => {
             // Only run this test in the matching timezone project
-            test.skip(testInfo.project.name !== tc.tz, `Skipping — test is for ${tc.tz}`);
+            test.skip(!testInfo.project.name.startsWith(tc.tz), `Skipping — test is for ${tc.tz}`);
             // Navigate to fresh form and wait for VV.Form ready
             await gotoAndWaitForVVForm(page, FORM_TEMPLATE_URL);
 
