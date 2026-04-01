@@ -206,6 +206,27 @@ const TEST_DATA = [
         notes: 'Config A preset in IST. Bug #7 on init path: moment("2026-03-01").toDate() → IST midnight → Feb 28 UTC. Display correct (03/01/2026) but internal UTC date wrong. Save would store "2026-02-28".',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-A-IST.md',
     },
+    // ═══════════════════════════════════════════════════════════════════════
+    // Category 8 — GetFieldValue Return
+    // Call GetFieldValue() on a field and verify the return value.
+    // Tests format transformations, empty-field handling, and Bug #5/#6.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: '8-A-empty',
+        category: 8,
+        categoryName: 'GetFieldValue Return',
+        config: 'A',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'getFieldValue',
+        inputDate: null,
+        inputDateStr: '',
+        expectedRaw: '',
+        expectedApi: '',
+        bugs: [],
+        notes: 'Control test: empty Config A field returns "". Confirms Bug #6 is absent for enableTime=false. Bug #6 requires enableTime=true && ignoreTimezone=true (Config D).',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-A-empty.md',
+    },
 ];
 
 module.exports = { TEST_DATA };

@@ -1590,3 +1590,10 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 **Key outcomes**: Bug #7 confirmed on preset path. Major scope expansion: every UTC+ form instance with date-only presets carries wrong internal UTC date.
 
 - 2026-04-01 [TC-5-A-IST Run 1](runs/tc-5-A-IST-run-1.md) — IST — FAIL-3 — Config A preset in IST; Bug #7 on init path: Date obj UTC = `"2026-02-28"`, display correct `03/01/2026`, save would corrupt
+
+## Session 2026-04-01 (BRT — Playwright CLI, GetFieldValue Empty)
+
+**Purpose**: Test GetFieldValue on empty fields — scope Bug #6 beyond Config D.
+**Key outcomes**: Bug #6 confirmed D-only; Config A empty field returns `""` correctly.
+
+- 2026-04-01 [TC-8-A-empty Run 1](runs/tc-8-A-empty-run-1.md) — BRT — PASS — Config A empty field returns `""` (not "Invalid Date"); Bug #6 absent for enableTime=false
