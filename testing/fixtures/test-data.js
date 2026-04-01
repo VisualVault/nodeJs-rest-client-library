@@ -27,6 +27,8 @@
  *   bugs          — Array of bug IDs this test exercises (e.g., ["Bug #5", "Bug #7"])
  *   notes         — Why this test case exists and what it proves
  *   tcRef         — Path to the markdown TC spec in tasks/date-handling/
+ *   savedRecord   — (Cat 3 only) Key into SAVED_RECORDS in vv-config.js (e.g., "DateTest-000080")
+ *   saveTz        — (Cat 3 cross-TZ only) TZ the record was originally saved in (e.g., "BRT")
  */
 
 const TEST_DATA = [
@@ -50,6 +52,65 @@ const TEST_DATA = [
         bugs: [],
         notes: 'Date-only baseline. No TZ shift expected in BRT (UTC-). Bug #7 only affects UTC+.',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-A-BRT.md',
+    },
+    {
+        id: '1-B-BRT',
+        category: 1,
+        categoryName: 'Calendar Popup',
+        config: 'B',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'popup',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '03/15/2026',
+        expectedRaw: '2026-03-15',
+        expectedApi: '2026-03-15',
+        bugs: [],
+        notes: 'Config B date-only + ignoreTZ. Same as A in BRT — ignoreTZ inert for date-only fields.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-B-BRT.md',
+    },
+    // ═══════════════════════════════════════════════════════════════════════
+    // Category 2 — Typed Input
+    // User types a date directly in the input field (segment-by-segment).
+    // Tests how VV stores and returns the value after typed entry + Tab.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: '2-A-BRT',
+        category: 2,
+        categoryName: 'Typed Input',
+        config: 'A',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'typed',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '03/15/2026',
+        expectedRaw: '2026-03-15',
+        expectedApi: '2026-03-15',
+        bugs: [],
+        notes: 'Date-only typed input baseline. No TZ shift in BRT. Matches popup (1-A-BRT) — Bug #2 absent.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-A-BRT.md',
+    },
+    // ═══════════════════════════════════════════════════════════════════════
+    // Category 3 — Server Reload
+    // Save form, open saved record. Compare displayed dates and GFV return
+    // with original values. Tests value integrity through the save/load cycle.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: '3-A-BRT-BRT',
+        category: 3,
+        categoryName: 'Server Reload',
+        config: 'A',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'reload',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '03/15/2026',
+        expectedRaw: '2026-03-15',
+        expectedApi: '2026-03-15',
+        savedRecord: 'DateTest-000080',
+        bugs: [],
+        notes: 'Date-only save/reload in same TZ. Value survives round-trip through server. No shift in BRT.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-A-BRT-BRT.md',
     },
 ];
 
