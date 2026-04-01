@@ -224,6 +224,27 @@ const TEST_DATA = [
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-G-BRT-BRT.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
+    // Category 6 — Current Date Default
+    // Open fresh form template. Current Date field auto-populates with today's date.
+    // Expected values are dynamic (today's date), not fixed — spec computes at runtime.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: '6-A-IST',
+        category: 6,
+        categoryName: 'Current Date',
+        config: 'A',
+        tz: 'IST',
+        tzOffset: 'GMT+0530',
+        action: 'currentDate',
+        inputDate: null,
+        inputDateStr: '',
+        expectedRaw: 'dynamic',
+        expectedApi: 'dynamic',
+        bugs: [],
+        notes: 'Current Date auto-populates correctly in IST. Uses new Date() → UTC timestamp, skipping Bug #7 moment parsing. Stored as Date object. Cross-midnight edge: if tested 00:00-05:30 IST, UTC date may be previous day.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-A-IST.md',
+    },
+    // ═══════════════════════════════════════════════════════════════════════
     // Category 8 — GetFieldValue Return
     // Call GetFieldValue() on a field and verify the return value.
     // Tests format transformations, empty-field handling, and Bug #5/#6.
@@ -243,6 +264,22 @@ const TEST_DATA = [
         bugs: [],
         notes: 'Control test: empty Config A field returns "". Confirms Bug #6 is absent for enableTime=false. Bug #6 requires enableTime=true && ignoreTimezone=true (Config D).',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-A-empty.md',
+    },
+    {
+        id: '8-C-empty',
+        category: 8,
+        categoryName: 'GetFieldValue Return',
+        config: 'C',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'getFieldValue',
+        inputDate: null,
+        inputDateStr: '',
+        expectedRaw: '',
+        expectedApi: 'THROWS',
+        bugs: ['Bug #6'],
+        notes: 'Bug #6 variant: GFV THROWS RangeError on empty Config C. new Date("").toISOString() throws. Worse than Config D (returns "Invalid Date" string). All enableTime=true && !useLegacy configs fail on empty.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-C-empty.md',
     },
     {
         id: '8-H-BRT',
@@ -283,6 +320,73 @@ const TEST_DATA = [
         bugs: [],
         notes: 'GDOC returns real Date object with correct UTC. toISOString() gives real UTC (BRT midnight + 3h). Contrasts Bug #5: GFV returns fake Z "T00:00:00.000Z" while GDOC gives correct "T03:00:00.000Z".',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-D-BRT.md',
+    },
+    // ═══════════════════════════════════════════════════════════════════════
+    // Category 9-GDOC — Round-Trip via GetDateObjectFromCalendar
+    // SetFieldValue(field, GetDateObjectFromCalendar(field).toISOString())
+    // Tests whether GDOC.toISOString() (real UTC) round-trips safely vs
+    // GFV round-trip (Bug #5 fake Z drift).
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: '9-GDOC-D-BRT-1',
+        category: '9-GDOC',
+        categoryName: 'GDOC Round-Trip',
+        config: 'D',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'gdocRoundTrip',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '2026-03-15T00:00:00',
+        expectedRaw: '2026-03-15T00:00:00',
+        expectedApi: '2026-03-15T00:00:00.000Z',
+        trips: 1,
+        bugs: [],
+        notes: 'GDOC round-trip is STABLE in BRT (0 drift). Real UTC "T03:00:00.000Z" → normalizeCalValue correctly parses Z → stores local midnight unchanged. Matrix prediction of -3h corrected. Safe alternative to GFV round-trip (Bug #5 drifts -3h/trip).',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-GDOC-D-BRT-1.md',
+    },
+    // ═══════════════════════════════════════════════════════════════════════
+    // Category 9 — Round-Trip (GFV: SetFieldValue → GetFieldValue → SetFieldValue)
+    // Tests cumulative drift from Bug #5 (fake Z). Each trip feeds GFV output
+    // back into SFV. Config D drifts; Config H (legacy) should not.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: '9-H-BRT-1',
+        category: 9,
+        categoryName: 'GFV Round-Trip',
+        config: 'H',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'gfvRoundTrip',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '2026-03-15T00:00:00',
+        expectedRaw: '2026-03-15T00:00:00',
+        expectedApi: '2026-03-15T00:00:00',
+        trips: 1,
+        bugs: [],
+        notes: 'Config H legacy control: useLegacy=true means GFV returns raw (no fake Z), so SFV(GFV()) is identity. Zero drift — contrasts Config D which drifts -3h/trip in BRT.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-H-BRT-1.md',
+    },
+    // ═══════════════════════════════════════════════════════════════════════
+    // Category 12 — Edge Cases
+    // Boundary conditions, timezone controls, and special inputs that stress
+    // date handling logic at extremes.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: '12-utc-0-control',
+        category: 12,
+        categoryName: 'Edge Cases',
+        config: 'D',
+        tz: 'UTC0',
+        tzOffset: 'GMT+0000',
+        action: 'gfvRoundTrip',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '2026-03-15T00:00:00',
+        expectedRaw: '2026-03-15T00:00:00',
+        expectedApi: '2026-03-15T00:00:00.000Z',
+        trips: 1,
+        bugs: [],
+        notes: 'Bug #5 control at UTC+0: fake Z is coincidentally correct because local midnight = UTC midnight. Zero drift — proves Bug #5 drift is proportional to TZ offset (BRT -3h, UTC 0, IST +5:30h).',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-utc-0-control.md',
     },
 ];
 

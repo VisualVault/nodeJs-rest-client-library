@@ -1,8 +1,9 @@
 /**
- * Category 8 — GetFieldValue Return Tests
+ * Category 9 — GFV Round-Trip Tests (SetFieldValue → GetFieldValue → SetFieldValue)
  *
- * Call GetFieldValue() on a field and verify the return value.
- * Tests format transformations, empty-field handling, and Bug #5/#6.
+ * Execute N cycles of: read value via GetFieldValue(), feed it back via SetFieldValue().
+ * Tests whether Bug #5 (fake Z suffix on Config D) causes cumulative drift.
+ * Legacy configs (useLegacy=true) should show zero drift since GFV returns raw value.
  *
  * Test cases are defined in ../fixtures/test-data.js and filtered by category.
  * Each test runs only in its matching timezone project (BRT, IST, or UTC0).
@@ -14,16 +15,17 @@ const {
     gotoAndWaitForVVForm,
     getCodePath,
     verifyField,
-    captureFieldValues,
-    getBrowserTimezone,
     setFieldValue,
+    getBrowserTimezone,
+    captureFieldValues,
+    roundTripCycle,
 } = require('../helpers/vv-form');
 
-const categoryTests = TEST_DATA.filter((t) => t.category === 8);
+const categoryTests = TEST_DATA.filter((t) => t.category === 9);
 
 for (const tc of categoryTests) {
     test.describe(`TC-${tc.id}: ${tc.categoryName}, Config ${tc.config}`, () => {
-        test(`GetFieldValue on ${tc.inputDate ? tc.inputDateStr : 'empty field'}`, async ({ page }, testInfo) => {
+        test(`GFV round-trip ${tc.trips} trip(s) on ${tc.inputDateStr}`, async ({ page }, testInfo) => {
             // Only run this test in the matching timezone project
             test.skip(!testInfo.project.name.startsWith(tc.tz), `Skipping — test is for ${tc.tz}`);
 
@@ -48,31 +50,16 @@ for (const tc of categoryTests) {
             });
             expect(fieldName).toBe(fieldCfg.field);
 
-            // If a value needs to be set first, set it
-            if (tc.inputDate) {
-                await setFieldValue(page, fieldCfg.field, tc.inputDateStr);
-            }
+            // Set baseline value
+            await setFieldValue(page, fieldCfg.field, tc.inputDateStr);
 
-            // Capture and verify stored values
-            // Some configs throw on GetFieldValue for empty fields (Bug #6 variant)
-            if (tc.expectedApi === 'THROWS') {
-                const result = await page.evaluate((name) => {
-                    const raw = VV.Form.VV.FormPartition.getValueObjectValue(name);
-                    let apiThrew = false;
-                    try {
-                        VV.Form.GetFieldValue(name);
-                    } catch (e) {
-                        apiThrew = true;
-                    }
-                    return { raw, apiThrew };
-                }, fieldCfg.field);
-                expect(result.raw).toBe(tc.expectedRaw);
-                expect(result.apiThrew).toBe(true);
-            } else {
-                const values = await captureFieldValues(page, fieldCfg.field);
-                expect(values.raw).toBe(tc.expectedRaw);
-                expect(values.api).toBe(tc.expectedApi);
-            }
+            // Execute GFV round-trip(s)
+            await roundTripCycle(page, fieldCfg.field, tc.trips || 1);
+
+            // After all trips, verify the raw value matches expected
+            const finalValues = await captureFieldValues(page, fieldCfg.field);
+            expect(finalValues.raw).toBe(tc.expectedRaw);
+            expect(finalValues.api).toBe(tc.expectedApi);
         });
     });
 }

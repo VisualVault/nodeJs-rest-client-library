@@ -1606,3 +1606,8 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-01 [TC-8B-D-BRT Run 1](runs/tc-8B-D-BRT-run-1.md) — BRT — PASS + FAIL-1 — Config D GDOC correct; GFV comparison re-confirms Bug #5 fake Z (3h discrepancy)
 - 2026-04-01 [TC-8-H-BRT Run 1](runs/tc-8-H-BRT-run-1.md) — BRT — PASS — Config H GFV returns raw unchanged; useLegacy=true bypasses Bug #5 fake-Z branch
 - 2026-04-01 [TC-3-G-BRT-BRT Run 1](runs/tc-3-G-BRT-BRT-run-1.md) — BRT — PASS — Config G legacy DateTime same-TZ reload; value survives intact, no shift
+- 2026-04-01 [TC-6-A-IST Run 1](runs/tc-6-A-IST-run-1.md) — IST — PASS — Config A Current Date correct in IST; UTC Date object, IST date matches today
+- 2026-04-01 [TC-8-C-empty Run 1](runs/tc-8-C-empty-run-1.md) — BRT — FAIL-1 — Config C empty GFV THROWS RangeError; Bug #6 variant worse than Config D (throws vs returns string)
+- 2026-04-01 [TC-9-GDOC-D-BRT-1 Run 1](runs/tc-9-GDOC-D-BRT-1-run-1.md) — BRT — PASS — GDOC round-trip stable (0 drift); real UTC parsed correctly, matrix prediction corrected from -3h to 0
+- 2026-04-01 [TC-9-H-BRT-1 Run 1](runs/tc-9-H-BRT-1-run-1.md) — BRT — PASS — Config H GFV round-trip stable (0 drift); useLegacy=true prevents Bug #5 fake-Z drift
+- 2026-04-01 [TC-12-utc-0-control Run 1](runs/tc-12-utc-0-control-run-1.md) — UTC+0 — PASS — Config D round-trip 0 drift at UTC+0; fake Z coincidentally correct (local=UTC)

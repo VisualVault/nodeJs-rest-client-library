@@ -275,7 +275,11 @@ async function roundTripCycle(page, fieldName, times = 3) {
 
         const raw = await page.evaluate((name) => VV.Form.VV.FormPartition.getValueObjectValue(name), fieldName);
         const api = await page.evaluate((name) => VV.Form.GetFieldValue(name), fieldName);
-        const display = await page.locator(`[aria-label="${fieldName}"]`).locator('input').first().inputValue();
+        // Legacy fields (useLegacy=true) render as plain <input aria-label="...">, not inside a Kendo wrapper.
+        const container = page.locator(`[aria-label="${fieldName}"]`);
+        const tagName = await container.evaluate((el) => el.tagName.toLowerCase());
+        const input = tagName === 'input' ? container : container.locator('input').first();
+        const display = await input.inputValue();
 
         results.push({ trip: i + 1, raw, api, display });
     }
