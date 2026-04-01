@@ -28,12 +28,85 @@ See `testing/date-handling/README.md` and `docs/guides/playwright-testing.md` fo
 ## Usage
 
 ```
-/create-pw-date-test <category-id>
+/create-pw-date-test <category-id> [category-id-2 ...] [--skip-verify]
 ```
 
-Example: `/create-pw-date-test 7-D-isoZ-BRT`
+**Single test (default):** `/create-pw-date-test 7-D-isoZ-BRT`
+
+**Batch mode:** `/create-pw-date-test 8-D-BRT 8-D-IST 8-D-UTC0` — processes multiple IDs in one invocation. Groups by TZ to minimize browser context switches. Each ID goes through the full pipeline.
+
+**Skip-verify mode:** `/create-pw-date-test --skip-verify 8-E-BRT 8-F-BRT` — skips Phases 0–2 (no browser session). Extracts expected values from the existing TC spec and/or latest run file. Use this to backfill test-data.js entries for TCs that already have verified run files.
+
+**Batch + skip-verify:** `/create-pw-date-test --skip-verify 1-A-BRT 1-B-BRT 2-A-BRT 3-A-BRT-BRT` — backfill multiple entries without opening a browser.
 
 The category ID identifies a row in `tasks/date-handling/forms-calendar/matrix.md` (e.g., `1-A-IST`, `9-D-BRT-8`, `7-C-isoNoZ`).
+
+---
+
+## Batch Mode
+
+When multiple category IDs are provided:
+
+1. **Parse all IDs** from the arguments (space-separated). Filter out `--skip-verify` flag.
+2. **Group by TZ** (last segment of each ID) to minimize browser context switches.
+3. **For each TZ group:**
+    - Open one browser session with that TZ (Phase 0, unless `--skip-verify`)
+    - Process each ID through Phases 1–5 sequentially
+    - Close browser after the group is done
+4. **Report** a summary table at the end:
+
+```
+| ID          | Status | Artifacts Created               |
+|-------------|--------|---------------------------------|
+| 8-D-BRT     | PASS   | test-data entry                 |
+| 8-D-IST     | FAIL-1 | TC spec + run + summary + entry |
+| 8-D-UTC0    | PASS   | test-data entry + run           |
+```
+
+---
+
+## Skip-Verify Mode (`--skip-verify`)
+
+When `--skip-verify` is present, the command **does not open a browser**. Instead:
+
+### What it DOES:
+
+- **Phase 1**: Read source material (matrix.md, analysis.md) — same as normal
+- **Phase 3**: Generate TC spec if it doesn't exist — **only if the matrix row has Actual values filled in** (from a previous manual run). If the matrix row has no Actual values, STOP and report: "Cannot create TC spec without verified values. Run without --skip-verify first."
+- **Phase 3B**: Add test-data.js entry — extract expected values from:
+    1. The **latest run file** (`runs/tc-{id}-run-N.md`) if it exists — parse the Step Results table for actual observed values
+    2. Or the **TC spec** (`test-cases/tc-{id}.md`) — parse the Expected Result column from the Test Steps table
+    3. Or the **matrix row** Expected/Actual columns
+- **Phase 3B**: Create `cat-*.spec.js` if the category doesn't have one yet
+- **Phase 4**: Update matrix Evidence column to link to summary (if not already linked)
+
+### What it SKIPS:
+
+- **Phase 0** (no browser session)
+- **Phase 2** (no live verification)
+- **Phase 5A** (no new run file — no verification was performed)
+- **Phase 5B** (no summary update — no new run to record)
+- **Phase 5C** (no results.md entry — no new run)
+
+### Value extraction priority:
+
+When building the test-data.js entry without live verification:
+
+1. **Run file** (most reliable — contains actual observed values): parse `Step Results` table → `Actual` column
+2. **Matrix row** (second choice): `Actual` column values
+3. **TC spec** (last resort — these are intended/correct values, not necessarily what the system produces): `Expected Result` column
+
+For fields like `expectedRaw` and `expectedApi`, use the **Actual** values from the latest run (what the system really does), not the Expected values from the TC spec (what the system should do). The Playwright regression test needs to match current behavior to detect future changes.
+
+### Required artifacts:
+
+Skip-verify mode requires at least ONE of these to exist:
+
+- A run file with step results (`runs/tc-{id}-run-*.md`)
+- A matrix row with Actual values filled in
+- A TC spec with Expected Result values (fallback — less reliable)
+
+If none exist, report: "No verified data found for {id}. Run without --skip-verify to verify live."
 
 ---
 
@@ -712,7 +785,7 @@ Always close the Playwright browser at the end of the command, regardless of suc
 playwright-cli close
 ```
 
-This prevents orphan browser processes.
+This prevents orphan browser processes. In **batch mode**, close the browser once per TZ group (after all IDs in that group are processed), not after each individual test. In **skip-verify mode**, no browser is opened — skip this step.
 
 ---
 
