@@ -500,7 +500,9 @@ VV.Form.UnsavedChanges; // 0 = no pending changes
 VV.Form.DataID; // GUID of the current form record
 ```
 
-After saving from a template URL (`?formid=`), `VV.Form.DataID` updates to the saved record's DataID. Confirmed on Build 20260304.1 — template formid `6be0265c-...` → after save, DataID `c63dea33-...` (DateTest-000107). Note: the page URL does NOT update with the new DataID (known VV behavior), but the JS property is reliable.
+**Before save** (template form): `VV.Form.DataID` is pre-populated with the **form template GUID** (the `formid=` URL param), not empty. Do not use `DataID.length > 0` to detect a successful save — check that the value **changed** from its pre-save value.
+
+**After save**: `VV.Form.DataID` updates to the saved record's DataID (a different GUID). Confirmed on Build 20260304.1 — template formid `6be0265c-...` → after save, DataID `c63dea33-...` (DateTest-000107). The page URL does NOT update with the new DataID (known VV behavior), but the JS property is reliable.
 
 ### Construct a saved record URL
 
