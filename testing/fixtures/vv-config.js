@@ -171,6 +171,19 @@ const RECORD_DEFINITIONS = [
         ],
         description: 'BRT save, Config B = 03/15/2026 via typed input',
     },
+    {
+        key: 'cat3-G-BRT',
+        tz: 'America/Sao_Paulo',
+        fields: [
+            {
+                name: 'DataField14',
+                value: '03/15/2026 12:00 AM',
+                method: 'typed',
+                input: { year: 2026, month: 3, day: 15 },
+            },
+        ],
+        description: 'BRT save, Config G (legacy DateTime) = 03/15/2026 12:00 AM via typed input',
+    },
 ];
 
 // Fallback saved records for backward compatibility — used when saved-records.json

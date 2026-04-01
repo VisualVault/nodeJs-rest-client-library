@@ -43,12 +43,12 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | ------------------------- | :-----: | :----: | :----: | :-----: | :-----: | :-----: | :---: |
 | 1. Calendar Popup         |   20    |   8    |   12   |    0    |    0    |    0    |   0   |
 | 2. Typed Input            |   16    |   11   |   5    |    0    |    0    |    0    |   0   |
-| 3. Server Reload          |   18    |   8    |   2    |    8    |    0    |    0    |   0   |
+| 3. Server Reload          |   18    |   9    |   2    |    7    |    0    |    0    |   0   |
 | 4. URL Parameters         |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
 | 5. Preset Date            |   18    |   1    |   1    |   16    |    0    |    0    |   0   |
 | 6. Current Date           |   15    |   1    |   0    |   14    |    0    |    0    |   0   |
 | 7. SetFieldValue formats  |   39    |   9    |   4    |   26    |    0    |    0    |   0   |
-| 8. GetFieldValue return   |   19    |   4    |   3    |   12    |    0    |    0    |   0   |
+| 8. GetFieldValue return   |   19    |   5    |   3    |   11    |    0    |    0    |   0   |
 | 8B. GetDateObject return  |   12    |   1    |   0    |   11    |    0    |    0    |   0   |
 | 9. Round-Trip (GFV)       |   20    |   4    |   5    |   11    |    0    |    0    |   0   |
 | 9-GDOC. Round-Trip (GDOC) |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
@@ -150,7 +150,7 @@ Save form, open saved record in a new tab. Compare displayed dates and GFV retur
 | 3-B-IST-BRT |   B    |   IST   |   BRT   | Same as A-IST-BRT (ignoreTZ no effect on date-only)                                                | —                                                                          | PENDING | —          | —                                      |
 | 3-E-BRT-BRT |   E    |   BRT   |   BRT   | No shift — same as A-BRT-BRT (legacy date-only, same reload path)                                  | —                                                                          | PENDING | —          | —                                      |
 | 3-F-BRT-BRT |   F    |   BRT   |   BRT   | No shift — same as E-BRT-BRT (ignoreTZ no effect on date-only)                                     | —                                                                          | PENDING | —          | —                                      |
-| 3-G-BRT-BRT |   G    |   BRT   |   BRT   | No shift; display identical — predict same as C-BRT-BRT (legacy DateTime)                          | —                                                                          | PENDING | —          | —                                      |
+| 3-G-BRT-BRT |   G    |   BRT   |   BRT   | No shift; display identical — predict same as C-BRT-BRT (legacy DateTime)                          | `"2026-03-15T00:00:00"` raw + GFV unchanged                                | PASS    | 2026-04-01 | [summary](summaries/tc-3-G-BRT-BRT.md) |
 | 3-H-BRT-BRT |   H    |   BRT   |   BRT   | No shift; GFV returns stored value without fake Z (useLegacy=true)                                 | —                                                                          | PENDING | —          | —                                      |
 | 3-E-BRT-IST |   E    |   BRT   |   IST   | No shift — same as A-BRT-IST; date-only survives cross-TZ reload (prediction corrected 2026-04-01) | —                                                                          | PENDING | —          | —                                      |
 | 3-H-BRT-IST |   H    |   BRT   |   IST   | Display OK; no fake Z drift (useLegacy=true); compare with 3-D-BRT-IST                             | —                                                                          | PENDING | —          | —                                      |
@@ -301,7 +301,7 @@ Return value for each configuration from `VV.Form.GetFieldValue()`.
 | 8-E           |   E    |  any  | `"2026-03-15"`          | `"2026-03-15"` (legacy date-only; same as A)                                                        | —                                                                   | PENDING | —          | —                                    |
 | 8-F           |   F    |  any  | `"2026-03-15"`          | `"2026-03-15"` (legacy date-only + ignoreTZ; same as E — date-only unaffected by ignoreTZ)          | —                                                                   | PENDING | —          | —                                    |
 | 8-G-BRT       |   G    |  BRT  | `"2026-03-15T00:00:00"` | `"2026-03-15T03:00:00.000Z"` (real UTC — same as C-BRT; ignoreTZ=false)                             | —                                                                   | PENDING | —          | —                                    |
-| 8-H-BRT       |   H    |  BRT  | `"2026-03-15T00:00:00"` | `"2026-03-15T00:00:00"` (**no fake Z** — useLegacy=true skips fake-Z branch; key Bug #5 comparison) | —                                                                   | PENDING | —          | —                                    |
+| 8-H-BRT       |   H    |  BRT  | `"2026-03-15T00:00:00"` | `"2026-03-15T00:00:00"` (**no fake Z** — useLegacy=true skips fake-Z branch; key Bug #5 comparison) | `"2026-03-15T00:00:00"` (raw unchanged, no fake Z)                  | PASS    | 2026-04-01 | [summary](summaries/tc-8-H-BRT.md)   |
 | 8-H-IST       |   H    |  IST  | `"2026-03-15T00:00:00"` | `"2026-03-15T00:00:00"` (no fake Z — TZ-invariant, same as H-BRT)                                   | —                                                                   | PENDING | —          | —                                    |
 | 8-H-empty     |   H    |  any  | `""`                    | `""` (expected) — does useLegacy=true prevent Bug #6?                                               | —                                                                   | PENDING | —          | —                                    |
 | 8-V2          |  any   |  any  | any                     | raw value unchanged (`useUpdatedCalendarValueLogic=true`)                                           | —                                                                   | PENDING | —          | —                                    |

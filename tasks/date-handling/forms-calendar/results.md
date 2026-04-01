@@ -1604,3 +1604,5 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 **Key outcomes**: GDOC correct (real UTC in toISOString); Bug #5 re-confirmed via GFV comparison (fake Z vs real Z, 3h gap).
 
 - 2026-04-01 [TC-8B-D-BRT Run 1](runs/tc-8B-D-BRT-run-1.md) — BRT — PASS + FAIL-1 — Config D GDOC correct; GFV comparison re-confirms Bug #5 fake Z (3h discrepancy)
+- 2026-04-01 [TC-8-H-BRT Run 1](runs/tc-8-H-BRT-run-1.md) — BRT — PASS — Config H GFV returns raw unchanged; useLegacy=true bypasses Bug #5 fake-Z branch
+- 2026-04-01 [TC-3-G-BRT-BRT Run 1](runs/tc-3-G-BRT-BRT-run-1.md) — BRT — PASS — Config G legacy DateTime same-TZ reload; value survives intact, no shift

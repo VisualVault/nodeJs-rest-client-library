@@ -206,6 +206,23 @@ const TEST_DATA = [
         notes: 'Config A preset in IST. Bug #7 on init path: moment("2026-03-01").toDate() → IST midnight → Feb 28 UTC. Display correct (03/01/2026) but internal UTC date wrong. Save would store "2026-02-28".',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-A-IST.md',
     },
+    {
+        id: '3-G-BRT-BRT',
+        category: 3,
+        categoryName: 'Server Reload',
+        config: 'G',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'reload',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '03/15/2026 12:00 AM',
+        expectedRaw: '2026-03-15T00:00:00',
+        expectedApi: '2026-03-15T00:00:00',
+        savedRecord: 'cat3-G-BRT',
+        bugs: [],
+        notes: 'Legacy DateTime same-TZ reload (BRT→BRT). Value survives intact — parseDateString roundtrip stable when no Z to strip. GFV returns raw unchanged (useLegacy=true).',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-G-BRT-BRT.md',
+    },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 8 — GetFieldValue Return
     // Call GetFieldValue() on a field and verify the return value.
@@ -226,6 +243,22 @@ const TEST_DATA = [
         bugs: [],
         notes: 'Control test: empty Config A field returns "". Confirms Bug #6 is absent for enableTime=false. Bug #6 requires enableTime=true && ignoreTimezone=true (Config D).',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-A-empty.md',
+    },
+    {
+        id: '8-H-BRT',
+        category: 8,
+        categoryName: 'GetFieldValue Return',
+        config: 'H',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'getFieldValue',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '2026-03-15T00:00:00',
+        expectedRaw: '2026-03-15T00:00:00',
+        expectedApi: '2026-03-15T00:00:00',
+        bugs: [],
+        notes: 'Config H legacy control: useLegacy=true skips Bug #5 fake-Z branch. GFV returns raw value unchanged. Zero round-trip drift — contrasts Config D which drifts -3h/trip in BRT.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-H-BRT.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 8B — GetDateObjectFromCalendar Return

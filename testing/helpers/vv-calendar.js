@@ -60,6 +60,7 @@ async function detectPickerType(fieldContainer) {
  */
 async function selectDateViaPopup(page, fieldName, year, month, day) {
     const fieldContainer = page.locator(`[aria-label="${fieldName}"]`);
+    await fieldContainer.scrollIntoViewIfNeeded();
     await fieldContainer.waitFor({ state: 'visible', timeout: 10000 });
 
     const pickerType = await detectPickerType(fieldContainer);
@@ -253,18 +254,30 @@ async function selectDateInDateTimePicker(page, year, month, day) {
  */
 async function typeDateInField(page, fieldName, dateStr) {
     const fieldContainer = page.locator(`[aria-label="${fieldName}"]`);
-    const input = fieldContainer.locator('input').first();
-    await input.click();
+    await fieldContainer.scrollIntoViewIfNeeded();
+    // Legacy fields (useLegacy=true) render as a plain <input aria-label="DataFieldN"> inside div.d-picker.
+    // Non-legacy fields render inside a Kendo wrapper (<kendo-datepicker> or <kendo-datetimepicker>)
+    // with the aria-label on the wrapper and the input nested inside.
+    const tagName = await fieldContainer.evaluate((el) => el.tagName.toLowerCase());
+    const isLegacyInput = tagName === 'input';
+    const input = isLegacyInput ? fieldContainer : fieldContainer.locator('input').first();
 
-    // Split on segment separators and type each part individually.
-    // The spinbutton auto-advances to the next segment after each is filled.
-    const parts = dateStr.split(/[/ :]/);
-    for (const part of parts) {
-        await page.keyboard.type(part);
+    if (isLegacyInput) {
+        // Legacy fields (useLegacy=true) use a plain text <input> — no spinbutton segments.
+        // Clear and fill with the full date string, then Tab to trigger blur processing.
+        await input.fill(dateStr);
+        await page.keyboard.press('Tab');
+    } else {
+        // Kendo spinbutton fields: type each segment individually.
+        // The spinbutton auto-advances to the next segment after each is filled.
+        await input.click();
+        const parts = dateStr.split(/[/ :]/);
+        for (const part of parts) {
+            await page.keyboard.type(part);
+        }
+        // Tab out to trigger VV's value processing (save handler runs on blur).
+        await page.keyboard.press('Tab');
     }
-
-    // Tab out of the field to trigger VV's value processing (save handler runs on blur).
-    await page.keyboard.press('Tab');
 
     // Wait for the field's value to be processed by VV instead of using an arbitrary timeout.
     // VV processes the value on blur — poll until the raw value is set.
