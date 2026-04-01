@@ -31,7 +31,7 @@ For each file below, run `git log -1 --format='%ai %s' -- <path>` to get the las
 
 | Category     | Paths                                                                                   |
 | ------------ | --------------------------------------------------------------------------------------- |
-| Root docs    | `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `Puppeteer.md`, `Readme-microservices.md`     |
+| Root docs    | `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `Readme-microservices.md`                     |
 | Docs         | all `docs/**/*.md` files                                                                |
 | Task files   | `tasks/README.md`, `tasks/date-handling/CLAUDE.md`                                      |
 | Testing docs | `testing/README.md`, `testing/date-handling/README.md`, `testing/config/README.md`      |
@@ -41,7 +41,6 @@ For each file below, run `git log -1 --format='%ai %s' -- <path>` to get the las
 ### 1C. Flag stale items
 
 - **WARNING** if a documentation file (docs/, testing/ READMEs) is stale — it may be outdated
-- **WARNING** if `Puppeteer.md` exists and is stale — likely superseded by Playwright
 - **INFO** if a config or root file is stale — may be fine, just noting it
 
 ---
@@ -68,7 +67,7 @@ The expected root-level items are:
 
 **Directories**: `.claude/`, `.husky/`, `.playwright/`, `.playwright-cli/`, `docs/`, `lib/`, `node_modules/`, `playwright-report/`, `scripts/`, `tasks/`, `test-results/`, `testing/`
 
-**Files**: `_config.yml`, `.gitattributes`, `.gitignore`, `.npmignore`, `.prettierignore`, `.prettierrc`, `CHANGELOG.md`, `CLAUDE.md`, `eslint.config.js`, `package.json`, `package-lock.json`, `Puppeteer.md`, `README.md`, `Readme-microservices.md`
+**Files**: `_config.yml`, `.gitattributes`, `.gitignore`, `.npmignore`, `.prettierignore`, `.prettierrc`, `CHANGELOG.md`, `CLAUDE.md`, `eslint.config.js`, `package.json`, `package-lock.json`, `README.md`, `Readme-microservices.md`
 
 Run `ls -1A` at root and compare against these lists. Any unexpected items: **WARNING** with a note about what they might be. Ignore hidden system files (`.DS_Store`, `.env`).
 
@@ -76,8 +75,7 @@ Run `ls -1A` at root and compare against these lists. Any unexpected items: **WA
 
 Check these pairs for overlap:
 
-1. `Puppeteer.md` vs `docs/guides/playwright-testing.md` — is Puppeteer.md superseded by the Playwright guide?
-2. `tasks/date-handling/CLAUDE.md` vs root `CLAUDE.md` — is the task-level file redundant or contradictory?
+1. `tasks/date-handling/CLAUDE.md` vs root `CLAUDE.md` — is the task-level file redundant or contradictory?
 
 Read the first 30 lines of each file in the pair. If one appears to be a stale or outdated version of the other, flag as **INFO** with a recommendation.
 
