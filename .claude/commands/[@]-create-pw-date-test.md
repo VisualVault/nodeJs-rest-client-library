@@ -13,6 +13,16 @@ This command is **Layer 1** — it uses `playwright-cli` (interactive CLI) to ve
 | Auth state | `testing/config/auth-state.json`                     | `testing/config/auth-state-pw.json`                |
 | Outputs    | TC spec (.md) + run file + summary + test-data entry | testing/test-results/ + testing/playwright-report/ |
 
+### Output separation: manual vs automated
+
+This command produces **two independent artifact types**:
+
+1. **TC spec file** (`.md` in `test-cases/`) — a **manual testing procedure** written for a human tester using Chrome + DevTools console. **Must not mention Playwright, `playwright-cli`, `timezoneId`, or any automation tooling.** The tester follows P1–P6 preconditions, opens the form in Chrome, runs console commands, and visually inspects results. Browser = "Google Chrome, latest stable (V8 engine)".
+
+2. **test-data.js entry** + parameterized spec file (`cat-*.spec.js`) — the **automated Playwright regression test**. This is where Playwright config, `timezoneId`, browser engine matrix, and automation details belong. Run files (Phase 5A) document how the command _verified_ the values (Playwright CLI) and may reference Playwright tooling.
+
+The TC spec is the authoritative test procedure. The Playwright test is a regression harness derived from the same expected values. They share expected values but have completely different audiences and tooling references.
+
 See `testing/date-handling/README.md` and `docs/guides/playwright-testing.md` for full documentation.
 
 ## Usage
@@ -376,13 +386,14 @@ Table with these rows. All values come from Phase 2 observations, not assumption
 
 | Parameter               | Required Value                                                                                      |
 | ----------------------- | --------------------------------------------------------------------------------------------------- |
-| **Browser**             | `<browser engine>` — Chromium, Firefox, or WebKit (record actual engine used in Phase 2)            |
+| **Browser**             | Google Chrome, latest stable (V8 engine)                                                            |
 | **System Timezone**     | `<IANA name>` — UTC±X, `<short name>`. Note if DST is active.                                       |
 | **Platform**            | VisualVault FormViewer, Build `<number from top-right of form page>`                                |
 | **VV Code Path**        | V1 or V2 — `useUpdatedCalendarValueLogic = <value>` (verified at runtime via P5)                    |
 | **Target Field Config** | `enableTime=<>`, `ignoreTimezone=<>`, `useLegacy=<>`, `enableInitialValue=<>`                       |
 | **Scenario**            | `<date>`, `<TZ short>` midnight — `<local timestamp with explicit offset>` = `<UTC equivalent>` UTC |
-| **Test Method**         | Playwright CLI (`timezoneId: <IANA name>`)                                                          |
+
+> **No `Test Method` row.** TC specs are manual test procedures for Chrome + DevTools. Playwright is used internally by this command to verify values (Phase 2) but is not referenced in the generated TC spec.
 
 ---
 
@@ -425,18 +436,14 @@ Common mappings:
 - `Europe/London` → Windows: `"GMT Standard Time"`
 - `UTC` → Windows: `"UTC"`
 
-> **Automated alternative:** When running via `/@-create-pw-date-test`, Playwright's `timezoneId` context option handles timezone simulation at browser level. P1 and P2 are skipped — the timezone is set at browser launch via `--config=testing/config/tz-{tz}.json`.
-
 **P2 — Restart Chrome** after the timezone change.
 
-> **Automated alternative:** Not needed when using Playwright — timezone is set at context creation.
-
-**P3 — Verify browser timezone** (DevTools console or Playwright eval):
+**P3 — Verify browser timezone** (DevTools console):
 
 ```javascript
 new Date().toString();
 // PASS: output contains <expected GMT offset>
-// FAIL: any other offset — abort, re-check P1 and P2 (manual) or TZ config file (Playwright)
+// FAIL: any other offset — abort, re-check P1 and P2
 ```
 
 **P4 — Open the DateTest form template** (creates a fresh instance):
@@ -445,7 +452,7 @@ new Date().toString();
 <template URL from CLAUDE.md>
 ```
 
-**P5 — Verify code path** (DevTools console or Playwright eval, after form loads):
+**P5 — Verify code path** (DevTools console, after form loads):
 
 ```javascript
 VV.Form.calendarValueService.useUpdatedCalendarValueLogic;
@@ -453,7 +460,7 @@ VV.Form.calendarValueService.useUpdatedCalendarValueLogic;
 // ABORT: true  → V2 is active; verify this test applies to V2 before continuing
 ```
 
-**P6 — Locate the target field by configuration** (DevTools console or Playwright run-code):
+**P6 — Locate the target field by configuration** (DevTools console, after form loads):
 
 ```javascript
 Object.values(VV.Form.VV.FormPartition.fieldMaster)
@@ -713,7 +720,8 @@ This prevents orphan browser processes.
 
 - **No relative dates.** Every timestamp carries an explicit UTC offset.
 - **No field names in prose.** Fields are described by their config properties. Console snippets use `<FIELD_NAME>` as a placeholder resolved via P6.
-- **All four OS timezone variants** in P1, every time — even though Playwright handles TZ automatically, P1 documents the manual steps for reproducibility.
+- **All four OS timezone variants** in P1, every time — the TC spec is a manual procedure and must include OS-level timezone setup for all platforms.
+- **TC spec files must not reference Playwright.** No mentions of `playwright-cli`, `timezoneId`, `--config`, browser engine matrix, or automation tooling. The TC spec is written for a human tester using Chrome + DevTools console. Playwright details belong only in run files (Phase 5A) and `test-data.js` entries (Phase 3B).
 - **Expected result is always on the same row as the step that produces it.** Never in a separate section.
 - **Pass criteria are exact string matches** — binary, not approximate.
 - **Fail Conditions carry all risk reasoning** and live in their own `## Fail Conditions` section.
