@@ -106,6 +106,48 @@ npm run format:check      # Check formatting without writing
 - **Prettier** (`.prettierrc`) — single quotes, 4-space tabs, 120 print width
 - **Husky + lint-staged** — pre-commit hook runs ESLint fix + Prettier on staged files
 
+## Playwright Testing
+
+Browser automation for VV platform testing. Uses two complementary layers:
+
+1. **`/@-create-pw-date-test <id>`** — interactive command using `playwright-cli` to verify behavior live and generate artifacts (TC spec + run file + summary + `.spec.js`)
+2. **`npx playwright test`** — headless regression runner for generated `.spec.js` files
+
+Key advantage over Chrome MCP: Playwright's `timezoneId` context option simulates timezones without system TZ changes or Chrome restarts.
+
+```bash
+# Generate a test case (interactive — creates markdown + .spec.js)
+/@-create-pw-date-test 1-A-BRT
+
+# Run generated tests (headless regression)
+npm run test:pw              # All TZ projects (BRT, IST, UTC0)
+npm run test:pw:brt          # BRT tests only
+npm run test:pw:ist          # IST tests only
+npm run test:pw:headed       # Headed mode (visible browser)
+npm run test:pw:report       # Open HTML report
+```
+
+**Config** (in `.playwright/`):
+
+- `vv-config.json` — VV credentials (gitignored, create from `vv-config.example.json`)
+- `tz-*.json` — timezone overrides for `playwright-cli` sessions
+- `auth-state.json` / `auth-state-pw.json` — saved auth cookies (CLI / test runner, both gitignored)
+
+**Test infrastructure** (in `tests/date-handling/`):
+
+- `vv-config.js` — form URLs, field config map (Configs A-H)
+- `vv-helpers.js` — page helpers: form loading, field ops, calendar popup interaction
+- `global-setup.js` — auto-login before test runs
+- `tc-*.spec.js` — generated test files (one per TC + timezone)
+
+**Key implementation learnings:**
+
+- VV Angular SPA requires `networkidle` + `waitForFunction` for reliable form detection
+- Calendar toggle button uses `getByRole('button', { name: 'Toggle calendar' })` (aria-label, not visible text)
+- Scrollable calendar grid needs `tbody` header matching to select days in the correct month section
+
+Full documentation: [`tests/date-handling/README.md`](tests/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
+
 ## Active Tasks
 
 See `tasks/` folder. Each task gets its own subfolder with analysis, test results, and working notes.
