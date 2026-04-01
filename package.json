@@ -59,6 +59,12 @@
     },
     "scripts": {
         "test": "jest",
+        "test:pw": "npx playwright test",
+        "test:pw:brt": "npx playwright test --project=BRT",
+        "test:pw:ist": "npx playwright test --project=IST",
+        "test:pw:utc0": "npx playwright test --project=UTC0",
+        "test:pw:headed": "npx playwright test --headed",
+        "test:pw:report": "npx playwright show-report",
         "lint": "eslint lib/ scripts/",
         "lint:fix": "eslint --fix lib/ scripts/",
         "format": "prettier --write \"lib/**/*.js\" \"scripts/**/*.js\"",
@@ -105,6 +111,7 @@
     "homepage": "https://github.com/VisualVault/nodeJs-rest-client-library#readme",
     "devDependencies": {
         "@eslint/js": "^10.0.1",
+        "@playwright/test": "^1.59.0",
         "eslint": "^10.1.0",
         "eslint-config-prettier": "^10.1.8",
         "globals": "^17.4.0",

@@ -1,0 +1,8 @@
+{
+    "instance": "vvdemo",
+    "loginUrl": "https://vvdemo.visualvault.com",
+    "username": "your.email@company.com",
+    "password": "your-password-here",
+    "customerAlias": "YourCustomerAlias",
+    "databaseAlias": "Main"
+}

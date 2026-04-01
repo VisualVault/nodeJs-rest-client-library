@@ -159,3 +159,11 @@ node_modules/
 lib/VVRestApi/VVRestApiNodeJS/node_modules/
 lib/VVRestApi/VVRestApiNodeJS/files
 scripts/test-scripts
+
+# Playwright
+.playwright/auth-state*.json
+.playwright/vv-config.json
+.playwright/screenshots/
+.playwright-cli/
+test-results/
+playwright-report/
