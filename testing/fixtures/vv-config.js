@@ -122,6 +122,9 @@ const SAVED_RECORDS = {
     // Saved from IST on 2026-04-01, Config A + D set to 03/15/2026
     'DateTest-000084':
         '/FormViewer/app?DataID=28e371b7-e4e2-456a-94ab-95105ad97d0e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
+    // Saved from BRT on 2026-04-01, Config C (DataField6) set to 03/15/2026 12:00 AM
+    'DateTest-000106':
+        '/FormViewer/app?DataID=6d2f720d-8621-4a97-a751-90c4cc8588b6&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
 };
 
 module.exports = { vvConfig, AUTH_STATE_PATH, FORM_TEMPLATE_URL, FIELD_MAP, SAVED_RECORDS };

@@ -112,6 +112,24 @@ const TEST_DATA = [
         notes: 'Date-only save/reload in same TZ. Value survives round-trip through server. No shift in BRT.',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-A-BRT-BRT.md',
     },
+    {
+        id: '3-C-BRT-IST',
+        category: 3,
+        categoryName: 'Server Reload',
+        config: 'C',
+        tz: 'IST',
+        tzOffset: 'GMT+0530',
+        action: 'reload',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '03/15/2026 12:00 AM',
+        expectedRaw: '2026-03-15T00:00:00',
+        expectedApi: '2026-03-15T03:00:00.000Z',
+        savedRecord: 'DateTest-000106',
+        saveTz: 'BRT',
+        bugs: ['Bug #1', 'Bug #4'],
+        notes: 'Config C cross-TZ: BRT-saved DateTime reloaded in IST. Bug #1+#4 cause 8.5h GFV shift.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-C-BRT-IST.md',
+    },
 ];
 
 module.exports = { TEST_DATA };

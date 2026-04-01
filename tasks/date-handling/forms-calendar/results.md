@@ -1543,6 +1543,7 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-01 [TC-3-A-BRT-IST Run 1](runs/tc-3-A-BRT-IST-run-1.md) — IST — PASS — Config A cross-TZ reload: date-only "2026-03-15" survives IST reload; Bug #7 prediction disproved
 - 2026-04-01 [TC-3-A-BRT-IST Run 2](runs/tc-3-A-BRT-IST-run-2.md) — IST — PASS — Config A on fresh record (DateTest-000080); confirms Run 1
 - 2026-04-01 [TC-3-D-BRT-IST Run 3](runs/tc-3-D-BRT-IST-run-3.md) — IST — FAIL-3 — Config D on fresh record (DateTest-000080); Bug #5 confirmed; raw format changed to US on reload
+- 2026-04-01 [TC-3-C-BRT-IST Run 1](runs/tc-3-C-BRT-IST-run-1.md) — IST — FAIL-3,FAIL-4 — Config C cross-TZ: DateTime reinterpreted as IST local; GFV 8.5h shift (Bug #1+#4)
 
 ## Session 2026-04-01 (BRT — IST→BRT reload)
 
