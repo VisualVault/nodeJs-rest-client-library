@@ -126,12 +126,27 @@ async function captureFieldValues(page, fieldName) {
 /**
  * Call VV.Form.SetFieldValue() to programmatically set a field value.
  *
+ * VV processes SetFieldValue asynchronously via component messages. By default,
+ * this helper waits for the raw stored value to be populated before returning.
+ *
  * @param {import('@playwright/test').Page} page
  * @param {string} fieldName
  * @param {string} value - date string in the format VV expects (varies by config)
+ * @param {Object} [options]
+ * @param {boolean} [options.waitForValue=true] - wait for getValueObjectValue to be non-empty
  */
-async function setFieldValue(page, fieldName, value) {
+async function setFieldValue(page, fieldName, value, { waitForValue = true } = {}) {
     await page.evaluate(({ name, val }) => VV.Form.SetFieldValue(name, val), { name: fieldName, val: value });
+    if (waitForValue) {
+        await page.waitForFunction(
+            (name) => {
+                const val = VV.Form.VV.FormPartition.getValueObjectValue(name);
+                return val !== null && val !== undefined && val !== '';
+            },
+            fieldName,
+            { timeout: 5000 }
+        );
+    }
 }
 
 /**

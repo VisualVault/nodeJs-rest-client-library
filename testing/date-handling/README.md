@@ -60,14 +60,16 @@ Shared config:
 
 ## File Reference
 
-| File                        | Purpose                                                                               |
-| --------------------------- | ------------------------------------------------------------------------------------- |
-| `../fixtures/vv-config.js`  | Shared constants: form template URL, field configuration map (A-H), saved record URLs |
-| `../fixtures/test-data.js`  | All test case definitions as structured data (data-driven parameterization)           |
-| `../helpers/vv-form.js`     | Generic VV form helpers: navigation, field verification, value capture                |
-| `../helpers/vv-calendar.js` | Calendar-specific helpers: popup date selection, typed input                          |
-| `../global-setup.js`        | Runs once before all tests: logs into VV, saves auth cookies                          |
-| `cat-*.spec.js`             | Parameterized test files (one per category, loops over test-data entries)             |
+| File                           | Purpose                                                                               |
+| ------------------------------ | ------------------------------------------------------------------------------------- |
+| `../fixtures/vv-config.js`     | Shared constants: form template URL, field configuration map (A-H), saved record URLs |
+| `../fixtures/test-data.js`     | All test case definitions as structured data (data-driven parameterization)           |
+| `../helpers/vv-form.js`        | Generic VV form helpers: navigation, field verification, value capture                |
+| `../helpers/vv-calendar.js`    | Calendar-specific helpers: popup date selection, typed input                          |
+| `../global-setup.js`           | Runs once before all tests: logs into VV, saves auth cookies                          |
+| `cat-1-calendar-popup.spec.js` | Category 1 — calendar popup date selection tests                                      |
+| `cat-2-typed-input.spec.js`    | Category 2 — keyboard segment-by-segment date entry tests                             |
+| `cat-3-server-reload.spec.js`  | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                 |
 
 ### External Config
 

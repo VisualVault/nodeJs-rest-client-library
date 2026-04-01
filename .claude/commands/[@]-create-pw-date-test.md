@@ -43,13 +43,17 @@ Extract the TZ column from the category ID (the last segment: `BRT`, `IST`, or `
 | IST      | Asia/Calcutta     | `testing/config/tz-ist.json`  |
 | UTC      | Etc/GMT           | `testing/config/tz-utc0.json` |
 
+> **Cross-TZ IDs (Category 3):** IDs with pattern `{cat}-{config}-{saveTZ}-{loadTZ}` (e.g., `3-A-BRT-IST`) have two TZ segments — save TZ and load TZ. Use the **load TZ** (last segment) for Phase 0.3 browser launch. For the save step, use a pre-saved record from `SAVED_RECORDS` in `testing/fixtures/vv-config.js` instead of saving a fresh form — this avoids needing two browser launches. If no matching saved record exists, save one manually first and add its DataID URL to `SAVED_RECORDS`.
+
 ### 0.3 — Open browser with timezone
 
 ```bash
-playwright-cli open --browser=chrome --config=testing/config/tz-{tz}.json
+playwright-cli open --config=testing/config/tz-{tz}.json
 ```
 
-This sets `timezoneId` at the browser context level. All `Date` APIs inside the page will reflect the target timezone.
+This sets `timezoneId` at the browser context level. All `Date` APIs inside the page will reflect the target timezone. Defaults to Chromium (Playwright's default engine).
+
+> The browser used for initial verification (Layer 1) does not constrain future runs. Layer 2 re-runs execute across all configured browsers (Chromium, Firefox, WebKit) via `npx playwright test --project=...`.
 
 ### 0.4 — Authenticate
 
@@ -291,6 +295,8 @@ playwright-cli run-code "async page => {
 
 **Form load / server reload scenario (Cat 3, 5, 6):**
 
+> **Preferred approach for Cat 3:** Use pre-saved records from `SAVED_RECORDS` in `testing/fixtures/vv-config.js` rather than saving a fresh form during the command. Fresh saves via Playwright CLI are unreliable — the VV redirect behavior varies and may not add a DataID to the URL. If a matching saved record doesn't exist, save one manually in the browser first and add its DataID URL to `SAVED_RECORDS`.
+
 Navigate to the saved record URL if applicable, or observe the field's initial state on the template form:
 
 ```bash
@@ -332,6 +338,8 @@ Compare captured values against the Expected column from Phase 1. Note any discr
 
 ## Phase 3 — Generate the test case file
 
+**Before generating:** Check if `test-cases/tc-{id}.md` already exists. If it does, **skip Phase 3 entirely** — TC specs are immutable (see Constraints). Proceed directly to Phase 3B (test-data.js entry). Phase 5A (run file) and 5B (summary update) still run normally for the new execution.
+
 **Determine filename:**
 `tc-{category-id}.md`
 
@@ -368,7 +376,7 @@ Table with these rows. All values come from Phase 2 observations, not assumption
 
 | Parameter               | Required Value                                                                                      |
 | ----------------------- | --------------------------------------------------------------------------------------------------- |
-| **Browser**             | Google Chrome, latest stable (V8 engine)                                                            |
+| **Browser**             | `<browser engine>` — Chromium, Firefox, or WebKit (record actual engine used in Phase 2)            |
 | **System Timezone**     | `<IANA name>` — UTC±X, `<short name>`. Note if DST is active.                                       |
 | **Platform**            | VisualVault FormViewer, Build `<number from top-right of form page>`                                |
 | **VV Code Path**        | V1 or V2 — `useUpdatedCalendarValueLogic = <value>` (verified at runtime via P5)                    |
@@ -552,6 +560,8 @@ Read the file first, then append a new entry to the `TEST_DATA` array (before th
     bugs: [{bug refs}],            // e.g., ['Bug #5', 'Bug #7'] or []
     notes: '{why this test exists and what it proves}',
     tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-{id}.md',
+    savedRecord: '{record key}',   // (Cat 3 only) Key into SAVED_RECORDS in vv-config.js
+    saveTz: '{TZ}',                // (Cat 3 cross-TZ only) TZ the record was saved in
 },
 ```
 
