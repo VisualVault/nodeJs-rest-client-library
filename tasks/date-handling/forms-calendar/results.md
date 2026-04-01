@@ -1543,3 +1543,17 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-01 [TC-3-A-BRT-IST Run 1](runs/tc-3-A-BRT-IST-run-1.md) — IST — PASS — Config A cross-TZ reload: date-only "2026-03-15" survives IST reload; Bug #7 prediction disproved
 - 2026-04-01 [TC-3-A-BRT-IST Run 2](runs/tc-3-A-BRT-IST-run-2.md) — IST — PASS — Config A on fresh record (DateTest-000080); confirms Run 1
 - 2026-04-01 [TC-3-D-BRT-IST Run 3](runs/tc-3-D-BRT-IST-run-3.md) — IST — FAIL-3 — Config D on fresh record (DateTest-000080); Bug #5 confirmed; raw format changed to US on reload
+
+## Session 2026-04-01 (BRT — IST→BRT reload)
+
+**Purpose**: Reverse cross-TZ reload — IST-saved record (DateTest-000084) opened in BRT.
+**Key outcomes**: Config D raw TZ-invariant (Bug #5 on GFV); bidirectional cross-TZ verification complete.
+
+- 2026-04-01 [TC-3-D-IST-BRT Run 1](runs/tc-3-D-IST-BRT-run-1.md) — BRT — PASS (FAIL-3) — Config D IST→BRT reload: raw value unchanged, display correct; Bug #5 fake Z on GFV; confirms bidirectional TZ-invariance
+
+## Session 2026-04-01 (BRT — Playwright CLI)
+
+**Purpose**: First Playwright CLI test run — validate TZ simulation equivalence with system TZ change.
+**Key outcomes**: Playwright `timezoneId: America/Sao_Paulo` produces identical results to system BRT for 1-A-BRT.
+
+- 2026-04-01 [TC-1-A-BRT Run 3](runs/tc-1-A-BRT-run-3.md) — BRT — PASS — Config A calendar popup via Playwright CLI; confirms TZ simulation equivalence

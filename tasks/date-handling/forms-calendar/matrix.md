@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the forms calendar date-handling investigation.
 Full test evidence → `results.md` | Bug analysis → `analysis.md`
 
-Last updated: 2026-03-31 | Total slots: ~242 | Done: ~81 | Blocked: 0
+Last updated: 2026-04-01 | Total slots: ~242 | Done: ~82 | Blocked: 0
 
 ---
 
@@ -43,7 +43,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | ------------------------- | :-----: | :----: | :----: | :-----: | :-----: | :-----: | :---: |
 | 1. Calendar Popup         |   20    |   8    |   12   |    0    |    0    |    0    |   0   |
 | 2. Typed Input            |   16    |   11   |   5    |    0    |    0    |    0    |   0   |
-| 3. Server Reload          |   18    |   5    |   0    |   13    |    0    |    0    |   0   |
+| 3. Server Reload          |   18    |   6    |   0    |   12    |    0    |    0    |   0   |
 | 4. URL Parameters         |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
 | 5. Preset Date            |   18    |   1    |   0    |   17    |    0    |    0    |   0   |
 | 6. Current Date           |   15    |   1    |   0    |   14    |    0    |    0    |   0   |
@@ -56,7 +56,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 11. Cross-Timezone        |   14    |   0    |   0    |   13    |    0    |    1    |   0   |
 | 12. Edge Cases            |   20    |   4    |   5    |   10    |    0    |    0    |   1   |
 | 13. Database              |   10    |   2    |   0    |    8    |    0    |    0    |   0   |
-| **TOTAL**                 | **242** | **47** | **34** | **159** |  **0**  |  **1**  | **1** |
+| **TOTAL**                 | **242** | **48** | **34** | **158** |  **0**  |  **1**  | **1** |
 
 ---
 
@@ -142,7 +142,7 @@ Save form, open saved record in a new tab. Compare displayed dates and GFV retur
 | 3-D-BRT-IST |   D    |   BRT   |   IST   | Display OK; raw TZ-invariant; GFV returns raw without fake Z                                       | Display OK; raw TZ-invariant; GFV appends fake Z (Bug #5) | PASS    | 2026-04-01 | [summary](summaries/tc-3-D-BRT-IST.md) |
 | 3-A-BRT-IST |   A    |   BRT   |   IST   | No shift; date-only string survives cross-TZ reload (prediction corrected 2026-04-01)              | No shift; display/GFV identical on reload                 | PASS    | 2026-04-01 | [summary](summaries/tc-3-A-BRT-IST.md) |
 | 3-C-BRT-IST |   C    |   BRT   |   IST   | Config C stores real UTC; IST reload shows correct local time (control)                            | —                                                         | PENDING | —          | —                                      |
-| 3-D-IST-BRT |   D    |   IST   |   BRT   | Display OK; GFV same fake Z (TZ-invariant)                                                         | —                                                         | PENDING | —          | —                                      |
+| 3-D-IST-BRT |   D    |   IST   |   BRT   | Display OK; GFV same fake Z (TZ-invariant)                                                         | Display OK; raw TZ-invariant; GFV appends fake Z (Bug #5) | PASS    | 2026-04-01 | [summary](summaries/tc-3-D-IST-BRT.md) |
 | 3-B-BRT-BRT |   B    |   BRT   |   BRT   | No shift — same as A-BRT-BRT (ignoreTZ no effect on date-only)                                     | —                                                         | PENDING | —          | —                                      |
 | 3-B-BRT-IST |   B    |   BRT   |   IST   | No shift — same as A-BRT-IST (prediction corrected 2026-04-01)                                     | —                                                         | PENDING | —          | —                                      |
 | 3-A-IST-BRT |   A    |   IST   |   BRT   | Wrong day permanently stored (Bug #7 baked in during IST save)                                     | —                                                         | PENDING | —          | —                                      |

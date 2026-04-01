@@ -47,7 +47,7 @@ tasks/date-handling/
 
 ### Progress
 
-**~81 of ~242 test cases completed** (47 PASS, 34 FAIL). 7 bugs confirmed (5 from original analysis + 2 new). Testing done across three timezones: BRT (UTC-3), IST (UTC+5:30), and UTC+0 (GMT). **Category 1 (Calendar Popup) is 100% complete** (20/20: 8 PASS, 12 FAIL). **Category 2 (Typed Input) is 100% complete** (16/16: 11 PASS, 5 FAIL). Category 3 (Server Reload) has 4 PASS with formal TC specs. Categories 8B (GetDateObjectFromCalendar) and 9-GDOC (GDOC round-trip) added — 17 new slots.
+**~82 of ~242 test cases completed** (48 PASS, 34 FAIL). 7 bugs confirmed (5 from original analysis + 2 new). Testing done across three timezones: BRT (UTC-3), IST (UTC+5:30), and UTC+0 (GMT). **Category 1 (Calendar Popup) is 100% complete** (20/20: 8 PASS, 12 FAIL). **Category 2 (Typed Input) is 100% complete** (16/16: 11 PASS, 5 FAIL). Category 3 (Server Reload) has 6 PASS with formal TC specs; Config D bidirectional cross-TZ (BRT↔IST) fully verified. Categories 8B (GetDateObjectFromCalendar) and 9-GDOC (GDOC round-trip) added — 17 new slots.
 
 ### Files
 
@@ -211,6 +211,12 @@ https://vvdemo.visualvault.com/FormViewer/app?hidemenu=true&formid=6be0265c-152a
 https://vvdemo.visualvault.com/FormViewer/app?DataID=901ce05d-b2f7-42e9-8569-7f9d4caf258d&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939
 ```
 
+**Saved record — DateTest-000084 Rev 1** (saved from IST 2026-04-01, Config A + D set to 03/15/2026):
+
+```
+https://vvdemo.visualvault.com/FormViewer/app?DataID=28e371b7-e4e2-456a-94ab-95105ad97d0e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939
+```
+
 **Old saved record — DateTest-000004 Rev 1** (saved from BRT, used in early tests — prefer DateTest-000080):
 
 ```
@@ -299,7 +305,7 @@ Tests run via **Claude-in-Chrome MCP extension**. The extension tab must be crea
 - URL parameter input — needs `enableQListener=true` fields
 - Web service / scheduled script input — needs server-side execution (Category 10)
 - Preset/Current Date with `enableTime=true` fields — needs new test form fields
-- Save from IST timezone, reload from BRT (Category 3-D-IST-BRT) — IST record not saved
+- Save from IST timezone, reload from BRT (Category 3-D-IST-BRT) — **DONE** (DateTest-000084, saved 2026-04-01 from IST)
 - Category 2 legacy typed input (E–H) across all TZs — popup is complete, typed input pending
 
 ### Next Steps (Forms)
