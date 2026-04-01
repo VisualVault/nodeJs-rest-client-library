@@ -6,14 +6,14 @@ Generates a verified, deterministic test case file for a VisualVault Forms calen
 
 This command is **Layer 1** — it uses `playwright-cli` (interactive CLI) to verify behavior live and generate artifacts. The generated `.spec.js` files are **Layer 2** — reusable Playwright tests runnable via `npx playwright test` for regression.
 
-|            | Layer 1 (this command)                        | Layer 2 (test runner)                        |
-| ---------- | --------------------------------------------- | -------------------------------------------- |
-| Tool       | `playwright-cli`                              | `@playwright/test` via `npx playwright test` |
-| Purpose    | Exploratory testing + artifact generation     | Headless regression testing                  |
-| Auth state | `.playwright/auth-state.json`                 | `.playwright/auth-state-pw.json`             |
-| Outputs    | TC spec (.md) + run file + summary + .spec.js | test-results/ + playwright-report/           |
+|            | Layer 1 (this command)                               | Layer 2 (test runner)                              |
+| ---------- | ---------------------------------------------------- | -------------------------------------------------- |
+| Tool       | `playwright-cli`                                     | `@playwright/test` via `npx playwright test`       |
+| Purpose    | Exploratory testing + artifact generation            | Headless regression testing                        |
+| Auth state | `testing/config/auth-state.json`                     | `testing/config/auth-state-pw.json`                |
+| Outputs    | TC spec (.md) + run file + summary + test-data entry | testing/test-results/ + testing/playwright-report/ |
 
-See `tests/date-handling/README.md` and `docs/guides/playwright-testing.md` for full documentation.
+See `testing/date-handling/README.md` and `docs/guides/playwright-testing.md` for full documentation.
 
 ## Usage
 
@@ -31,34 +31,34 @@ The category ID identifies a row in `tasks/date-handling/forms-calendar/matrix.m
 
 ### 0.1 — Read credentials
 
-Read `.playwright/vv-config.json` to get VV instance URL, username, password, customerAlias, and databaseAlias. If the file does not exist, stop and instruct the user to create it from `.playwright/vv-config.example.json`.
+Read `testing/config/vv-config.json` to get VV instance URL, username, password, customerAlias, and databaseAlias. If the file does not exist, stop and instruct the user to create it from `testing/config/vv-config.example.json`.
 
 ### 0.2 — Determine timezone
 
 Extract the TZ column from the category ID (the last segment: `BRT`, `IST`, or `UTC`). Map to IANA name:
 
-| TZ short | IANA name         | Config file                |
-| -------- | ----------------- | -------------------------- |
-| BRT      | America/Sao_Paulo | `.playwright/tz-brt.json`  |
-| IST      | Asia/Calcutta     | `.playwright/tz-ist.json`  |
-| UTC      | Etc/GMT           | `.playwright/tz-utc0.json` |
+| TZ short | IANA name         | Config file                   |
+| -------- | ----------------- | ----------------------------- |
+| BRT      | America/Sao_Paulo | `testing/config/tz-brt.json`  |
+| IST      | Asia/Calcutta     | `testing/config/tz-ist.json`  |
+| UTC      | Etc/GMT           | `testing/config/tz-utc0.json` |
 
 ### 0.3 — Open browser with timezone
 
 ```bash
-playwright-cli open --browser=chrome --config=.playwright/tz-{tz}.json
+playwright-cli open --browser=chrome --config=testing/config/tz-{tz}.json
 ```
 
 This sets `timezoneId` at the browser context level. All `Date` APIs inside the page will reflect the target timezone.
 
 ### 0.4 — Authenticate
 
-Check if `.playwright/auth-state.json` exists:
+Check if `testing/config/auth-state.json` exists:
 
 **If auth state exists:**
 
 ```bash
-playwright-cli state-load .playwright/auth-state.json
+playwright-cli state-load testing/config/auth-state.json
 ```
 
 Then navigate to the DateTest form template URL (from Phase 1 step 4). After navigation, check if the page URL contains `/VVLogin` — if so, the saved state is expired and you must re-authenticate (see below).
@@ -94,7 +94,7 @@ playwright-cli run-code "async page => {
 Save authenticated state:
 
 ```bash
-playwright-cli state-save .playwright/auth-state.json
+playwright-cli state-save testing/config/auth-state.json
 ```
 
 ### 0.5 — Navigate to DateTest form template
@@ -188,7 +188,7 @@ Do not proceed to Phase 2 until all required files are read.
 
 - **Wait for async operations**: use `run-code` with `page.waitForFunction()` or `page.waitForSelector()`
 
-- **Screenshots**: use `playwright-cli screenshot --filename=.playwright/screenshots/tc-{id}-step-{n}.png`
+- **Screenshots**: use `playwright-cli screenshot --filename=testing/config/screenshots/tc-{id}-step-{n}.png`
 
 ### 2.1 — Precondition checks
 
@@ -321,7 +321,7 @@ playwright-cli run-code "async page => {
 Take a screenshot to capture the display value:
 
 ```bash
-playwright-cli screenshot --filename=.playwright/screenshots/tc-{category-id}.png
+playwright-cli screenshot --filename=testing/config/screenshots/tc-{category-id}.png
 ```
 
 ### 2.4 — Compare and record
@@ -417,7 +417,7 @@ Common mappings:
 - `Europe/London` → Windows: `"GMT Standard Time"`
 - `UTC` → Windows: `"UTC"`
 
-> **Automated alternative:** When running via `/@-create-pw-date-test`, Playwright's `timezoneId` context option handles timezone simulation at browser level. P1 and P2 are skipped — the timezone is set at browser launch via `--config=.playwright/tz-{tz}.json`.
+> **Automated alternative:** When running via `/@-create-pw-date-test`, Playwright's `timezoneId` context option handles timezone simulation at browser level. P1 and P2 are skipped — the timezone is set at browser launch via `--config=testing/config/tz-{tz}.json`.
 
 **P2 — Restart Chrome** after the timezone change.
 
@@ -526,86 +526,42 @@ Always include:
 
 ---
 
-## Phase 3B — Generate Playwright spec file
+## Phase 3B — Append test case to test-data.js
 
-Generate a reusable Playwright test file that can re-run this test case automatically via `npx playwright test`.
+Instead of generating individual spec files, append a test case entry to `testing/fixtures/test-data.js`. The parameterized category spec files (`testing/date-handling/cat-*.spec.js`) automatically pick up new entries.
 
-**Determine filename:** `tc-{category-id}.spec.js`
-**Output path:** `tests/date-handling/`
+**Output file:** `testing/fixtures/test-data.js`
 
-The generated file must:
+Read the file first, then append a new entry to the `TEST_DATA` array (before the closing `];`).
 
-1. Import from `./vv-config` and `./vv-helpers` (shared infrastructure)
-2. Set constants at the top: `CONFIG`, `FIELD_NAME`, `EXPECTED_RAW`, `EXPECTED_API`, `EXPECTED_TZ_OFFSET`
-3. Use `gotoAndWaitForVVForm(page, FORM_TEMPLATE_URL)` to navigate and wait
-4. Verify preconditions: TZ (P3), code path (P5), field existence (P6)
-5. Execute the scenario using the appropriate helper:
-    - **Cat 1 (Calendar Popup):** `selectDateViaPopup(page, FIELD_NAME, year, month, day)`
-    - **Cat 2 (Typed Input):** `typeDateInField(page, FIELD_NAME, 'MM/dd/yyyy')`
-    - **Cat 7/9/10 (SetFieldValue/Round-trip):** `setFieldValue(page, FIELD_NAME, value)` then `captureFieldValues()`
-    - **Cat 8 (GetFieldValue):** `setFieldValue()` then `getFieldValue()`
-    - **Cat 3/5/6 (Form Load/Reload):** navigate to saved record URL, then `captureFieldValues()`
-6. Assert expected values with `expect(values.raw).toBe(EXPECTED_RAW)` and `expect(values.api).toBe(EXPECTED_API)`
-7. Verify TZ active via `isoRef` assertion as the last check
-
-**Template structure:**
+**Entry template:**
 
 ```javascript
-// Generated by @-create-pw-date-test on {date}
-//
-// TC-{ID} — Config {X}, {Scenario}, {TZ}
-// Config: enableTime={}, ignoreTimezone={}, useLegacy={} ({field})
-// Timezone: {IANA} ({offset})
-// Expected: raw="{}", api="{}"
-// Bugs: {applicable bugs or "None in {TZ}"}
-
-const { test, expect } = require('@playwright/test');
-const { FORM_TEMPLATE_URL, FIELD_MAP } = require('./vv-config');
-const { gotoAndWaitForVVForm, getCodePath, verifyField, captureFieldValues, getBrowserTimezone, /* scenario helper */ } = require('./vv-helpers');
-
-const CONFIG = '{X}';
-const FIELD_NAME = FIELD_MAP[CONFIG].field;
-const EXPECTED_RAW = '{expected raw}';
-const EXPECTED_API = '{expected api}';
-const EXPECTED_TZ_OFFSET = '{GMT±HHMM}';
-
-test.describe('TC-{ID}: {Scenario}, Config {X}, {TZ}', () => {
-    test('{scenario description}', async ({ page }) => {
-        await gotoAndWaitForVVForm(page, FORM_TEMPLATE_URL);
-
-        // P3, P5, P6 precondition checks
-        const dateStr = await getBrowserTimezone(page);
-        expect(dateStr).toContain(EXPECTED_TZ_OFFSET);
-        const isV2 = await getCodePath(page);
-        expect(isV2).toBe(false);
-        const fieldName = await verifyField(page, {
-            enableTime: {}, ignoreTimezone: {}, useLegacy: {}, enableInitialValue: false,
-        });
-        expect(fieldName).toBe(FIELD_NAME);
-
-        // Execute scenario
-        {scenario-specific code}
-
-        // Verify
-        const values = await captureFieldValues(page, FIELD_NAME);
-        expect(values.raw).toBe(EXPECTED_RAW);
-        expect(values.api).toBe(EXPECTED_API);
-
-        // Confirm TZ active
-        const isoRef = await page.evaluate(() => new Date({year}, {month0}, {day}, 0, 0, 0).toISOString());
-        expect(isoRef).toBe('{expected isoRef}');
-    });
-});
+{
+    id: '{category-id}',           // e.g., '1-A-IST'
+    category: {N},                 // Category number (1-13)
+    categoryName: '{name}',        // e.g., 'Calendar Popup', 'Typed Input'
+    config: '{X}',                 // Config letter (A-H)
+    tz: '{TZ}',                    // Playwright project name: 'BRT', 'IST', or 'UTC0'
+    tzOffset: '{GMT±HHMM}',        // e.g., 'GMT-0300', 'GMT+0530'
+    action: '{action}',            // 'popup', 'typed', 'setFieldValue', 'getFieldValue', 'reload'
+    inputDate: { year: {Y}, month: {M}, day: {D} },  // 1-indexed month
+    inputDateStr: '{MM/dd/yyyy}',  // For typed input tests
+    expectedRaw: '{raw value}',    // Expected getValueObjectValue() return
+    expectedApi: '{api value}',    // Expected GetFieldValue() return
+    bugs: [{bug refs}],            // e.g., ['Bug #5', 'Bug #7'] or []
+    notes: '{why this test exists and what it proves}',
+    tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-{id}.md',
+},
 ```
 
 **Rules:**
 
-- Add a `// Generated by @-create-pw-date-test on {date}` header comment
-- Include metadata comments (config, TZ, expected values, bugs) for readability
-- Use `FIELD_MAP[CONFIG].field` not hardcoded field names
 - Expected values come from Phase 1 (correct/intended behavior), same as the TC markdown spec
-- If the test file already exists, do NOT overwrite — report that it exists and skip this phase
-- Check that `tests/date-handling/vv-config.js` and `vv-helpers.js` exist; if not, stop and instruct the user to run the Playwright setup first
+- If an entry with the same `id` already exists, do NOT duplicate — report that it exists and skip
+- If the category spec file doesn't exist yet (e.g., `cat-2-typed-input.spec.js`), create it following the pattern in `testing/date-handling/cat-1-calendar-popup.spec.js`
+- Add a category section comment (with `// ═══...`) if this is the first entry for a new category
+- Check that `testing/fixtures/test-data.js` exists; if not, stop and report
 
 ---
 
@@ -759,5 +715,5 @@ This prevents orphan browser processes.
 - **Matrix Evidence column links to the summary file**, not the TC spec. Format: `[summary](summaries/tc-{id}.md)`. For PENDING slots with no summary yet, link to the spec: `[spec](tc-{id}.md)`.
 - **results.md is a frozen archive** for sessions before 2026-04-01. New runs append only a one-line index entry (Phase 5C). Do not add narrative blocks to results.md for new tests.
 - **No Findings or Key Finding section in TC files.** TC files are test procedures, not analytical records. Observations about whether the matrix prediction was right or wrong, which bugs were confirmed, and what sibling rows imply belong exclusively in run files (Phase 5A). The title encodes the behavioral finding; Fail Conditions encode the risk reasoning. Do not add any other analytical sections to TC files.
-- **Screenshots go to `.playwright/screenshots/`** — never committed to git.
+- **Screenshots go to `testing/config/screenshots/`** — never committed to git.
 - **Auth state files (`.playwright/auth-state*.json`) are never committed** — they contain session cookies.

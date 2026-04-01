@@ -28,6 +28,17 @@ nodeV2/
     form-scripts/                    # Form button event scripts
     server-scripts/                  # Scheduled/server-side scripts
     test-scripts/                    # Local test scripts
+  testing/                           # Playwright testing infrastructure
+    playwright.config.js             # 3-project config (BRT, IST, UTC0)
+    global-setup.js                  # Auto-login before test runs
+    config/                          # Credentials, TZ configs, auth state
+    helpers/                         # Reusable page helpers
+      vv-form.js                     # Generic VV form automation (8 functions)
+      vv-calendar.js                 # Calendar popup + typed input helpers
+    fixtures/                        # Shared test data and config
+      vv-config.js                   # FIELD_MAP, form URLs, saved records
+      test-data.js                   # All test case definitions (data-driven)
+    date-handling/                   # Date-handling test specs (1 per category)
   docs/                              # Shared documentation
     architecture/                    # Platform architecture, component diagrams, data flow
     standards/                       # Coding standards, patterns, conventions
@@ -108,15 +119,15 @@ npm run format:check      # Check formatting without writing
 
 ## Playwright Testing
 
-Browser automation for VV platform testing. Uses two complementary layers:
+Browser automation for VV platform testing. All Playwright infrastructure lives under `testing/` to keep the root clean for upstream sync. Uses two complementary layers:
 
-1. **`/@-create-pw-date-test <id>`** — interactive command using `playwright-cli` to verify behavior live and generate artifacts (TC spec + run file + summary + `.spec.js`)
-2. **`npx playwright test`** — headless regression runner for generated `.spec.js` files
+1. **`/@-create-pw-date-test <id>`** — interactive command using `playwright-cli` to verify behavior live and generate artifacts (TC spec + run file + summary + test-data entry)
+2. **`npx playwright test`** — headless regression runner for parameterized spec files
 
 Key advantage over Chrome MCP: Playwright's `timezoneId` context option simulates timezones without system TZ changes or Chrome restarts.
 
 ```bash
-# Generate a test case (interactive — creates markdown + .spec.js)
+# Generate a test case (interactive — creates markdown + appends to test-data.js)
 /@-create-pw-date-test 1-A-BRT
 
 # Run generated tests (headless regression)
@@ -127,26 +138,29 @@ npm run test:pw:headed       # Headed mode (visible browser)
 npm run test:pw:report       # Open HTML report
 ```
 
-**Config** (in `.playwright/`):
+**Config** (in `testing/config/`):
 
 - `vv-config.json` — VV credentials (gitignored, create from `vv-config.example.json`)
 - `tz-*.json` — timezone overrides for `playwright-cli` sessions
 - `auth-state.json` / `auth-state-pw.json` — saved auth cookies (CLI / test runner, both gitignored)
 
-**Test infrastructure** (in `tests/date-handling/`):
+**Test infrastructure** (in `testing/`):
 
-- `vv-config.js` — form URLs, field config map (Configs A-H)
-- `vv-helpers.js` — page helpers: form loading, field ops, calendar popup interaction
+- `fixtures/vv-config.js` — form URLs, field config map (Configs A-H), saved records
+- `fixtures/test-data.js` — all test case definitions as structured data (data-driven)
+- `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture
+- `helpers/vv-calendar.js` — calendar-specific: popup selection, typed input
 - `global-setup.js` — auto-login before test runs
-- `tc-*.spec.js` — generated test files (one per TC + timezone)
+- `date-handling/cat-*.spec.js` — parameterized test files (one per category, loops over test-data)
 
 **Key implementation learnings:**
 
 - VV Angular SPA requires `networkidle` + `waitForFunction` for reliable form detection
 - Calendar toggle button uses `getByRole('button', { name: 'Toggle calendar' })` (aria-label, not visible text)
 - Scrollable calendar grid needs `tbody` header matching to select days in the correct month section
+- Tests use `test.skip()` inside test body for TZ filtering — all specs run in all projects, each test self-filters
 
-Full documentation: [`tests/date-handling/README.md`](tests/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
+Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
 
 ## Active Tasks
 
