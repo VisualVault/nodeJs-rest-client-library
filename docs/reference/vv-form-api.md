@@ -497,15 +497,14 @@ VV.Form.UnsavedChanges; // 0 = no pending changes
 ### Get the DataID for constructing reload URLs
 
 ```javascript
-VV.Form.DataID; // GUID — but see caveat below
+VV.Form.DataID; // GUID of the current form record
 ```
 
-**Caveat:** When a form is opened from a template URL (`?formid=`), `VV.Form.DataID` retains the **template form ID** even after save — it does NOT update to the saved record's DataID. To get the actual DataID after saving from a template, intercept the save response from `POST preformsapi.visualvault.com/api/v1/FormInstance`, which returns `{data: {formId: "<DataID>", revision: N}}`. When opened via `?DataID=` URL, `VV.Form.DataID` correctly reflects the record's DataID.
+After saving from a template URL (`?formid=`), `VV.Form.DataID` updates to the saved record's DataID. Confirmed on Build 20260304.1 — template formid `6be0265c-...` → after save, DataID `c63dea33-...` (DateTest-000107). Note: the page URL does NOT update with the new DataID (known VV behavior), but the JS property is reliable.
 
 ### Construct a saved record URL
 
 ```javascript
-// Only reliable when form was opened via ?DataID= URL, not from template
 `${VV.BaseAppUrl}FormViewer/app?DataID=${VV.Form.DataID}&hidemenu=true&rOpener=1&xcid=${VV.Form.VV.currentUser.Xcid}&xcdid=${VV.Form.VV.currentUser.Xcdid}`;
 ```
 
