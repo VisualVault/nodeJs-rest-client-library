@@ -89,10 +89,17 @@ This file is gitignored. Never commit credentials.
 
 ### 4.4 Authentication
 
-`testing/global-setup.js` runs automatically before any test suite:
+`testing/global-setup.js` runs automatically before any test suite and handles two tasks:
+
+**Authentication:**
 
 1. If `testing/config/auth-state-pw.json` exists and is less than 1 hour old → skips login
 2. Otherwise → launches Chrome, navigates to VV login, fills credentials, saves cookies
+
+**Record creation** (for cross-TZ reload tests):
+
+1. If `testing/config/saved-records.json` exists and is less than 1 hour old → skips
+2. Otherwise → creates form records via browser UI per `RECORD_DEFINITIONS` in `vv-config.js`, using the specified input method (popup, typed, SetFieldValue) and timezone per record. Extracts DataIDs via `VV.Form.DataID` and writes to `saved-records.json`
 
 Two separate auth state files exist because `playwright-cli` and `@playwright/test` manage browser contexts independently:
 

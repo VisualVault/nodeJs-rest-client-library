@@ -39,15 +39,15 @@ This command:
 
 ## Key Files
 
-| File                             | Purpose                                                       |
-| -------------------------------- | ------------------------------------------------------------- |
-| `testing/playwright.config.js`   | TZ × browser matrix (9 projects), auth state                  |
-| `testing/fixtures/vv-config.js`  | Form URLs, field config map (A-H), saved records              |
-| `testing/fixtures/test-data.js`  | All test case definitions (data-driven parameterization)      |
-| `testing/helpers/vv-form.js`     | Generic VV form helpers: navigation, field ops, value capture |
-| `testing/helpers/vv-calendar.js` | Calendar-specific: popup date selection, typed input          |
-| `testing/global-setup.js`        | Auto-login before test runs                                   |
-| `testing/config/vv-config.json`  | VV credentials (gitignored)                                   |
+| File                             | Purpose                                                              |
+| -------------------------------- | -------------------------------------------------------------------- |
+| `testing/playwright.config.js`   | TZ × browser matrix (9 projects), auth state                         |
+| `testing/fixtures/vv-config.js`  | Form URLs, field config map (A-H), record definitions, saved records |
+| `testing/fixtures/test-data.js`  | All test case definitions (data-driven parameterization)             |
+| `testing/helpers/vv-form.js`     | Generic VV form helpers: navigation, field ops, value capture, save  |
+| `testing/helpers/vv-calendar.js` | Calendar helpers: popup (date-only + DateTime), typed input, legacy  |
+| `testing/global-setup.js`        | Auto-login + create saved records via browser UI (per-TZ, cached 1h) |
+| `testing/config/vv-config.json`  | VV credentials (gitignored)                                          |
 
 ## Extending to Non-Date Testing
 

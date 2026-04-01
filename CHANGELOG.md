@@ -24,6 +24,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `docs/guides/dev-setup.md` — canonical dev environment setup guide (single source of truth for all setup instructions)
 - Playwright helpers: `captureDisplayValue`, `saveFormAndReload`, `roundTripCycle` in `testing/helpers/vv-form.js`
 - Multi-browser Playwright testing: TZ × browser matrix (Chromium, Firefox, WebKit) with per-browser npm scripts (`test:pw:chromium`, `test:pw:firefox`, `test:pw:webkit`)
+- Portable test record creation: `global-setup.js` auto-creates saved form records via browser UI using per-field input methods (popup, typed, SetFieldValue), caches DataIDs in `saved-records.json` (1h TTL). Replaces hardcoded SAVED_RECORDS for environment portability
+- `RECORD_DEFINITIONS` in `vv-config.js`: declarative record definitions with timezone, field values, and input methods per record
+- DateTime popup support in `vv-calendar.js`: `selectDateViaPopup` handles both kendo-datepicker (date-only) and kendo-datetimepicker (DateTime) popups with infinite-scroll navigation
+- Legacy field handling in calendar helpers: `typeDateInField` and `roundTripCycle` detect plain `<input>` (useLegacy=true) vs Kendo wrappers and adapt interaction accordingly
+- `saveFormOnly` helper in `vv-form.js`: saves form and extracts DataID via `VV.Form.DataID` property (reliable post-save indicator)
+- New Playwright spec files: cat-5 (preset), cat-6 (current date), cat-8 (GetFieldValue), cat-8b (GetDateObject), cat-9-gdoc (GDOC round-trip), cat-9-gfv (GFV round-trip), cat-12 (edge cases) — 10 total category specs
 
 ### Changed
 

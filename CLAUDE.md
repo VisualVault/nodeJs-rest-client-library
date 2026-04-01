@@ -139,13 +139,12 @@ npm run test:pw:report       # Open HTML report
 
 **Test infrastructure** (in `testing/`):
 
-- `fixtures/vv-config.js` — form URLs, field config map (Configs A-H), saved records
 - `fixtures/vv-config.js` — form URLs, field config map (A-H), record definitions, saved records
 - `fixtures/test-data.js` — all test case definitions as structured data (data-driven)
 - `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture, save
-- `helpers/vv-calendar.js` — calendar-specific: popup selection (date-only + DateTime), typed input
+- `helpers/vv-calendar.js` — calendar helpers: popup selection (date-only + DateTime), typed input, legacy fields
 - `global-setup.js` — auto-login + create saved records via browser UI (per-TZ, cached 1h)
-- `date-handling/cat-*.spec.js` — parameterized test files (one per category, loops over test-data)
+- `date-handling/cat-*.spec.js` — 10 parameterized spec files (cat-1, 2, 3, 5, 6, 8, 8b, 9-gdoc, 9-gfv, 12)
 
 Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
 

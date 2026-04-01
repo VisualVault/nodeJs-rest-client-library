@@ -60,19 +60,23 @@ Shared config:
 
 ## File Reference
 
-| File                           | Purpose                                                                            |
-| ------------------------------ | ---------------------------------------------------------------------------------- |
-| `../fixtures/vv-config.js`     | Shared constants: form URL, field map (A-H), record definitions, saved record URLs |
-| `../fixtures/test-data.js`     | All test case definitions as structured data (data-driven parameterization)        |
-| `../helpers/vv-form.js`        | Generic VV form helpers: navigation, field verification, value capture, save       |
-| `../helpers/vv-calendar.js`    | Calendar helpers: popup selection (date-only + DateTime), typed input              |
-| `../global-setup.js`           | Runs before all tests: auth + creates saved records via browser UI per timezone    |
-| `cat-1-calendar-popup.spec.js` | Category 1 — calendar popup date selection tests                                   |
-| `cat-2-typed-input.spec.js`    | Category 2 — keyboard segment-by-segment date entry tests                          |
-| `cat-3-server-reload.spec.js`  | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)              |
-| `cat-5-preset-date.spec.js`    | Category 5 — preset date default auto-population tests                             |
-| `cat-8-getfieldvalue.spec.js`  | Category 8 — GetFieldValue return value tests                                      |
-| `cat-8b-getdateobject.spec.js` | Category 8B — GetDateObjectFromCalendar return tests                               |
+| File                           | Purpose                                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------------------- |
+| `../fixtures/vv-config.js`     | Shared constants: form URL, field map (A-H), record definitions, saved record URLs      |
+| `../fixtures/test-data.js`     | All test case definitions as structured data (data-driven parameterization)             |
+| `../helpers/vv-form.js`        | Generic VV form helpers: navigation, field verification, value capture, save            |
+| `../helpers/vv-calendar.js`    | Calendar helpers: popup selection (date-only + DateTime), typed input                   |
+| `../global-setup.js`           | Runs before all tests: auth + creates saved records via browser UI per timezone         |
+| `cat-1-calendar-popup.spec.js` | Category 1 — calendar popup date selection tests                                        |
+| `cat-2-typed-input.spec.js`    | Category 2 — keyboard segment-by-segment date entry tests                               |
+| `cat-3-server-reload.spec.js`  | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                   |
+| `cat-5-preset-date.spec.js`    | Category 5 — preset date default auto-population tests                                  |
+| `cat-6-current-date.spec.js`   | Category 6 — current date default auto-population tests                                 |
+| `cat-8-getfieldvalue.spec.js`  | Category 8 — GetFieldValue return value tests                                           |
+| `cat-8b-getdateobject.spec.js` | Category 8B — GetDateObjectFromCalendar return tests                                    |
+| `cat-9-gfv-roundtrip.spec.js`  | Category 9 — GFV round-trip drift tests (SetFieldValue → GetFieldValue → SetFieldValue) |
+| `cat-9-gdoc-roundtrip.spec.js` | Category 9-GDOC — GDOC round-trip tests (SetFieldValue → GetDateObject → SetFieldValue) |
+| `cat-12-edge-cases.spec.js`    | Category 12 — edge case and boundary condition tests                                    |
 
 ### External Config
 
