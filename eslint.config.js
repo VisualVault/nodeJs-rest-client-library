@@ -39,4 +39,13 @@ module.exports = [
             },
         },
     },
+    {
+        files: ['testing/**/*.js'],
+        languageOptions: {
+            globals: {
+                VV: 'readonly',
+                document: 'readonly',
+            },
+        },
+    },
 ];

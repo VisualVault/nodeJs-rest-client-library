@@ -2,22 +2,22 @@
  * Shared configuration for VV date-handling Playwright tests.
  *
  * Provides constants used by all test files and global-setup.js:
- * - VV instance credentials (loaded from .playwright/vv-config.json)
+ * - VV instance credentials (loaded from testing/config/vv-config.json)
  * - DateTest form template URL (creates a fresh form instance on each load)
  * - Field configuration map (8 configs A-H mapping to VV calendar field boolean flags)
  * - Saved record URLs for reload/cross-TZ tests
  *
- * See tests/date-handling/README.md for field configuration documentation.
+ * See testing/date-handling/README.md for field configuration documentation.
  */
 const path = require('path');
 const fs = require('fs');
 
-const VV_CONFIG_PATH = path.join(__dirname, '..', '..', '.playwright', 'vv-config.json');
+const VV_CONFIG_PATH = path.join(__dirname, '..', 'config', 'vv-config.json');
 
 // Auth state for @playwright/test (Layer 2 — test runner).
-// Separate from .playwright/auth-state.json which is used by playwright-cli (Layer 1 — command).
+// Separate from testing/config/auth-state.json which is used by playwright-cli (Layer 1 — command).
 // Both are gitignored. See README.md "Auth Flow" section for details.
-const AUTH_STATE_PATH = path.join(__dirname, '..', '..', '.playwright', 'auth-state-pw.json');
+const AUTH_STATE_PATH = path.join(__dirname, '..', 'config', 'auth-state-pw.json');
 
 const vvConfig = JSON.parse(fs.readFileSync(VV_CONFIG_PATH, 'utf8'));
 

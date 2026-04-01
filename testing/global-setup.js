@@ -2,7 +2,7 @@
  * Playwright global setup — authenticates with VV before tests run.
  *
  * Runs once before all test files. Logs into VisualVault and saves browser
- * cookies/storage to .playwright/auth-state-pw.json. Individual tests then
+ * cookies/storage to testing/config/auth-state-pw.json. Individual tests then
  * reuse these cookies via playwright.config.js `storageState`.
  *
  * Auth state freshness: skips login if the saved state is less than 1 hour old.
@@ -11,7 +11,7 @@
  */
 const { chromium } = require('@playwright/test');
 const fs = require('fs');
-const { vvConfig, AUTH_STATE_PATH } = require('./vv-config');
+const { vvConfig, AUTH_STATE_PATH } = require('./fixtures/vv-config');
 
 module.exports = async function globalSetup() {
     // Reuse existing auth state if it was saved less than 1 hour ago.

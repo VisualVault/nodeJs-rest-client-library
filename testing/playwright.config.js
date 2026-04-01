@@ -4,23 +4,22 @@
  * Defines 3 timezone projects (BRT, IST, UTC0) that simulate user timezones
  * via Playwright's timezoneId context option — no system timezone changes needed.
  *
- * Test files are matched to projects by filename suffix:
- *   tc-1-A-BRT.spec.js  -> BRT project (America/Sao_Paulo)
- *   tc-1-A-IST.spec.js  -> IST project (Asia/Calcutta)
- *   tc-1-A-UTC0.spec.js -> UTC0 project (Etc/GMT)
+ * All spec files run in all 3 projects. Individual tests use test.skip()
+ * to self-filter based on testInfo.project.name, so each test only
+ * executes in its target timezone.
  *
- * Auth: global-setup.js logs into VV once and saves cookies to auth-state-pw.json.
+ * Auth: global-setup.js logs into VV once and saves cookies to config/auth-state-pw.json.
  * All tests reuse these cookies via the storageState option.
  *
- * See tests/date-handling/README.md for full documentation.
+ * See testing/date-handling/README.md for full documentation.
  */
 const { defineConfig } = require('@playwright/test');
 const path = require('path');
 
-const AUTH_STATE_PATH = path.join(__dirname, '.playwright', 'auth-state-pw.json');
+const AUTH_STATE_PATH = path.join(__dirname, 'config', 'auth-state-pw.json');
 
 module.exports = defineConfig({
-    testDir: './tests/date-handling',
+    testDir: './date-handling',
 
     // Serial execution — VV creates server-side state per form instance,
     // and concurrent requests to the same VV instance can interfere.
@@ -36,7 +35,7 @@ module.exports = defineConfig({
     timeout: 60_000,
     expect: { timeout: 10_000 },
 
-    globalSetup: './tests/date-handling/global-setup.js',
+    globalSetup: './global-setup.js',
 
     use: {
         baseURL: 'https://vvdemo.visualvault.com',
@@ -50,26 +49,24 @@ module.exports = defineConfig({
         channel: 'chrome',
     },
 
-    // Each project simulates a different user timezone. Test files are matched
-    // by filename suffix so each project only runs its own timezone's tests.
+    // Each project simulates a different user timezone. All spec files run in
+    // all projects — individual tests use test.skip() to self-filter based on
+    // testInfo.project.name, ensuring each test only executes in its target TZ.
     projects: [
         {
             name: 'BRT',
             use: { timezoneId: 'America/Sao_Paulo' }, // UTC-3
-            testMatch: /.*-BRT\.spec\.js$/,
         },
         {
             name: 'IST',
             use: { timezoneId: 'Asia/Calcutta' }, // UTC+5:30
-            testMatch: /.*-IST\.spec\.js$/,
         },
         {
             name: 'UTC0',
             use: { timezoneId: 'Etc/GMT' }, // UTC+0
-            testMatch: /.*-UTC0\.spec\.js$/,
         },
     ],
 
     outputDir: './test-results',
-    reporter: [['html', { open: 'never' }], ['list']],
+    reporter: [['html', { open: 'never', outputFolder: './playwright-report' }], ['list']],
 });

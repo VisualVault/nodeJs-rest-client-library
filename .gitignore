@@ -160,10 +160,18 @@ lib/VVRestApi/VVRestApiNodeJS/node_modules/
 lib/VVRestApi/VVRestApiNodeJS/files
 scripts/test-scripts
 
-# Playwright
+# Playwright (legacy root paths — kept for safety during transition)
 .playwright/auth-state*.json
 .playwright/vv-config.json
 .playwright/screenshots/
 .playwright-cli/
 test-results/
 playwright-report/
+
+# Playwright (testing/ directory)
+testing/config/auth-state*.json
+testing/config/vv-config.json
+testing/config/screenshots/
+testing/.playwright-cli/
+testing/test-results/
+testing/playwright-report/

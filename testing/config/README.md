@@ -1,4 +1,4 @@
-# .playwright/ — Browser Automation Config
+# testing/config/ — Browser Automation Config
 
 Configuration files for VV platform Playwright testing. These files are shared between the `playwright-cli` command workflow and the `@playwright/test` runner.
 
@@ -20,7 +20,7 @@ Configuration files for VV platform Playwright testing. These files are shared b
 1. Copy the example config:
 
     ```bash
-    cp .playwright/vv-config.example.json .playwright/vv-config.json
+    cp testing/config/vv-config.example.json testing/config/vv-config.json
     ```
 
 2. Edit `vv-config.json` with your credentials:
@@ -45,10 +45,10 @@ Both are auto-generated on first use. To force re-login, delete the relevant fil
 
 ## Timezone Config Files
 
-The `tz-*.json` files are used by `playwright-cli open --config=.playwright/tz-brt.json` to set the browser's timezone context. They contain a single property:
+The `tz-*.json` files are used by `playwright-cli open --config=testing/config/tz-brt.json` to set the browser's timezone context. They contain a single property:
 
 ```json
 { "timezoneId": "America/Sao_Paulo" }
 ```
 
-The `@playwright/test` runner does NOT use these files — it sets `timezoneId` directly in `playwright.config.js` project definitions.
+The `@playwright/test` runner does NOT use these files — it sets `timezoneId` directly in `testing/playwright.config.js` project definitions.
