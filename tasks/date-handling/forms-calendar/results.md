@@ -1576,3 +1576,17 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-01 [TC-3-A-BRT-BRT Run 4](runs/tc-3-A-BRT-BRT-run-4.md) — BRT — PASS — Config A server reload via Playwright CLI; value survives save/reload
 - 2026-04-01 [TC-3-B-BRT-BRT Run 1](runs/tc-3-B-BRT-BRT-run-1.md) — BRT — PASS — Config B server reload; ignoreTZ inert; same as 3-A-BRT-BRT
 - 2026-04-01 [TC-3-B-BRT-IST Run 1](runs/tc-3-B-BRT-IST-run-1.md) — IST — PASS — Config B cross-TZ reload (BRT→IST); date-only survives; same as 3-A-BRT-IST
+
+## Session 2026-04-01 (BRT — Playwright CLI, IST→BRT cross-TZ)
+
+**Purpose**: Verify IST-saved records reloaded in BRT — reverse direction of previous BRT→IST tests.
+**Key outcomes**: Bug #7 confirmed permanent — wrong day baked in during IST save persists on BRT reload.
+
+- 2026-04-01 [TC-3-A-IST-BRT Run 1](runs/tc-3-A-IST-BRT-run-1.md) — BRT — FAIL-3 — Config A IST→BRT reload; Bug #7 wrong day from IST save persists (`"2026-03-14"` instead of `"2026-03-15"`)
+
+## Session 2026-04-01 (IST — Playwright CLI, Preset Date)
+
+**Purpose**: Verify preset date initial values in IST — does Bug #7 fire on form init path?
+**Key outcomes**: Bug #7 confirmed on preset path. Major scope expansion: every UTC+ form instance with date-only presets carries wrong internal UTC date.
+
+- 2026-04-01 [TC-5-A-IST Run 1](runs/tc-5-A-IST-run-1.md) — IST — FAIL-3 — Config A preset in IST; Bug #7 on init path: Date obj UTC = `"2026-02-28"`, display correct `03/01/2026`, save would corrupt

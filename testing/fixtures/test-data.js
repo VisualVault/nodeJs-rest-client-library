@@ -165,6 +165,47 @@ const TEST_DATA = [
         notes: 'Config C cross-TZ: BRT-saved DateTime reloaded in IST. Bug #1+#4 cause 8.5h GFV shift.',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-C-BRT-IST.md',
     },
+    {
+        id: '3-A-IST-BRT',
+        category: 3,
+        categoryName: 'Server Reload',
+        config: 'A',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'reload',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '03/15/2026',
+        expectedRaw: '2026-03-14',
+        expectedApi: '2026-03-14',
+        savedRecord: 'DateTest-000084',
+        saveTz: 'IST',
+        bugs: ['Bug #7'],
+        notes: 'Config A cross-TZ: IST-saved date-only reloaded in BRT. Bug #7 wrong day baked in during IST save (-1 day). BRT reload preserves corrupted value.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-A-IST-BRT.md',
+    },
+    // ═══════════════════════════════════════════════════════════════════════
+    // Category 5 — Preset Date Default
+    //
+    // Open fresh form template. Preset field auto-populates on load via
+    // initCalendarValueV1. Verify the initial value is correct and the
+    // save path would produce the right date-only string.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: '5-A-IST',
+        category: 5,
+        categoryName: 'Preset Date',
+        config: 'A',
+        tz: 'IST',
+        tzOffset: 'GMT+0530',
+        action: 'preset',
+        inputDate: { year: 2026, month: 3, day: 1 },
+        inputDateStr: '03/01/2026',
+        expectedRaw: '2026-02-28T18:30:00.000Z',
+        expectedApi: '2026-02-28T18:30:00.000Z',
+        bugs: ['Bug #7'],
+        notes: 'Config A preset in IST. Bug #7 on init path: moment("2026-03-01").toDate() → IST midnight → Feb 28 UTC. Display correct (03/01/2026) but internal UTC date wrong. Save would store "2026-02-28".',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-A-IST.md',
+    },
 ];
 
 module.exports = { TEST_DATA };

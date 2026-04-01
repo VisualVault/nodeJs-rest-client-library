@@ -47,7 +47,7 @@ tasks/date-handling/
 
 ### Progress
 
-**~86 of ~242 test cases completed** (50 PASS, 34 FAIL). 7 bugs confirmed (5 from original analysis + 2 new). Testing done across three timezones: BRT (UTC-3), IST (UTC+5:30), and UTC+0 (GMT). **Category 1 (Calendar Popup) is 100% complete** (20/20: 8 PASS, 12 FAIL). **Category 2 (Typed Input) is 100% complete** (16/16: 11 PASS, 5 FAIL). Category 3 (Server Reload) has 8 PASS + 1 FAIL with formal TC specs; Config B same-TZ and cross-TZ (BRT→IST) confirm ignoreTZ inert for date-only; Config C cross-TZ BRT→IST confirms Bug #1+#4 interaction (8.5h GFV shift). Categories 8B (GetDateObjectFromCalendar) and 9-GDOC (GDOC round-trip) added — 17 new slots.
+**~88 of ~242 test cases completed** (50 PASS, 36 FAIL). 7 bugs confirmed (5 from original analysis + 2 new). Testing done across three timezones: BRT (UTC-3), IST (UTC+5:30), and UTC+0 (GMT). **Category 1 (Calendar Popup) is 100% complete** (20/20: 8 PASS, 12 FAIL). **Category 2 (Typed Input) is 100% complete** (16/16: 11 PASS, 5 FAIL). Category 3 (Server Reload) has 8 PASS + 2 FAIL with formal TC specs; Config B same-TZ and cross-TZ (BRT→IST) confirm ignoreTZ inert for date-only; Config C cross-TZ BRT→IST confirms Bug #1+#4 interaction (8.5h GFV shift); Config A IST→BRT confirms Bug #7 permanent damage from IST save. **Category 5 (Preset Date): 5-A-IST FAIL — Bug #7 confirmed on form-init path** (major scope expansion: preset Date has wrong UTC date in IST, display masks it). Categories 8B (GetDateObjectFromCalendar) and 9-GDOC (GDOC round-trip) added — 17 new slots.
 
 ### Files
 
