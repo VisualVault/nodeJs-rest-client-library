@@ -716,4 +716,4 @@ This prevents orphan browser processes.
 - **results.md is a frozen archive** for sessions before 2026-04-01. New runs append only a one-line index entry (Phase 5C). Do not add narrative blocks to results.md for new tests.
 - **No Findings or Key Finding section in TC files.** TC files are test procedures, not analytical records. Observations about whether the matrix prediction was right or wrong, which bugs were confirmed, and what sibling rows imply belong exclusively in run files (Phase 5A). The title encodes the behavioral finding; Fail Conditions encode the risk reasoning. Do not add any other analytical sections to TC files.
 - **Screenshots go to `testing/config/screenshots/`** — never committed to git.
-- **Auth state files (`.playwright/auth-state*.json`) are never committed** — they contain session cookies.
+- **Auth state files (`testing/config/auth-state*.json`) are never committed** — they contain session cookies.
