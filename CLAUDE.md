@@ -30,7 +30,7 @@ nodeV2/
     test-scripts/                    # Local test scripts
   testing/                           # Playwright testing infrastructure
     playwright.config.js             # 3-project config (BRT, IST, UTC0)
-    global-setup.js                  # Auto-login before test runs
+    global-setup.js                  # Auto-login + create saved records before test runs
     config/                          # Credentials, TZ configs, auth state
     helpers/                         # Reusable page helpers
       vv-form.js                     # Generic VV form automation (11 functions)
@@ -140,10 +140,11 @@ npm run test:pw:report       # Open HTML report
 **Test infrastructure** (in `testing/`):
 
 - `fixtures/vv-config.js` — form URLs, field config map (Configs A-H), saved records
+- `fixtures/vv-config.js` — form URLs, field config map (A-H), record definitions, saved records
 - `fixtures/test-data.js` — all test case definitions as structured data (data-driven)
-- `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture
-- `helpers/vv-calendar.js` — calendar-specific: popup selection, typed input
-- `global-setup.js` — auto-login before test runs
+- `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture, save
+- `helpers/vv-calendar.js` — calendar-specific: popup selection (date-only + DateTime), typed input
+- `global-setup.js` — auto-login + create saved records via browser UI (per-TZ, cached 1h)
 - `date-handling/cat-*.spec.js` — parameterized test files (one per category, loops over test-data)
 
 Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)

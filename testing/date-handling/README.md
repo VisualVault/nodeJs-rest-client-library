@@ -60,24 +60,28 @@ Shared config:
 
 ## File Reference
 
-| File                           | Purpose                                                                               |
-| ------------------------------ | ------------------------------------------------------------------------------------- |
-| `../fixtures/vv-config.js`     | Shared constants: form template URL, field configuration map (A-H), saved record URLs |
-| `../fixtures/test-data.js`     | All test case definitions as structured data (data-driven parameterization)           |
-| `../helpers/vv-form.js`        | Generic VV form helpers: navigation, field verification, value capture                |
-| `../helpers/vv-calendar.js`    | Calendar-specific helpers: popup date selection, typed input                          |
-| `../global-setup.js`           | Runs once before all tests: logs into VV, saves auth cookies                          |
-| `cat-1-calendar-popup.spec.js` | Category 1 — calendar popup date selection tests                                      |
-| `cat-2-typed-input.spec.js`    | Category 2 — keyboard segment-by-segment date entry tests                             |
-| `cat-3-server-reload.spec.js`  | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                 |
+| File                           | Purpose                                                                            |
+| ------------------------------ | ---------------------------------------------------------------------------------- |
+| `../fixtures/vv-config.js`     | Shared constants: form URL, field map (A-H), record definitions, saved record URLs |
+| `../fixtures/test-data.js`     | All test case definitions as structured data (data-driven parameterization)        |
+| `../helpers/vv-form.js`        | Generic VV form helpers: navigation, field verification, value capture, save       |
+| `../helpers/vv-calendar.js`    | Calendar helpers: popup selection (date-only + DateTime), typed input              |
+| `../global-setup.js`           | Runs before all tests: auth + creates saved records via browser UI per timezone    |
+| `cat-1-calendar-popup.spec.js` | Category 1 — calendar popup date selection tests                                   |
+| `cat-2-typed-input.spec.js`    | Category 2 — keyboard segment-by-segment date entry tests                          |
+| `cat-3-server-reload.spec.js`  | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)              |
+| `cat-5-preset-date.spec.js`    | Category 5 — preset date default auto-population tests                             |
+| `cat-8-getfieldvalue.spec.js`  | Category 8 — GetFieldValue return value tests                                      |
+| `cat-8b-getdateobject.spec.js` | Category 8B — GetDateObjectFromCalendar return tests                               |
 
 ### External Config
 
-| File                       | Purpose                                                         |
-| -------------------------- | --------------------------------------------------------------- |
-| `../playwright.config.js`  | TZ × browser matrix (9 projects: 3 TZ × 3 browsers), auth state |
-| `../config/vv-config.json` | VV credentials (gitignored)                                     |
-| `../config/tz-*.json`      | Timezone overrides for `playwright-cli` (Layer 1 only)          |
+| File                           | Purpose                                                             |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `../playwright.config.js`      | TZ × browser matrix (9 projects: 3 TZ × 3 browsers), auth state     |
+| `../config/vv-config.json`     | VV credentials (gitignored)                                         |
+| `../config/saved-records.json` | Auto-created DataID URLs for cross-TZ tests (gitignored, cached 1h) |
+| `../config/tz-*.json`          | Timezone overrides for `playwright-cli` (Layer 1 only)              |
 
 ---
 
