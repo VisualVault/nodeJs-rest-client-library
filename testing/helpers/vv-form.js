@@ -157,6 +157,89 @@ async function getBrowserTimezone(page) {
     return page.evaluate(() => new Date().toString());
 }
 
+/**
+ * Capture the visible display value from a date field's input element.
+ *
+ * This reads what the user sees on screen — the formatted date string in the
+ * spinbutton input (e.g., "03/15/2026" or "03/15/2026 12:00 AM"). This differs
+ * from `captureFieldValues` which reads VV's internal raw and API values.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} fieldName - e.g., "DataField7"
+ * @returns {Promise<string>} the visible input value
+ */
+async function captureDisplayValue(page, fieldName) {
+    const fieldContainer = page.locator(`[aria-label="${fieldName}"]`);
+    return fieldContainer.locator('input').first().inputValue();
+}
+
+/**
+ * Save the current VV form and reload the saved record.
+ *
+ * Clicks the Save button, waits for the URL to change (DataID appears when
+ * VV redirects from template to saved record), then performs a full page reload
+ * and waits for VV.Form to be ready again. Returns the saved record URL.
+ *
+ * The reload clears Angular SPA state, simulating a fresh page load — this is
+ * what Categories 3, 5, 6, 9, 11 need to test server round-trip behavior.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {number} [timeout=60000] - max wait in ms (VV saves can take 5-10s)
+ * @returns {Promise<string>} the saved record URL
+ */
+async function saveFormAndReload(page, timeout = 60000) {
+    const saveBtn = page.getByRole('button', { name: 'Save' });
+    await saveBtn.click();
+
+    // Wait for URL to change — DataID appears when VV redirects to the saved record
+    await page.waitForFunction(() => document.location.href.includes('DataID='), { timeout });
+
+    const savedUrl = page.url();
+
+    // Full reload to clear Angular SPA state and simulate a fresh page load
+    await page.reload({ waitUntil: 'networkidle', timeout });
+    await page.waitForFunction(
+        () =>
+            typeof VV !== 'undefined' &&
+            VV.Form &&
+            VV.Form.VV &&
+            VV.Form.VV.FormPartition &&
+            VV.Form.VV.FormPartition.fieldMaster,
+        { timeout }
+    );
+
+    return savedUrl;
+}
+
+/**
+ * Run N round-trip cycles of GetFieldValue → SetFieldValue and capture values after each.
+ *
+ * Used to detect cumulative drift caused by Bug #5 (fake Z suffix). Each cycle reads
+ * the field value via GetFieldValue(), feeds it back via SetFieldValue(), then captures
+ * the raw, API, and display values. In BRT, Bug #5 causes -3h drift per trip; in IST,
+ * +5:30h per trip.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} fieldName - e.g., "DataField5"
+ * @param {number} [times=3] - number of round-trip cycles
+ * @returns {Promise<Array<{trip: number, raw: string, api: string, display: string}>>}
+ */
+async function roundTripCycle(page, fieldName, times = 3) {
+    const results = [];
+    for (let i = 0; i < times; i++) {
+        const apiValue = await page.evaluate((name) => VV.Form.GetFieldValue(name), fieldName);
+
+        await page.evaluate(({ name, val }) => VV.Form.SetFieldValue(name, val), { name: fieldName, val: apiValue });
+
+        const raw = await page.evaluate((name) => VV.Form.VV.FormPartition.getValueObjectValue(name), fieldName);
+        const api = await page.evaluate((name) => VV.Form.GetFieldValue(name), fieldName);
+        const display = await page.locator(`[aria-label="${fieldName}"]`).locator('input').first().inputValue();
+
+        results.push({ trip: i + 1, raw, api, display });
+    }
+    return results;
+}
+
 module.exports = {
     gotoAndWaitForVVForm,
     waitForVVForm,
@@ -166,4 +249,7 @@ module.exports = {
     setFieldValue,
     getFieldValue,
     getBrowserTimezone,
+    captureDisplayValue,
+    saveFormAndReload,
+    roundTripCycle,
 };
