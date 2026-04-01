@@ -1557,3 +1557,19 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 **Key outcomes**: Playwright `timezoneId: America/Sao_Paulo` produces identical results to system BRT for 1-A-BRT.
 
 - 2026-04-01 [TC-1-A-BRT Run 3](runs/tc-1-A-BRT-run-3.md) — BRT — PASS — Config A calendar popup via Playwright CLI; confirms TZ simulation equivalence
+
+## Session 2026-04-01 (BRT — WebKit)
+
+**Purpose**: Cross-browser verification — WebKit (Safari engine) via Playwright headless.
+**Key outcomes**: WebKit produces identical results to Chrome for Config A BRT.
+
+- 2026-04-01 [TC-1-A-BRT Run 4](runs/tc-1-A-BRT-run-4.md) — BRT — PASS — Config A calendar popup in WebKit; cross-browser consistency confirmed
+
+## Session 2026-04-01 (BRT — Playwright CLI, Config B)
+
+**Purpose**: First formal TC spec + Playwright CLI verification for Config B (ignoreTZ=true, date-only) in BRT.
+**Key outcomes**: Config B stores identical values to Config A; ignoreTZ inert for date-only fields.
+
+- 2026-04-01 [TC-1-B-BRT Run 2](runs/tc-1-B-BRT-run-2.md) — BRT — PASS — Config B calendar popup via Playwright CLI; ignoreTZ=true has no effect on date-only storage
+- 2026-04-01 [TC-2-A-BRT Run 2](runs/tc-2-A-BRT-run-2.md) — BRT — PASS — Config A typed input via Playwright CLI; matches popup, Bug #2 absent
+- 2026-04-01 [TC-3-A-BRT-BRT Run 4](runs/tc-3-A-BRT-BRT-run-4.md) — BRT — PASS — Config A server reload via Playwright CLI; value survives save/reload
