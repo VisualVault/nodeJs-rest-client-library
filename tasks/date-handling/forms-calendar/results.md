@@ -1574,3 +1574,5 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-01 [TC-1-B-BRT Run 2](runs/tc-1-B-BRT-run-2.md) — BRT — PASS — Config B calendar popup via Playwright CLI; ignoreTZ=true has no effect on date-only storage
 - 2026-04-01 [TC-2-A-BRT Run 2](runs/tc-2-A-BRT-run-2.md) — BRT — PASS — Config A typed input via Playwright CLI; matches popup, Bug #2 absent
 - 2026-04-01 [TC-3-A-BRT-BRT Run 4](runs/tc-3-A-BRT-BRT-run-4.md) — BRT — PASS — Config A server reload via Playwright CLI; value survives save/reload
+- 2026-04-01 [TC-3-B-BRT-BRT Run 1](runs/tc-3-B-BRT-BRT-run-1.md) — BRT — PASS — Config B server reload; ignoreTZ inert; same as 3-A-BRT-BRT
+- 2026-04-01 [TC-3-B-BRT-IST Run 1](runs/tc-3-B-BRT-IST-run-1.md) — IST — PASS — Config B cross-TZ reload (BRT→IST); date-only survives; same as 3-A-BRT-IST

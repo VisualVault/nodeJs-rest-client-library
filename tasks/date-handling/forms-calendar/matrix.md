@@ -43,7 +43,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | ------------------------- | :-----: | :----: | :----: | :-----: | :-----: | :-----: | :---: |
 | 1. Calendar Popup         |   20    |   8    |   12   |    0    |    0    |    0    |   0   |
 | 2. Typed Input            |   16    |   11   |   5    |    0    |    0    |    0    |   0   |
-| 3. Server Reload          |   18    |   6    |   1    |   11    |    0    |    0    |   0   |
+| 3. Server Reload          |   18    |   8    |   1    |    9    |    0    |    0    |   0   |
 | 4. URL Parameters         |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
 | 5. Preset Date            |   18    |   1    |   0    |   17    |    0    |    0    |   0   |
 | 6. Current Date           |   15    |   1    |   0    |   14    |    0    |    0    |   0   |
@@ -56,7 +56,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 11. Cross-Timezone        |   14    |   0    |   0    |   13    |    0    |    1    |   0   |
 | 12. Edge Cases            |   20    |   4    |   5    |   10    |    0    |    0    |   1   |
 | 13. Database              |   10    |   2    |   0    |    8    |    0    |    0    |   0   |
-| **TOTAL**                 | **242** | **48** | **34** | **158** |  **0**  |  **1**  | **1** |
+| **TOTAL**                 | **242** | **50** | **34** | **156** |  **0**  |  **1**  | **1** |
 
 ---
 
@@ -143,8 +143,8 @@ Save form, open saved record in a new tab. Compare displayed dates and GFV retur
 | 3-A-BRT-IST |   A    |   BRT   |   IST   | No shift; date-only string survives cross-TZ reload (prediction corrected 2026-04-01)              | No shift; display/GFV identical on reload                                  | PASS    | 2026-04-01 | [summary](summaries/tc-3-A-BRT-IST.md) |
 | 3-C-BRT-IST |   C    |   BRT   |   IST   | Display 8:30 AM (BRT midnight in IST); GFV `T03:00:00Z` (prediction corrected 2026-04-01)          | Display 12:00 AM; GFV `"2026-03-14T18:30:00.000Z"` (8.5h shift, Bug #1+#4) | FAIL    | 2026-04-01 | [summary](summaries/tc-3-C-BRT-IST.md) |
 | 3-D-IST-BRT |   D    |   IST   |   BRT   | Display OK; GFV same fake Z (TZ-invariant)                                                         | Display OK; raw TZ-invariant; GFV appends fake Z (Bug #5)                  | PASS    | 2026-04-01 | [summary](summaries/tc-3-D-IST-BRT.md) |
-| 3-B-BRT-BRT |   B    |   BRT   |   BRT   | No shift — same as A-BRT-BRT (ignoreTZ no effect on date-only)                                     | —                                                                          | PENDING | —          | —                                      |
-| 3-B-BRT-IST |   B    |   BRT   |   IST   | No shift — same as A-BRT-IST (prediction corrected 2026-04-01)                                     | —                                                                          | PENDING | —          | —                                      |
+| 3-B-BRT-BRT |   B    |   BRT   |   BRT   | No shift — same as A-BRT-BRT (ignoreTZ no effect on date-only)                                     | raw: `"2026-03-15"`, api: `"2026-03-15"`                                   | PASS    | 2026-04-01 | [summary](summaries/tc-3-B-BRT-BRT.md) |
+| 3-B-BRT-IST |   B    |   BRT   |   IST   | No shift — same as A-BRT-IST (prediction corrected 2026-04-01)                                     | raw: `"2026-03-15"`, api: `"2026-03-15"`                                   | PASS    | 2026-04-01 | [summary](summaries/tc-3-B-BRT-IST.md) |
 | 3-A-IST-BRT |   A    |   IST   |   BRT   | Wrong day permanently stored (Bug #7 baked in during IST save)                                     | —                                                                          | PENDING | —          | —                                      |
 | 3-C-IST-BRT |   C    |   IST   |   BRT   | Stored IST-offset UTC-equiv; BRT reload shows different time                                       | —                                                                          | PENDING | —          | —                                      |
 | 3-B-IST-BRT |   B    |   IST   |   BRT   | Same as A-IST-BRT (ignoreTZ no effect on date-only)                                                | —                                                                          | PENDING | —          | —                                      |
