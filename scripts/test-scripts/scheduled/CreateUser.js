@@ -17,19 +17,17 @@ var logger = require(require('path').dirname(require.main.filename) + "/log");
 //getCredentials function will be called by the VisualVault NodeJs client library (/lib/VVRestApi/VVRestAiNodeJs/VVRestApi.js) when appropriate
 //Use this as a template and replace with your API credentials and VisualVault Customer/Database alias values
 module.exports.getCredentials = function () {
-    var options = {};
-    //baseUrl is optional
-    //if script is sent from VV server, the baseUrl is provided
-    //if executing the script via HTTP GET for testing then provide the baseUrl here
-    options.baseUrl = "https://demo.visualvault.com";
-    options.customerAlias = "YOUR Customer Name";
-    options.databaseAlias = "YOUR Database Name";
-    options.userId = "YOUR User Id";
-    options.password = "YOUR PASSWORD";
-    options.clientId = "YOUR API KEY";
-    options.clientSecret = "YOUR API KEY";
-    options.audience = "OPTIONAL AUDIENCE KEY";
-    return options;
+    var env = global.VV_ENV || {};
+    return {
+        baseUrl: env.baseUrl || 'https://demo.visualvault.com',
+        customerAlias: env.customerAlias || 'YOUR Customer Name',
+        databaseAlias: env.databaseAlias || 'YOUR Database Name',
+        userId: env.userId || 'YOUR User Id',
+        password: env.password || 'YOUR PASSWORD',
+        clientId: env.clientId || 'YOUR API KEY',
+        clientSecret: env.clientSecret || 'YOUR API KEY',
+        audience: env.audience || '',
+    };
 };
 
 //main function will be called by the VisualVault NodeJs client library (/lib/VVRestApi/VVRestAiNodeJs/VVRestApi.js) when appropriate
