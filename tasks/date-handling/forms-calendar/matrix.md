@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the forms calendar date-handling investigation.
 Full test evidence → `results.md` | Bug analysis → `analysis.md`
 
-Last updated: 2026-04-01 | Total slots: ~242 | Done: ~82 | Blocked: 0
+Last updated: 2026-04-02 | Total slots: ~242 | Done: ~120 | Blocked: 0
 
 ---
 

@@ -6,15 +6,15 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 
 ## Scope
 
-| Component                                | Status                           | Folder                     |
-| ---------------------------------------- | -------------------------------- | -------------------------- |
-| **Forms — Calendar Fields**              | IN PROGRESS (~71/225 tests done) | `forms-calendar/`          |
-| **Web Services (REST API)**              | IN PROGRESS (0 tests done)       | `web-services/`            |
-| **Analytic Dashboards**                  | NOT STARTED                      | `dashboards/` (to create)  |
-| **VisualVault Reports**                  | NOT STARTED                      | `reports/` (to create)     |
-| **Files (document dates)**               | NOT STARTED                      | `files/` (to create)       |
-| **Workflows (date triggers, deadlines)** | NOT STARTED                      | `workflows/` (to create)   |
-| **Node.js Client Library**               | NOT STARTED                      | `node-client/` (to create) |
+| Component                                | Status                            | Folder                     |
+| ---------------------------------------- | --------------------------------- | -------------------------- |
+| **Forms — Calendar Fields**              | IN PROGRESS (~120/242 tests done) | `forms-calendar/`          |
+| **Web Services (REST API)**              | IN PROGRESS (0 tests done)        | `web-services/`            |
+| **Analytic Dashboards**                  | NOT STARTED                       | `dashboards/` (to create)  |
+| **VisualVault Reports**                  | NOT STARTED                       | `reports/` (to create)     |
+| **Files (document dates)**               | NOT STARTED                       | `files/` (to create)       |
+| **Workflows (date triggers, deadlines)** | NOT STARTED                       | `workflows/` (to create)   |
+| **Node.js Client Library**               | NOT STARTED                       | `node-client/` (to create) |
 
 ## Folder Structure
 
@@ -53,7 +53,7 @@ tasks/date-handling/
 
 ### Progress
 
-**~112 of ~242 test cases completed** (58 PASS, 41 FAIL). 7 bugs confirmed (5 from original analysis + 2 new, Bug #6 scope expanded). Testing across three timezones: BRT (UTC-3), IST (UTC+5:30), UTC+0 (GMT). 11 Playwright spec files with 106 test-data entries covering Categories 1, 2, 3, 5, 6, 7, 8, 8B, 9, 9-GDOC, 12. **Cat 1 fully backfilled** (20/20 entries). **Cat 2 fully backfilled** (16/16 entries). Cat 3 (Server Reload) 11/18 (9P, 2F). Cat 5 (Preset) 2 entries (1P, 2F). Cat 6 (Current Date) 3 entries (2P, 1F). Cat 7 (SFV Formats) 16 entries across 3 configs × 2 TZs (4P, 12F — Bug #5 fake Z on all Config D; Bug #7 -1/-2 day on Config A IST; Config C passes). Cat 8 (GFV Return) 12 entries (4P, 8F — Bug #5 on Config D BRT/IST; Bug #6 on empty Config C/D; Config A/B/H pass). Cat 8B (GDOC) 3 entries (3P). Cat 9 (GFV Round-Trip) 11 entries (5P, 6F — Config A/B/H 0 drift; Config D drifts; Config C stable with real UTC). Cat 9-GDOC 2P. Cat 12 (Edge Cases) 10 entries (1P UTC0 control, 9F — near-midnight, year/leap boundary, DST, empty, invalid, far-future, pre-epoch).
+**~120 of ~242 test cases completed** (71 PASS, 49 FAIL). 7 bugs confirmed (5 from original analysis + 2 new, Bug #6 scope expanded). Testing across three timezones: BRT (UTC-3), IST (UTC+5:30), UTC+0 (GMT). 11 Playwright spec files with 116 test-data entries covering Categories 1, 2, 3, 5, 6, 7, 8, 8B, 9, 9-GDOC, 12. **Cat 1 fully backfilled** (20/20 entries). **Cat 2 fully backfilled** (16/16 entries). **Cat 3 fully complete** 18/18 (14P, 4F — legacy E/F/H added, B-IST-BRT closes category). Cat 5 (Preset) 2 entries (1P, 2F). Cat 6 (Current Date) 3 entries (2P, 1F). Cat 7 (SFV Formats) 16 entries across 3 configs × 2 TZs (4P, 12F — Bug #5 fake Z on all Config D; Bug #7 -1/-2 day on Config A IST; Config C passes). Cat 8 (GFV Return) 12 entries (4P, 8F — Bug #5 on Config D BRT/IST; Bug #6 on empty Config C/D; Config A/B/H pass). Cat 8B (GDOC) 3 entries (3P). Cat 9 (GFV Round-Trip) 11 entries (5P, 6F — Config A/B/H 0 drift; Config D drifts; Config C stable with real UTC). Cat 9-GDOC 2P. Cat 12 (Edge Cases) 14 entries (5P BRT+UTC0, 9F BRT + 4 IST — near-midnight, year/leap boundary, DST, empty, invalid, far-future, pre-epoch; IST shows opposite drift direction).
 
 ### Files
 

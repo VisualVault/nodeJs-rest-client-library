@@ -45,7 +45,7 @@ Layer 1: @-create-pw-date-test command (Claude Code)
 Layer 2: npx playwright test (CI/regression)
   Uses: @playwright/test (Node.js API)
   Purpose: Re-run parameterized specs headlessly for regression
-  Outputs: testing/test-results/, testing/playwright-report/
+  Outputs: testing/tmp/test-results/, testing/tmp/playwright-report/
   Auth state: testing/config/auth-state-pw.json
 
 Shared config:

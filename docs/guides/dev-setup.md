@@ -159,13 +159,13 @@ You can also target a single cell: `npx playwright test --config=testing/playwri
 
 ### 4.7 Two Automation Layers
 
-| Aspect     | Layer 1 (interactive)                      | Layer 2 (regression)                                  |
-| ---------- | ------------------------------------------ | ----------------------------------------------------- |
-| Tool       | `playwright-cli`                           | `@playwright/test` via `npx playwright test`          |
-| Trigger    | `/@-create-pw-date-test <id>`              | `npm run test:pw`                                     |
-| Purpose    | Live verification + artifact generation    | Headless regression testing                           |
-| Auth state | `testing/config/auth-state.json`           | `testing/config/auth-state-pw.json`                   |
-| Outputs    | TC specs, run files, summaries in `tasks/` | `testing/test-results/`, `testing/playwright-report/` |
+| Aspect     | Layer 1 (interactive)                      | Layer 2 (regression)                                          |
+| ---------- | ------------------------------------------ | ------------------------------------------------------------- |
+| Tool       | `playwright-cli`                           | `@playwright/test` via `npx playwright test`                  |
+| Trigger    | `/@-create-pw-date-test <id>`              | `npm run test:pw`                                             |
+| Purpose    | Live verification + artifact generation    | Headless regression testing                                   |
+| Auth state | `testing/config/auth-state.json`           | `testing/config/auth-state-pw.json`                           |
+| Outputs    | TC specs, run files, summaries in `tasks/` | `testing/tmp/test-results/`, `testing/tmp/playwright-report/` |
 
 ## 5. Upstream Sync
 
