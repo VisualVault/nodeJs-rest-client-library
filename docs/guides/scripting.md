@@ -157,6 +157,67 @@ When `expand: true` is set in `getForms()`, the response includes system metadat
 | `createBy` / `modifyBy`     | User email                              |
 | `href`                      | API resource path                       |
 
+### Server-Side Date Format Acceptance (on Write)
+
+The VV server parses date strings before storing. It does **not** echo the input as-is — it normalizes to ISO 8601 datetime+Z on storage.
+
+**Accepted formats** (all normalized to ISO 8601+Z):
+
+| Format              | Example                                                | Stored As                                   |
+| ------------------- | ------------------------------------------------------ | ------------------------------------------- |
+| ISO date-only       | `"2026-03-15"`                                         | `"2026-03-15T00:00:00Z"`                    |
+| US (MM/DD/YYYY)     | `"03/15/2026"`                                         | `"2026-03-15T00:00:00Z"`                    |
+| ISO datetime        | `"2026-03-15T14:30:00"`                                | `"2026-03-15T14:30:00Z"` (Z appended)       |
+| ISO datetime+Z      | `"2026-03-15T14:30:00Z"`                               | `"2026-03-15T14:30:00Z"`                    |
+| ISO datetime+offset | `"2026-03-15T14:30:00-03:00"`                          | `"2026-03-15T17:30:00Z"` (converted to UTC) |
+| ISO datetime+ms     | `"2026-03-15T14:30:00.000Z"`                           | `"2026-03-15T14:30:00Z"` (ms stripped)      |
+| YYYY/MM/DD          | `"2026/03/15"`                                         | `"2026-03-15T00:00:00Z"`                    |
+| English month       | `"March 15, 2026"`, `"15 March 2026"`, `"15-Mar-2026"` | `"2026-03-15T00:00:00Z"`                    |
+| DB storage format   | `"3/15/2026 12:00:00 AM"`                              | `"2026-03-15T00:00:00Z"`                    |
+
+**Silently rejected formats** (accepted by API, stored as `null` — no error):
+
+| Format               | Example                                        | Problem                                           |
+| -------------------- | ---------------------------------------------- | ------------------------------------------------- |
+| DD/MM/YYYY (LATAM)   | `"15/03/2026"`, `"15-03-2026"`, `"15.03.2026"` | Day-first not recognized; silent data loss        |
+| Compact ISO          | `"20260315"`                                   | No separators; not parsed                         |
+| Ambiguous (day ≤ 12) | `"05/03/2026"`                                 | Interpreted as MM/DD (May 3), not DD/MM (March 5) |
+
+**Key behaviors:**
+
+- TZ offsets are **converted to UTC** on the server (e.g., `-03:00` → +3 hours)
+- Milliseconds are **stripped** from stored values
+- Unparseable dates are **silently stored as `null`** — no API error, record creation succeeds
+- `enableTime`, `ignoreTimezone`, `useLegacy` field config flags have **zero effect** on API write behavior
+
+### Clearing Date Fields via API
+
+Send empty string `""` via `postFormRevision()` to clear an existing date value. The field will store `null` after the update.
+
+### OData Query Date Format Tolerance
+
+The `q` parameter in `getForms()` normalizes date formats in filter expressions:
+
+- `[DataField7] eq '03/15/2026'` — US format works
+- `[DataField6] eq '2026-03-15T14:30:00Z'` — Z suffix works
+- `[DataField6] ge '2026-03-15' AND le '2026-03-16'` — date-only range on DateTime fields works
+
+### TZ-Safe Date Patterns for Scripts
+
+When constructing dates in scripts that may run in different timezones (local dev vs cloud):
+
+| Pattern            | Code                                | TZ-Safe? | Why                                                   |
+| ------------------ | ----------------------------------- | :------: | ----------------------------------------------------- |
+| ISO string parse   | `new Date("2026-03-15")`            | **Yes**  | ISO date-only → UTC midnight per spec                 |
+| Date.UTC()         | `new Date(Date.UTC(2026, 2, 15))`   | **Yes**  | Explicit UTC construction                             |
+| UTC arithmetic     | `d.setUTCDate(d.getUTCDate() + 30)` | **Yes**  | UTC methods avoid local TZ                            |
+| String extract     | `d.toISOString().split('T')[0]`     | **Yes**  | Extracts UTC date as string                           |
+| US string parse    | `new Date("03/15/2026")`            |  **No**  | Local midnight — different UTC per TZ                 |
+| Constructor parts  | `new Date(2026, 2, 15)`             |  **No**  | Local midnight — same as US parse                     |
+| toLocaleDateString | `d.toLocaleDateString('en-US')`     |  **No**  | Returns local calendar date — wrong day in UTC- zones |
+
+**Recommendation**: Always send date strings (not Date objects) to the API. Use `toISOString().split('T')[0]` for date-only fields, or `toISOString()` for datetime fields.
+
 ---
 
 ## Script Response Pattern
