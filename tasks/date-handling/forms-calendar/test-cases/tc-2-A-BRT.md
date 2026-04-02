@@ -40,7 +40,7 @@ Linux:
 sudo timedatectl set-timezone America/Sao_Paulo
 ```
 
-> **Automated alternative:** When running via `/@-create-pw-date-test`, Playwright's `timezoneId` context option handles timezone simulation at browser level. P1 and P2 are skipped — the timezone is set at browser launch via `--config=testing/config/tz-brt.json`.
+> **Automated alternative:** When running via `/@-test-forms-date-pw`, Playwright's `timezoneId` context option handles timezone simulation at browser level. P1 and P2 are skipped — the timezone is set at browser launch via `--config=testing/config/tz-brt.json`.
 
 **P2 — Restart Chrome** after the timezone change.
 

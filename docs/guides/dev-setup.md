@@ -66,7 +66,7 @@ npx playwright install chrome firefox webkit
 npm install -g @playwright/cli@latest
 ```
 
-This is only needed for the `/@-create-pw-date-test` command (Layer 1). The headless test runner (Layer 2) uses `@playwright/test` which is already in devDependencies.
+This is only needed for the `/@-test-forms-date-pw` command (Layer 1). The headless test runner (Layer 2) uses `@playwright/test` which is already in devDependencies.
 
 ### 4.3 Create VV Credentials File
 
@@ -166,7 +166,7 @@ You can also target a single cell: `npx playwright test --config=testing/playwri
 | Aspect     | Layer 1 (interactive)                      | Layer 2 (regression)                                          |
 | ---------- | ------------------------------------------ | ------------------------------------------------------------- |
 | Tool       | `playwright-cli`                           | `@playwright/test` via `npx playwright test`                  |
-| Trigger    | `/@-create-pw-date-test <id>`              | `npm run test:pw`                                             |
+| Trigger    | `/@-test-forms-date-pw <id>`               | `npm run test:pw`                                             |
 | Purpose    | Live verification + artifact generation    | Headless regression testing                                   |
 | Auth state | `testing/config/auth-state.json`           | `testing/config/auth-state-pw.json`                           |
 | Outputs    | TC specs, run files, summaries in `tasks/` | `testing/tmp/test-results/`, `testing/tmp/playwright-report/` |

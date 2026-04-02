@@ -10,7 +10,7 @@
  *   2. If the category spec file doesn't exist yet, create it in date-handling/
  *   3. Run `npm run test:pw` to execute
  *
- * The @-create-pw-date-test command appends entries here after live verification.
+ * The @-test-forms-date-pw command appends entries here after live verification.
  *
  * Field reference:
  *   id            — Unique test ID: "{category}-{config}-{tz}" (e.g., "1-A-BRT")

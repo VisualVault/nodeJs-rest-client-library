@@ -28,16 +28,16 @@ See `testing/date-handling/README.md` and `docs/guides/playwright-testing.md` fo
 ## Usage
 
 ```
-/create-pw-date-test <category-id> [category-id-2 ...] [--skip-verify]
+/test-forms-date-pw <category-id> [category-id-2 ...] [--skip-verify]
 ```
 
-**Single test (default):** `/create-pw-date-test 7-D-isoZ-BRT`
+**Single test (default):** `/test-forms-date-pw 7-D-isoZ-BRT`
 
-**Batch mode:** `/create-pw-date-test 8-D-BRT 8-D-IST 8-D-UTC0` — processes multiple IDs in one invocation. Groups by TZ to minimize browser context switches. Each ID goes through the full pipeline.
+**Batch mode:** `/test-forms-date-pw 8-D-BRT 8-D-IST 8-D-UTC0` — processes multiple IDs in one invocation. Groups by TZ to minimize browser context switches. Each ID goes through the full pipeline.
 
-**Skip-verify mode:** `/create-pw-date-test --skip-verify 8-E-BRT 8-F-BRT` — skips Phases 0–2 (no browser session). Extracts expected values from the existing TC spec and/or latest run file. Use this to backfill test-data.js entries for TCs that already have verified run files.
+**Skip-verify mode:** `/test-forms-date-pw --skip-verify 8-E-BRT 8-F-BRT` — skips Phases 0–2 (no browser session). Extracts expected values from the existing TC spec and/or latest run file. Use this to backfill test-data.js entries for TCs that already have verified run files.
 
-**Batch + skip-verify:** `/create-pw-date-test --skip-verify 1-A-BRT 1-B-BRT 2-A-BRT 3-A-BRT-BRT` — backfill multiple entries without opening a browser.
+**Batch + skip-verify:** `/test-forms-date-pw --skip-verify 1-A-BRT 1-B-BRT 2-A-BRT 3-A-BRT-BRT` — backfill multiple entries without opening a browser.
 
 The category ID identifies a row in `tasks/date-handling/forms-calendar/matrix.md` (e.g., `1-A-IST`, `9-D-BRT-8`, `7-C-isoNoZ`).
 

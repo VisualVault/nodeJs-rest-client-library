@@ -12,7 +12,7 @@ All Playwright infrastructure lives under `testing/` to keep the repo root clean
 
 **Two automation layers:**
 
-1. **`/@-create-pw-date-test` command** (Claude Code) — interactive test case creation using `playwright-cli`. Opens a browser, verifies behavior live, generates documentation + appends test data.
+1. **`/@-test-forms-date-pw` command** (Claude Code) — interactive test case creation using `playwright-cli`. Opens a browser, verifies behavior live, generates documentation + appends test data.
 
 2. **`npx playwright test`** — headless regression runner. Executes parameterized spec files (one per category) that loop over test case definitions in `testing/fixtures/test-data.js`.
 
@@ -21,7 +21,7 @@ All Playwright infrastructure lives under `testing/` to keep the repo root clean
 Use the Claude Code command to generate both a human-readable TC spec and a test data entry:
 
 ```
-/@-create-pw-date-test 1-A-IST
+/@-test-forms-date-pw 1-A-IST
 ```
 
 This command:

@@ -38,7 +38,7 @@ Configuration files for VV platform Playwright testing. These files are shared b
 
 Two separate auth state files exist because `playwright-cli` (interactive CLI) and `@playwright/test` (Node.js API) manage browser contexts independently:
 
-- **`auth-state.json`** — created by `playwright-cli state-save` during the `@-create-pw-date-test` command workflow
+- **`auth-state.json`** — created by `playwright-cli state-save` during the `@-test-forms-date-pw` command workflow
 - **`auth-state-pw.json`** — created by `global-setup.js` when running `npm run test:pw`
 
 Both are auto-generated on first use. To force re-login, delete the relevant file.

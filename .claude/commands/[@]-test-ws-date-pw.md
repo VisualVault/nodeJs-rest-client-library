@@ -5,18 +5,18 @@ Executes a web services date-handling test case, captures the API response, gene
 ## Usage
 
 ```
-/run-ws-date-test <test-id> [test-id-2 ...] [--mode script|browser] [--debug] [--skip-verify]
+/test-ws-date-pw <test-id> [test-id-2 ...] [--mode script|browser] [--debug] [--skip-verify]
 ```
 
-**Single test:** `/run-ws-date-test ws-1-A-BRT`
+**Single test:** `/test-ws-date-pw ws-1-A-BRT`
 
-**Batch mode:** `/run-ws-date-test ws-1-A-BRT ws-1-C-BRT ws-1-D-BRT` — processes multiple IDs sequentially. Groups by TZ for script mode (minimizes server restarts).
+**Batch mode:** `/test-ws-date-pw ws-1-A-BRT ws-1-C-BRT ws-1-D-BRT` — processes multiple IDs sequentially. Groups by TZ for script mode (minimizes server restarts).
 
-**Browser mode:** `/run-ws-date-test ws-4-A-IST --mode browser` — uses Chrome MCP or Playwright to click the form button and verify Forms display. Required for WS-4 (API→Forms cross-layer).
+**Browser mode:** `/test-ws-date-pw ws-4-A-IST --mode browser` — uses Chrome MCP or Playwright to click the form button and verify Forms display. Required for WS-4 (API→Forms cross-layer).
 
-**Debug mode:** `/run-ws-date-test ws-2-A-BRT --debug` — passes Debug=true to the harness, includes raw API response in output.
+**Debug mode:** `/test-ws-date-pw ws-2-A-BRT --debug` — passes Debug=true to the harness, includes raw API response in output.
 
-**Skip-verify mode:** `/run-ws-date-test ws-1-A-BRT --skip-verify` — skips execution. Generates artifacts from existing data in the matrix (for backfilling run/summary files from manual test results).
+**Skip-verify mode:** `/test-ws-date-pw ws-1-A-BRT --skip-verify` — skips execution. Generates artifacts from existing data in the matrix (for backfilling run/summary files from manual test results).
 
 ---
 

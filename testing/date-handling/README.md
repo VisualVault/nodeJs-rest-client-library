@@ -32,7 +32,7 @@ npm run test:pw        # Run all timezone projects
 This project uses **two automation layers** that share the same `testing/config/` directory:
 
 ```
-Layer 1: @-create-pw-date-test command (Claude Code)
+Layer 1: @-test-forms-date-pw command (Claude Code)
   Uses: playwright-cli (interactive CLI)
   Purpose: Live verification + artifact generation
   Outputs:
@@ -142,7 +142,7 @@ All spec files run in all 9 projects (3 TZ × 3 browsers). Each test uses `test.
 
 ### Path 1: Via the Command (Recommended)
 
-The `/@-create-pw-date-test <category-id>` command:
+The `/@-test-forms-date-pw <category-id>` command:
 
 1. Opens a browser with the target timezone
 2. Runs the test live and captures actual behavior
@@ -150,7 +150,7 @@ The `/@-create-pw-date-test <category-id>` command:
 4. Appends the test case definition to `testing/fixtures/test-data.js`
 
 ```
-/@-create-pw-date-test 2-D-IST
+/@-test-forms-date-pw 2-D-IST
 ```
 
 ### Path 2: Manual Creation
