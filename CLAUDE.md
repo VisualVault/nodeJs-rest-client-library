@@ -50,6 +50,7 @@ nodeV2/
     date-handling/                   # Active: cross-platform date bug investigation
       forms-calendar/                # Forms calendar field testing (8 bugs, ~242 slots)
       web-services/                  # REST API date handling testing (150 slots, complete)
+    form-templates/                  # XML template analysis, generator, redesigned DateTest v2
         README.md                    # Environment setup, runner usage, execution modes
         matrix.md                    # Test matrix — 9 categories (WS-1 through WS-9)
         analysis.md                  # Hypotheses (H-1 to H-12), confirmed behaviors
@@ -183,9 +184,10 @@ Full documentation: [`tasks/date-handling/web-services/README.md`](tasks/date-ha
 
 See `tasks/` folder. Each task gets its own subfolder with analysis, test results, and working notes.
 
-| Task                                  | Status      | Description                                                                                               |
-| ------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
-| [date-handling](tasks/date-handling/) | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Reports, Workflows |
+| Task                                    | Status      | Description                                                                                               |
+| --------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
+| [date-handling](tasks/date-handling/)   | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Reports, Workflows |
+| [form-templates](tasks/form-templates/) | Active      | VV form template XML analysis, format documentation, and improved template generation                     |
 
 ## Platform Documentation
 

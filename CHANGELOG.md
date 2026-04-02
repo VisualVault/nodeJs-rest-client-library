@@ -46,8 +46,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - New Playwright spec files: cat-5 (preset), cat-6 (current date), cat-8 (GetFieldValue), cat-8b (GetDateObject), cat-9-gdoc (GDOC round-trip), cat-9-gfv (GFV round-trip), cat-12 (edge cases) — 11 total category specs
 - Web services date-handling test infrastructure: test matrix (WS-1 through WS-9, 145 slots — complete), form button harness (`ws-harness-button.js`), direct Node.js runner (`run-ws-test.js`), and `README.md` with setup/architecture docs
 
+- `tasks/form-templates/` — new task folder for VV form template XML analysis and generation: original DateTest export, Subscription Pack reference, generator script (`generate-datetest-v2.js`), redesigned DateTest v2 template with descriptive field names (Cal_A, Pre_B, Cur_C), labels, and grouped layout
+
 ### Changed
 
+- Renamed all 28 date fields on the VV platform form: `DataFieldN` → `FieldN` (removed "Data" prefix). Updated 22 files across testing fixtures, helpers, specs, WS harness, commands, and all reference documentation to match
+- Moved XML template exports from `tasks/date-handling/forms-calendar/` to `tasks/form-templates/` with descriptive filenames (`datetest-original.xml`, `subscription-pack.xml`)
 - `[@]-create-date-test` command: parameter changed from execution test IDs (`1.2`) to category test IDs (`7-D-isoZ-BRT`); command now reads from `matrix.md` instead of `results.md`, derives field config from the Config letter, generates TC filenames as `tc-{category-id}.md`, and updates the matrix row (Actual/Status/Evidence) after writing the file
 - `[@]-create-pw-date-test` command: removed Chrome hardcode from initial verification (Phase 0.3); browser row in generated TC specs now reflects actual engine used; Layer 2 re-runs handle multi-browser regression via `npx playwright test --project=...`
 - Playwright output dirs moved from `/tmp/pw-test-results` and `/tmp/pw-report` to `testing/tmp/test-results` and `testing/tmp/playwright-report` (project-local, gitignored) for portability across machines
