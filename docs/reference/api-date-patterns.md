@@ -1,75 +1,101 @@
 # API Date Patterns — Correct DateTime Handling for Web Services
 
-How to send date and datetime values through the VV REST API so they display correctly in Forms.
+How to send date and datetime values through the VV REST API so they display correctly in Forms for users in any timezone.
 
-> Based on confirmed test results from the [WS date-handling investigation](../../tasks/date-handling/web-services/analysis.md) (145 tests, WS-1 through WS-9).
+> Based on confirmed test results from the [WS date-handling investigation](../../tasks/date-handling/web-services/analysis.md) (150 tests, WS-1 through WS-9).
 
 ---
 
 ## The Problem
 
-When a web service creates or updates a form record with a datetime value, the time displayed in the browser may not match the time sent by the script. This happens because:
-
-1. **API appends Z**: The VV server adds a `Z` (UTC indicator) to all stored datetimes. Sending `"2026-03-15T14:30:00"` stores `"2026-03-15T14:30:00Z"`.
-2. **Forms interprets Z as UTC**: When a user opens the form, the V1 calendar component treats the `Z` as real UTC and converts to the user's local timezone.
-3. **Result**: A BRT (UTC-3) user sees 11:30 AM instead of 2:30 PM. An IST (UTC+5:30) user sees 8:00 PM.
+When a web service creates or updates a form record with a datetime value, the time displayed in the browser depends on the user's local timezone. The VV server stores all datetimes in UTC. If the import sends a time without timezone context, the server assumes UTC — and every user sees a different local time.
 
 ```
-Script sends:   "2026-03-15T14:30:00"     (intended: 2:30 PM local)
-Server stores:  "2026-03-15T14:30:00Z"    (treated as 2:30 PM UTC)
-BRT user sees:  "11:30 AM"               (14:30 UTC - 3h = 11:30 local)
-IST user sees:  "8:00 PM"                (14:30 UTC + 5:30 = 20:00 local)
+Import sends:   "2026-03-15T14:30:00"     (no timezone — server treats as UTC)
+Server stores:  "2026-03-15T14:30:00Z"    (UTC)
+
+User in New York (EST, UTC-5):  sees 9:30 AM
+User in Chicago (CST, UTC-6):   sees 8:30 AM
+User in Denver (MST, UTC-7):    sees 7:30 AM
+User in LA (PST, UTC-8):        sees 6:30 AM
+User in São Paulo (BRT, UTC-3): sees 11:30 AM
 ```
+
+If the CSV time `14:30` was meant as "2:30 PM Eastern", only the New York user would see the right time — everyone else gets a shifted value. The import process and server work correctly; the question is **what timezone does the source data represent?**
 
 ---
 
-## Solutions by Scenario
+## Decision Tree for CSV/API DateTime Imports
 
-### Scenario 1: CSV Import — Times are local to a known timezone
+Before writing the import script, answer one question:
 
-If the CSV contains times in a known timezone (e.g., the client is in BRT), append the correct UTC offset before sending:
+### Q: What does the time in the source data represent?
+
+**A) The time is already in UTC** (e.g., database export, API response, system log)
+→ Send with `Z` suffix. Users see their local equivalent. This is correct UTC behavior.
 
 ```javascript
-// CSV row: { date: "2026-03-15", time: "14:30:00" }
-// Client timezone: BRT (UTC-3)
-
-// WRONG — server treats as UTC:
-const wrong = `${row.date}T${row.time}`;
-// → "2026-03-15T14:30:00" → stored as "T14:30:00Z" → BRT sees 11:30 AM
-
-// CORRECT — include the offset:
-const correct = `${row.date}T${row.time}-03:00`;
-// → "2026-03-15T14:30:00-03:00" → stored as "T17:30:00Z" → BRT sees 2:30 PM ✓
+{
+    DataField6: `${row.datetime}Z`;
+}
+// "2026-03-15T14:30:00Z" → stored as-is
+// EST user sees 9:30 AM, CST sees 8:30 AM — each sees their local time ✓
 ```
 
-**Offset reference for common VV client timezones:**
-
-| Timezone           | Offset (standard) |   Offset (DST)    | Example           |
-| ------------------ | :---------------: | :---------------: | ----------------- |
-| BRT (São Paulo)    |     `-03:00`      | `-03:00` (no DST) | `T14:30:00-03:00` |
-| ART (Buenos Aires) |     `-03:00`      | `-03:00` (no DST) | `T14:30:00-03:00` |
-| COT (Colombia)     |     `-05:00`      | `-05:00` (no DST) | `T14:30:00-05:00` |
-| EST (US East)      |     `-05:00`      |  `-04:00` (EDT)   | `T14:30:00-05:00` |
-| CST (US Central)   |     `-06:00`      |  `-05:00` (CDT)   | `T14:30:00-06:00` |
-| PST (US Pacific)   |     `-08:00`      |  `-07:00` (PDT)   | `T14:30:00-08:00` |
-| IST (India)        |     `+05:30`      | `+05:30` (no DST) | `T14:30:00+05:30` |
-
-### Scenario 2: CSV Import — Times are already UTC
-
-If the source data is in UTC (e.g., from a database export), send with `Z`:
+**B) The time is local to a specific timezone** (e.g., "appointment at 2:30 PM Eastern")
+→ Send with the source timezone's UTC offset. The server converts to UTC, and each user sees their local equivalent.
 
 ```javascript
-// CSV: { datetime: "2026-03-15T14:30:00" } — known to be UTC
-const value = `${row.datetime}Z`;
-// → "2026-03-15T14:30:00Z" — stored as-is, displayed as local time in Forms
+// Source timezone: US Eastern (EST = -05:00, EDT = -04:00)
+{
+    DataField6: `${row.date}T${row.time}-05:00`;
+}
+// "2026-03-15T14:30:00-05:00" → stored as "2026-03-15T19:30:00Z"
+// EST user sees 2:30 PM ✓, CST sees 1:30 PM, PST sees 11:30 AM
 ```
 
-### Scenario 3: Date-only fields (no time component)
-
-Date-only fields are unaffected by this issue. All these formats work correctly:
+**C) The time should display identically for ALL users regardless of their timezone** (e.g., "deadline is 2:30 PM — same wall clock for everyone")
+→ This requires `ignoreTZ=true` fields (Config D/H). Send with `Z` — the display ignores timezone conversion.
 
 ```javascript
-// All of these store "2026-03-15T00:00:00Z" and display as "03/15/2026"
+// Field must have ignoreTZ=true in form designer
+{
+    DataField5: '2026-03-15T14:30:00Z';
+}
+// Display shows "2:30 PM" for ALL users regardless of timezone
+// ⚠ rawValue in the form will shift per user TZ (CB-8) — but display is stable
+```
+
+**D) The time has no timezone context** (CSV just has `"14:30"` with no indication of what TZ)
+→ You need to determine the source timezone from context. Without it, the server will treat it as UTC and users will see shifted times. There is no safe default — ask the data provider.
+
+---
+
+## UTC Offset Reference
+
+If the source data has a known timezone, use these offsets. **US timezones observe DST** — the offset changes seasonally.
+
+| Timezone           | Standard |      DST       | DST Period (approx.) |
+| ------------------ | :------: | :------------: | -------------------- |
+| US Eastern (ET)    | `-05:00` | `-04:00` (EDT) | Mar–Nov              |
+| US Central (CT)    | `-06:00` | `-05:00` (CDT) | Mar–Nov              |
+| US Mountain (MT)   | `-07:00` | `-06:00` (MDT) | Mar–Nov              |
+| US Pacific (PT)    | `-08:00` | `-07:00` (PDT) | Mar–Nov              |
+| Arizona (no DST)   | `-07:00` |    `-07:00`    | —                    |
+| São Paulo (BRT)    | `-03:00` |    `-03:00`    | No DST               |
+| Buenos Aires (ART) | `-03:00` |    `-03:00`    | No DST               |
+| Colombia (COT)     | `-05:00` |    `-05:00`    | No DST               |
+| India (IST)        | `+05:30` |    `+05:30`    | No DST               |
+
+**DST complication**: If your CSV spans dates across DST transitions (early March or early November for US), some rows may need `-05:00` and others `-04:00` for the same timezone. Use a library like `luxon` or `moment-timezone` to compute the correct offset per date.
+
+---
+
+## Date-Only Fields (No Time Component)
+
+Date-only fields are **not affected** by this issue. All these formats work correctly and display the same date for all users:
+
+```javascript
 {
     DataField7: '2026-03-15';
 } // ISO — recommended
@@ -81,7 +107,9 @@ Date-only fields are unaffected by this issue. All these formats work correctly:
 } // English — works
 ```
 
-### Scenario 4: Script computes dates/times dynamically
+---
+
+## Script-Computed Dates
 
 When your script calculates dates (due dates, deadlines, offsets), use TZ-safe patterns:
 
@@ -107,54 +135,59 @@ d.setDate(d.getDate() + 30); // Local arithmetic — may vary per TZ
 
 ## Quick Reference: What to Send
 
-| Field Type | Source Data           | Send This       | Example                       |
-| ---------- | --------------------- | --------------- | ----------------------------- |
-| Date-only  | Any date string       | ISO date        | `"2026-03-15"`                |
-| DateTime   | Local time (known TZ) | ISO + offset    | `"2026-03-15T14:30:00-03:00"` |
-| DateTime   | UTC time              | ISO + Z         | `"2026-03-15T14:30:00Z"`      |
-| DateTime   | Computed              | `toISOString()` | `"2026-03-15T14:30:00.000Z"`  |
+| Field Type | Source Data                       | Send This                        | Example                       |
+| ---------- | --------------------------------- | -------------------------------- | ----------------------------- |
+| Date-only  | Any date string                   | ISO date                         | `"2026-03-15"`                |
+| DateTime   | UTC time                          | ISO + Z                          | `"2026-03-15T14:30:00Z"`      |
+| DateTime   | Local time (known TZ)             | ISO + offset                     | `"2026-03-15T14:30:00-05:00"` |
+| DateTime   | Computed                          | `toISOString()`                  | `"2026-03-15T14:30:00.000Z"`  |
+| DateTime   | Display-only (same for all users) | ISO + Z on `ignoreTZ=true` field | `"2026-03-15T14:30:00Z"`      |
 
 ---
 
 ## What NOT to Send
 
-| Input                                  | Problem                                                         |
-| -------------------------------------- | --------------------------------------------------------------- |
-| `"2026-03-15T14:30:00"` (no offset)    | Server adds Z → treated as UTC → wrong local display            |
-| `"15/03/2026"` (DD/MM/YYYY)            | Silently stored as null — complete data loss (Bug #8)           |
-| `"05/03/2026"` (ambiguous)             | Interpreted as May 3 (MM/DD), not March 5 — wrong date silently |
-| `1773532800000` (epoch ms)             | Silently stored as null — numeric timestamps not supported      |
-| `"1773532800000"` (epoch string)       | Silently stored as null — numeric strings not parsed as dates   |
-| `new Date("03/15/2026")` (Date object) | Serialized as local midnight → different UTC per server TZ      |
+| Input                                     | Problem                                                          |
+| ----------------------------------------- | ---------------------------------------------------------------- |
+| `"2026-03-15T14:30:00"` (no offset, no Z) | Server adds Z → treated as UTC → wrong display if time was local |
+| `"15/03/2026"` (DD/MM/YYYY)               | Silently stored as null — complete data loss (Bug #8)            |
+| `"05/03/2026"` (ambiguous)                | Interpreted as May 3 (MM/DD), not March 5 — wrong date silently  |
+| `1773532800000` (epoch ms)                | Silently stored as null — numeric timestamps not supported       |
+| `"1773532800000"` (epoch string)          | Silently stored as null — numeric strings not parsed as dates    |
+| `new Date("03/15/2026")` (Date object)    | Serialized as local midnight → different UTC per server TZ       |
 
 ---
 
 ## How to Fix Existing Records
 
-If records were already created with incorrect times (no offset), you can correct them via `postFormRevision()`:
+If records were created with times that lack timezone context (no offset, no Z), the stored values are treated as UTC. To correct them, compute the intended UTC value and update:
 
 ```javascript
-// Read the record
+// Example: stored "2026-03-15T14:30:00Z" but was actually US Eastern (EDT, -04:00)
+// Correct UTC = 14:30 + 4h = 18:30 UTC
 const record = await vvClient.forms.getForms(
     { q: "[instanceName] eq 'MyRecord-000123'", expand: true },
     'MyFormTemplate'
 );
-const stored = record.data[0].dataField6; // "2026-03-15T14:30:00Z" (wrong — was local, not UTC)
 
-// The stored value "T14:30:00Z" was actually BRT local (T14:30:00-03:00 = T17:30:00Z)
-// Correct it by replacing with the right UTC value:
-const corrected = '2026-03-15T17:30:00Z'; // or compute from original + offset
+// Compute corrected value: original_local_time + abs(offset) = correct_UTC
+// 14:30 Eastern (EDT) = 14:30 + 04:00 = 18:30 UTC
+const corrected = '2026-03-15T18:30:00Z';
 
 await vvClient.forms.postFormRevision(null, { DataField6: corrected }, 'MyFormTemplate', record.data[0].revisionId);
 ```
+
+For batch corrections, you need to know the original source timezone to compute the right offset. If the source timezone is unknown, there's no way to determine the correct UTC value programmatically.
 
 ---
 
 ## Evidence
 
-| Test | Finding                                                  | Reference                                                                              |
-| ---- | -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| WS-4 | API Z normalization causes cross-layer time shift (CB-8) | [ws-4-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-4-batch-run-1.md) |
-| WS-5 | Server converts TZ offsets to UTC correctly (CB-12)      | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md) |
-| WS-5 | DD/MM/YYYY silently stored as null — Bug #8              | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md) |
-| WS-9 | TZ-safe vs unsafe Date patterns (CB-24–CB-28)            | [ws-9-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-9-batch-run-1.md) |
+| Test   | Finding                                                 | Reference                                                                              |
+| ------ | ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| WS-1   | Server TZ irrelevant for API writes (H-4)               | [matrix.md WS-1](../../tasks/date-handling/web-services/matrix.md)                     |
+| WS-4   | API Z normalization → Forms TZ-dependent display (CB-8) | [ws-4-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-4-batch-run-1.md) |
+| WS-5   | Server converts TZ offsets to UTC correctly (CB-12)     | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md) |
+| WS-5   | DD/MM/YYYY silently stored as null — Bug #8             | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md) |
+| WS-9   | TZ-safe vs unsafe Date patterns (CB-24–CB-28)           | [ws-9-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-9-batch-run-1.md) |
+| Cat 10 | Epoch silent null, midnight-crossing                    | [cat10-gaps-run-1.md](../../tasks/date-handling/web-services/runs/cat10-gaps-run-1.md) |
