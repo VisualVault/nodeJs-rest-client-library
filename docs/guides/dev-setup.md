@@ -175,6 +175,32 @@ You can also target a single cell: `npx playwright test --config=testing/playwri
 
 WS testing uses a direct Node.js runner to call the VV API. No server or browser needed for API-only tests.
 
+### 5.0 Server-Side Credentials (`.env.json`)
+
+When running tests through VV's Microservice routing (browser path), the server needs credentials to authenticate API calls. Create `.env.json` in the repo root (gitignored):
+
+```json
+{
+    "activeEnv": "vvdemo",
+    "environments": {
+        "vvdemo": {
+            "baseUrl": "https://vvdemo.visualvault.com",
+            "customerAlias": "YourCustomer",
+            "databaseAlias": "Main",
+            "clientId": "YOUR_CLIENT_ID",
+            "clientSecret": "YOUR_CLIENT_SECRET",
+            "userId": "YOUR_CLIENT_ID",
+            "password": "YOUR_CLIENT_SECRET",
+            "audience": ""
+        }
+    }
+}
+```
+
+`app.js` loads the active environment into `global.VV_ENV` at startup. Server-side scripts read from this global via `getCredentials()`. Switch environments by changing `activeEnv` and restarting the server.
+
+The direct runner (`run-ws-test.js`) uses `testing/config/vv-config.json` instead — it doesn't go through the server.
+
 ### 5.1 Prerequisites
 
 - VV credentials in `testing/config/vv-config.json` with `clientId` and `clientSecret` fields (see section 4.3)

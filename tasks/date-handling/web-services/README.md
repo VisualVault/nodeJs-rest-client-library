@@ -41,9 +41,10 @@ If this prints a JSON response with `"status": "Success"`, the runner is working
 
 Only needed for WS-4 (API→Forms cross-layer) or to validate the full production path.
 
-1. Node.js server running: `node lib/VVRestApi/VVRestApiNodeJs/app.js` (port 3000)
-2. Server accessible from VV: `ngrok http 3000` (or deploy to a public URL)
-3. One-time VV configuration (see below)
+1. `.env.json` in repo root with credentials for the active environment (see [dev-setup.md section 5.0](../../docs/guides/dev-setup.md#50-server-side-credentials-envjson))
+2. Node.js server running: `node lib/VVRestApi/VVRestApiNodeJs/app.js` (port 3000)
+3. Server accessible from VV: `ngrok http 3000` (or deploy to a public URL)
+4. One-time VV configuration (see below)
 
 ### One-Time VV Configuration (Browser Path Only)
 

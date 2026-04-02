@@ -156,6 +156,7 @@ $RECYCLE.BIN/
 # local nodeJS dev
 .vscode
 node_modules/
+.env.json
 lib/VVRestApi/VVRestApiNodeJS/node_modules/
 lib/VVRestApi/VVRestApiNodeJS/files
 scripts/test-scripts
