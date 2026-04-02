@@ -409,7 +409,7 @@ module.exports.main = async function (ffCollection, vvClient, response) {
 
     /* ----------------------------- Action Handlers ----------------------------- */
 
-    async function actionSetDate(targetConfigs, inputDate) {
+    async function actionSetDate(targetConfigs, inputDate, isDebug) {
         // WS-1: Create a record with inputDate in each target config field, then read back to verify
         const fieldValues = {};
         for (const configKey of targetConfigs) {
@@ -432,7 +432,7 @@ module.exports.main = async function (ffCollection, vvClient, response) {
             })
         );
 
-        return {
+        const result = {
             action: 'WS-1',
             targetConfigs,
             inputDate,
@@ -441,9 +441,16 @@ module.exports.main = async function (ffCollection, vvClient, response) {
             serverTime: new Date().toISOString(),
             results,
         };
+
+        if (isDebug) {
+            result.rawRecord = record;
+            result.fieldValuesSent = fieldValues;
+        }
+
+        return result;
     }
 
-    async function actionGetDate(targetConfigs, recordID) {
+    async function actionGetDate(targetConfigs, recordID, isDebug) {
         // WS-2: Read an existing record and return the API values for each target config
         const record = await readFormRecord(recordID);
         const stored = extractDateFields(record, targetConfigs);
@@ -454,7 +461,7 @@ module.exports.main = async function (ffCollection, vvClient, response) {
             })
         );
 
-        return {
+        const result = {
             action: 'WS-2',
             targetConfigs,
             inputDate: null,
@@ -462,6 +469,12 @@ module.exports.main = async function (ffCollection, vvClient, response) {
             serverTime: new Date().toISOString(),
             results,
         };
+
+        if (isDebug) {
+            result.rawRecord = record;
+        }
+
+        return result;
     }
 
     async function actionRoundTrip() {
@@ -494,6 +507,7 @@ module.exports.main = async function (ffCollection, vvClient, response) {
         const targetConfigsRaw = getFieldValueByName('TargetConfigs', true);
         const recordID = getFieldValueByName('RecordID', true);
         const inputDate = getFieldValueByName('InputDate', true);
+        const debug = getFieldValueByName('Debug', true).toLowerCase() === 'true';
 
         if (output.errors.length > 0) {
             throw new Error();
@@ -505,11 +519,11 @@ module.exports.main = async function (ffCollection, vvClient, response) {
         switch (action) {
             case 'WS-1':
                 if (!inputDate) throw new Error('InputDate is required for WS-1');
-                output.data = await actionSetDate(targetConfigs, inputDate);
+                output.data = await actionSetDate(targetConfigs, inputDate, debug);
                 break;
             case 'WS-2':
                 if (!recordID) throw new Error('RecordID is required for WS-2');
-                output.data = await actionGetDate(targetConfigs, recordID);
+                output.data = await actionGetDate(targetConfigs, recordID, debug);
                 break;
             case 'WS-3':
                 output.data = await actionRoundTrip(targetConfigs, recordID, inputDate);
@@ -528,6 +542,12 @@ module.exports.main = async function (ffCollection, vvClient, response) {
                 break;
             default:
                 throw new Error(`Unknown action: '${action}'. Valid: WS-1 through WS-7`);
+        }
+
+        // Enrich output with diagnostics
+        if (output.data) {
+            output.data.serverTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            output.data.parameters = { action, targetConfigsRaw, recordID, inputDate, debug };
         }
 
         // Set status

@@ -68,10 +68,46 @@ Add a button to the form and assign `ws-harness-button.js` as its script. The sc
 
 ## Test Execution
 
-| Mode            | Tool                 | Use case                                        |
-| --------------- | -------------------- | ----------------------------------------------- |
-| **Exploration** | Claude-in-Chrome MCP | Fill matrix slots, initial discovery, debugging |
-| **Regression**  | Playwright           | Automated repeat runs across configs/TZs        |
+| Mode              | Tool                 | Use case                                                         |
+| ----------------- | -------------------- | ---------------------------------------------------------------- |
+| **Direct runner** | `run-ws-test.js`     | API-only tests (WS-1-3, WS-5-9). Debugger support. Primary path. |
+| **Exploration**   | Claude-in-Chrome MCP | WS-4 (browser required), ad-hoc inspection                       |
+| **Regression**    | Playwright           | Automated repeat runs across configs/TZs                         |
+
+### Direct runner (primary for API tests)
+
+Calls the harness directly in Node.js — no server, no VV Microservice, no browser. Full debugger support.
+
+```bash
+# Basic usage
+node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A,D --input-date 2026-03-15
+
+# Read existing record
+node tasks/date-handling/web-services/run-ws-test.js --action WS-2 --configs ALL --record-id DateTest-000080
+
+# With debug (includes raw API response in output)
+node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15 --debug
+
+# With VS Code debugger
+node --inspect-brk tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+
+# Simulate cloud TZ
+TZ=UTC node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+```
+
+**Credentials**: Reads from `testing/config/vv-config.json`. Required fields:
+
+```json
+{
+    "loginUrl": "https://vvdemo.visualvault.com",
+    "customerAlias": "EmanuelJofre",
+    "databaseAlias": "Main",
+    "clientId": "YOUR_CLIENT_ID",
+    "clientSecret": "YOUR_CLIENT_SECRET",
+    "username": "your.email@example.com",
+    "password": "your-password"
+}
+```
 
 ### Exploration flow (MCP)
 
