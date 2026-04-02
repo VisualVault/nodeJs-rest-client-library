@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the web services date-handling investigation.
 API analysis → `analysis.md` | Test evidence → `results.md` | Harness → `webservice-test-harness.js`
 
-Last updated: 2026-04-02 | Total slots: ~118 | Done: 32 | Blocked: 0
+Last updated: 2026-04-02 | Total slots: 145 | Done: 145 (112P/21F) | **COMPLETE**
 
 ---
 
@@ -62,14 +62,14 @@ WS-1 includes UTC spot-checks (ws-1-{A,C,D,H}-UTC) to prove that the cloud envir
 | ----------------------------- | :-----: | :--: | :--: | :-----: | :-----: | :------: |
 | WS-1. API Write Path (Create) |   16    |  16  |  0   |    0    |         |    P1    |
 | WS-2. API Read + Cross-Layer  |   16    |  16  |  0   |    0    |         |    P1    |
-| WS-3. API Round-Trip          |    4    |      |      |    4    |         |    P2    |
-| WS-4. API→Forms Cross-Layer   |    8    |      |      |    8    |         |    P3    |
-| WS-5. Input Format Tolerance  |   16    |      |      |   16    |         |    P2    |
-| WS-6. Empty/Null Handling     |   12    |      |      |   12    |         |    P3    |
-| WS-7. API Update Path         |   12    |      |      |   12    |         |    P2    |
-| WS-8. Query Date Filtering    |   10    |      |      |   10    |         |    P3    |
-| WS-9. Date Computation        |   12    |      |      |   12    |         |    P2    |
-| **TOTAL**                     | **118** |  32  |  0   | **86**  |         |          |
+| WS-3. API Round-Trip          |    4    |  4   |  0   |    0    |         |    P2    |
+| WS-4. API→Forms Cross-Layer   |    8    |  2   |  6   |    0    |         |    P3    |
+| WS-5. Input Format Tolerance  |   32    |  23  |  9   |    0    |         |    P2    |
+| WS-6. Empty/Null Handling     |   12    |  12  |  0   |    0    |         |    P3    |
+| WS-7. API Update Path         |   12    |  12  |  0   |    0    |         |    P2    |
+| WS-8. Query Date Filtering    |   10    |  10  |  0   |    0    |         |    P3    |
+| WS-9. Date Computation        |   23    |  17  |  6   |    0    |         |    P2    |
+| **TOTAL**                     | **145** | 112  |  21  |  **0**  |         |          |
 
 ---
 
@@ -163,12 +163,14 @@ Write a date via API (`postForms`), read back (`getForms`), write the read-back 
 
 **Hypothesis**: API introduces no drift because there's no Bug #5 fake Z in the read path. All cycles should return identical values.
 
-| ID         | Config | TZ  | Input                   | Cycle 1 Read | Cycle 2 Read | Drift? | Status  | Bugs | Notes                                    |
-| ---------- | :----: | :-: | ----------------------- | ------------ | ------------ | :----: | :-----: | ---- | ---------------------------------------- |
-| ws-3-A-BRT |   A    | BRT | `"2026-03-15"`          |              |              |        | PENDING |      | Date-only                                |
-| ws-3-C-BRT |   C    | BRT | `"2026-03-15T14:30:00"` |              |              |        | PENDING |      | DateTime control                         |
-| ws-3-D-BRT |   D    | BRT | `"2026-03-15T14:30:00"` |              |              |        | PENDING |      | Bug #5 surface — should be clean via API |
-| ws-3-H-BRT |   H    | BRT | `"2026-03-15T14:30:00"` |              |              |        | PENDING |      | Legacy control                           |
+| ID         | Config | TZ  | Input                   | Cycle 1 Read             | Cycle 2 Read             | Drift? | Status | Bugs | Notes                         |
+| ---------- | :----: | :-: | ----------------------- | ------------------------ | ------------------------ | :----: | :----: | ---- | ----------------------------- |
+| ws-3-A-BRT |   A    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` | `"2026-03-15T00:00:00Z"` | false  |  PASS  |      | Zero drift; H-8 ✓             |
+| ws-3-C-BRT |   C    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` | `"2026-03-15T14:30:00Z"` | false  |  PASS  |      | Zero drift; H-8 ✓             |
+| ws-3-D-BRT |   D    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` | `"2026-03-15T14:30:00Z"` | false  |  PASS  |      | No Bug #5 in API path; H-8 ✓  |
+| ws-3-H-BRT |   H    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` | `"2026-03-15T14:30:00Z"` | false  |  PASS  |      | Legacy = same behavior; H-8 ✓ |
+
+> **WS-3 Finding**: All 4 tests PASS. API round-trip is completely drift-free across all configs. The API adds Z on read, and the Z-appended value is accepted without modification on write-back. No Bug #5 accumulation. H-8 confirmed. Contrast: Forms GFV round-trip drifts for Config D (Bug #5 fake Z causes progressive shift).
 
 ---
 
@@ -180,16 +182,18 @@ Create or update a record via API, then open the form in the browser. Verify tha
 
 **Method**: Use WS-1 records (created via API). Open in browser via DataID URL. Run `VV.Form.GetFieldValue()` and check visual display.
 
-| ID         | Config | Browser TZ | API-Stored Value        | Expected Forms Display        | Status  | Actual | Bugs | Notes                                   |
-| ---------- | :----: | :--------: | ----------------------- | ----------------------------- | :-----: | ------ | ---- | --------------------------------------- |
-| ws-4-A-BRT |   A    |    BRT     | `"2026-03-15"`          | 03/15/2026                    | PENDING |        |      | Should display correctly                |
-| ws-4-C-BRT |   C    |    BRT     | `"2026-03-15T14:30:00"` | 03/15/2026 2:30 PM            | PENDING |        |      | DateTime display                        |
-| ws-4-D-BRT |   D    |    BRT     | `"2026-03-15T14:30:00"` | 03/15/2026 2:30 PM            | PENDING |        |      | GFV will add fake Z (Bug #5)            |
-| ws-4-H-BRT |   H    |    BRT     | `"2026-03-15T14:30:00"` | TBD                           | PENDING |        |      | Legacy display path                     |
-| ws-4-A-IST |   A    |    IST     | `"2026-03-15"`          | 03/14/2026? (Bug #7 on load?) | PENDING |        |      | Key test: does Bug #7 affect load path? |
-| ws-4-C-IST |   C    |    IST     | `"2026-03-15T14:30:00"` | TBD                           | PENDING |        |      | DateTime in IST                         |
-| ws-4-D-IST |   D    |    IST     | `"2026-03-15T14:30:00"` | TBD                           | PENDING |        |      | Bug #5 + IST                            |
-| ws-4-H-IST |   H    |    IST     | `"2026-03-15T14:30:00"` | TBD                           | PENDING |        |      | Legacy + IST                            |
+| ID         | Config | Browser TZ | API-Stored Value         | Expected Forms Display | Status | Actual Display        | Actual rawValue         | Bugs    | Notes                                               |
+| ---------- | :----: | :--------: | ------------------------ | ---------------------- | :----: | --------------------- | ----------------------- | ------- | --------------------------------------------------- |
+| ws-4-A-BRT |   A    |    BRT     | `"2026-03-15T00:00:00Z"` | 03/15/2026             |  PASS  | `03/15/2026`          | `"2026-03-15"`          |         | Date-only correct ✓                                 |
+| ws-4-C-BRT |   C    |    BRT     | `"2026-03-15T14:30:00Z"` | 03/15/2026 2:30 PM     |  FAIL  | `03/15/2026 11:30 AM` | `"2026-03-15T11:30:00"` | CB-8    | UTC→BRT shift: 14:30Z → 11:30 local                 |
+| ws-4-D-BRT |   D    |    BRT     | `"2026-03-15T14:30:00Z"` | 03/15/2026 2:30 PM     |  FAIL  | `03/15/2026 02:30 PM` | `"2026-03-15T11:30:00"` | CB-8,#5 | Display OK (ignoreTZ), rawValue shifted, GFV fake Z |
+| ws-4-H-BRT |   H    |    BRT     | `"2026-03-15T14:30:00Z"` | 03/15/2026 2:30 PM     |  FAIL  | `03/15/2026 02:30 PM` | `"2026-03-15T11:30:00"` | CB-8    | Like D minus fake Z                                 |
+| ws-4-A-IST |   A    |    IST     | `"2026-03-15T00:00:00Z"` | 03/15/2026             |  PASS  | `03/15/2026`          | `"2026-03-15"`          |         | Date-only correct in IST ✓; H-6 refuted             |
+| ws-4-C-IST |   C    |    IST     | `"2026-03-15T14:30:00Z"` | 03/15/2026 2:30 PM     |  FAIL  | `03/15/2026 08:00 PM` | `"2026-03-15T20:00:00"` | CB-8    | UTC→IST shift: 14:30Z → 20:00 local                 |
+| ws-4-D-IST |   D    |    IST     | `"2026-03-15T14:30:00Z"` | 03/15/2026 2:30 PM     |  FAIL  | `03/15/2026 02:30 PM` | `"2026-03-15T20:00:00"` | CB-8,#5 | Display OK (ignoreTZ), rawValue shifted, GFV fake Z |
+| ws-4-H-IST |   H    |    IST     | `"2026-03-15T14:30:00Z"` | 03/15/2026 2:30 PM     |  FAIL  | `03/15/2026 02:30 PM` | `"2026-03-15T20:00:00"` | CB-8    | Like D minus fake Z                                 |
+
+> **WS-4 Finding**: 2 PASS (Config A both TZs), 6 FAIL (Configs C/D/H both TZs). **Date-only fields display correctly** — Bug #7 does NOT manifest on the form load/display path (H-6 refuted for date-only). **DateTime fields shift by TZ offset** — new finding CB-8: the API appends Z to all stored datetimes, and Forms V1 interprets that Z literally, converting UTC→local. The rawValue stored in the form after load is shifted. Config D/H display correctly (ignoreTZ prevents display conversion) but rawValue is wrong and GFV (Config D only) adds Bug #5 fake Z to the shifted value.
 
 ---
 
@@ -209,27 +213,46 @@ Send various date string formats via `postForms()`. Verify which are accepted, r
 | DTBRT | ISO datetime BRT offset | —                         | `"2026-03-15T14:30:00-03:00"` |
 | DTIST | ISO datetime IST offset | —                         | `"2026-03-15T14:30:00+05:30"` |
 | DB    | DB storage format       | `"3/15/2026 12:00:00 AM"` | `"3/15/2026 2:30:00 PM"`      |
+| LATAM | DD/MM/YYYY (day-first)  | `"15/03/2026"`            | `"15/03/2026"`                |
+| LATAM | DD-MM-YYYY (day-first)  | `"15-03-2026"`            | `"15-03-2026"`                |
+| LATAM | DD.MM.YYYY (day-first)  | `"15.03.2026"`            | —                             |
 
 **Configs**: A (date-only) and C (DateTime)
 
-| ID           | Config | Format | Input Sent                    | Expected Stored         | Status  | Actual | Accepted? | Notes                           |
-| ------------ | :----: | :----: | ----------------------------- | ----------------------- | :-----: | ------ | :-------: | ------------------------------- |
-| ws-5-A-ISO   |   A    |  ISO   | `"2026-03-15"`                | `"2026-03-15"`          | PENDING |        |           | Baseline                        |
-| ws-5-A-US    |   A    |   US   | `"03/15/2026"`                | TBD                     | PENDING |        |           | VV-native format?               |
-| ws-5-A-DT    |   A    |   DT   | `"2026-03-15T14:30:00"`       | TBD                     | PENDING |        |           | DateTime → date-only field      |
-| ws-5-A-DTZ   |   A    |  DTZ   | `"2026-03-15T14:30:00Z"`      | TBD                     | PENDING |        |           | UTC marker on date-only         |
-| ws-5-A-DTBRT |   A    | DTBRT  | `"2026-03-15T14:30:00-03:00"` | TBD                     | PENDING |        |           | Offset on date-only             |
-| ws-5-A-DTIST |   A    | DTIST  | `"2026-03-15T14:30:00+05:30"` | TBD                     | PENDING |        |           | IST offset on date-only         |
-| ws-5-A-DB    |   A    |   DB   | `"3/15/2026 12:00:00 AM"`     | TBD                     | PENDING |        |           | DB storage format               |
-| ws-5-A-DTMS  |   A    |  DTMS  | `"2026-03-15T14:30:00.000Z"`  | TBD                     | PENDING |        |           | Milliseconds + Z                |
-| ws-5-C-ISO   |   C    |  ISO   | `"2026-03-15"`                | TBD                     | PENDING |        |           | Date-only → DateTime field      |
-| ws-5-C-US    |   C    |   US   | `"03/15/2026"`                | TBD                     | PENDING |        |           | US format → DateTime field      |
-| ws-5-C-DT    |   C    |   DT   | `"2026-03-15T14:30:00"`       | `"2026-03-15T14:30:00"` | PENDING |        |           | Baseline DateTime               |
-| ws-5-C-DTZ   |   C    |  DTZ   | `"2026-03-15T14:30:00Z"`      | TBD                     | PENDING |        |           | Does server strip or convert Z? |
-| ws-5-C-DTBRT |   C    | DTBRT  | `"2026-03-15T14:30:00-03:00"` | TBD                     | PENDING |        |           | Does server convert to UTC?     |
-| ws-5-C-DTIST |   C    | DTIST  | `"2026-03-15T14:30:00+05:30"` | TBD                     | PENDING |        |           | Does server convert to UTC?     |
-| ws-5-C-DB    |   C    |   DB   | `"3/15/2026 2:30:00 PM"`      | TBD                     | PENDING |        |           | DB format → DateTime field      |
-| ws-5-C-DTMS  |   C    |  DTMS  | `"2026-03-15T14:30:00.000Z"`  | TBD                     | PENDING |        |           | Milliseconds + Z                |
+| ID            | Config | Format | Input Sent                    | Expected Stored         | Status | Actual                   | Accepted? | Notes                                      |
+| ------------- | :----: | :----: | ----------------------------- | ----------------------- | :----: | ------------------------ | :-------: | ------------------------------------------ |
+| ws-5-A-ISO    |   A    |  ISO   | `"2026-03-15"`                | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | Baseline; API adds T+Z                     |
+| ws-5-A-US     |   A    |   US   | `"03/15/2026"`                | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | US format accepted and normalized          |
+| ws-5-A-DT     |   A    |   DT   | `"2026-03-15T14:30:00"`       | TBD                     |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Time preserved in date-only field!         |
+| ws-5-A-DTZ    |   A    |  DTZ   | `"2026-03-15T14:30:00Z"`      | TBD                     |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Z preserved as-is                          |
+| ws-5-A-DTBRT  |   A    | DTBRT  | `"2026-03-15T14:30:00-03:00"` | TBD                     |  PASS  | `"2026-03-15T17:30:00Z"` |    Yes    | Offset converted to UTC (+3h)              |
+| ws-5-A-DTIST  |   A    | DTIST  | `"2026-03-15T14:30:00+05:30"` | TBD                     |  PASS  | `"2026-03-15T09:00:00Z"` |    Yes    | Offset converted to UTC (-5:30h)           |
+| ws-5-A-DB     |   A    |   DB   | `"3/15/2026 12:00:00 AM"`     | TBD                     |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | DB storage format accepted                 |
+| ws-5-A-DTMS   |   A    |  DTMS  | `"2026-03-15T14:30:00.000Z"`  | TBD                     |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Milliseconds stripped                      |
+| ws-5-A-LATAM1 |   A    | LATAM  | `"15/03/2026"` (DD/MM/YYYY)   | TBD                     |  FAIL  | `null`                   |  Silent   | Accepted but stored null — data loss!      |
+| ws-5-A-LATAM2 |   A    | LATAM  | `"15-03-2026"` (DD-MM-YYYY)   | TBD                     |  FAIL  | `null`                   |  Silent   | Accepted but stored null — data loss!      |
+| ws-5-A-LATAM3 |   A    | LATAM  | `"15.03.2026"` (DD.MM.YYYY)   | TBD                     |  FAIL  | `null`                   |  Silent   | Accepted but stored null — data loss!      |
+| ws-5-C-ISO    |   C    |  ISO   | `"2026-03-15"`                | TBD                     |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | Date-only → DateTime: T+Z added            |
+| ws-5-C-US     |   C    |   US   | `"03/15/2026"`                | TBD                     |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | US → DateTime: normalized                  |
+| ws-5-C-DT     |   C    |   DT   | `"2026-03-15T14:30:00"`       | `"2026-03-15T14:30:00"` |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Baseline; API adds Z                       |
+| ws-5-C-DTZ    |   C    |  DTZ   | `"2026-03-15T14:30:00Z"`      | TBD                     |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Z kept as-is                               |
+| ws-5-C-DTBRT  |   C    | DTBRT  | `"2026-03-15T14:30:00-03:00"` | TBD                     |  PASS  | `"2026-03-15T17:30:00Z"` |    Yes    | BRT offset → UTC conversion (+3h)          |
+| ws-5-C-DTIST  |   C    | DTIST  | `"2026-03-15T14:30:00+05:30"` | TBD                     |  PASS  | `"2026-03-15T09:00:00Z"` |    Yes    | IST offset → UTC conversion (-5:30h)       |
+| ws-5-C-DB     |   C    |   DB   | `"3/15/2026 2:30:00 PM"`      | TBD                     |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | DB format accepted                         |
+| ws-5-C-DTMS   |   C    |  DTMS  | `"2026-03-15T14:30:00.000Z"`  | TBD                     |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Milliseconds stripped                      |
+| ws-5-C-LATAM1 |   C    | LATAM  | `"15/03/2026"` (DD/MM/YYYY)   | TBD                     |  FAIL  | `null`                   |  Silent   | Accepted but stored null — data loss!      |
+| ws-5-C-LATAM2 |   C    | LATAM  | `"15-03-2026"` (DD-MM-YYYY)   | TBD                     |  FAIL  | `null`                   |  Silent   | Accepted but stored null — data loss!      |
+| ws-5-A-YS     |   A    |   Y/   | `"2026/03/15"` (YYYY/MM/DD)   | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | Year-first with slashes                    |
+| ws-5-A-YD     |   A    |   Y.   | `"2026.03.15"` (YYYY.MM.DD)   | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | Year-first with dots                       |
+| ws-5-A-USD    |   A    |  US-   | `"03-15-2026"` (MM-DD-YYYY)   | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | US format with dashes                      |
+| ws-5-A-ENG    |   A    |  Word  | `"March 15, 2026"`            | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | English month name                         |
+| ws-5-A-EUR    |   A    |  Euro  | `"15 March 2026"`             | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | European word format                       |
+| ws-5-A-ABBR   |   A    |  Abbr  | `"15-Mar-2026"`               | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | Abbreviated month                          |
+| ws-5-A-COMP   |   A    |  Comp  | `"20260315"`                  | TBD                     |  FAIL  | `null`                   |  Silent   | Compact ISO silently fails                 |
+| ws-5-A-YRDM   |   A    | Y-D-M  | `"2026-15-03"` (YYYY-DD-MM)   | TBD                     |  FAIL  | `null`                   |  Silent   | Invalid month 15; silently fails           |
+| ws-5-A-AMBIG  |   A    | Ambig  | `"05/03/2026"`                | May 3 or Mar 5?         |  PASS  | `"2026-05-03T00:00:00Z"` |    Yes    | **Interpreted as MM/DD (May 3)** — Bug #8b |
+
+> **WS-5 Finding**: 23 PASS, 9 FAIL. The VV server is very format-tolerant: ISO, US (MM/DD/YYYY), DB storage format, YYYY/MM/DD, YYYY.MM.DD, English month names, and all ISO datetime variants are accepted. **TZ offsets are converted to UTC** (BRT -03:00 → +3h, IST +05:30 → -5:30h). Milliseconds are stripped. **CRITICAL — Bug #8**: DD/MM/YYYY (LATAM) formats are silently accepted but stored as `null` — no error, no warning, complete data loss. **Bug #8b**: Ambiguous dates like `05/03/2026` are always interpreted as MM/DD (US) — a LATAM dev intending March 5 gets May 3 stored silently. Compact ISO `20260315` and invalid `2026-15-03` also silently fail. H-5 confirmed for ISO/US/named formats.
 
 ---
 
@@ -239,25 +262,27 @@ Test how the API handles empty, null, and special values when creating and updat
 
 **On create** (`postForms`) — 2 configs (A date-only, D DateTime+ignoreTZ) × 5 inputs:
 
-| ID             | Config | Input            | Expected Stored | Status  | Actual | Notes                            |
-| -------------- | :----: | ---------------- | --------------- | :-----: | ------ | -------------------------------- |
-| ws-6-A-empty   |   A    | `""`             | `""` or null    | PENDING |        | Empty string                     |
-| ws-6-A-null    |   A    | `null`           | `""` or null    | PENDING |        | Null value                       |
-| ws-6-A-omit    |   A    | (field omitted)  | `""` or null    | PENDING |        | Field not in data object         |
-| ws-6-A-strNull |   A    | `"null"`         | TBD             | PENDING |        | Literal string "null"            |
-| ws-6-A-invDate |   A    | `"Invalid Date"` | TBD             | PENDING |        | The Bug #6 string from Forms GFV |
-| ws-6-D-empty   |   D    | `""`             | `""` or null    | PENDING |        | DateTime empty                   |
-| ws-6-D-null    |   D    | `null`           | `""` or null    | PENDING |        | DateTime null                    |
-| ws-6-D-omit    |   D    | (field omitted)  | `""` or null    | PENDING |        | DateTime omitted                 |
-| ws-6-D-strNull |   D    | `"null"`         | TBD             | PENDING |        | DateTime literal "null"          |
-| ws-6-D-invDate |   D    | `"Invalid Date"` | TBD             | PENDING |        | DateTime "Invalid Date"          |
+| ID             | Config | Input            | Expected Stored | Status | Actual | Notes                               |
+| -------------- | :----: | ---------------- | --------------- | :----: | ------ | ----------------------------------- |
+| ws-6-A-empty   |   A    | `""`             | `""` or null    |  PASS  | `null` | Empty → null; H-3 ✓                 |
+| ws-6-A-null    |   A    | `null`           | `""` or null    |  PASS  | `null` | Null → null                         |
+| ws-6-A-omit    |   A    | (field omitted)  | `""` or null    |  PASS  | `null` | Omit → null                         |
+| ws-6-A-strNull |   A    | `"null"`         | TBD             |  PASS  | `null` | Literal "null" not stored as string |
+| ws-6-A-invDate |   A    | `"Invalid Date"` | TBD             |  PASS  | `null` | "Invalid Date" → null; no Bug #6    |
+| ws-6-D-empty   |   D    | `""`             | `""` or null    |  PASS  | `null` | DateTime empty → null               |
+| ws-6-D-null    |   D    | `null`           | `""` or null    |  PASS  | `null` | DateTime null → null                |
+| ws-6-D-omit    |   D    | (field omitted)  | `""` or null    |  PASS  | `null` | DateTime omit → null                |
+| ws-6-D-strNull |   D    | `"null"`         | TBD             |  PASS  | `null` | DateTime "null" → null              |
+| ws-6-D-invDate |   D    | `"Invalid Date"` | TBD             |  PASS  | `null` | DateTime "Invalid Date" → null      |
 
 **On update** (`postFormRevision`) — clear existing value:
 
-| ID              | Config | Scenario                       | Expected | Status  | Actual | Notes                    |
-| --------------- | :----: | ------------------------------ | -------- | :-----: | ------ | ------------------------ |
-| ws-6-A-clearUpd |   A    | Create with date → Update `""` | Cleared  | PENDING |        | Does "" clear the field? |
-| ws-6-D-clearUpd |   D    | Create with date → Update `""` | Cleared  | PENDING |        | DateTime clear           |
+| ID              | Config | Scenario                       | Expected | Status | Actual                            | Notes                            |
+| --------------- | :----: | ------------------------------ | -------- | :----: | --------------------------------- | -------------------------------- |
+| ws-6-A-clearUpd |   A    | Create with date → Update `""` | Cleared  |  PASS  | before=`T00:00:00Z`, after=`null` | Empty string clears date field   |
+| ws-6-D-clearUpd |   D    | Create with date → Update `""` | Cleared  |  PASS  | before=`T00:00:00Z`, after=`null` | Empty string clears DateTime too |
+
+> **WS-6 Finding**: All 12 tests PASS. The API handles empty/null/special values cleanly: all store `null`. **No Bug #6** — `"Invalid Date"` is not stored as a string (unlike Forms `GetFieldValue` which returns it). `"null"` literal string is also not stored. Empty string via `postFormRevision` successfully clears existing date values. H-3 fully confirmed: API returns `null` for empty date fields, never `""` or `"Invalid Date"`. Configs A and D behave identically.
 
 ---
 
@@ -265,20 +290,22 @@ Test how the API handles empty, null, and special values when creating and updat
 
 Test `postFormRevision()` behavior: changing dates, preserving existing values, and adding dates to empty fields.
 
-| ID              | Config | Scenario | Step 1 (Create)         | Step 2 (Update)         | Expected After Update    | Status  | Actual | Notes                            |
-| --------------- | :----: | :------: | ----------------------- | ----------------------- | ------------------------ | :-----: | ------ | -------------------------------- |
-| ws-7-A-change   |   A    |  Change  | `"2026-03-15"`          | `"2026-06-20"`          | `"2026-06-20"`           | PENDING |        | New date replaces old            |
-| ws-7-C-change   |   C    |  Change  | `"2026-03-15T14:30:00"` | `"2026-06-20T09:00:00"` | `"2026-06-20T09:00:00"`  | PENDING |        | DateTime change                  |
-| ws-7-D-change   |   D    |  Change  | `"2026-03-15T14:30:00"` | `"2026-06-20T09:00:00"` | `"2026-06-20T09:00:00"`  | PENDING |        | DateTime+ignoreTZ                |
-| ws-7-H-change   |   H    |  Change  | `"2026-03-15T14:30:00"` | `"2026-06-20T09:00:00"` | `"2026-06-20T09:00:00"`  | PENDING |        | Legacy                           |
-| ws-7-A-preserve |   A    | Preserve | `"2026-03-15"`          | (field omitted)         | `"2026-03-15"` preserved | PENDING |        | Omitting field should keep value |
-| ws-7-C-preserve |   C    | Preserve | `"2026-03-15T14:30:00"` | (field omitted)         | `"2026-03-15T14:30:00"`  | PENDING |        |                                  |
-| ws-7-D-preserve |   D    | Preserve | `"2026-03-15T14:30:00"` | (field omitted)         | `"2026-03-15T14:30:00"`  | PENDING |        |                                  |
-| ws-7-H-preserve |   H    | Preserve | `"2026-03-15T14:30:00"` | (field omitted)         | `"2026-03-15T14:30:00"`  | PENDING |        |                                  |
-| ws-7-A-add      |   A    |   Add    | (no date)               | `"2026-03-15"`          | `"2026-03-15"`           | PENDING |        | Add date to empty field          |
-| ws-7-C-add      |   C    |   Add    | (no date)               | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"`  | PENDING |        |                                  |
-| ws-7-D-add      |   D    |   Add    | (no date)               | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"`  | PENDING |        |                                  |
-| ws-7-H-add      |   H    |   Add    | (no date)               | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"`  | PENDING |        |                                  |
+| ID              | Config | Scenario | Step 1 (Create)         | Step 2 (Update)         | Expected After Update    | Status | Actual                   | Notes                    |
+| --------------- | :----: | :------: | ----------------------- | ----------------------- | ------------------------ | :----: | ------------------------ | ------------------------ |
+| ws-7-A-change   |   A    |  Change  | `"2026-03-15"`          | `"2026-06-20"`          | `"2026-06-20"`           |  PASS  | `"2026-06-20T00:00:00Z"` | New date replaces old ✓  |
+| ws-7-C-change   |   C    |  Change  | `"2026-03-15T14:30:00"` | `"2026-06-20T09:00:00"` | `"2026-06-20T09:00:00"`  |  PASS  | `"2026-06-20T09:00:00Z"` | DateTime change ✓        |
+| ws-7-D-change   |   D    |  Change  | `"2026-03-15T14:30:00"` | `"2026-06-20T09:00:00"` | `"2026-06-20T09:00:00"`  |  PASS  | `"2026-06-20T09:00:00Z"` | DateTime+ignoreTZ ✓      |
+| ws-7-H-change   |   H    |  Change  | `"2026-03-15T14:30:00"` | `"2026-06-20T09:00:00"` | `"2026-06-20T09:00:00"`  |  PASS  | `"2026-06-20T09:00:00Z"` | Legacy ✓                 |
+| ws-7-A-preserve |   A    | Preserve | `"2026-03-15"`          | (field omitted)         | `"2026-03-15"` preserved |  PASS  | `"2026-03-15T00:00:00Z"` | Field preserved ✓; H-9 ✓ |
+| ws-7-C-preserve |   C    | Preserve | `"2026-03-15T14:30:00"` | (field omitted)         | `"2026-03-15T14:30:00"`  |  PASS  | `"2026-03-15T14:30:00Z"` | Preserved ✓              |
+| ws-7-D-preserve |   D    | Preserve | `"2026-03-15T14:30:00"` | (field omitted)         | `"2026-03-15T14:30:00"`  |  PASS  | `"2026-03-15T14:30:00Z"` | Preserved ✓              |
+| ws-7-H-preserve |   H    | Preserve | `"2026-03-15T14:30:00"` | (field omitted)         | `"2026-03-15T14:30:00"`  |  PASS  | `"2026-03-15T14:30:00Z"` | Preserved ✓              |
+| ws-7-A-add      |   A    |   Add    | (no date)               | `"2026-03-15"`          | `"2026-03-15"`           |  PASS  | `"2026-03-15T00:00:00Z"` | Add to empty field ✓     |
+| ws-7-C-add      |   C    |   Add    | (no date)               | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"`  |  PASS  | `"2026-03-15T14:30:00Z"` | Add ✓                    |
+| ws-7-D-add      |   D    |   Add    | (no date)               | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"`  |  PASS  | `"2026-03-15T14:30:00Z"` | Add ✓                    |
+| ws-7-H-add      |   H    |   Add    | (no date)               | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"`  |  PASS  | `"2026-03-15T14:30:00Z"` | Add ✓                    |
+
+> **WS-7 Finding**: All 12 tests PASS. `postFormRevision()` behaves correctly for all three scenarios: **Change** replaces the old value, **Preserve** keeps existing values when the field is omitted from the update, **Add** sets a date on a previously empty field. H-9 confirmed (unmentioned fields preserved). All 4 configs (A, C, D, H) behave identically — field config flags have no effect on the update path.
 
 ---
 
@@ -288,18 +315,20 @@ Test OData-style `q` parameter filters on date fields via `getForms()`. Requires
 
 **Prerequisite**: At least one WS-1 record with known stored values.
 
-| ID             | Config | Query Type      | Query                                                           | Expected | Status  | Actual | Notes                             |
-| -------------- | :----: | --------------- | --------------------------------------------------------------- | -------- | :-----: | ------ | --------------------------------- |
-| ws-8-A-eq      |   A    | Exact match     | `[DataField7] eq '2026-03-15'`                                  | Match    | PENDING |        | Basic equality                    |
-| ws-8-A-gt      |   A    | Greater than    | `[DataField7] gt '2026-03-14'`                                  | Match    | PENDING |        | Date comparison                   |
-| ws-8-A-range   |   A    | Range           | `[DataField7] ge '2026-03-15' AND [DataField7] le '2026-03-16'` | Match    | PENDING |        | Inclusive range                   |
-| ws-8-A-fmtUS   |   A    | Format mismatch | `[DataField7] eq '03/15/2026'`                                  | TBD      | PENDING |        | US format in query                |
-| ws-8-A-noMatch |   A    | No match        | `[DataField7] eq '2026-03-16'`                                  | No match | PENDING |        | Control — wrong date              |
-| ws-8-C-eq      |   C    | Exact match     | `[DataField6] eq '2026-03-15T14:30:00'`                         | Match    | PENDING |        | DateTime equality                 |
-| ws-8-C-gt      |   C    | Greater than    | `[DataField6] gt '2026-03-15T14:00:00'`                         | Match    | PENDING |        | DateTime comparison               |
-| ws-8-C-range   |   C    | Range           | `[DataField6] ge '2026-03-15' AND [DataField6] le '2026-03-16'` | Match    | PENDING |        | Date-only range on DateTime field |
-| ws-8-C-fmtZ    |   C    | Format mismatch | `[DataField6] eq '2026-03-15T14:30:00Z'`                        | TBD      | PENDING |        | Z suffix in query                 |
-| ws-8-C-noMatch |   C    | No match        | `[DataField6] eq '2026-03-15T15:00:00'`                         | No match | PENDING |        | Control — wrong time              |
+| ID             | Config | Query Type      | Query                                                           | Expected | Status | Matched | Notes                                     |
+| -------------- | :----: | --------------- | --------------------------------------------------------------- | -------- | :----: | :-----: | ----------------------------------------- |
+| ws-8-A-eq      |   A    | Exact match     | `[DataField7] eq '2026-03-15'`                                  | Match    |  PASS  |   Yes   | ISO date-only matches stored T00:00:00Z   |
+| ws-8-A-gt      |   A    | Greater than    | `[DataField7] gt '2026-03-14'`                                  | Match    |  PASS  |   Yes   | Date comparison works ✓                   |
+| ws-8-A-range   |   A    | Range           | `[DataField7] ge '2026-03-15' AND [DataField7] le '2026-03-16'` | Match    |  PASS  |   Yes   | Inclusive range works ✓                   |
+| ws-8-A-fmtUS   |   A    | Format mismatch | `[DataField7] eq '03/15/2026'`                                  | TBD      |  PASS  |   Yes   | US format in query works! H-10 ✓          |
+| ws-8-A-noMatch |   A    | No match        | `[DataField7] eq '2026-03-16'`                                  | No match |  PASS  |   No    | Control — correct no-match ✓              |
+| ws-8-C-eq      |   C    | Exact match     | `[DataField6] eq '2026-03-15T14:30:00'`                         | Match    |  PASS  |   Yes   | DateTime equality works ✓                 |
+| ws-8-C-gt      |   C    | Greater than    | `[DataField6] gt '2026-03-15T14:00:00'`                         | Match    |  PASS  |   Yes   | DateTime comparison works ✓               |
+| ws-8-C-range   |   C    | Range           | `[DataField6] ge '2026-03-15' AND [DataField6] le '2026-03-16'` | Match    |  PASS  |   Yes   | Date-only range on DateTime field works ✓ |
+| ws-8-C-fmtZ    |   C    | Format mismatch | `[DataField6] eq '2026-03-15T14:30:00Z'`                        | TBD      |  PASS  |   Yes   | Z suffix in query matches stored Z ✓      |
+| ws-8-C-noMatch |   C    | No match        | `[DataField6] eq '2026-03-15T15:00:00'`                         | No match |  PASS  |   No    | Control — correct no-match ✓              |
+
+> **WS-8 Finding**: All 10 tests PASS. The OData query engine normalizes date formats — ISO date-only, US format (MM/DD/YYYY), and ISO datetime with Z all match correctly. Date-only range queries work on DateTime fields. H-10 confirmed: OData filters match stored format reliably. The query engine is more format-tolerant than expected.
 
 ---
 
@@ -320,17 +349,29 @@ Test what gets stored when scripts perform date arithmetic or create JavaScript 
 | **Local arithmetic**        | `d.setDate(d.getDate() + 30)` → send Date     | `getDate()` is local-TZ-dependent. For ISO-parsed dates, local day may differ from UTC day.                       |
 | **Safe string pattern**     | `d.toISOString().split('T')[0]` → send string | Always extracts UTC date → TZ-independent. Recommended pattern.                                                   |
 
-| ID               | Config | Server TZ | Pattern              | Computed Value Sent                                          | Expected Stored       | Status  | Actual | Notes                                                                     |
-| ---------------- | :----: | :-------: | -------------------- | ------------------------------------------------------------ | --------------------- | :-----: | ------ | ------------------------------------------------------------------------- |
-| ws-9-A-iso-BRT   |   A    |    BRT    | Date obj from ISO    | `new Date("2026-03-15")` → Date                              | TBD (Z in date-only?) | PENDING |        | `.toJSON()` = `"2026-03-15T00:00:00.000Z"`                                |
-| ws-9-A-iso-IST   |   A    |    IST    | Date obj from ISO    | `new Date("2026-03-15")` → Date                              | Same as BRT (TZ-safe) | PENDING |        | Same UTC midnight regardless of TZ                                        |
-| ws-9-A-iso-UTC   |   A    |    UTC    | Date obj from ISO    | `new Date("2026-03-15")` → Date                              | Same as BRT (control) | PENDING |        | Cloud baseline                                                            |
-| ws-9-C-iso-BRT   |   C    |    BRT    | Date obj from ISO    | `new Date("2026-03-15")` → Date                              | TBD                   | PENDING |        | DateTime field receives ISO+Z                                             |
-| ws-9-A-us-BRT    |   A    |    BRT    | Date obj from US fmt | `new Date("03/15/2026")` → Date                              | TBD                   | PENDING |        | `.toJSON()` = `"2026-03-15T03:00:00.000Z"` (BRT midnight)                 |
-| ws-9-A-us-IST    |   A    |    IST    | Date obj from US fmt | `new Date("03/15/2026")` → Date                              | TBD                   | PENDING |        | `.toJSON()` = `"2026-03-14T18:30:00.000Z"` (IST midnight = prev UTC day!) |
-| ws-9-A-us-UTC    |   A    |    UTC    | Date obj from US fmt | `new Date("03/15/2026")` → Date                              | TBD                   | PENDING |        | `.toJSON()` = `"2026-03-15T00:00:00.000Z"`                                |
-| ws-9-A-arith-BRT |   A    |    BRT    | Local arith +30 days | `d=new Date("2026-03-15"); d.setDate(d.getDate()+30)` → Date | TBD                   | PENDING |        | BRT: getDate()=14 → setDate(44) → Apr 13 21:00 BRT → Apr 14 UTC           |
-| ws-9-A-arith-IST |   A    |    IST    | Local arith +30 days | same code                                                    | TBD                   | PENDING |        | IST: getDate()=15 → setDate(45) → Apr 14 05:30 IST → Apr 14 UTC           |
-| ws-9-A-arith-UTC |   A    |    UTC    | Local arith +30 days | same code                                                    | TBD                   | PENDING |        | UTC: getDate()=15 → setDate(45) → Apr 14 00:00 UTC (control)              |
-| ws-9-A-safe-BRT  |   A    |    BRT    | Safe string extract  | `d.toISOString().split('T')[0]` → `"2026-04-14"`             | `"2026-04-14"`        | PENDING |        | TZ-independent string                                                     |
-| ws-9-A-safe-IST  |   A    |    IST    | Safe string extract  | same code → `"2026-04-14"`                                   | `"2026-04-14"`        | PENDING |        | Should match BRT exactly                                                  |
+| ID                  | Config | Server TZ | Pattern                       | Serialized (.toJSON / string) | Status | Stored                   | TZ-safe? | Notes                                                            |
+| ------------------- | :----: | :-------: | ----------------------------- | ----------------------------- | :----: | ------------------------ | :------: | ---------------------------------------------------------------- |
+| ws-9-A-iso-BRT      |   A    |    BRT    | `new Date("2026-03-15")`      | `"2026-03-15T00:00:00.000Z"`  |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | ISO parse → UTC midnight; H-11 ✓                                 |
+| ws-9-A-iso-IST      |   A    |    IST    | `new Date("2026-03-15")`      | `"2026-03-15T00:00:00.000Z"`  |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | Same result regardless of TZ                                     |
+| ws-9-A-iso-UTC      |   A    |    UTC    | `new Date("2026-03-15")`      | `"2026-03-15T00:00:00.000Z"`  |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | Cloud baseline                                                   |
+| ws-9-C-iso-BRT      |   C    |    BRT    | `new Date("2026-03-15")`      | `"2026-03-15T00:00:00.000Z"`  |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | DateTime field receives ISO+Z                                    |
+| ws-9-A-us-BRT       |   A    |    BRT    | `new Date("03/15/2026")`      | `"2026-03-15T03:00:00.000Z"`  |  FAIL  | `"2026-03-15T03:00:00Z"` |    No    | BRT midnight = 3am UTC; time leaks into date-only                |
+| ws-9-A-us-IST       |   A    |    IST    | `new Date("03/15/2026")`      | `"2026-03-14T18:30:00.000Z"`  |  FAIL  | `"2026-03-14T18:30:00Z"` |    No    | IST midnight = prev UTC day! H-12 ✓                              |
+| ws-9-A-us-UTC       |   A    |    UTC    | `new Date("03/15/2026")`      | `"2026-03-15T00:00:00.000Z"`  |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | UTC: local=UTC, no shift                                         |
+| ws-9-A-parts-BRT    |   A    |    BRT    | `new Date(2026, 2, 15)`       | `"2026-03-15T03:00:00.000Z"`  |  FAIL  | `"2026-03-15T03:00:00Z"` |    No    | Same as US: local midnight = 3am UTC                             |
+| ws-9-A-parts-IST    |   A    |    IST    | `new Date(2026, 2, 15)`       | `"2026-03-14T18:30:00.000Z"`  |  FAIL  | `"2026-03-14T18:30:00Z"` |    No    | Same as US: IST midnight = prev UTC day                          |
+| ws-9-A-parts-UTC    |   A    |    UTC    | `new Date(2026, 2, 15)`       | `"2026-03-15T00:00:00.000Z"`  |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | UTC control                                                      |
+| ws-9-A-utc-BRT      |   A    |    BRT    | `new Date(Date.UTC(...))`     | `"2026-03-15T00:00:00.000Z"`  |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | Explicit UTC — TZ-safe ✓                                         |
+| ws-9-A-utc-IST      |   A    |    IST    | `new Date(Date.UTC(...))`     | `"2026-03-15T00:00:00.000Z"`  |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | Explicit UTC — TZ-safe ✓                                         |
+| ws-9-A-arith-BRT    |   A    |    BRT    | `setDate(getDate()+30)`       | `"2026-04-14T00:00:00.000Z"`  |  PASS  | `"2026-04-14T00:00:00Z"` |   Yes    | Local arith on UTC base → coincidentally correct                 |
+| ws-9-A-arith-IST    |   A    |    IST    | `setDate(getDate()+30)`       | `"2026-04-14T00:00:00.000Z"`  |  PASS  | `"2026-04-14T00:00:00Z"` |   Yes    | IST getDate()=15 → same result (lucky: base is UTC midnight)     |
+| ws-9-A-arith-UTC    |   A    |    UTC    | `setDate(getDate()+30)`       | `"2026-04-14T00:00:00.000Z"`  |  PASS  | `"2026-04-14T00:00:00Z"` |   Yes    | UTC control                                                      |
+| ws-9-A-arithUTC-BRT |   A    |    BRT    | `setUTCDate(getUTCDate()+30)` | `"2026-04-14T00:00:00.000Z"`  |  PASS  | `"2026-04-14T00:00:00Z"` |   Yes    | UTC arithmetic — always TZ-safe                                  |
+| ws-9-A-arithUTC-IST |   A    |    IST    | `setUTCDate(getUTCDate()+30)` | `"2026-04-14T00:00:00.000Z"`  |  PASS  | `"2026-04-14T00:00:00Z"` |   Yes    | UTC arithmetic — always TZ-safe                                  |
+| ws-9-A-safe-BRT     |   A    |    BRT    | `toISOString().split('T')[0]` | `"2026-04-14"`                |  PASS  | `"2026-04-14T00:00:00Z"` |   Yes    | Safe string extract — TZ-independent ✓                           |
+| ws-9-A-safe-IST     |   A    |    IST    | `toISOString().split('T')[0]` | `"2026-04-14"`                |  PASS  | `"2026-04-14T00:00:00Z"` |   Yes    | Same as BRT ✓                                                    |
+| ws-9-A-locale-BRT   |   A    |    BRT    | `toLocaleDateString('en-US')` | `"3/14/2026"`                 |  FAIL  | `"2026-03-14T00:00:00Z"` |    No    | **BRT gets Mar 14 (wrong day!)** — UTC midnight = prev local day |
+| ws-9-A-locale-IST   |   A    |    IST    | `toLocaleDateString('en-US')` | `"3/15/2026"`                 |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | IST: UTC midnight = same local day (lucky)                       |
+| ws-9-A-locale-UTC   |   A    |    UTC    | `toLocaleDateString('en-US')` | `"3/15/2026"`                 |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | UTC control                                                      |
+
+> **WS-9 Finding**: 17 PASS, 6 FAIL across 3 TZs and 8 patterns. **TZ-safe patterns**: `new Date("ISO")`, `Date.UTC()`, `toISOString().split('T')[0]`, `setUTCDate/getUTCDate`. **TZ-unsafe patterns**: `new Date("MM/DD")`, `new Date(y,m,d)`, `toLocaleDateString()` — all produce local midnight which shifts UTC day/time per TZ. **H-11 confirmed**: Date objects serialized with Z suffix are handled correctly by the server. **H-12 confirmed**: US-format `new Date()` produces different API results per server TZ — IST stores the previous day. **New finding**: `toLocaleDateString()` in UTC- timezones (BRT) returns the previous calendar day for UTC-midnight dates, causing wrong date storage.

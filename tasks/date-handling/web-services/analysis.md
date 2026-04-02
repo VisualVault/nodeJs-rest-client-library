@@ -111,11 +111,87 @@ Based on Forms UI analysis (`../forms-calendar/analysis.md`) and upstream librar
 | CB-6 | Field config flags (enableTime, ignoreTimezone, useLegacy) have NO effect on API behavior | WS-1: All 8 configs store and return identically per input type             | New finding                               |
 | CB-7 | API normalizes ALL dates to ISO 8601 datetime+Z on read                                   | WS-1+WS-2: date-only `"2026-03-15"` returns as `"2026-03-15T00:00:00Z"`     | New finding — cross-layer format mismatch |
 
+### Confirmed 2026-04-02 (WS-3, WS-4)
+
+**Run**: [ws-3-batch-run-1.md](runs/ws-3-batch-run-1.md) — 4 tests, all PASS.
+**Run**: [ws-4-batch-run-1.md](runs/ws-4-batch-run-1.md) — 8 tests, 2 PASS / 6 FAIL.
+
+| #     | Behavior                                                                                 | Evidence                                                                                    | Hypotheses            |
+| ----- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------- |
+| CB-8  | API Z normalization causes cross-layer datetime shift when opened in Forms               | WS-4: `"T14:30:00"` → stored `"T14:30:00Z"` → Forms displays 11:30 AM (BRT) / 8:00 PM (IST) | New finding           |
+| CB-9  | API round-trip is drift-free across all configs (date-only and datetime)                 | WS-3: 2 cycles, 4 configs, all zero drift                                                   | H-8 confirmed         |
+| CB-10 | Bug #7 does NOT manifest on Forms load/display path for date-only fields loaded from API | WS-4: Config A IST displays `03/15/2026` (correct) — Kendo shows local date from Date obj   | H-6 partially refuted |
+| CB-11 | ignoreTZ=true preserves display but not rawValue when loading API-stored datetimes       | WS-4: Config D/H display 2:30 PM but rawValue shifted to 11:30/20:00                        | New finding           |
+
+### Confirmed 2026-04-02 (WS-5)
+
+**Run**: [ws-5-batch-run-1.md](runs/ws-5-batch-run-1.md) — 32 tests, 23 PASS / 9 FAIL.
+
+| #     | Behavior                                                                               | Evidence                                                                         | Hypotheses    |
+| ----- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------- |
+| CB-12 | Server converts TZ offsets to UTC on write                                             | WS-5: `"T14:30:00-03:00"` → `"T17:30:00Z"`, `"T14:30:00+05:30"` → `"T09:00:00Z"` | New finding   |
+| CB-13 | Server strips milliseconds from datetime values                                        | WS-5: `"T14:30:00.000Z"` → `"T14:30:00Z"`                                        | New finding   |
+| CB-14 | Server accepts US, ISO, DB, YYYY/DD, YYYY.DD, English month, abbreviated month formats | WS-5: all accepted and correctly normalized to ISO 8601                          | H-5 confirmed |
+| CB-15 | DD/MM/YYYY formats silently stored as null (Bug #8)                                    | WS-5: `"15/03/2026"`, `"15-03-2026"`, `"15.03.2026"` → null, no error            | New finding   |
+| CB-16 | Ambiguous dates interpreted as MM/DD (US) not DD/MM (Bug #8b)                          | WS-5: `"05/03/2026"` → May 3 (`2026-05-03`), not March 5                         | New finding   |
+| CB-17 | Compact ISO format (`20260315`) silently stored as null                                | WS-5: accepted, stored null                                                      | New finding   |
+
+### Confirmed 2026-04-02 (WS-6)
+
+**Run**: [ws-6-batch-run-1.md](runs/ws-6-batch-run-1.md) — 12 tests, all PASS.
+
+| #     | Behavior                                                                       | Evidence                                                          | Hypotheses          |
+| ----- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ------------------- |
+| CB-18 | All empty/null/special values store `null` — no Bug #6 via API                 | WS-6: `""`, `null`, omit, `"null"`, `"Invalid Date"` all → `null` | H-3 fully confirmed |
+| CB-19 | Empty string via `postFormRevision` clears existing date values                | WS-6: clearUpd scenario: before=`"T00:00:00Z"`, after=`null`      | New finding         |
+| CB-20 | `"Invalid Date"` string (Bug #6 output) is safely rejected by API, stores null | WS-6: not stored as string — safe round-trip from buggy Forms GFV | New finding         |
+
+### Confirmed 2026-04-02 (WS-7)
+
+**Run**: [ws-7-batch-run-1.md](runs/ws-7-batch-run-1.md) — 12 tests, all PASS.
+
+| #     | Behavior                                                                                      | Evidence                                   | Hypotheses    |
+| ----- | --------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------- |
+| CB-21 | `postFormRevision()` preserves omitted fields, replaces included fields, adds to empty fields | WS-7: 3 scenarios × 4 configs, all correct | H-9 confirmed |
+
+### Confirmed 2026-04-02 (WS-8)
+
+**Run**: [ws-8-batch-run-1.md](runs/ws-8-batch-run-1.md) — 10 tests, all PASS.
+
+| #     | Behavior                                                                           | Evidence                                                                  | Hypotheses     |
+| ----- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------- |
+| CB-22 | OData query filters normalize date formats — US, ISO, Z suffix all match correctly | WS-8: all 10 queries return expected results                              | H-10 confirmed |
+| CB-23 | Date-only range queries work on DateTime fields (date interpreted as midnight)     | WS-8: `ge '2026-03-15' AND le '2026-03-16'` matches `"T14:30:00Z"` record | New finding    |
+
+### Confirmed 2026-04-02 (WS-9)
+
+**Run**: [ws-9-batch-run-1.md](runs/ws-9-batch-run-1.md) — 23 tests, 17 PASS / 6 FAIL.
+
+| #     | Behavior                                                                                    | Evidence                                                  | Hypotheses     |
+| ----- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------- | -------------- |
+| CB-24 | Date objects serialized with Z are stored correctly (ms stripped)                           | WS-9: `"T00:00:00.000Z"` → `"T00:00:00Z"` consistently    | H-11 confirmed |
+| CB-25 | US-format `new Date()` produces different stored values per server TZ                       | WS-9: BRT=`T03:00Z`, IST=`Mar14 T18:30Z`, UTC=`T00:00Z`   | H-12 confirmed |
+| CB-26 | `new Date(year, month, day)` is equally TZ-unsafe as US format parse                        | WS-9: identical serialization to `new Date("MM/DD/YYYY")` | New finding    |
+| CB-27 | `toLocaleDateString()` returns wrong date in UTC- timezones for UTC-midnight dates          | WS-9: BRT → `"3/14/2026"` for a March 15 UTC date         | New finding    |
+| CB-28 | TZ-safe patterns: ISO parse, Date.UTC(), setUTCDate/getUTCDate, toISOString().split('T')[0] | WS-9: all produce identical results in BRT/IST/UTC        | New finding    |
+
 ## Confirmed Bugs
 
-No new API-specific bugs found. The API layer is clean — all Forms bugs (Bug #5, #6, #7) are confirmed client-side only.
+### Bug #8 — Silent Data Loss for DD/MM/YYYY Formats (NEW — SERVER-SIDE)
+
+**Severity**: HIGH for Latin American and European developers.
+
+The VV server's date parser does not recognize day-first date formats. All DD/MM/YYYY variants (`15/03/2026`, `15-03-2026`, `15.03.2026`) are accepted by the API (HTTP 200, record created) but the date field is stored as `null`. No error message in the response. Complete silent data loss.
+
+For ambiguous dates where day ≤ 12 (e.g., `05/03/2026`), the server interprets as MM/DD (US format) — storing May 3rd instead of March 5th. No error, wrong data stored silently.
+
+**Impact**: Any script using `new Date().toLocaleDateString('es-AR')` or similar LATAM locale formatting will produce DD/MM/YYYY strings that cause silent data loss or wrong dates when sent to the API.
+
+**Previously confirmed**: All Forms bugs (Bug #5, #6, #7) are client-side only.
 
 **Cross-layer impact**: Bug #7 damage persists in the database and is visible via API (CB-5). The API can read the wrong date but cannot cause it — only Forms `SetFieldValue` / calendar popup can write the wrong date.
+
+**Cross-layer datetime shift (CB-8)**: When a datetime is written via API without Z suffix (intended as local time), the VV server appends Z. When Forms loads this value, V1 `initCalendarValueV1` interprets the Z as real UTC and converts to local time. The rawValue stored in the form after load is permanently shifted by the user's TZ offset. This affects all production scripts that create/update datetime fields — the stored time will be wrong when viewed in Forms by users outside UTC+0.
 
 ---
 
