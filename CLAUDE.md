@@ -49,13 +49,14 @@ nodeV2/
     README.md                        # Task index and structure guide
     date-handling/                   # Active: cross-platform date bug investigation
       forms-calendar/                # Forms calendar field testing (7 bugs, ~242 slots)
-      web-services/                  # REST API date handling testing (~118 slots)
+      web-services/                  # REST API date handling testing (145 slots, complete)
         README.md                    # Environment setup, runner usage, execution modes
         matrix.md                    # Test matrix — 9 categories (WS-1 through WS-9)
         analysis.md                  # Hypotheses (H-1 to H-12), confirmed behaviors
         webservice-test-harness.js   # Server-side harness (all 9 categories via Action param)
         run-ws-test.js               # Direct Node.js CLI runner (auth + harness invocation)
         ws-harness-button.js         # Client-side form button script for browser path
+        verify-ws4-browser.js        # Playwright browser verification for WS-4 cross-layer
 ```
 
 ## How the Server Works

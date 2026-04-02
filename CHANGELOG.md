@@ -25,6 +25,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `docs/guides/scripting.md` — Node.js server data flow guide: script contracts, API serialization chain, field name casing (camelCase), date passthrough behavior
 - Web services date-handling test infrastructure: action-driven harness (`webservice-test-harness.js`), direct Node.js runner (`run-ws-test.js`), form button script (`ws-harness-button.js`), test matrix (9 categories, ~118 slots)
 - Multi-environment credentials via `.env.json` (gitignored). Loaded at `app.js` startup into `global.VV_ENV`; server-side scripts read credentials from this global with fallback to placeholder defaults
+- WS-3 through WS-9 action handlers in `webservice-test-harness.js`: round-trip, API→Forms cross-layer, format tolerance, empty/null handling, update path, query filtering, and date computation patterns
+- `verify-ws4-browser.js` — Playwright browser verification script for WS-4 (API→Forms cross-layer testing)
+- `docs/guides/scripting.md` expanded: server-side date format acceptance table, OData query format tolerance, TZ-safe Date construction patterns for production scripts
 - `[@]-cleanup` command: read-only 6-phase repository maintenance audit (staleness, orphans, bloat, doc consistency, config hygiene, git hygiene)
 - `testing/README.md` — entry-point documentation for testing infrastructure
 - Playwright testing infrastructure under `testing/` (3-TZ projects, global auth, reusable helpers, data-driven specs)
@@ -37,7 +40,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Legacy field handling in calendar helpers: `typeDateInField` and `roundTripCycle` detect plain `<input>` (useLegacy=true) vs Kendo wrappers and adapt interaction accordingly
 - `saveFormOnly` helper in `vv-form.js`: saves form and extracts DataID via `VV.Form.DataID` property (reliable post-save indicator)
 - New Playwright spec files: cat-5 (preset), cat-6 (current date), cat-8 (GetFieldValue), cat-8b (GetDateObject), cat-9-gdoc (GDOC round-trip), cat-9-gfv (GFV round-trip), cat-12 (edge cases) — 11 total category specs
-- Web services date-handling test infrastructure: test matrix (WS-1 through WS-9, ~118 slots), form button harness (`ws-harness-button.js`), direct Node.js runner (`run-ws-test.js`), and `README.md` with setup/architecture docs
+- Web services date-handling test infrastructure: test matrix (WS-1 through WS-9, 145 slots — complete), form button harness (`ws-harness-button.js`), direct Node.js runner (`run-ws-test.js`), and `README.md` with setup/architecture docs
 
 ### Changed
 
