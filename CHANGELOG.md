@@ -27,6 +27,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Multi-environment credentials via `.env.json` (gitignored). Loaded at `app.js` startup into `global.VV_ENV`; server-side scripts read credentials from this global with fallback to placeholder defaults
 - WS-3 through WS-9 action handlers in `webservice-test-harness.js`: round-trip, API→Forms cross-layer, format tolerance, empty/null handling, update path, query filtering, and date computation patterns
 - `verify-ws4-browser.js` — Playwright browser verification script for WS-4 (API→Forms cross-layer testing)
+- `docs/reference/api-date-patterns.md` — practical guide for CSV imports and web service datetime handling: decision tree, UTC offset reference, TZ-safe patterns, Bug #8 warnings
 - `docs/guides/scripting.md` expanded: server-side date format acceptance table, OData query format tolerance, TZ-safe Date construction patterns for production scripts
 - `[@]-cleanup` command: read-only 6-phase repository maintenance audit (staleness, orphans, bloat, doc consistency, config hygiene, git hygiene)
 - `testing/README.md` — entry-point documentation for testing infrastructure
