@@ -13,7 +13,7 @@ Fork of [VisualVault/nodeJs-rest-client-library](https://github.com/VisualVault/
 nodeV2/
   CHANGELOG.md                       # Server/library changes (lib/ scope + project tooling)
   lib/VVRestApi/VVRestApiNodeJs/     # The Node.js microservices server
-    app.js                           # Express entry point (port 3000)
+    app.js                           # Express entry point (port 3000), loads .env.json
     VVRestApi.js                     # Main REST API client wrapper
     common.js                        # Auth, HTTP layer, token management
     config.yml                       # URI templates for all VV API endpoints
@@ -96,6 +96,8 @@ This is a **microservices execution environment** — middleware between VisualV
 OAuth token-based via `common.js`:
 
 - Scripts provide credentials via `getCredentials()`
+- Server-side credentials load from `.env.json` (gitignored) at `app.js` startup into `global.VV_ENV`. Scripts read `global.VV_ENV` with fallback to placeholder defaults
+- Direct runner (`run-ws-test.js`) reads from `testing/config/vv-config.json` instead
 - `common.js` handles token acquisition and auto-refresh (30s before expiry)
 - All API calls use Bearer token in Authorization header
 

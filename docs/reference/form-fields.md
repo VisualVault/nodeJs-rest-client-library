@@ -4,6 +4,21 @@ Runtime behavior, configuration properties, and debugging methods for VisualVaul
 
 ---
 
+## Field Type Enum
+
+Known `fieldType` values in `VV.Form.VV.FormPartition.fieldMaster`:
+
+| `fieldType` | Field Kind      | Example                    |
+| ----------- | --------------- | -------------------------- |
+| `3`         | Text / textarea | `WSAction`, `WSResult`     |
+| `13`        | Calendar / date | `DataField7`, `DataField5` |
+| `17`        | Button          | `btnSave`, `btnCallWS`     |
+| `103`       | Container       | `Container1`               |
+
+This list is partial — only types observed on the DateTest form are included.
+
+---
+
 ## Calendar / Date Field
 
 **`fieldType`:** `13`

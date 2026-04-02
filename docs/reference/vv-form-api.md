@@ -67,16 +67,16 @@ The primary developer interface. Contains both own properties (form state) and p
 
 #### Field Value Operations
 
-| Method                                   | Params | Description                                                                                                                                                    |
-| ---------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GetFieldValue(fieldName)`               | 1      | Returns the processed field value. For calendar fields, applies `getCalendarFieldValue()` which may transform the raw value (Bug #5 adds fake Z for Config D). |
-| `SetFieldValue(fieldName, value)`        | 2      | Sets a field value. For calendar fields, goes through `normalizeCalValue()` → `calChange()` → `getSaveValue()`. Triggers `UnsavedChanges` increment.           |
-| `GetDateObjectFromCalendar(fieldName)`   | 1      | Returns a JavaScript `Date` object for a calendar field. Always returns local-timezone Date regardless of field config.                                        |
-| `GetDropDownListItemValue(fieldName)`    | 1      | Returns the selected value of a dropdown field.                                                                                                                |
-| `getDropDownListText(fieldName)`         | 1      | Returns the display text of a dropdown field.                                                                                                                  |
-| `SetDropDownListIndex(fieldName, index)` | 2      | Sets the selected index of a dropdown field.                                                                                                                   |
-| `getFormDataCollection()`                | 0      | Returns an array of `{id, name, value}` objects for all fields — the full form data snapshot.                                                                  |
-| `GetUnsavedFields()`                     | 0      | Returns an array of field names that have unsaved changes.                                                                                                     |
+| Method                                   | Params | Description                                                                                                                                                                                                                          |
+| ---------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GetFieldValue(fieldName)`               | 1      | Returns the processed field value. For calendar fields, applies `getCalendarFieldValue()` which may transform the raw value (Bug #5 adds fake Z for Config D). **For non-existent fields, returns `""` silently** (no error thrown). |
+| `SetFieldValue(fieldName, value)`        | 2      | Sets a field value. For calendar fields, goes through `normalizeCalValue()` → `calChange()` → `getSaveValue()`. Triggers `UnsavedChanges` increment. **Silently fails for non-existent fields** (no error, value is discarded).      |
+| `GetDateObjectFromCalendar(fieldName)`   | 1      | Returns a JavaScript `Date` object for a calendar field. Always returns local-timezone Date regardless of field config.                                                                                                              |
+| `GetDropDownListItemValue(fieldName)`    | 1      | Returns the selected value of a dropdown field.                                                                                                                                                                                      |
+| `getDropDownListText(fieldName)`         | 1      | Returns the display text of a dropdown field.                                                                                                                                                                                        |
+| `SetDropDownListIndex(fieldName, index)` | 2      | Sets the selected index of a dropdown field.                                                                                                                                                                                         |
+| `getFormDataCollection()`                | 0      | Returns an array of `{id, name, value}` objects for all fields — the full form data snapshot.                                                                                                                                        |
+| `GetUnsavedFields()`                     | 0      | Returns an array of field names that have unsaved changes.                                                                                                                                                                           |
 
 #### Field State
 

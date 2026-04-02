@@ -24,6 +24,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `[@]-run-ws-date-test` command: WS test execution + artifact generation (TC spec, run file, summary, matrix update). Script and browser modes, batch support, TZ simulation
 - `docs/guides/scripting.md` — Node.js server data flow guide: script contracts, API serialization chain, field name casing (camelCase), date passthrough behavior
 - Web services date-handling test infrastructure: action-driven harness (`webservice-test-harness.js`), direct Node.js runner (`run-ws-test.js`), form button script (`ws-harness-button.js`), test matrix (9 categories, ~118 slots)
+- Multi-environment credentials via `.env.json` (gitignored). Loaded at `app.js` startup into `global.VV_ENV`; server-side scripts read credentials from this global with fallback to placeholder defaults
 - `[@]-cleanup` command: read-only 6-phase repository maintenance audit (staleness, orphans, bloat, doc consistency, config hygiene, git hygiene)
 - `testing/README.md` — entry-point documentation for testing infrastructure
 - Playwright testing infrastructure under `testing/` (3-TZ projects, global auth, reusable helpers, data-driven specs)
