@@ -50,6 +50,7 @@ nodeV2/
     date-handling/                   # Active: cross-platform date bug investigation
       forms-calendar/                # Forms calendar field testing (8 bugs, ~242 slots)
       web-services/                  # REST API date handling testing (150 slots, complete)
+      dashboards/                    # Dashboard date display testing (44 slots, not started)
     form-templates/                  # XML template analysis, generator, redesigned DateTest v2
         README.md                    # Environment setup, runner usage, execution modes
         matrix.md                    # Test matrix — 9 categories (WS-1 through WS-9)
@@ -136,7 +137,7 @@ ESLint + Prettier + Husky pre-commit hooks. See [Dev Setup Guide](docs/guides/de
 
 Browser automation for VV platform testing. All infrastructure lives under `testing/`. Two layers:
 
-1. **`/@-create-pw-date-test <id>`** — interactive `playwright-cli` sessions for live verification + artifact generation
+1. **`/@-test-forms-date-pw <id>`** — interactive `playwright-cli` sessions for live verification + artifact generation
 2. **`npx playwright test`** — headless regression runner for parameterized spec files
 
 ```bash
@@ -176,7 +177,7 @@ node tasks/date-handling/web-services/run-ws-test.js --action WS-2 --configs A,D
 TZ=UTC node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 ```
 
-**Command:** `/@-run-ws-date-test <test-id>` — executes test, generates artifacts (TC spec, run file, summary), updates matrix.
+**Command:** `/@-test-ws-date-pw <test-id>` — executes test, generates artifacts (TC spec, run file, summary), updates matrix.
 
 Full documentation: [`tasks/date-handling/web-services/README.md`](tasks/date-handling/web-services/README.md) | [`docs/guides/scripting.md`](docs/guides/scripting.md)
 

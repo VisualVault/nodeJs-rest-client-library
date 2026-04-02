@@ -19,9 +19,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Task workspace (`tasks/`) for structured investigation tracking
 - CHANGELOG.md for tracking server and project changes
 - ESLint (flat config) + Prettier + Husky + lint-staged for code quality and pre-commit formatting
-- Claude Code custom commands (`[@]-update-docs`, `[@]-smart-commit-push`, `[@]-sync-with-develop`, `[@]-create-date-test`, `[@]-vv-learn`, `[@]-create-pw-date-test`)
-- `[@]-create-pw-date-test` batch mode: multiple space-separated IDs, grouped by TZ. `--skip-verify` flag: backfill test-data.js entries from existing run files without browser session
-- `[@]-run-ws-date-test` command: WS test execution + artifact generation (TC spec, run file, summary, matrix update). Script and browser modes, batch support, TZ simulation
+- Claude Code custom commands (`[@]-update-docs`, `[@]-smart-commit-push`, `[@]-sync-with-develop`, `[@]-vv-learn`, `[@]-test-forms-date-pw`, `[@]-test-ws-date-pw`, `[@]-test-dash-date-pw`, `[@]-cleanup`)
+- `[@]-test-dash-date-pw` command: dashboard date display test execution + artifact generation (TC spec, run file, summary, matrix update). Playwright-based against Telerik RadGrid
+- `tasks/date-handling/dashboards/` — dashboard date display investigation: README, matrix (8 categories, 44 slots), analysis (server-side rendering, TZ independence), exploration script
+- Dashboard architecture documentation in `docs/architecture/visualvault-platform.md`: Telerik RadGrid rendering, DOM selectors, date format rules, DateTest Dashboard GUID
+- `[@]-test-forms-date-pw` batch mode: multiple space-separated IDs, grouped by TZ. `--skip-verify` flag: backfill test-data.js entries from existing run files without browser session
+- `[@]-test-ws-date-pw` command: WS test execution + artifact generation (TC spec, run file, summary, matrix update). Script and browser modes, batch support, TZ simulation
 - `docs/guides/scripting.md` — Node.js server data flow guide: script contracts, API serialization chain, field name casing (camelCase), date passthrough behavior
 - Web services date-handling test infrastructure: action-driven harness (`webservice-test-harness.js`), direct Node.js runner (`run-ws-test.js`), form button script (`ws-harness-button.js`), test matrix (9 categories, ~118 slots)
 - Multi-environment credentials via `.env.json` (gitignored). Loaded at `app.js` startup into `global.VV_ENV`; server-side scripts read credentials from this global with fallback to placeholder defaults
@@ -52,8 +55,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 - Renamed all 28 date fields on the VV platform form: `DataFieldN` → `FieldN` (removed "Data" prefix). Updated 22 files across testing fixtures, helpers, specs, WS harness, commands, and all reference documentation to match
 - Moved XML template exports from `tasks/date-handling/forms-calendar/` to `tasks/form-templates/` with descriptive filenames (`datetest-original.xml`, `subscription-pack.xml`)
-- `[@]-create-date-test` command: parameter changed from execution test IDs (`1.2`) to category test IDs (`7-D-isoZ-BRT`); command now reads from `matrix.md` instead of `results.md`, derives field config from the Config letter, generates TC filenames as `tc-{category-id}.md`, and updates the matrix row (Actual/Status/Evidence) after writing the file
-- `[@]-create-pw-date-test` command: removed Chrome hardcode from initial verification (Phase 0.3); browser row in generated TC specs now reflects actual engine used; Layer 2 re-runs handle multi-browser regression via `npx playwright test --project=...`
+- Normalized date test command names: `[@]-create-pw-date-test` → `[@]-test-forms-date-pw`, `[@]-run-ws-date-test` → `[@]-test-ws-date-pw`, `[@]-create-db-date-test` → `[@]-test-dash-date-pw`. Consistent `test-{layer}-date-pw` pattern
+- Removed `[@]-create-date-test` command (Chrome MCP variant deprecated — Playwright covers all forms testing)
+- `[@]-test-forms-date-pw` command (was `[@]-create-pw-date-test`): removed Chrome hardcode from initial verification (Phase 0.3); browser row in generated TC specs now reflects actual engine used; Layer 2 re-runs handle multi-browser regression via `npx playwright test --project=...`
 - Playwright output dirs moved from `/tmp/pw-test-results` and `/tmp/pw-report` to `testing/tmp/test-results` and `testing/tmp/playwright-report` (project-local, gitignored) for portability across machines
 - Consolidated setup instructions into `docs/guides/dev-setup.md`; trimmed duplicated setup from `CLAUDE.md`, `testing/date-handling/README.md`, and `docs/guides/playwright-testing.md` (replaced with links)
 - `[@]-update-docs` command: expanded documentation registry (6 → 12 files), added single-source-of-truth principle, added `testing/` impact zones
