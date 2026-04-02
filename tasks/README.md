@@ -16,6 +16,7 @@ tasks/
 
 ## Active Tasks
 
-| Task                            | Status      | Description                                                                                          |
-| ------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------- |
-| [date-handling](date-handling/) | In Progress | Cross-platform date handling bug investigation — Forms, Web Services, Dashboards, Reports, Workflows |
+| Task                              | Status      | Description                                                                                          |
+| --------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------- |
+| [date-handling](date-handling/)   | In Progress | Cross-platform date handling bug investigation — Forms, Web Services, Dashboards, Reports, Workflows |
+| [form-templates](form-templates/) | Active      | VV form template XML analysis, format documentation, and improved template generation                |
