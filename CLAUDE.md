@@ -49,7 +49,13 @@ nodeV2/
     README.md                        # Task index and structure guide
     date-handling/                   # Active: cross-platform date bug investigation
       forms-calendar/                # Forms calendar field testing (7 bugs, ~242 slots)
-      web-services/                  # REST API date handling testing
+      web-services/                  # REST API date handling testing (~118 slots)
+        README.md                    # Environment setup, runner usage, execution modes
+        matrix.md                    # Test matrix — 9 categories (WS-1 through WS-9)
+        analysis.md                  # Hypotheses (H-1 to H-12), confirmed behaviors
+        webservice-test-harness.js   # Server-side harness (all 9 categories via Action param)
+        run-ws-test.js               # Direct Node.js CLI runner (auth + harness invocation)
+        ws-harness-button.js         # Client-side form button script for browser path
 ```
 
 ## How the Server Works
@@ -150,6 +156,25 @@ npm run test:pw:report       # Open HTML report
 - `date-handling/cat-*.spec.js` — 11 parameterized spec files (cat-1, 2, 3, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 12)
 
 Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
+
+## Web Services Testing
+
+REST API date handling tests via the `DateTestWSHarness`. Two execution paths:
+
+1. **`run-ws-test.js`** — direct Node.js runner (primary for API tests). Supports `--debug`, `--inspect-brk`, and `TZ=` env var for server TZ simulation
+2. **Form button** (`ws-harness-button.js`) — browser path via VV Microservice (for WS-4 cross-layer or production-path validation)
+
+```bash
+# Run a WS test directly
+node tasks/date-handling/web-services/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
+
+# Simulate cloud TZ
+TZ=UTC node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+```
+
+**Command:** `/@-run-ws-date-test <test-id>` — executes test, generates artifacts (TC spec, run file, summary), updates matrix.
+
+Full documentation: [`tasks/date-handling/web-services/README.md`](tasks/date-handling/web-services/README.md) | [`docs/guides/scripting.md`](docs/guides/scripting.md)
 
 ## Active Tasks
 

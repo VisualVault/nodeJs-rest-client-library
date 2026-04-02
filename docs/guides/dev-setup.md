@@ -76,14 +76,18 @@ cp testing/config/vv-config.example.json testing/config/vv-config.json
 
 Edit `testing/config/vv-config.json`:
 
-| Field           | Description                    | Default                          |
-| --------------- | ------------------------------ | -------------------------------- |
-| `instance`      | VV instance name               | `vvdemo`                         |
-| `loginUrl`      | VV login URL                   | `https://vvdemo.visualvault.com` |
-| `username`      | Your VV email                  | —                                |
-| `password`      | Your VV password               | —                                |
-| `customerAlias` | Customer alias for your tenant | —                                |
-| `databaseAlias` | Database alias                 | `Main`                           |
+| Field           | Description                             | Default                          |
+| --------------- | --------------------------------------- | -------------------------------- |
+| `instance`      | VV instance name                        | `vvdemo`                         |
+| `loginUrl`      | VV login URL                            | `https://vvdemo.visualvault.com` |
+| `username`      | Your VV email                           | —                                |
+| `password`      | Your VV password                        | —                                |
+| `customerAlias` | Customer alias for your tenant          | —                                |
+| `databaseAlias` | Database alias                          | `Main`                           |
+| `clientId`      | OAuth app client ID (for WS runner)     | —                                |
+| `clientSecret`  | OAuth app client secret (for WS runner) | —                                |
+
+`clientId` and `clientSecret` are required for the WS test runner (`run-ws-test.js`). Register an API application in VV Admin to obtain these. Playwright tests do not need them (they use browser auth).
 
 This file is gitignored. Never commit credentials.
 
