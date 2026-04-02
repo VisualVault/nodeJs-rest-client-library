@@ -68,15 +68,17 @@ for (const tc of categoryTests) {
                 };
             }, fieldCfg.field);
 
-            // Assert Date object type
-            expect(gdocResult.isDate).toBe(true);
-
-            // Assert toISOString matches expected
-            expect(gdocResult.toIso).toBe(tc.expectedGdocIso);
-
-            // Assert toString contains expected substring
-            if (tc.expectedGdocToStringContains) {
-                expect(gdocResult.toString).toContain(tc.expectedGdocToStringContains);
+            if (tc.expectedGdocIso === null) {
+                // Empty field — GDOC should return null/undefined (not a Date, no throw)
+                expect(gdocResult.isDate).toBe(false);
+                expect(gdocResult.toIso).toBeNull();
+            } else {
+                // Filled field — GDOC should return a valid Date object
+                expect(gdocResult.isDate).toBe(true);
+                expect(gdocResult.toIso).toBe(tc.expectedGdocIso);
+                if (tc.expectedGdocToStringContains) {
+                    expect(gdocResult.toString).toContain(tc.expectedGdocToStringContains);
+                }
             }
         });
     });
