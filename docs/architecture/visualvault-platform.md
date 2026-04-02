@@ -51,22 +51,88 @@ https://{env}.visualvault.com/FormViewer/app?DataID={recordGUID}&hidemenu=true&r
 
 The FormViewer is a completely separate SPA from the main VV shell. It runs independently with its own URL structure.
 
+### Dashboard Detail (shows a grid of form records)
+
+```
+https://{env}.visualvault.com/app/{customer}/{database}/FormDataDetails?Mode=ReadOnly&ReportID={dashboardGUID}
+```
+
+- `ReportID` — GUID identifying the dashboard/report to display
+- `Mode=ReadOnly` — standard view mode (click a record to open it in FormViewer)
+
+This is an ASP.NET page (not the Angular FormViewer SPA) using Telerik RadGrid for server-side rendering.
+
 ---
 
 ## Navigation Map
 
 All sections are accessed from the top nav bar within `https://{env}.visualvault.com/app/{customer}/{database}/`:
 
-| Nav Label                 | URL Path                                | Description                                                                                                                                               |
-| ------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Document Library**      | `/DocumentLibrary`                      | Folder-tree document storage. Left panel = folder tree, right = file list. Has a Recycle Bin.                                                             |
-| **Form Templates**        | `/FormTemplateAdmin`                    | Admin view to create/manage form schemas. Columns: Category, Template Name, Form Design (View/Edit), Description, Status, Revision, Import, Export, Copy. |
-| **Form Library**          | `/FormDataAdmin`                        | End-user list of all forms available to fill in. Each row has a "Fill-In" link that opens the FormViewer.                                                 |
-| **Dashboards**            | `/formdata`                             | List of dashboards — one per form template — showing submitted records. Each dashboard is viewable and editable.                                          |
-| **Reports**               | Submenu                                 | Report generation. Submenu items vary by customer setup.                                                                                                  |
-| **Process Design Studio** | `/ProcessDesignStudio?access_token=...` | Visual workflow (BPMN-style) designer. Token-authenticated. Separate app.                                                                                 |
-| **Admin Tools**           | Dropdown                                | Users, Groups, Portals, Menus, Dropdown Lists, Site Administration (Locations, Customers, Suppliers)                                                      |
-| **Enterprise Tools**      | Via Control Panel                       | Microservices, Scheduled Services, Data Connections, Data Connection Queries — see below                                                                  |
+| Nav Label                 | URL Path                                | Description                                                                                                                                                         |
+| ------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Document Library**      | `/DocumentLibrary`                      | Folder-tree document storage. Left panel = folder tree, right = file list. Has a Recycle Bin.                                                                       |
+| **Form Templates**        | `/FormTemplateAdmin`                    | Admin view to create/manage form schemas. Columns: Category, Template Name, Form Design (View/Edit), Description, Status, Revision, Import, Export, Copy.           |
+| **Form Library**          | `/FormDataAdmin`                        | End-user list of all forms available to fill in. Each row has a "Fill-In" link that opens the FormViewer.                                                           |
+| **Dashboards**            | `/formdata`                             | List of dashboards — one per form template — showing submitted records. Each dashboard is viewable and editable. See [Dashboard Details](#dashboard-details) below. |
+| **Reports**               | Submenu                                 | Report generation. Submenu items vary by customer setup.                                                                                                            |
+| **Process Design Studio** | `/ProcessDesignStudio?access_token=...` | Visual workflow (BPMN-style) designer. Token-authenticated. Separate app.                                                                                           |
+| **Admin Tools**           | Dropdown                                | Users, Groups, Portals, Menus, Dropdown Lists, Site Administration (Locations, Customers, Suppliers)                                                                |
+| **Enterprise Tools**      | Via Control Panel                       | Microservices, Scheduled Services, Data Connections, Data Connection Queries — see below                                                                            |
+
+---
+
+## Dashboard Details
+
+### Dashboard List vs Dashboard Detail
+
+The **Dashboards** nav item (`/formdata`) shows a list of all form dashboards. Clicking a dashboard opens the detail view:
+
+```
+/FormDataDetails?Mode=ReadOnly&ReportID={dashboardGUID}
+```
+
+- `Mode=ReadOnly` — standard view mode (records are read-only in the grid; click to open for editing)
+- `ReportID` — GUID identifying which dashboard/report to display
+
+### Rendering Technology
+
+Dashboards use **Telerik RadGrid** (ASP.NET WebForms) — a **server-side rendered** grid component. The server queries the SQL database, formats values in .NET, and sends pre-rendered HTML. The browser renders static HTML with no client-side date processing.
+
+**Key implication:** Browser timezone has **zero effect** on displayed date values. BRT, IST, and UTC0 users see byte-identical content for the same dashboard. This is fundamentally different from the FormViewer (Angular SPA with client-side `moment.js` date processing).
+
+### Grid Structure
+
+| Property       | Value                                                                |
+| -------------- | -------------------------------------------------------------------- |
+| Grid component | Telerik RadGrid (`.RadGrid`, `.rgMasterTable`)                       |
+| Row classes    | `.rgRow` (even), `.rgAltRow` (odd)                                   |
+| Header links   | `.GridHeaderLink` (sortable column headers)                          |
+| Pager          | `.rgPagerCell` — configurable page size (10/15/20/25/50/100/200/500) |
+| Default sort   | By Form ID descending (most recent first)                            |
+
+**Column layout:** Columns are sorted **alphabetically** by field name (Field1, Field10, Field11, ..., Field2, Field20, ..., Field7), not numerically. The first column is always Form ID.
+
+### Date Display Format
+
+The server formats dates based on the field's `enableTime` property:
+
+| enableTime | Server Format      | Example             |
+| :--------: | ------------------ | ------------------- |
+|  `false`   | `M/d/yyyy`         | `3/15/2026`         |
+|   `true`   | `M/d/yyyy h:mm tt` | `3/15/2026 3:00 AM` |
+
+The `ignoreTimezone` and `useLegacy` flags do **not** affect the server-side display format — only `enableTime` matters.
+
+### Features
+
+| Feature          | Details                                                                                                               |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Sort**         | Click any column header to sort ascending/descending (server postback)                                                |
+| **Search**       | SQL filter builder (`a[title="Toggle search toolbar display"]`) with field/operator/value conditions and AND/OR joins |
+| **Export**       | Excel (`.xlsx`), Word (`.doc`), XML (`.xml`) — available via toolbar buttons                                          |
+| **Print**        | Print dialog with page range selection                                                                                |
+| **Record click** | `__doPostBack` opens the form record in FormViewer (server postback, same window)                                     |
+| **Pagination**   | Server-side paging with configurable page size                                                                        |
 
 ---
 
@@ -246,10 +312,11 @@ The Microservice registered in VV points to `{nodeV2 server URL}/scripts` or `/s
 
 ### Test Forms (demo environment)
 
-| Form                          | Template GUID                          | Template URL                                                                                                                                                                                             | Notes                                                                     |
-| ----------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| DateTest                      | `6be0265c-152a-f111-ba23-0afff212cc87` | `https://vvdemo.visualvault.com/FormViewer/app?hidemenu=true&formid=6be0265c-152a-f111-ba23-0afff212cc87&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939`           | 8 date fields across all calendar configs; creates new instance each load |
-| DateTest-000004 Rev 1 (saved) | —                                      | `https://vvdemo.visualvault.com/FormViewer/app?DataID=2ae985b5-1892-4d26-94da-388121b0907e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939` | Saved record from BRT session; use for reload/cross-TZ tests              |
+| Form                          | Template GUID                                    | Template URL                                                                                                                                                                                             | Notes                                                                     |
+| ----------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| DateTest                      | `6be0265c-152a-f111-ba23-0afff212cc87`           | `https://vvdemo.visualvault.com/FormViewer/app?hidemenu=true&formid=6be0265c-152a-f111-ba23-0afff212cc87&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939`           | 8 date fields across all calendar configs; creates new instance each load |
+| DateTest Dashboard            | ReportID: `e522c887-e72e-f111-ba23-0e3ceb11fc25` | `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25`                                                                       | 267 records (as of 2026-04-02); Telerik RadGrid, server-rendered          |
+| DateTest-000004 Rev 1 (saved) | —                                                | `https://vvdemo.visualvault.com/FormViewer/app?DataID=2ae985b5-1892-4d26-94da-388121b0907e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939` | Saved record from BRT session; use for reload/cross-TZ tests              |
 
 ---
 
