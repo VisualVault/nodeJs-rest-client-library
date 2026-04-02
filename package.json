@@ -67,7 +67,7 @@
         "test:pw:firefox": "npx playwright test --config=testing/playwright.config.js --project='*-firefox'",
         "test:pw:webkit": "npx playwright test --config=testing/playwright.config.js --project='*-webkit'",
         "test:pw:headed": "npx playwright test --config=testing/playwright.config.js --headed",
-        "test:pw:report": "npx playwright show-report testing/playwright-report",
+        "test:pw:report": "npx playwright show-report /tmp/pw-report",
         "lint": "eslint lib/ scripts/",
         "lint:fix": "eslint --fix lib/ scripts/",
         "format": "prettier --write \"lib/**/*.js\" \"scripts/**/*.js\"",

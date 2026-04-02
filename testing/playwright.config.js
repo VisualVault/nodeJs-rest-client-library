@@ -66,6 +66,6 @@ module.exports = defineConfig({
 
     projects,
 
-    outputDir: './test-results',
-    reporter: [['html', { open: 'never', outputFolder: './playwright-report' }], ['list']],
+    outputDir: '/tmp/pw-test-results',
+    reporter: [['html', { open: 'never', outputFolder: '/tmp/pw-report' }], ['list']],
 });
