@@ -198,6 +198,8 @@ const HARDCODED_SAVED_RECORDS = {
         '/FormViewer/app?DataID=6d2f720d-8621-4a97-a751-90c4cc8588b6&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
     'cat3-B-BRT':
         '/FormViewer/app?DataID=c63dea33-867e-49e2-b929-fb226b6d3933&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
+    'cat3-C-IST':
+        '/FormViewer/app?DataID=278aee29-1141-4165-8769-e33869a5056e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
 };
 
 const SAVED_RECORDS_PATH = path.join(__dirname, '..', 'config', 'saved-records.json');

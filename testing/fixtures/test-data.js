@@ -850,6 +850,24 @@ const TEST_DATA = [
         notes: 'Legacy DateTime same-TZ reload (BRT→BRT). Value survives intact — parseDateString roundtrip stable when no Z to strip. GFV returns raw unchanged (useLegacy=true).',
         tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-G-BRT-BRT.md',
     },
+    {
+        id: '3-C-IST-BRT',
+        category: 3,
+        categoryName: 'Server Reload',
+        config: 'C',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'reload',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '03/15/2026 12:00 AM',
+        expectedRaw: '2026-03-15T00:00:00',
+        expectedApi: '2026-03-14T18:30:00.000Z',
+        savedRecord: 'cat3-C-IST',
+        saveTz: 'IST',
+        bugs: ['Bug #1', 'Bug #4'],
+        notes: 'EXPECTED FAIL: Cross-TZ reload IST→BRT. Raw string survives ("2026-03-15T00:00:00") but GFV reinterprets as BRT midnight (T03:00:00.000Z) instead of preserving IST midnight (T18:30:00.000Z). 8.5h UTC shift due to Bug #1+#4 timezone stripping.',
+        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-C-IST-BRT.md',
+    },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 6 — Current Date Default
     // Open fresh form template. Current Date field auto-populates with today's date.
