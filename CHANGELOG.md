@@ -33,6 +33,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Legacy field handling in calendar helpers: `typeDateInField` and `roundTripCycle` detect plain `<input>` (useLegacy=true) vs Kendo wrappers and adapt interaction accordingly
 - `saveFormOnly` helper in `vv-form.js`: saves form and extracts DataID via `VV.Form.DataID` property (reliable post-save indicator)
 - New Playwright spec files: cat-5 (preset), cat-6 (current date), cat-8 (GetFieldValue), cat-8b (GetDateObject), cat-9-gdoc (GDOC round-trip), cat-9-gfv (GFV round-trip), cat-12 (edge cases) — 11 total category specs
+- Web services date-handling test infrastructure: test matrix (WS-1 through WS-9, ~118 slots), form button harness (`ws-harness-button.js`), direct Node.js runner (`run-ws-test.js`), and `README.md` with setup/architecture docs
 
 ### Changed
 

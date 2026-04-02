@@ -9,7 +9,7 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 | Component                                | Status                            | Folder                     |
 | ---------------------------------------- | --------------------------------- | -------------------------- |
 | **Forms — Calendar Fields**              | IN PROGRESS (~120/242 tests done) | `forms-calendar/`          |
-| **Web Services (REST API)**              | IN PROGRESS (0 tests done)        | `web-services/`            |
+| **Web Services (REST API)**              | IN PROGRESS (~118 slots, 0 done)  | `web-services/`            |
 | **Analytic Dashboards**                  | NOT STARTED                       | `dashboards/` (to create)  |
 | **VisualVault Reports**                  | NOT STARTED                       | `reports/` (to create)     |
 | **Files (document dates)**               | NOT STARTED                       | `files/` (to create)       |
@@ -25,9 +25,13 @@ tasks/date-handling/
     analysis.md                # Code review + confirmed bug analysis
     test/results.md                  # Live browser test evidence (source of truth)
   web-services/                      # REST API date handling investigation
+    README.md                        # Test environment setup, harness usage, architecture
     analysis.md                      # API analysis, hypotheses, confirmed behaviors
-    matrix.md                        # Test matrix — WS-1 through WS-7 categories
+    matrix.md                        # Test matrix — WS-1 through WS-9 categories (~118 slots)
     results.md                       # Live test evidence
+    webservice-test-harness.js       # VV form button script — runs tests inside FormViewer
+    ws-harness-button.js             # Form button event script — triggers harness
+    run-ws-test.js                   # Direct Node.js test runner (via microservices server)
     test-cases/                      # Individual TC spec files
     runs/                            # Immutable execution records
     summaries/                       # Per-TC status files
