@@ -110,8 +110,8 @@ VV Server responds with JSON
     ├── common.js: JSON.parse(responseData) if string, else passthrough
     │
     └── Script receives parsed JavaScript object
-           - Dates remain as ISO 8601 strings (NOT converted to Date objects)
-           - Field names are LOWERCASED (e.g., "datafield7" not "DataField7")
+           - Dates are normalized to ISO 8601 datetime with Z suffix (e.g., "2026-03-15T00:00:00Z")
+           - Field names are in camelCase (e.g., "dataField7" not "DataField7")
 ```
 
 ### Field Name Casing
@@ -128,6 +128,34 @@ When **writing** field values (e.g., `postForms()`, `postFormRevision()`), the A
 ```javascript
 vvClient.forms.postForms(null, { DataField7: '2026-03-15' }, templateName); // original case
 ```
+
+### Date Format Normalization
+
+The VV API normalizes **all date values** to ISO 8601 datetime with Z suffix in responses, regardless of how they were stored:
+
+| Stored via Forms                          | API Returns                            |
+| ----------------------------------------- | -------------------------------------- |
+| `"2026-03-15"` (date-only field)          | `"2026-03-15T00:00:00Z"`               |
+| `"2026-03-15T00:00:00"` (datetime, no Z)  | `"2026-03-15T00:00:00Z"`               |
+| `"2026-03-15T03:00:00.000Z"` (legacy UTC) | `"2026-03-15T03:00:00Z"` (ms stripped) |
+
+This means **API return values do not match Forms `getValueObjectValue()` format**. A date-only field returns `"2026-03-15"` in Forms but `"2026-03-15T00:00:00Z"` via the API. Scripts comparing API reads against Forms behavior must account for this normalization.
+
+### Null and Empty Fields
+
+Unset or empty date fields return `null` in API responses (not `""` or `"Invalid Date"`). This differs from Forms `GetFieldValue()` which returns `"Invalid Date"` for empty Config D fields (Bug #6).
+
+### Expanded Record Metadata
+
+When `expand: true` is set in `getForms()`, the response includes system metadata alongside field values:
+
+| Field                       | Description                             |
+| --------------------------- | --------------------------------------- |
+| `revisionId`                | Record GUID                             |
+| `instanceName`              | Record name (e.g., `"DateTest-000080"`) |
+| `createDate` / `modifyDate` | ISO 8601 timestamps with Z              |
+| `createBy` / `modifyBy`     | User email                              |
+| `href`                      | API resource path                       |
 
 ---
 
