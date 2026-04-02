@@ -286,6 +286,18 @@ https://vvdemo.visualvault.com/app/EmanuelJofre/Main/DocumentLibrary
 
 ---
 
+## API Behavior Notes
+
+### Field Name Casing
+
+The VV REST API returns field names **lowercased** in response objects (e.g., `datafield7` instead of `DataField7`). When writing data, the API accepts the original mixed casing. Scripts must account for this asymmetry when reading field values from API responses vs. constructing field data for writes.
+
+### Data Passthrough
+
+The Node.js client library (`lib/`) performs **no data transformation** between script code and the VV server. Field values (including dates) are serialized via `JSON.stringify()` on the way out and `JSON.parse()` on the way back. Dates remain as strings throughout — never converted to/from JavaScript `Date` objects by the library. See [Scripting Guide](../guides/scripting.md) for the full data flow.
+
+---
+
 ## External Documentation
 
 - Official docs: https://docs.visualvault.com/docs
