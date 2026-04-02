@@ -19,4 +19,3 @@ tasks/
 | Task                            | Status      | Description                                                                                          |
 | ------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------- |
 | [date-handling](date-handling/) | In Progress | Cross-platform date handling bug investigation — Forms, Web Services, Dashboards, Reports, Workflows |
-| [workflow-test](workflow-test/) | Not Started | Workflow microservice test script template for scheduled process testing                             |

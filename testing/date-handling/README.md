@@ -72,6 +72,7 @@ Shared config:
 | `cat-3-server-reload.spec.js`  | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                   |
 | `cat-5-preset-date.spec.js`    | Category 5 — preset date default auto-population tests                                  |
 | `cat-6-current-date.spec.js`   | Category 6 — current date default auto-population tests                                 |
+| `cat-7-setfieldvalue.spec.js`  | Category 7 — SetFieldValue input format tests (Date obj, ISO±Z, US, epoch)              |
 | `cat-8-getfieldvalue.spec.js`  | Category 8 — GetFieldValue return value tests                                           |
 | `cat-8b-getdateobject.spec.js` | Category 8B — GetDateObjectFromCalendar return tests                                    |
 | `cat-9-gfv-roundtrip.spec.js`  | Category 9 — GFV round-trip drift tests (SetFieldValue → GetFieldValue → SetFieldValue) |

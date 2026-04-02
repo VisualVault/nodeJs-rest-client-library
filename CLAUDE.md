@@ -48,6 +48,8 @@ nodeV2/
   tasks/                             # Investigation and task workspace
     README.md                        # Task index and structure guide
     date-handling/                   # Active: cross-platform date bug investigation
+      forms-calendar/                # Forms calendar field testing (7 bugs, ~242 slots)
+      web-services/                  # REST API date handling testing
 ```
 
 ## How the Server Works
@@ -145,7 +147,7 @@ npm run test:pw:report       # Open HTML report
 - `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture, save
 - `helpers/vv-calendar.js` — calendar helpers: popup selection (date-only + DateTime), typed input, legacy fields
 - `global-setup.js` — auto-login + create saved records via browser UI (per-TZ, cached 1h)
-- `date-handling/cat-*.spec.js` — 10 parameterized spec files (cat-1, 2, 3, 5, 6, 8, 8b, 9-gdoc, 9-gfv, 12)
+- `date-handling/cat-*.spec.js` — 11 parameterized spec files (cat-1, 2, 3, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 12)
 
 Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
 
@@ -156,7 +158,6 @@ See `tasks/` folder. Each task gets its own subfolder with analysis, test result
 | Task                                  | Status      | Description                                                                                               |
 | ------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
 | [date-handling](tasks/date-handling/) | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Reports, Workflows |
-| [workflow-test](tasks/workflow-test/) | Not Started | Workflow microservice test script template for scheduled process testing                                  |
 
 ## Platform Documentation
 

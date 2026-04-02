@@ -15,10 +15,14 @@ testing/
   helpers/                   # Reusable page helpers
     vv-form.js               # Generic VV form automation (navigation, fields, save)
     vv-calendar.js           # Calendar popup + typed input helpers
+    ws-api.js                # REST API helpers for web service tests
   fixtures/                  # Shared test data and config
     vv-config.js             # FIELD_MAP, form URLs, saved records
     test-data.js             # All test case definitions (data-driven)
+    ws-config.js             # Web service API config and helpers
+    ws-test-data.js          # Web service test case definitions
   date-handling/             # Date-handling test specs (1 per category)
+  web-services/              # REST API date-handling test specs
 ```
 
 ## Quick Start
@@ -36,7 +40,7 @@ npm run test:pw:report       # Open HTML report
 
 | Suite                                    | Specs         | Description                                                         |
 | ---------------------------------------- | ------------- | ------------------------------------------------------------------- |
-| [date-handling](date-handling/README.md) | 10 spec files | Calendar field date-handling across 8 field configs and 3 timezones |
+| [date-handling](date-handling/README.md) | 11 spec files | Calendar field date-handling across 8 field configs and 3 timezones |
 | [web-services](web-services/README.md)   | 7 spec files  | REST API date-handling across 8 field configs and 3 timezones       |
 
 ## Configuration
