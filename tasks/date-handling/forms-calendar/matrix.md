@@ -52,7 +52,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 8B. GetDateObject return  |   12    |   3    |   0    |    9    |    0    |    0    |   0   |
 | 9. Round-Trip (GFV)       |   20    |   6    |   5    |    9    |    0    |    0    |   0   |
 | 9-GDOC. Round-Trip (GDOC) |    5    |   2    |   0    |    3    |    0    |    0    |   0   |
-| 10. Web Service           |   11    |   0    |   0    |   11    |    0    |    0    |   0   |
+| 10. Web Service           |   11    |   4    |   5    |    1    |    0    |    0    |   1   |
 | 11. Cross-Timezone        |   14    |   0    |   0    |   13    |    0    |    1    |   0   |
 | 12. Edge Cases            |   20    |   5    |   9    |    5    |    0    |    0    |   1   |
 | 13. Database              |   10    |   2    |   0    |    8    |    0    |    0    |   0   |
@@ -384,21 +384,25 @@ Call `SetFieldValue(field, GetFieldValue(field))` and measure date drift.
 
 Simulate a scheduled script, form button event, or REST API call setting a date value.
 **Bugs exercised**: Bug #7 (date-only, UTC+ server?), input format sensitivity in all configs
-**Blocker**: Requires a Node.js test script to send values via `VVRestApi`.
+**Blocker**: ~~Requires a Node.js test script to send values via `VVRestApi`.~~ Resolved — full WS test infrastructure built.
 
-| Test ID                | Config | Source           | Value                             | Expected                                 | Actual | Status  | Run Date | Evidence |
-| ---------------------- | :----: | ---------------- | --------------------------------- | ---------------------------------------- | ------ | ------- | -------- | -------- |
-| 10-D-ws-isoZ           |   D    | Web service JSON | `"2026-03-15T00:00:00.000Z"`      | Stored as local (shifted?)               | —      | PENDING | —        | —        |
-| 10-D-ws-isoNoZ         |   D    | Web service JSON | `"2026-03-15T00:00:00"`           | Stored as-is                             | —      | PENDING | —        | —        |
-| 10-D-ws-dateOnly       |   D    | Web service JSON | `"2026-03-15"`                    | Midnight appended                        | —      | PENDING | —        | —        |
-| 10-D-ws-dotnet         |   D    | .NET DateTime    | `"2026-03-15T00:00:00.000+00:00"` | —                                        | —      | PENDING | —        | —        |
-| 10-D-ws-epoch          |   D    | Epoch ms         | `1773784800000`                   | —                                        | —      | PENDING | —        | —        |
-| 10-C-ws-isoZ           |   C    | Web service JSON | `"2026-03-15T00:00:00.000Z"`      | UTC→local (Mar 14 in BRT)                | —      | PENDING | —        | —        |
-| 10-A-ws-isoZ           |   A    | Web service JSON | `"2026-03-15T00:00:00.000Z"`      | `"2026-03-15"` (date extracted)          | —      | PENDING | —        | —        |
-| 10-A-ws-dateOnly       |   A    | Web service JSON | `"2026-03-15"`                    | `"2026-03-15"`                           | —      | PENDING | —        | —        |
-| 10-D-ws-midnight-cross |   D    | Web service      | `"2026-03-15T02:00:00.000Z"`      | In BRT: Mar 14 23:00 (crosses midnight!) | —      | PENDING | —        | —        |
-| 10-D-script-scheduled  |   D    | Scheduled script | `response.data.date`              | —                                        | —      | PENDING | —        | —        |
-| 10-D-script-button     |   D    | Form button      | `VV.Form.SetFieldValue(...)`      | Same as Cat 7 — no new behavior expected | —      | PENDING | —        | —        |
+> **Cross-reference**: Most Cat 10 scenarios are covered by the [WS test matrix](../web-services/matrix.md) (WS-1, WS-4, WS-5). Evidence links below point to WS run files. Gap tests: [cat10-gaps-run-1.md](../web-services/runs/cat10-gaps-run-1.md).
+
+| Test ID                | Config | Source           | Value                             | Actual (Forms Display / rawValue)                                         | Status  | Run Date   | Evidence                                                                 |
+| ---------------------- | :----: | ---------------- | --------------------------------- | ------------------------------------------------------------------------- | :-----: | ---------- | ------------------------------------------------------------------------ |
+| 10-D-ws-isoZ           |   D    | Web service JSON | `"2026-03-15T00:00:00.000Z"`      | Display: 03/15 12:00AM; raw shifted to local (CB-8)                       |  FAIL   | 2026-04-02 | [ws-4-batch-run-1](../web-services/runs/ws-4-batch-run-1.md)             |
+| 10-D-ws-isoNoZ         |   D    | Web service JSON | `"2026-03-15T00:00:00"`           | API adds Z → same as isoZ (CB-8)                                          |  FAIL   | 2026-04-02 | [ws-4-batch-run-1](../web-services/runs/ws-4-batch-run-1.md)             |
+| 10-D-ws-dateOnly       |   D    | Web service JSON | `"2026-03-15"`                    | Stored `T00:00:00Z`; display correct                                      |  PASS   | 2026-04-02 | [ws-1 matrix rows](../web-services/matrix.md#ws-1-api-write-path-create) |
+| 10-D-ws-dotnet         |   D    | .NET DateTime    | `"2026-03-15T00:00:00.000+00:00"` | Stored `T00:00:00Z`; `+00:00` = Z equivalent (CB-12)                      |  PASS   | 2026-04-02 | [cat10-gaps-run-1](../web-services/runs/cat10-gaps-run-1.md)             |
+| 10-D-ws-epoch          |   D    | Epoch ms         | `1773532800000`                   | Stored `null` — silent data loss (Bug #8 variant)                         |  FAIL   | 2026-04-02 | [cat10-gaps-run-1](../web-services/runs/cat10-gaps-run-1.md)             |
+| 10-C-ws-isoZ           |   C    | Web service JSON | `"2026-03-15T00:00:00.000Z"`      | BRT: display 9:00 PM Mar 14; IST: 5:30 AM Mar 15 (CB-8 UTC→local)         |  FAIL   | 2026-04-02 | [ws-4-batch-run-1](../web-services/runs/ws-4-batch-run-1.md)             |
+| 10-A-ws-isoZ           |   A    | Web service JSON | `"2026-03-15T00:00:00.000Z"`      | raw: `"2026-03-15"`, display: `03/15/2026` ✓                              |  PASS   | 2026-04-02 | [ws-4-batch-run-1](../web-services/runs/ws-4-batch-run-1.md)             |
+| 10-A-ws-dateOnly       |   A    | Web service JSON | `"2026-03-15"`                    | raw: `"2026-03-15"`, display: `03/15/2026` ✓                              |  PASS   | 2026-04-02 | [ws-1 matrix rows](../web-services/matrix.md#ws-1-api-write-path-create) |
+| 10-D-ws-midnight-cross |   D    | Web service      | `"2026-03-15T02:00:00"`           | BRT: display `02:00 AM` OK, raw `"2026-03-14T23:00:00"` **date crossed!** |  FAIL   | 2026-04-02 | [cat10-gaps-run-1](../web-services/runs/cat10-gaps-run-1.md)             |
+| 10-D-script-scheduled  |   D    | Scheduled script | `response.data.date`              | —                                                                         | PENDING | —          | — (requires live scheduled script)                                       |
+| 10-D-script-button     |   D    | Form button      | `VV.Form.SetFieldValue(...)`      | Same as Cat 7 — no new behavior                                           |  SKIP   | —          | See Cat 7 results                                                        |
+
+> **Cat 10 Finding**: 4 PASS, 5 FAIL, 1 PENDING, 1 SKIP. All FAIL cases are caused by the CB-8 cross-layer datetime shift (API Z normalization + Forms V1 UTC interpretation). Date-only fields (Config A) are safe. Epoch format is a Bug #8 variant (silent null). Midnight-crossing in BRT causes rawValue date to shift to the previous day — critical for CSV imports with near-midnight UTC times.
 
 ---
 

@@ -123,6 +123,8 @@ d.setDate(d.getDate() + 30); // Local arithmetic — may vary per TZ
 | `"2026-03-15T14:30:00"` (no offset)    | Server adds Z → treated as UTC → wrong local display            |
 | `"15/03/2026"` (DD/MM/YYYY)            | Silently stored as null — complete data loss (Bug #8)           |
 | `"05/03/2026"` (ambiguous)             | Interpreted as May 3 (MM/DD), not March 5 — wrong date silently |
+| `1773532800000` (epoch ms)             | Silently stored as null — numeric timestamps not supported      |
+| `"1773532800000"` (epoch string)       | Silently stored as null — numeric strings not parsed as dates   |
 | `new Date("03/15/2026")` (Date object) | Serialized as local midnight → different UTC per server TZ      |
 
 ---
