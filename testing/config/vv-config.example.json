@@ -4,5 +4,7 @@
     "username": "your.email@company.com",
     "password": "your-password-here",
     "customerAlias": "YourCustomerAlias",
-    "databaseAlias": "Main"
+    "databaseAlias": "Main",
+    "clientId": "your-oauth-client-id",
+    "clientSecret": "your-oauth-client-secret"
 }

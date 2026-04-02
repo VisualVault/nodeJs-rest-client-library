@@ -171,7 +171,51 @@ You can also target a single cell: `npx playwright test --config=testing/playwri
 | Auth state | `testing/config/auth-state.json`           | `testing/config/auth-state-pw.json`                           |
 | Outputs    | TC specs, run files, summaries in `tasks/` | `testing/tmp/test-results/`, `testing/tmp/playwright-report/` |
 
-## 5. Upstream Sync
+## 5. Web Services Testing Setup
+
+WS testing uses a direct Node.js runner to call the VV API. No server or browser needed for API-only tests.
+
+### 5.1 Prerequisites
+
+- VV credentials in `testing/config/vv-config.json` with `clientId` and `clientSecret` fields (see section 4.3)
+- To obtain OAuth credentials: register an API application in VV Admin (Admin Tools > API Applications, or contact your VV admin)
+
+### 5.2 Quick Start (Direct Runner)
+
+```bash
+# Smoke test — read an existing record
+node tasks/date-handling/web-services/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
+
+# Create a record via API
+node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+
+# Debug mode (includes raw API response)
+node tasks/date-handling/web-services/run-ws-test.js --action WS-2 --configs ALL --record-id DateTest-000080 --debug
+
+# Simulate cloud/AWS timezone
+TZ=UTC node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+
+# Attach debugger (VS Code)
+node --inspect-brk tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+```
+
+The runner authenticates with VV, builds the ffCollection, calls the harness, and prints the JSON result. No local server needed.
+
+### 5.3 Browser Path Setup (Optional — for WS-4 or production-path validation)
+
+This path calls the harness through VV's Microservice routing, like a real production form button would. Only needed for WS-4 (API→Forms cross-layer) or to validate the full production path.
+
+**One-time VV configuration:**
+
+1. **Start the local server**: `node lib/VVRestApi/VVRestApiNodeJs/app.js` (port 3000)
+2. **Make server accessible from VV**: Use ngrok or similar tunneling tool (`ngrok http 3000`). Note the public URL.
+3. **Register the Microservice** in VV: Enterprise Tools > Microservices (`/outsideprocessadmin`). Set Service Name = `DateTestWSHarness`, URL = `{public URL}/scripts`, Category = `Form`, Service Type = `NodeServer`.
+4. **Add form fields**: On the DateTest form template, add text fields: `WSAction`, `WSConfigs`, `WSRecordID`, `WSInputDate`, `WSResult` (textarea).
+5. **Add form button**: Assign `ws-harness-button.js` as the button script (copy the code into the VV form button editor).
+
+Full details: [`tasks/date-handling/web-services/README.md`](../../tasks/date-handling/web-services/README.md)
+
+## 6. Upstream Sync
 
 ```bash
 git fetch upstream
@@ -180,7 +224,7 @@ git merge upstream/master
 
 Origin: `emanueljofre/nodeV2` | Upstream: `VisualVault/nodeJs-rest-client-library`
 
-## 6. Troubleshooting
+## 7. Troubleshooting
 
 ### Form didn't load (timeout on `waitForVVForm`)
 

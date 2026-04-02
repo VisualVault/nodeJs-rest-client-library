@@ -21,12 +21,31 @@ REST API date handling investigation. Tests how dates are sent, stored, and retu
 
 ## Environment Setup
 
-### Prerequisites
+> Full dev environment setup (Node.js, dependencies, credentials): [dev-setup.md](../../docs/guides/dev-setup.md)
+
+### Prerequisites (Direct Runner — API-only tests)
+
+1. `npm install` completed (dependencies installed)
+2. `testing/config/vv-config.json` with `clientId` and `clientSecret` fields filled in (see [dev-setup.md section 4.3](../../docs/guides/dev-setup.md#43-create-vv-credentials-file))
+3. That's it — no server, no VV Microservice registration, no form button needed
+
+**Quick smoke test:**
+
+```bash
+node tasks/date-handling/web-services/run-ws-test.js --action WS-2 --configs A --record-id DateTest-000080
+```
+
+If this prints a JSON response with `"status": "Success"`, the runner is working.
+
+### Prerequisites (Browser Path — form button tests)
+
+Only needed for WS-4 (API→Forms cross-layer) or to validate the full production path.
 
 1. Node.js server running: `node lib/VVRestApi/VVRestApiNodeJs/app.js` (port 3000)
-2. Server accessible from VV (use ngrok or similar for local dev if needed)
+2. Server accessible from VV: `ngrok http 3000` (or deploy to a public URL)
+3. One-time VV configuration (see below)
 
-### One-Time VV Configuration
+### One-Time VV Configuration (Browser Path Only)
 
 #### 1. Register the Microservice
 
