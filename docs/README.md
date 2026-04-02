@@ -29,3 +29,4 @@ docs/
 - [form-fields.md](reference/form-fields.md) — Calendar field config properties, popup modal behavior, V1/V2 code path, VV.Form console API, known bugs summary
 - [vv-form-api.md](reference/vv-form-api.md) — Full VV.Form object structure: properties, methods, sub-objects, field definitions, automation patterns
 - [api-date-patterns.md](reference/api-date-patterns.md) — Correct datetime handling for web services: CSV imports, TZ offsets, safe patterns, common pitfalls
+- [form-template-xml.md](reference/form-template-xml.md) — Form template XML export format: field types, groups/conditions, script library, built-in control GUIDs

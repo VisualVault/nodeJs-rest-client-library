@@ -29,6 +29,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `verify-ws4-browser.js` — Playwright browser verification script for WS-4 (API→Forms cross-layer testing)
 - `docs/reference/api-date-patterns.md` — practical guide for CSV imports and web service datetime handling: decision tree, UTC offset reference, TZ-safe patterns, Bug #8 warnings
 - `docs/guides/scripting.md` expanded: server-side date format acceptance table, OData query format tolerance, TZ-safe Date construction patterns for production scripts
+- `docs/reference/form-template-xml.md` — Form template XML export format reference: field types with XML element names, Groups/Conditions structure, script library/assignments, built-in form control GUIDs, what's included vs excluded in exports
+- `docs/reference/form-fields.md` expanded: field type enum table with 7 new types from production template analysis (Label, Dropdown, Checkbox, CellField, UploadButton, FormIDStamp), `mask`/`placeholder` calendar properties
+- `docs/reference/vv-form-api.md` expanded: script event type IDs (onChange/onBlur/onClick), `VV.Form.Template` namespace correction, `CentralDateValidation` operator details, `CloseAndUnlockForm` method
 - `[@]-cleanup` command: read-only 6-phase repository maintenance audit (staleness, orphans, bloat, doc consistency, config hygiene, git hygiene)
 - `testing/README.md` — entry-point documentation for testing infrastructure
 - Playwright testing infrastructure under `testing/` (3-TZ projects, global auth, reusable helpers, data-driven specs)

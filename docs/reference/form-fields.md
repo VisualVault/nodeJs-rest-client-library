@@ -8,14 +8,20 @@ Runtime behavior, configuration properties, and debugging methods for VisualVaul
 
 Known `fieldType` values in `VV.Form.VV.FormPartition.fieldMaster`:
 
-| `fieldType` | Field Kind      | Example                    |
-| ----------- | --------------- | -------------------------- |
-| `3`         | Text / textarea | `WSAction`, `WSResult`     |
-| `13`        | Calendar / date | `DataField7`, `DataField5` |
-| `17`        | Button          | `btnSave`, `btnCallWS`     |
-| `103`       | Container       | `Container1`               |
+| `fieldType` | Field Kind      | XML `xsi:type`                     | Example                                          |
+| ----------- | --------------- | ---------------------------------- | ------------------------------------------------ |
+| `3`         | Text / textarea | `FieldTextbox3` / `FieldTextArea3` | `WSAction`, `WSResult`, `Subscription Pack Name` |
+| `13`        | Calendar / date | `FieldCalendar3`                   | `DataField7`, `Start Date`                       |
+| `17`        | Button          | `FormButton`                       | `btnSave`, `btnCallWS`                           |
+| —           | Label           | `FieldLabel`                       | `Label5`, `Label22`                              |
+| —           | Dropdown        | `FieldDropDownList3`               | `Status`, `Type`                                 |
+| —           | Checkbox        | `FieldCheckbox`                    | `Bool`, `Admin Override`                         |
+| —           | Cell/Numeric    | `CellField`                        | `Numero`                                         |
+| —           | Upload          | `UploadButton`                     | `UploadButton35`                                 |
+| —           | Auto-ID Stamp   | `FormIDStamp`                      | `Subscription Pack ID`                           |
+| `103`       | Container       | `FieldContainer`                   | `Container1`, `Con_Title`                        |
 
-This list is partial — only types observed on the DateTest form are included.
+Runtime `fieldType` numbers for non-DateTest types have not been verified — they were only observed via XML export. The XML `xsi:type` column shows the element type used in template XML exports.
 
 ---
 
@@ -35,6 +41,8 @@ Each calendar field has the following boolean config flags. These are readable a
 | `enableInitialValue` | boolean      | If `true`, the field pre-populates with an initial value (current date or preset date) on form load.                                                                                                                                                                                                                                                                                                                                                                                             |
 | `initialValueMode`   | number       | `0` = CurrentDate (uses live `new Date()` at load time); `1` = Preset (uses a configured fixed date). Only relevant when `enableInitialValue=true`.                                                                                                                                                                                                                                                                                                                                              |
 | `initialValue`       | string\|null | The preset date value. `null` when using current date or when initial value is disabled.                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `mask`               | string\|null | Display/input format mask (e.g., `"MM/dd/yyyy"`). Present in XML exports as `<Mask>`. Controls what the user sees in the input field. **Does not affect the value processing pipeline** (`normalizeCalValue`, `getSaveValue`, `getCalendarFieldValue`) — those are driven solely by the three boolean flags. Not all fields have this property; DateTest fields omit it (uses platform default).                                                                                                 |
+| `placeholder`        | string\|null | Placeholder hint text shown when the field is empty. Present in XML exports as `<Placeholder>`. Purely cosmetic.                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ### Popup Modal Behavior
 

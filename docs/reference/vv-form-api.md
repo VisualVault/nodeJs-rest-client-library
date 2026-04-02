@@ -54,14 +54,14 @@ The primary developer interface. Contains both own properties (form state) and p
 
 ### Sub-Objects on `VV.Form`
 
-| Property               | Type               | Description                                                                                                                                                   |
-| ---------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VV`                   | Internal container | Holds `FormPartition`, `FormsDataService`, `currentUser`, `QueryService`, `OfflineStorageService`, `calendarValueService`, `messageService`, `signingService` |
-| `Global`               | Script library     | User-defined global helper functions loaded from the form template's script library                                                                           |
-| `Template`             | Template service   | Has `ValidateFormUpload()` method                                                                                                                             |
-| `messageService`       | Angular service    | Internal message bus for component communication                                                                                                              |
-| `calendarValueService` | Angular service    | Calendar date processing; owns `useUpdatedCalendarValueLogic`, `getSaveValue()`, `parseDateString()`                                                          |
-| `signingService`       | Angular service    | Digital signature: `generateSignature()`, `updateSignature()`, `bufferToHexString()`                                                                          |
+| Property               | Type               | Description                                                                                                                                                                                                                                         |
+| ---------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VV`                   | Internal container | Holds `FormPartition`, `FormsDataService`, `currentUser`, `QueryService`, `OfflineStorageService`, `calendarValueService`, `messageService`, `signingService`                                                                                       |
+| `Global`               | Script library     | User-defined global helper functions loaded from the form template's script library                                                                                                                                                                 |
+| `Template`             | Template service   | Contains all user-defined template scripts (e.g., `FormValidation()`, `FillinAndRelate()`, `CallWS()`). Scripts are defined in the template's `ScriptLibrary` and accessible as `VV.Form.Template.<ScriptName>()`. Also has `ValidateFormUpload()`. |
+| `messageService`       | Angular service    | Internal message bus for component communication                                                                                                                                                                                                    |
+| `calendarValueService` | Angular service    | Calendar date processing; owns `useUpdatedCalendarValueLogic`, `getSaveValue()`, `parseDateString()`                                                                                                                                                |
+| `signingService`       | Angular service    | Digital signature: `generateSignature()`, `updateSignature()`, `bufferToHexString()`                                                                                                                                                                |
 
 ### Prototype Methods (36 total)
 
@@ -307,31 +307,32 @@ Controls the V1/V2 code path switch and provides shared date functions.
 
 User-defined helper functions loaded from the form template's `scriptLibrary` config. These are NOT platform methods — they are customer/template-specific. The DateTest template includes:
 
-| Function                                                           | Params | Description                                                                                               |
-| ------------------------------------------------------------------ | ------ | --------------------------------------------------------------------------------------------------------- |
-| `Save()`                                                           | 0      | Custom save handler                                                                                       |
-| `DebouncedSave()`                                                  | 0      | Debounced save wrapper (calls `window.debouncedSave()`)                                                   |
-| `CallMicroservice(name, data)`                                     | 2      | Calls a VV microservice endpoint via REST API. Constructs URL from `VV.BaseAppUrl` + customer/db aliases. |
-| `CallWS()`                                                         | 0      | Web service call helper                                                                                   |
-| `CentralValidation(value, type)`                                   | 2      | Validates field value format/type                                                                         |
-| `CentralDateValidation(value, type, compValue, compUnit, compQty)` | 5      | Date-specific validation with comparison logic                                                            |
-| `BuildUrls(data, htmlLinks, readOnly)`                             | 3      | Builds form record URLs from identifiers                                                                  |
-| `Age(value)`                                                       | 1      | Calculates age from a date value                                                                          |
-| `Await(fn)`                                                        | 1      | Promise wrapper — calls `fn()` and logs result                                                            |
-| `retry(fn, maxAttempts=3)`                                         | 1      | Retries an async function with configurable max attempts                                                  |
-| `timeout(?, ?)`                                                    | 2      | Timeout wrapper                                                                                           |
-| `Debounce(fn, delay)`                                              | 2      | Debounce utility                                                                                          |
-| `DisplayMessaging(?, ?)`                                           | 2      | Shows a user-facing message                                                                               |
-| `DisplayConfirmMessaging(?, ?, ?, ?)`                              | 4      | Shows a confirmation dialog                                                                               |
-| `MessageModal(... 11 params)`                                      | 11     | Full-featured modal dialog                                                                                |
-| `EvaluateGroupsandConditions(?)`                                   | 1      | Re-evaluates group conditions                                                                             |
-| `FillinAndRelateForm(?, ?, ?)`                                     | 3      | Creates and relates a fill-in form                                                                        |
-| `FormatPhone(value)`                                               | 1      | Formats a phone number                                                                                    |
-| `RadioButtons(?)`                                                  | 1      | Radio button helper                                                                                       |
-| `GetSelectRows(?)`                                                 | 1      | Gets selected rows from a grid                                                                            |
-| `LoadBootstrapCSS()`                                               | 0      | Loads Bootstrap CSS into the form                                                                         |
-| `LoadModalSettings()`                                              | 0      | Loads modal dialog settings                                                                               |
-| `SetupReg()`                                                       | 0      | Setup/registration helper                                                                                 |
+| Function                                                           | Params | Description                                                                                                                                                                                                               |
+| ------------------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Save()`                                                           | 0      | Custom save handler                                                                                                                                                                                                       |
+| `DebouncedSave()`                                                  | 0      | Debounced save wrapper (calls `window.debouncedSave()`)                                                                                                                                                                   |
+| `CallMicroservice(name, data)`                                     | 2      | Calls a VV microservice endpoint via REST API. Constructs URL from `VV.BaseAppUrl` + customer/db aliases.                                                                                                                 |
+| `CallWS()`                                                         | 0      | Web service call helper                                                                                                                                                                                                   |
+| `CentralValidation(value, type)`                                   | 2      | Validates field value format/type                                                                                                                                                                                         |
+| `CentralDateValidation(value, type, compValue, compUnit, compQty)` | 5      | Date-specific validation with comparison logic. `type`: `"DateBefore"`, `"DateAfter"`. `compUnit`: `"D"` (days). `compQty`: minimum difference (e.g., `1` = at least 1 day apart). Returns `true` if the condition holds. |
+| `BuildUrls(data, htmlLinks, readOnly)`                             | 3      | Builds form record URLs from identifiers                                                                                                                                                                                  |
+| `Age(value)`                                                       | 1      | Calculates age from a date value                                                                                                                                                                                          |
+| `Await(fn)`                                                        | 1      | Promise wrapper — calls `fn()` and logs result                                                                                                                                                                            |
+| `retry(fn, maxAttempts=3)`                                         | 1      | Retries an async function with configurable max attempts                                                                                                                                                                  |
+| `timeout(?, ?)`                                                    | 2      | Timeout wrapper                                                                                                                                                                                                           |
+| `Debounce(fn, delay)`                                              | 2      | Debounce utility                                                                                                                                                                                                          |
+| `DisplayMessaging(?, ?)`                                           | 2      | Shows a user-facing message                                                                                                                                                                                               |
+| `DisplayConfirmMessaging(message, title, okFn, cancelFn)`          | 4      | Shows a confirmation dialog with OK/Cancel callbacks                                                                                                                                                                      |
+| `CloseAndUnlockForm(skipRefresh?)`                                 | 0–1    | Closes the form and unlocks it. Pass `'Yes'` to skip parent window refresh.                                                                                                                                               |
+| `MessageModal(... 11 params)`                                      | 11     | Full-featured modal dialog                                                                                                                                                                                                |
+| `EvaluateGroupsandConditions(?)`                                   | 1      | Re-evaluates group conditions                                                                                                                                                                                             |
+| `FillinAndRelateForm(?, ?, ?)`                                     | 3      | Creates and relates a fill-in form                                                                                                                                                                                        |
+| `FormatPhone(value)`                                               | 1      | Formats a phone number                                                                                                                                                                                                    |
+| `RadioButtons(?)`                                                  | 1      | Radio button helper                                                                                                                                                                                                       |
+| `GetSelectRows(?)`                                                 | 1      | Gets selected rows from a grid                                                                                                                                                                                            |
+| `LoadBootstrapCSS()`                                               | 0      | Loads Bootstrap CSS into the form                                                                                                                                                                                         |
+| `LoadModalSettings()`                                              | 0      | Loads modal dialog settings                                                                                                                                                                                               |
+| `SetupReg()`                                                       | 0      | Setup/registration helper                                                                                                                                                                                                 |
 
 ---
 
@@ -561,3 +562,18 @@ VV.Form.VV.currentUser.CustomerAlias; // "EmanuelJofre"
 VV.Form.VV.currentUser.DatabaseAlias; // "Main"
 VV.Form.VV.currentUser.AccessToken; // OAuth token (sensitive)
 ```
+
+---
+
+## Script Event Types
+
+Form template scripts are bound to controls via `ScriptAssignment` entries. Each assignment specifies an `EventId`:
+
+| EventId | Event    | Handler Signature                    | Notes                                                                          |
+| ------- | -------- | ------------------------------------ | ------------------------------------------------------------------------------ |
+| `1`     | onChange | `event, control`                     | Dropdown selection change, checkbox toggle                                     |
+| `3`     | onBlur   | `calendarObject` or `event, control` | Calendar fields receive `calendarObject`; text fields receive `event, control` |
+| `4`     | onClick  | `event, control`                     | Button click                                                                   |
+| `15`    | (form)   | —                                    | Form-level event on built-in controls                                          |
+
+These IDs appear in template XML exports (`<EventId>`) and in the runtime `scriptAssignments` array on `formEntity`.
