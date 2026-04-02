@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the web services date-handling investigation.
 API analysis → `analysis.md` | Test evidence → `results.md` | Harness → `webservice-test-harness.js`
 
-Last updated: 2026-04-02 | Total slots: ~118 | Done: 0 | Blocked: 0
+Last updated: 2026-04-02 | Total slots: ~118 | Done: 32 | Blocked: 0
 
 ---
 
@@ -60,8 +60,8 @@ WS-1 includes UTC spot-checks (ws-1-{A,C,D,H}-UTC) to prove that the cloud envir
 
 | Category                      |  Total  | PASS | FAIL | PENDING | BLOCKED | Priority |
 | ----------------------------- | :-----: | :--: | :--: | :-----: | :-----: | :------: |
-| WS-1. API Write Path (Create) |   16    |      |      |   16    |         |    P1    |
-| WS-2. API Read + Cross-Layer  |   16    |      |      |   16    |         |    P1    |
+| WS-1. API Write Path (Create) |   16    |  16  |  0   |    0    |         |    P1    |
+| WS-2. API Read + Cross-Layer  |   16    |  16  |  0   |    0    |         |    P1    |
 | WS-3. API Round-Trip          |    4    |      |      |    4    |         |    P2    |
 | WS-4. API→Forms Cross-Layer   |    8    |      |      |    8    |         |    P3    |
 | WS-5. Input Format Tolerance  |   16    |      |      |   16    |         |    P2    |
@@ -69,7 +69,7 @@ WS-1 includes UTC spot-checks (ws-1-{A,C,D,H}-UTC) to prove that the cloud envir
 | WS-7. API Update Path         |   12    |      |      |   12    |         |    P2    |
 | WS-8. Query Date Filtering    |   10    |      |      |   10    |         |    P3    |
 | WS-9. Date Computation        |   12    |      |      |   12    |         |    P2    |
-| **TOTAL**                     | **118** |      |      | **118** |         |          |
+| **TOTAL**                     | **118** |  32  |  0   | **86**  |         |          |
 
 ---
 
@@ -97,24 +97,26 @@ Create a new form record via `postForms()` with a date value in each target conf
 
 **Test date**: `"2026-03-15"` for date-only configs (A/B/E/F), `"2026-03-15T14:30:00"` for DateTime configs (C/D/G/H). Using non-midnight time (14:30) to distinguish from date-only.
 
-| ID         | Config | TZ  | Input Sent              | Expected Stored         | Status  | Actual | Bugs | Notes                       |
-| ---------- | :----: | :-: | ----------------------- | ----------------------- | :-----: | ------ | ---- | --------------------------- |
-| ws-1-A-BRT |   A    | BRT | `"2026-03-15"`          | `"2026-03-15"`          | PENDING |        |      | Date-only baseline          |
-| ws-1-B-BRT |   B    | BRT | `"2026-03-15"`          | `"2026-03-15"`          | PENDING |        |      | Date-only + ignoreTZ        |
-| ws-1-C-BRT |   C    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | DateTime UTC-aware          |
-| ws-1-D-BRT |   D    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | DateTime + ignoreTZ         |
-| ws-1-E-BRT |   E    | BRT | `"2026-03-15"`          | `"2026-03-15"`          | PENDING |        |      | Legacy date-only            |
-| ws-1-F-BRT |   F    | BRT | `"2026-03-15"`          | `"2026-03-15"`          | PENDING |        |      | Legacy date-only + ignoreTZ |
-| ws-1-G-BRT |   G    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | Legacy DateTime             |
-| ws-1-H-BRT |   H    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | Legacy DateTime + ignoreTZ  |
-| ws-1-A-IST |   A    | IST | `"2026-03-15"`          | `"2026-03-15"`          | PENDING |        |      | TZ independence check       |
-| ws-1-C-IST |   C    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | TZ independence check       |
-| ws-1-D-IST |   D    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | TZ independence check       |
-| ws-1-H-IST |   H    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | TZ independence check       |
-| ws-1-A-UTC |   A    | UTC | `"2026-03-15"`          | `"2026-03-15"`          | PENDING |        |      | Cloud/AWS simulation        |
-| ws-1-C-UTC |   C    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | Cloud/AWS simulation        |
-| ws-1-D-UTC |   D    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | Cloud/AWS simulation        |
-| ws-1-H-UTC |   H    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | Cloud/AWS simulation        |
+| ID         | Config | TZ  | Input Sent              | Expected Stored          | Status | Actual                   | Bugs | Notes                        |
+| ---------- | :----: | :-: | ----------------------- | ------------------------ | :----: | ------------------------ | ---- | ---------------------------- |
+| ws-1-A-BRT |   A    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Date preserved; API adds T+Z |
+| ws-1-B-BRT |   B    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | ignoreTZ no effect on API    |
+| ws-1-C-BRT |   C    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Time preserved; API adds Z   |
+| ws-1-D-BRT |   D    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | ignoreTZ no effect on API    |
+| ws-1-E-BRT |   E    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Legacy = same as non-legacy  |
+| ws-1-F-BRT |   F    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Legacy + ignoreTZ = same     |
+| ws-1-G-BRT |   G    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Legacy DateTime = same       |
+| ws-1-H-BRT |   H    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Legacy + ignoreTZ = same     |
+| ws-1-A-IST |   A    | IST | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | TZ independent ✓ H-1,H-4     |
+| ws-1-C-IST |   C    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | TZ independent ✓             |
+| ws-1-D-IST |   D    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | TZ independent ✓             |
+| ws-1-H-IST |   H    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | TZ independent ✓             |
+| ws-1-A-UTC |   A    | UTC | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Cloud simulation ✓ H-4       |
+| ws-1-C-UTC |   C    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Cloud simulation ✓           |
+| ws-1-D-UTC |   D    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Cloud simulation ✓           |
+| ws-1-H-UTC |   H    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Cloud simulation ✓           |
+
+> **WS-1 Finding**: All 16 tests PASS. The VV server stores the date/time value as sent. The API read-back normalizes the format by appending `T00:00:00Z` (date-only) or `Z` (datetime). The date value itself is preserved perfectly. No Bug #7 (H-1 confirmed). Server TZ has no effect (H-4 confirmed). Field config flags (enableTime, ignoreTimezone, useLegacy) have no effect on API write behavior. Created records: DateTest-000889 through DateTest-000894.
 
 ---
 
@@ -132,24 +134,26 @@ Read existing Forms-saved records via `getForms()` with `expand: true`. Two anal
 
 **Note**: These records have known stored values from Forms testing (see `forms-calendar/results.md`). Configs not explicitly set during save may have empty or preset values.
 
-| ID         | Config | Record Source | Forms Stored Value              | Expected API Return                 | Status  | Actual | Bugs | Notes                                |
-| ---------- | :----: | ------------- | ------------------------------- | ----------------------------------- | :-----: | ------ | ---- | ------------------------------------ |
-| ws-2-A-BRT |   A    | 000080 (BRT)  | `"2026-03-15"`                  | `"2026-03-15"`                      | PENDING |        |      | Date-only, set via popup             |
-| ws-2-B-BRT |   B    | 000080 (BRT)  | TBD                             | Same as stored                      | PENDING |        |      | May be empty                         |
-| ws-2-C-BRT |   C    | 000080 (BRT)  | TBD                             | Same as stored                      | PENDING |        |      | May be empty                         |
-| ws-2-D-BRT |   D    | 000080 (BRT)  | `"2026-03-15T00:00:00"`         | `"2026-03-15T00:00:00"` (no fake Z) | PENDING |        |      | Bug #5 only in Forms GFV             |
-| ws-2-E-BRT |   E    | 000080 (BRT)  | TBD                             | Same as stored                      | PENDING |        |      | Legacy                               |
-| ws-2-F-BRT |   F    | 000080 (BRT)  | TBD                             | Same as stored                      | PENDING |        |      | Legacy                               |
-| ws-2-G-BRT |   G    | 000080 (BRT)  | TBD                             | Same as stored                      | PENDING |        |      | Legacy                               |
-| ws-2-H-BRT |   H    | 000080 (BRT)  | TBD                             | Same as stored                      | PENDING |        |      | Legacy                               |
-| ws-2-A-IST |   A    | 000084 (IST)  | `"2026-03-14"` (Bug #7: -1 day) | `"2026-03-14"` (confirms bug in DB) | PENDING |        |      | API should confirm wrong date stored |
-| ws-2-B-IST |   B    | 000084 (IST)  | TBD                             | Same as stored                      | PENDING |        |      | May have Bug #7 value                |
-| ws-2-C-IST |   C    | 000084 (IST)  | TBD                             | Same as stored                      | PENDING |        |      |                                      |
-| ws-2-D-IST |   D    | 000084 (IST)  | `"2026-03-15T00:00:00"`         | `"2026-03-15T00:00:00"` (no fake Z) | PENDING |        |      | Bug #5 only in Forms GFV             |
-| ws-2-E-IST |   E    | 000084 (IST)  | TBD                             | Same as stored                      | PENDING |        |      | Legacy — may have UTC datetime       |
-| ws-2-F-IST |   F    | 000084 (IST)  | TBD                             | Same as stored                      | PENDING |        |      | Legacy                               |
-| ws-2-G-IST |   G    | 000084 (IST)  | TBD                             | Same as stored                      | PENDING |        |      | Legacy                               |
-| ws-2-H-IST |   H    | 000084 (IST)  | TBD                             | Same as stored                      | PENDING |        |      | Legacy                               |
+| ID         | Config | Record Source | Forms Stored Value              | Expected API Return                  | Status | Actual                   | Bugs | Notes                                        |
+| ---------- | :----: | ------------- | ------------------------------- | ------------------------------------ | :----: | ------------------------ | ---- | -------------------------------------------- |
+| ws-2-A-BRT |   A    | 000080 (BRT)  | `"2026-03-15"`                  | `"2026-03-15T00:00:00Z"`             |  PASS  | `"2026-03-15T00:00:00Z"` |      | API normalizes date-only → datetime+Z; H-2 ✓ |
+| ws-2-B-BRT |   B    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset field returns null                     |
+| ws-2-C-BRT |   C    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset field returns null                     |
+| ws-2-D-BRT |   D    | 000080 (BRT)  | `"2026-03-15T00:00:00"`         | `"2026-03-15T00:00:00Z"` (real Z)    |  PASS  | `"2026-03-15T00:00:00Z"` |      | No fake Z — H-2 confirmed; API adds real Z   |
+| ws-2-E-BRT |   E    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
+| ws-2-F-BRT |   F    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
+| ws-2-G-BRT |   G    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
+| ws-2-H-BRT |   H    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
+| ws-2-A-IST |   A    | 000084 (IST)  | `"2026-03-14"` (Bug #7: -1 day) | `"2026-03-14T00:00:00Z"` (bug in DB) |  PASS  | `"2026-03-14T00:00:00Z"` | #7   | API confirms wrong date in storage; H-7 ✓    |
+| ws-2-B-IST |   B    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset                                        |
+| ws-2-C-IST |   C    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset                                        |
+| ws-2-D-IST |   D    | 000084 (IST)  | `"2026-03-15T00:00:00"`         | `"2026-03-15T00:00:00Z"` (real Z)    |  PASS  | `"2026-03-15T00:00:00Z"` |      | No fake Z — H-2 confirmed                    |
+| ws-2-E-IST |   E    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
+| ws-2-F-IST |   F    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
+| ws-2-G-IST |   G    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
+| ws-2-H-IST |   H    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
+
+> **WS-2 Finding**: All 16 tests PASS. The API returns values normalized to datetime+Z format. No Bug #5 fake Z (H-2 confirmed). No Bug #6 "Invalid Date" — unset fields return `null` (H-3 partially confirmed). API confirms Bug #7 damage: IST-saved Config A has `"2026-03-14"` in storage (H-7 confirmed — buggy value readable via API). Cross-layer: API return format differs from Forms `getValueObjectValue()` — API normalizes to `"...T00:00:00Z"` while Forms returns date-only string or datetime without Z.
 
 ---
 

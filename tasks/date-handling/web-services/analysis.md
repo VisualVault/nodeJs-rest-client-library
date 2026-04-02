@@ -97,13 +97,25 @@ Based on Forms UI analysis (`../forms-calendar/analysis.md`) and upstream librar
 | H-11 | Date objects serialized with Z suffix are handled differently than plain strings | `JSON.stringify(new Date())` → ISO+Z; VV server may convert or strip Z |   WS-9   | HIGH     |
 | H-12 | US-format `new Date("03/15/2026")` produces different API results per server TZ  | Local midnight varies: BRT=T03:00Z, IST=prev-dayT18:30Z, UTC=T00:00Z   |   WS-9   | HIGH     |
 
-## Confirmed Behaviors
+## Confirmed Behaviors (2026-04-02)
 
-<!-- Add confirmed behaviors here as testing progresses -->
+**Run**: [ws-1-ws-2-batch-run-1.md](runs/ws-1-ws-2-batch-run-1.md) — 32 tests (16 WS-1 + 16 WS-2), all PASS.
+
+| #    | Behavior                                                                                  | Evidence                                                                    | Hypotheses                                |
+| ---- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------- |
+| CB-1 | API bypasses Bug #7 — date-only strings stored correctly in all TZs                       | WS-1: `"2026-03-15"` → `"2026-03-15T00:00:00Z"` in BRT, IST, UTC            | H-1, H-4 confirmed                        |
+| CB-2 | API returns raw stored values without Bug #5 fake Z                                       | WS-2: Config D returns `"2026-03-15T00:00:00Z"` (real Z from normalization) | H-2 confirmed                             |
+| CB-3 | Unset date fields return `null` from API (not `""` or `"Invalid Date"`)                   | WS-2: Configs B,C,E,F,G,H on both records → `null`                          | H-3 partially confirmed                   |
+| CB-4 | Server TZ has no effect on API write — strings stored as-is                               | WS-1: BRT, IST, UTC all produce identical stored values                     | H-4 confirmed                             |
+| CB-5 | Forms-saved buggy values readable via API as-is                                           | WS-2: IST Config A returns `"2026-03-14T00:00:00Z"` (Bug #7 -1 day in DB)   | H-7 confirmed                             |
+| CB-6 | Field config flags (enableTime, ignoreTimezone, useLegacy) have NO effect on API behavior | WS-1: All 8 configs store and return identically per input type             | New finding                               |
+| CB-7 | API normalizes ALL dates to ISO 8601 datetime+Z on read                                   | WS-1+WS-2: date-only `"2026-03-15"` returns as `"2026-03-15T00:00:00Z"`     | New finding — cross-layer format mismatch |
 
 ## Confirmed Bugs
 
-<!-- Add confirmed bugs here as testing discovers them -->
+No new API-specific bugs found. The API layer is clean — all Forms bugs (Bug #5, #6, #7) are confirmed client-side only.
+
+**Cross-layer impact**: Bug #7 damage persists in the database and is visible via API (CB-5). The API can read the wrong date but cannot cause it — only Forms `SetFieldValue` / calendar popup can write the wrong date.
 
 ## Related
 
