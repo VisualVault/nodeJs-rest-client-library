@@ -37,6 +37,7 @@ npm run test:pw:report       # Open HTML report
 | Suite                                    | Specs         | Description                                                         |
 | ---------------------------------------- | ------------- | ------------------------------------------------------------------- |
 | [date-handling](date-handling/README.md) | 10 spec files | Calendar field date-handling across 8 field configs and 3 timezones |
+| [web-services](web-services/README.md)   | 7 spec files  | REST API date-handling across 8 field configs and 3 timezones       |
 
 ## Configuration
 
