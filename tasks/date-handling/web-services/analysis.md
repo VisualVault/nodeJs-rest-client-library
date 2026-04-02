@@ -82,18 +82,20 @@ Full documentation: `docs/guides/scripting.md`
 
 Based on Forms UI analysis (`../forms-calendar/analysis.md`) and upstream library analysis:
 
-| #    | Hypothesis                                                                    | Rationale                                                  | Category | Priority |
-| ---- | ----------------------------------------------------------------------------- | ---------------------------------------------------------- | :------: | -------- |
-| H-1  | API bypasses `normalizeCalValue()` — no Bug #7 (date-only wrong day in UTC+)  | Bug #7 is client-side JS; API sends strings                |   WS-1   | HIGH     |
-| H-2  | API returns raw stored value — no Bug #5 (fake Z suffix)                      | Bug #5 is in `getCalendarFieldValue()` (Forms JS only)     |   WS-2   | HIGH     |
-| H-3  | API returns empty/null for empty fields — no Bug #6 ("Invalid Date")          | Bug #6 is in `getCalendarFieldValue()` (Forms JS only)     |   WS-6   | MEDIUM   |
-| H-4  | Server TZ does not affect API write — strings stored as-is                    | Node.js library sends strings, no Date object conversion   |   WS-1   | HIGH     |
-| H-5  | API accepts ISO 8601 and US date formats at minimum                           | VV ecosystem uses both formats                             |   WS-5   | MEDIUM   |
-| H-6  | Date set via API displays correctly in Forms (BRT) but may show Bug #7 in IST | `initCalendarValueV1` applies `moment(e).toDate()` on load |   WS-4   | HIGH     |
-| H-7  | Forms-saved values (including buggy ones) are readable via API as-is          | API reads raw DB, no Forms JS overlay                      |   WS-2   | HIGH     |
-| H-8  | API round-trip is drift-free                                                  | No Bug #5 fake Z in API read path                          |   WS-3   | MEDIUM   |
-| H-9  | `postFormRevision` preserves unmentioned fields                               | Standard REST partial-update behavior                      |   WS-7   | MEDIUM   |
-| H-10 | OData date filters match stored format                                        | Query engine compares against DB column                    |   WS-8   | MEDIUM   |
+| #    | Hypothesis                                                                       | Rationale                                                              | Category | Priority |
+| ---- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | :------: | -------- |
+| H-1  | API bypasses `normalizeCalValue()` — no Bug #7 (date-only wrong day in UTC+)     | Bug #7 is client-side JS; API sends strings                            |   WS-1   | HIGH     |
+| H-2  | API returns raw stored value — no Bug #5 (fake Z suffix)                         | Bug #5 is in `getCalendarFieldValue()` (Forms JS only)                 |   WS-2   | HIGH     |
+| H-3  | API returns empty/null for empty fields — no Bug #6 ("Invalid Date")             | Bug #6 is in `getCalendarFieldValue()` (Forms JS only)                 |   WS-6   | MEDIUM   |
+| H-4  | Server TZ does not affect API write — strings stored as-is                       | Node.js library sends strings, no Date object conversion               |   WS-1   | HIGH     |
+| H-5  | API accepts ISO 8601 and US date formats at minimum                              | VV ecosystem uses both formats                                         |   WS-5   | MEDIUM   |
+| H-6  | Date set via API displays correctly in Forms (BRT) but may show Bug #7 in IST    | `initCalendarValueV1` applies `moment(e).toDate()` on load             |   WS-4   | HIGH     |
+| H-7  | Forms-saved values (including buggy ones) are readable via API as-is             | API reads raw DB, no Forms JS overlay                                  |   WS-2   | HIGH     |
+| H-8  | API round-trip is drift-free                                                     | No Bug #5 fake Z in API read path                                      |   WS-3   | MEDIUM   |
+| H-9  | `postFormRevision` preserves unmentioned fields                                  | Standard REST partial-update behavior                                  |   WS-7   | MEDIUM   |
+| H-10 | OData date filters match stored format                                           | Query engine compares against DB column                                |   WS-8   | MEDIUM   |
+| H-11 | Date objects serialized with Z suffix are handled differently than plain strings | `JSON.stringify(new Date())` → ISO+Z; VV server may convert or strip Z |   WS-9   | HIGH     |
+| H-12 | US-format `new Date("03/15/2026")` produces different API results per server TZ  | Local midnight varies: BRT=T03:00Z, IST=prev-dayT18:30Z, UTC=T00:00Z   |   WS-9   | HIGH     |
 
 ## Confirmed Behaviors
 

@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the web services date-handling investigation.
 API analysis → `analysis.md` | Test evidence → `results.md` | Harness → `webservice-test-harness.js`
 
-Last updated: 2026-04-02 | Total slots: ~102 | Done: 0 | Blocked: 0
+Last updated: 2026-04-02 | Total slots: ~118 | Done: 0 | Blocked: 0
 
 ---
 
@@ -40,6 +40,18 @@ The Node.js library sends date **strings** to the VV server — no local timezon
 
 If IST spot-checks confirm TZ independence, no need for full 3-TZ expansion on API-only categories.
 
+### Server TZ Simulation
+
+The Node.js server's process timezone can be controlled via the `TZ` environment variable without changing the macOS system timezone or restarting Chrome:
+
+```bash
+TZ=UTC node app.js                    # Simulates AWS/cloud (production)
+TZ=America/Sao_Paulo node app.js      # Simulates BRT dev machine (default)
+TZ=Asia/Calcutta node app.js          # Simulates IST dev machine
+```
+
+WS-1 includes UTC spot-checks (ws-1-{A,C,D,H}-UTC) to prove that the cloud environment produces identical results to local development. If all three TZs (BRT, IST, UTC) produce identical stored values, server TZ is confirmed irrelevant for API string passthrough.
+
 ---
 
 ## Coverage Summary
@@ -48,7 +60,7 @@ If IST spot-checks confirm TZ independence, no need for full 3-TZ expansion on A
 
 | Category                      |  Total  | PASS | FAIL | PENDING | BLOCKED | Priority |
 | ----------------------------- | :-----: | :--: | :--: | :-----: | :-----: | :------: |
-| WS-1. API Write Path (Create) |   12    |      |      |   12    |         |    P1    |
+| WS-1. API Write Path (Create) |   16    |      |      |   16    |         |    P1    |
 | WS-2. API Read + Cross-Layer  |   16    |      |      |   16    |         |    P1    |
 | WS-3. API Round-Trip          |    4    |      |      |    4    |         |    P2    |
 | WS-4. API→Forms Cross-Layer   |    8    |      |      |    8    |         |    P3    |
@@ -56,7 +68,8 @@ If IST spot-checks confirm TZ independence, no need for full 3-TZ expansion on A
 | WS-6. Empty/Null Handling     |   12    |      |      |   12    |         |    P3    |
 | WS-7. API Update Path         |   12    |      |      |   12    |         |    P2    |
 | WS-8. Query Date Filtering    |   10    |      |      |   10    |         |    P3    |
-| **TOTAL**                     | **102** |      |      | **102** |         |          |
+| WS-9. Date Computation        |   12    |      |      |   12    |         |    P2    |
+| **TOTAL**                     | **118** |      |      | **118** |         |          |
 
 ---
 
@@ -72,6 +85,7 @@ If IST spot-checks confirm TZ independence, no need for full 3-TZ expansion on A
 |  6   | WS-4     | API→Forms — needs browser, uses WS-1 records                                                  |
 |  7   | WS-6     | Empty/null — edge cases                                                                       |
 |  8   | WS-8     | Query filtering — uses WS-1 records                                                           |
+|  9   | WS-9     | Date computation — tests JS Date patterns across server TZs, requires `TZ=` env var switching |
 
 ---
 
@@ -97,6 +111,10 @@ Create a new form record via `postForms()` with a date value in each target conf
 | ws-1-C-IST |   C    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | TZ independence check       |
 | ws-1-D-IST |   D    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | TZ independence check       |
 | ws-1-H-IST |   H    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | TZ independence check       |
+| ws-1-A-UTC |   A    | UTC | `"2026-03-15"`          | `"2026-03-15"`          | PENDING |        |      | Cloud/AWS simulation        |
+| ws-1-C-UTC |   C    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | Cloud/AWS simulation        |
+| ws-1-D-UTC |   D    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | Cloud/AWS simulation        |
+| ws-1-H-UTC |   H    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00"` | PENDING |        |      | Cloud/AWS simulation        |
 
 ---
 
@@ -278,3 +296,37 @@ Test OData-style `q` parameter filters on date fields via `getForms()`. Requires
 | ws-8-C-range   |   C    | Range           | `[DataField6] ge '2026-03-15' AND [DataField6] le '2026-03-16'` | Match    | PENDING |        | Date-only range on DateTime field |
 | ws-8-C-fmtZ    |   C    | Format mismatch | `[DataField6] eq '2026-03-15T14:30:00Z'`                        | TBD      | PENDING |        | Z suffix in query                 |
 | ws-8-C-noMatch |   C    | No match        | `[DataField6] eq '2026-03-15T15:00:00'`                         | No match | PENDING |        | Control — wrong time              |
+
+---
+
+## WS-9. Date Computation in Scripts
+
+Test what gets stored when scripts perform date arithmetic or create JavaScript `Date` objects before sending to the API. This simulates real production patterns where scripts compute due dates, deadlines, or offsets before creating/updating records.
+
+**Why this matters**: `JSON.stringify()` serializes `Date` objects via `.toJSON()` → ISO 8601 with Z suffix (e.g., `"2026-04-14T00:00:00.000Z"`). The `Date` constructor and arithmetic methods are TZ-sensitive. A script running in BRT may produce different results from the same script in UTC (cloud).
+
+**Server TZ simulation**: Use `TZ=` env var to run the Node.js server in different timezones without changing macOS system TZ.
+
+**Patterns tested**:
+
+| Pattern                     | Code                                          | Risk                                                                                                              |
+| --------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Date obj from ISO**       | `new Date("2026-03-15")` → send to API        | Always UTC midnight → `"2026-03-15T00:00:00.000Z"`. TZ-safe for serialization, but `getDate()` returns local day. |
+| **Date obj from US format** | `new Date("03/15/2026")` → send to API        | LOCAL midnight → different UTC per TZ. BRT: `T03:00:00.000Z`, IST: prev-day `T18:30:00.000Z`.                     |
+| **Local arithmetic**        | `d.setDate(d.getDate() + 30)` → send Date     | `getDate()` is local-TZ-dependent. For ISO-parsed dates, local day may differ from UTC day.                       |
+| **Safe string pattern**     | `d.toISOString().split('T')[0]` → send string | Always extracts UTC date → TZ-independent. Recommended pattern.                                                   |
+
+| ID               | Config | Server TZ | Pattern              | Computed Value Sent                                          | Expected Stored       | Status  | Actual | Notes                                                                     |
+| ---------------- | :----: | :-------: | -------------------- | ------------------------------------------------------------ | --------------------- | :-----: | ------ | ------------------------------------------------------------------------- |
+| ws-9-A-iso-BRT   |   A    |    BRT    | Date obj from ISO    | `new Date("2026-03-15")` → Date                              | TBD (Z in date-only?) | PENDING |        | `.toJSON()` = `"2026-03-15T00:00:00.000Z"`                                |
+| ws-9-A-iso-IST   |   A    |    IST    | Date obj from ISO    | `new Date("2026-03-15")` → Date                              | Same as BRT (TZ-safe) | PENDING |        | Same UTC midnight regardless of TZ                                        |
+| ws-9-A-iso-UTC   |   A    |    UTC    | Date obj from ISO    | `new Date("2026-03-15")` → Date                              | Same as BRT (control) | PENDING |        | Cloud baseline                                                            |
+| ws-9-C-iso-BRT   |   C    |    BRT    | Date obj from ISO    | `new Date("2026-03-15")` → Date                              | TBD                   | PENDING |        | DateTime field receives ISO+Z                                             |
+| ws-9-A-us-BRT    |   A    |    BRT    | Date obj from US fmt | `new Date("03/15/2026")` → Date                              | TBD                   | PENDING |        | `.toJSON()` = `"2026-03-15T03:00:00.000Z"` (BRT midnight)                 |
+| ws-9-A-us-IST    |   A    |    IST    | Date obj from US fmt | `new Date("03/15/2026")` → Date                              | TBD                   | PENDING |        | `.toJSON()` = `"2026-03-14T18:30:00.000Z"` (IST midnight = prev UTC day!) |
+| ws-9-A-us-UTC    |   A    |    UTC    | Date obj from US fmt | `new Date("03/15/2026")` → Date                              | TBD                   | PENDING |        | `.toJSON()` = `"2026-03-15T00:00:00.000Z"`                                |
+| ws-9-A-arith-BRT |   A    |    BRT    | Local arith +30 days | `d=new Date("2026-03-15"); d.setDate(d.getDate()+30)` → Date | TBD                   | PENDING |        | BRT: getDate()=14 → setDate(44) → Apr 13 21:00 BRT → Apr 14 UTC           |
+| ws-9-A-arith-IST |   A    |    IST    | Local arith +30 days | same code                                                    | TBD                   | PENDING |        | IST: getDate()=15 → setDate(45) → Apr 14 05:30 IST → Apr 14 UTC           |
+| ws-9-A-arith-UTC |   A    |    UTC    | Local arith +30 days | same code                                                    | TBD                   | PENDING |        | UTC: getDate()=15 → setDate(45) → Apr 14 00:00 UTC (control)              |
+| ws-9-A-safe-BRT  |   A    |    BRT    | Safe string extract  | `d.toISOString().split('T')[0]` → `"2026-04-14"`             | `"2026-04-14"`        | PENDING |        | TZ-independent string                                                     |
+| ws-9-A-safe-IST  |   A    |    IST    | Safe string extract  | same code → `"2026-04-14"`                                   | `"2026-04-14"`        | PENDING |        | Should match BRT exactly                                                  |
