@@ -117,6 +117,59 @@ No new API-specific bugs found. The API layer is clean — all Forms bugs (Bug #
 
 **Cross-layer impact**: Bug #7 damage persists in the database and is visible via API (CB-5). The API can read the wrong date but cannot cause it — only Forms `SetFieldValue` / calendar popup can write the wrong date.
 
+---
+
+## Cross-Layer Design Inconsistency: No Server-Side Date-Only Enforcement
+
+**Severity**: Design flaw — not a bug in any single component, but a systemic inconsistency that affects queries, reports, dashboards, and cross-component workflows.
+
+### The Problem
+
+The VV server has **no date-only storage type**. Every date field is stored as a datetime in the database, regardless of the `enableTime` flag. The "date-only" semantic exists only in the Forms client-side JS (`getSaveValue()`, `normalizeCalValue()`) — the API and database have no concept of it.
+
+This means the same "date-only" field (e.g., Config A: `enableTime=false`) can contain different time components depending on the code path that wrote the value:
+
+| Write Source                       | Value stored for "March 15, 2026" | Time Component                         |
+| ---------------------------------- | --------------------------------- | -------------------------------------- |
+| Forms popup (BRT, UTC-3)           | `"2026-03-15T00:00:00Z"`          | UTC midnight                           |
+| Forms popup (IST, UTC+5:30)        | `"2026-03-14T00:00:00Z"`          | UTC midnight of **wrong day** (Bug #7) |
+| Forms preset "3/1/2026" (BRT)      | `"2026-03-01T03:00:00Z"`          | BRT midnight = 3am UTC                 |
+| Forms Current Date (BRT, 8pm)      | `"2026-03-31T23:01:57Z"`          | Actual timestamp                       |
+| Forms legacy popup (BRT)           | `"2026-03-15T03:00:00.000Z"`      | BRT midnight as UTC with ms            |
+| API string `"2026-03-15"`          | `"2026-03-15T00:00:00Z"`          | UTC midnight                           |
+| API string `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"`          | Arbitrary time (no enforcement)        |
+
+### Evidence
+
+From WS-2 debug output (DateTest-000080, saved from BRT):
+
+```
+dataField7  (Config A, popup):       "2026-03-15T00:00:00Z"  ← UTC midnight
+dataField1  (Config A, Current Date): "2026-03-31T23:01:57Z"  ← actual timestamp
+dataField2  (Config A, preset):       "2026-03-01T03:00:00Z"  ← BRT midnight (3am UTC)
+dataField19 (Config E, legacy preset): "2026-03-01T03:00:00Z"  ← same BRT midnight
+```
+
+All four fields have `enableTime=false` (date-only), yet the DB stores four different time components.
+
+From WS-1: the API writes `"2026-03-15T14:30:00"` to a date-only field and the server accepts it without error. Field config flags are invisible to the API layer (CB-6).
+
+### Impact
+
+1. **SQL queries**: `WHERE DataField7 = '2026-03-15'` may not match `"2026-03-15T03:00:00Z"` (preset) or `"2026-03-15T23:01:57Z"` (Current Date). Range queries (`>= '2026-03-15' AND < '2026-03-16'`) are needed but still fail for Bug #7 records where the day is wrong.
+
+2. **Dashboard date filters**: May show inconsistent results for records created via different code paths (popup vs preset vs API vs Current Date).
+
+3. **Report date grouping**: Records for the "same" date may group differently depending on the time component.
+
+4. **API round-trip ambiguity**: A script reading a "date-only" field via API gets `"2026-03-15T14:30:00Z"` — it cannot tell if the time is meaningful or noise. Should it preserve `T14:30:00` when writing back, or normalize to `T00:00:00`?
+
+5. **Cross-layer consistency**: A record saved via Forms popup and one saved via API for the same date will have the same date but potentially different time components, leading to query mismatches.
+
+### Root Cause
+
+The `enableTime`, `ignoreTimezone`, and `useLegacy` flags are **client-side presentation/behavior flags** that control how the Forms calendar component formats and displays dates. They are not enforced at the API or database level. The VV server treats every date field identically — as a datetime column.
+
 ## Related
 
 Environment setup, test execution, and file index: see [`README.md`](README.md).
