@@ -1,18 +1,20 @@
 const logger = require('../log');
 
 module.exports.getCredentials = function () {
-    const customerAlias = 'CUSTOMER ALIAS';
-    const databaseAlias = 'DATABASE ALIAS';
-    const clientId = 'CLIENT ID';
-    const clientSecret = 'CLIENT SECRET';
+    var env = global.VV_ENV || {};
+    var customerAlias = env.customerAlias || 'CUSTOMER ALIAS';
+    var databaseAlias = env.databaseAlias || 'DATABASE ALIAS';
+    var clientId = env.clientId || 'CLIENT ID';
+    var clientSecret = env.clientSecret || 'CLIENT SECRET';
 
     return {
         customerAlias,
         databaseAlias,
         clientId,
         clientSecret,
-        userId: clientId,
-        password: clientSecret,
+        userId: env.userId || clientId,
+        password: env.password || clientSecret,
+        audience: env.audience || '',
     };
 };
 
@@ -140,6 +142,7 @@ module.exports.main = async function (ffCollection, vvClient, response) {
     // Date format generators for WS-6 (format tolerance testing)
     // Each takes an ISO date string (e.g. "2026-03-15") and returns the formatted version
     const FORMAT_MAP = {
+        // eslint-disable-line no-unused-vars
         ISO: (d) => d,
         US: (d) => {
             const [y, m, dd] = d.split('-');
@@ -480,24 +483,572 @@ module.exports.main = async function (ffCollection, vvClient, response) {
         return result;
     }
 
-    async function actionRoundTrip() {
-        throw new Error('WS-3 (Round-Trip) not yet implemented');
+    async function actionRoundTrip(targetConfigs, recordID, inputDate, isDebug) {
+        // WS-3: Write → Read → Write-back → Read. ROUND_TRIP_CYCLES times. Detect drift.
+        // Step 1: Create a record with inputDate in each target config field
+        const fieldValues = {};
+        for (const configKey of targetConfigs) {
+            fieldValues[FIELD_MAP[configKey].field] = inputDate;
+        }
+
+        const created = await createFormRecord(fieldValues);
+        const instanceName = created.instanceName;
+        const revisionId = created.revisionId;
+
+        // Step 2: Cycle read → write-back
+        const cycles = [];
+        let currentRevisionId = revisionId;
+
+        for (let cycle = 1; cycle <= ROUND_TRIP_CYCLES; cycle++) {
+            // Read current values
+            const record = await readFormRecord(instanceName);
+            const readValues = extractDateFields(record, targetConfigs);
+
+            // Write back the exact values we just read
+            const writeBackFields = {};
+            for (const configKey of targetConfigs) {
+                writeBackFields[FIELD_MAP[configKey].field] = readValues[configKey];
+            }
+
+            const updated = await updateFormRecord(currentRevisionId, writeBackFields);
+            currentRevisionId = updated.revisionId;
+
+            cycles.push({
+                cycle,
+                read: { ...readValues },
+                writeBack: { ...writeBackFields },
+            });
+        }
+
+        // Final read after all cycles
+        const finalRecord = await readFormRecord(instanceName);
+        const finalValues = extractDateFields(finalRecord, targetConfigs);
+
+        // Build per-config results with drift detection
+        const results = targetConfigs.map((configKey) => {
+            const cycleReads = cycles.map((c) => c.read[configKey]);
+            const drift = cycleReads.some((val) => val !== cycleReads[0]);
+            return buildResultEntry(configKey, {
+                sent: inputDate,
+                cycle1Read: cycles[0] ? cycles[0].read[configKey] : null,
+                cycle2Read: cycles[1] ? cycles[1].read[configKey] : null,
+                finalRead: finalValues[configKey],
+                drift,
+            });
+        });
+
+        const result = {
+            action: 'WS-3',
+            targetConfigs,
+            inputDate,
+            recordID: instanceName,
+            revisionId,
+            totalCycles: ROUND_TRIP_CYCLES,
+            serverTime: new Date().toISOString(),
+            cycles,
+            results,
+        };
+
+        if (isDebug) {
+            result.rawFinalRecord = finalRecord;
+            result.fieldValuesSent = fieldValues;
+        }
+
+        return result;
     }
 
-    async function actionApiToForms() {
-        throw new Error('WS-4 (API→Forms) not yet implemented');
+    async function actionApiToForms(targetConfigs, inputDate, isDebug) {
+        // WS-4: Create a record via API, return record info for browser verification.
+        // Step 1 (this handler): Create record + read back API values.
+        // Step 2 (Playwright — outside harness): Open record via DataID URL,
+        //         verify display value, GetFieldValue(), getValueObjectValue().
+        if (!inputDate) throw new Error('InputDate is required for WS-4');
+
+        const fieldValues = {};
+        for (const configKey of targetConfigs) {
+            fieldValues[FIELD_MAP[configKey].field] = inputDate;
+        }
+
+        const created = await createFormRecord(fieldValues);
+        const instanceName = created.instanceName;
+        const revisionId = created.revisionId;
+
+        // Read back to get canonical API-stored values
+        const record = await readFormRecord(instanceName);
+        const stored = extractDateFields(record, targetConfigs);
+
+        const results = targetConfigs.map((configKey) =>
+            buildResultEntry(configKey, {
+                sent: inputDate,
+                apiStored: stored[configKey],
+            })
+        );
+
+        const result = {
+            action: 'WS-4',
+            targetConfigs,
+            inputDate,
+            recordID: instanceName,
+            revisionId,
+            dataId: revisionId,
+            serverTime: new Date().toISOString(),
+            results,
+        };
+
+        if (isDebug) {
+            result.rawRecord = record;
+            result.fieldValuesSent = fieldValues;
+        }
+
+        return result;
     }
 
-    async function actionFormsToApi() {
-        throw new Error('WS-5 (Forms→API) not yet implemented');
+    async function actionFormatTolerance(targetConfigs, inputDate, isDebug) {
+        // WS-5: Send a date in a specific format via postForms(), verify what gets stored.
+        // Tests format acceptance, rejection, and normalization.
+        if (!inputDate) throw new Error('InputDate is required for WS-5');
+
+        const fieldValues = {};
+        for (const configKey of targetConfigs) {
+            fieldValues[FIELD_MAP[configKey].field] = inputDate;
+        }
+
+        let created, record, stored, accepted, error;
+        try {
+            created = await createFormRecord(fieldValues);
+            record = await readFormRecord(created.instanceName);
+            stored = extractDateFields(record, targetConfigs);
+            accepted = true;
+        } catch (err) {
+            accepted = false;
+            error = err.message || String(err);
+        }
+
+        const results = targetConfigs.map((configKey) =>
+            buildResultEntry(configKey, {
+                sent: inputDate,
+                accepted,
+                stored: accepted ? stored[configKey] : null,
+                error: accepted ? null : error,
+            })
+        );
+
+        const result = {
+            action: 'WS-5',
+            targetConfigs,
+            inputDate,
+            recordID: accepted ? created.instanceName : null,
+            serverTime: new Date().toISOString(),
+            results,
+        };
+
+        if (isDebug && record) {
+            result.rawRecord = record;
+            result.fieldValuesSent = fieldValues;
+        }
+
+        return result;
     }
 
-    async function actionFormatTolerance() {
-        throw new Error('WS-6 (Format Tolerance) not yet implemented');
+    async function actionEmptyNull(targetConfigs, inputDate, isDebug) {
+        // WS-6: Test how the API handles empty, null, and special values.
+        // Runs all scenarios per config in one invocation.
+        // inputDate is used as the "normal" date for the clearUpd scenario (default: "2026-03-15").
+        const normalDate = inputDate || '2026-03-15';
+
+        const scenarios = [
+            { id: 'empty', label: 'Empty string', value: '' },
+            { id: 'null', label: 'Null value', value: null },
+            { id: 'omit', label: 'Field omitted', value: undefined },
+            { id: 'strNull', label: 'Literal "null"', value: 'null' },
+            { id: 'invDate', label: '"Invalid Date" string', value: 'Invalid Date' },
+            { id: 'clearUpd', label: 'Create with date, update with ""', value: '__CLEAR_UPDATE__' },
+        ];
+
+        const allResults = [];
+
+        for (const scenario of scenarios) {
+            for (const configKey of targetConfigs) {
+                const fieldName = FIELD_MAP[configKey].field;
+                let stored, accepted, error, recordID, details;
+
+                try {
+                    if (scenario.id === 'clearUpd') {
+                        // Two-step: create with real date, then update with empty
+                        const createFields = { [fieldName]: normalDate };
+                        const created = await createFormRecord(createFields);
+                        recordID = created.instanceName;
+
+                        // Verify date was stored
+                        const recordBefore = await readFormRecord(recordID);
+                        const beforeValues = extractDateFields(recordBefore, [configKey]);
+                        const beforeValue = beforeValues[configKey];
+
+                        // Update with empty string to clear
+                        const updateFields = { [fieldName]: '' };
+                        await updateFormRecord(created.revisionId, updateFields);
+
+                        // Read back after clear
+                        const recordAfter = await readFormRecord(recordID);
+                        const afterValues = extractDateFields(recordAfter, [configKey]);
+
+                        stored = afterValues[configKey] || null;
+                        accepted = true;
+                        details = { beforeClear: beforeValue, afterClear: stored };
+                    } else if (scenario.id === 'omit') {
+                        // Create record WITHOUT the target field
+                        const createFields = {};
+                        const created = await createFormRecord(createFields);
+                        recordID = created.instanceName;
+                        const record = await readFormRecord(recordID);
+                        const values = extractDateFields(record, [configKey]);
+                        stored = values[configKey] || null;
+                        accepted = true;
+                    } else {
+                        // Create record WITH the specific value
+                        const createFields = { [fieldName]: scenario.value };
+                        const created = await createFormRecord(createFields);
+                        recordID = created.instanceName;
+                        const record = await readFormRecord(recordID);
+                        const values = extractDateFields(record, [configKey]);
+                        stored = values[configKey] || null;
+                        accepted = true;
+                    }
+                } catch (err) {
+                    accepted = false;
+                    error = err.message || String(err);
+                }
+
+                const entry = buildResultEntry(configKey, {
+                    scenario: scenario.id,
+                    scenarioLabel: scenario.label,
+                    sent: scenario.id === 'clearUpd' ? `"${normalDate}" then ""` : scenario.value,
+                    accepted,
+                    stored,
+                    recordID: recordID || null,
+                    error: error || null,
+                });
+
+                if (details) entry.details = details;
+                allResults.push(entry);
+            }
+        }
+
+        return {
+            action: 'WS-6',
+            targetConfigs,
+            serverTime: new Date().toISOString(),
+            results: allResults,
+        };
     }
 
-    async function actionEmptyNull() {
-        throw new Error('WS-7 (Empty/Null) not yet implemented');
+    async function actionUpdatePath(targetConfigs, inputDate, isDebug) {
+        // WS-7: Test postFormRevision() — change, preserve, and add date values.
+        // Runs 3 scenarios per config: Change, Preserve, Add.
+        const allResults = [];
+
+        for (const configKey of targetConfigs) {
+            const fieldName = FIELD_MAP[configKey].field;
+            const isDateTime = FIELD_MAP[configKey].enableTime;
+            const createDate = isDateTime ? '2026-03-15T14:30:00' : '2026-03-15';
+            const changeDate = isDateTime ? inputDate || '2026-06-20T09:00:00' : inputDate || '2026-06-20';
+            const addDate = createDate;
+
+            // Scenario 1: Change — create with dateA, update to dateB
+            {
+                const created = await createFormRecord({ [fieldName]: createDate });
+                await updateFormRecord(created.revisionId, { [fieldName]: changeDate });
+                const record = await readFormRecord(created.instanceName);
+                const values = extractDateFields(record, [configKey]);
+                allResults.push(
+                    buildResultEntry(configKey, {
+                        scenario: 'change',
+                        createValue: createDate,
+                        updateValue: changeDate,
+                        stored: values[configKey],
+                        recordID: created.instanceName,
+                        match: values[configKey] === changeDate || values[configKey] === changeDate + 'Z',
+                    })
+                );
+            }
+
+            // Scenario 2: Preserve — create with dateA, update WITHOUT the field
+            {
+                const created = await createFormRecord({ [fieldName]: createDate });
+                await updateFormRecord(created.revisionId, {}); // empty update
+                const record = await readFormRecord(created.instanceName);
+                const values = extractDateFields(record, [configKey]);
+                const preserved = values[configKey] !== '' && values[configKey] !== null;
+                allResults.push(
+                    buildResultEntry(configKey, {
+                        scenario: 'preserve',
+                        createValue: createDate,
+                        updateValue: '(field omitted)',
+                        stored: values[configKey],
+                        recordID: created.instanceName,
+                        preserved,
+                    })
+                );
+            }
+
+            // Scenario 3: Add — create WITHOUT date, update WITH date
+            {
+                const created = await createFormRecord({}); // no date fields
+                await updateFormRecord(created.revisionId, { [fieldName]: addDate });
+                const record = await readFormRecord(created.instanceName);
+                const values = extractDateFields(record, [configKey]);
+                allResults.push(
+                    buildResultEntry(configKey, {
+                        scenario: 'add',
+                        createValue: '(no date)',
+                        updateValue: addDate,
+                        stored: values[configKey],
+                        recordID: created.instanceName,
+                        match: values[configKey] === addDate || values[configKey] === addDate + 'Z',
+                    })
+                );
+            }
+        }
+
+        return {
+            action: 'WS-7',
+            targetConfigs,
+            serverTime: new Date().toISOString(),
+            results: allResults,
+        };
+    }
+
+    async function actionQueryFilter(targetConfigs, inputDate, isDebug) {
+        // WS-8: Test OData-style q parameter filters on date fields via getForms().
+        // Creates a fresh record with known values, then runs predefined queries to check match/no-match.
+        const dateOnlyValue = '2026-03-15';
+        const dateTimeValue = '2026-03-15T14:30:00';
+
+        // Create a self-contained test record with both Config A and C values
+        const fieldValues = {};
+        if (targetConfigs.includes('A')) fieldValues[FIELD_MAP.A.field] = dateOnlyValue;
+        if (targetConfigs.includes('C')) fieldValues[FIELD_MAP.C.field] = dateTimeValue;
+        // Fallback: if only one config requested, still create with it
+        for (const configKey of targetConfigs) {
+            if (!fieldValues[FIELD_MAP[configKey].field]) {
+                fieldValues[FIELD_MAP[configKey].field] = FIELD_MAP[configKey].enableTime
+                    ? dateTimeValue
+                    : dateOnlyValue;
+            }
+        }
+
+        const created = await createFormRecord(fieldValues);
+        const instanceName = created.instanceName;
+
+        // Define query test cases per config
+        const queryTests = {
+            A: [
+                { id: 'eq', type: 'Exact match', q: `[${FIELD_MAP.A.field}] eq '2026-03-15'`, expected: true },
+                { id: 'gt', type: 'Greater than', q: `[${FIELD_MAP.A.field}] gt '2026-03-14'`, expected: true },
+                {
+                    id: 'range',
+                    type: 'Range',
+                    q: `[${FIELD_MAP.A.field}] ge '2026-03-15' AND [${FIELD_MAP.A.field}] le '2026-03-16'`,
+                    expected: true,
+                },
+                { id: 'fmtUS', type: 'Format mismatch', q: `[${FIELD_MAP.A.field}] eq '03/15/2026'`, expected: null },
+                { id: 'noMatch', type: 'No match', q: `[${FIELD_MAP.A.field}] eq '2026-03-16'`, expected: false },
+            ],
+            C: [
+                { id: 'eq', type: 'Exact match', q: `[${FIELD_MAP.C.field}] eq '2026-03-15T14:30:00'`, expected: true },
+                {
+                    id: 'gt',
+                    type: 'Greater than',
+                    q: `[${FIELD_MAP.C.field}] gt '2026-03-15T14:00:00'`,
+                    expected: true,
+                },
+                {
+                    id: 'range',
+                    type: 'Range',
+                    q: `[${FIELD_MAP.C.field}] ge '2026-03-15' AND [${FIELD_MAP.C.field}] le '2026-03-16'`,
+                    expected: true,
+                },
+                {
+                    id: 'fmtZ',
+                    type: 'Format mismatch',
+                    q: `[${FIELD_MAP.C.field}] eq '2026-03-15T14:30:00Z'`,
+                    expected: null,
+                },
+                {
+                    id: 'noMatch',
+                    type: 'No match',
+                    q: `[${FIELD_MAP.C.field}] eq '2026-03-15T15:00:00'`,
+                    expected: false,
+                },
+            ],
+        };
+
+        const allResults = [];
+
+        for (const configKey of targetConfigs) {
+            const tests = queryTests[configKey];
+            if (!tests) continue;
+
+            for (const test of tests) {
+                let matched = false;
+                let matchCount = 0;
+                let error = null;
+                let queryResponse;
+
+                try {
+                    // Run the query, filtering by instanceName AND the date condition
+                    // This ensures we only check our test record
+                    const combinedQ = `[instanceName] eq '${instanceName}' AND ${test.q}`;
+                    const params = { q: combinedQ, expand: true };
+                    const res = await vvClient.forms
+                        .getForms(params, FORM_TEMPLATE_NAME)
+                        .then((r) => parseRes(r))
+                        .then((r) => checkMetaAndStatus(r, `Query ${test.id}`))
+                        .then((r) => checkDataPropertyExists(r, `Query ${test.id}`));
+
+                    queryResponse = res;
+                    matchCount = Array.isArray(res.data) ? res.data.length : 0;
+                    matched = matchCount > 0;
+                } catch (err) {
+                    error = err.message || String(err);
+                }
+
+                const pass =
+                    test.expected === null
+                        ? true // TBD — we just record the result
+                        : matched === test.expected;
+
+                allResults.push(
+                    buildResultEntry(configKey, {
+                        queryId: test.id,
+                        queryType: test.type,
+                        query: test.q,
+                        expectedMatch: test.expected,
+                        matched,
+                        matchCount,
+                        pass,
+                        error,
+                    })
+                );
+            }
+        }
+
+        return {
+            action: 'WS-8',
+            targetConfigs,
+            testRecordID: instanceName,
+            serverTime: new Date().toISOString(),
+            results: allResults,
+        };
+    }
+
+    async function actionDateComputation(targetConfigs, inputDate, isDebug) {
+        // WS-9: Test what gets stored when scripts use Date objects and arithmetic.
+        // The `request` library serializes Date objects via JSON.stringify() → .toJSON() → ISO+Z.
+        // This is TZ-sensitive: run with TZ= env var to simulate different server timezones.
+        const baseISO = '2026-03-15';
+        const baseUS = '03/15/2026';
+        const serverTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        const patterns = [
+            {
+                id: 'iso',
+                label: 'new Date("2026-03-15") — ISO parse → UTC midnight',
+                compute: () => new Date(baseISO),
+            },
+            {
+                id: 'us',
+                label: 'new Date("03/15/2026") — US parse → LOCAL midnight',
+                compute: () => new Date(baseUS),
+            },
+            {
+                id: 'parts',
+                label: 'new Date(2026, 2, 15) — constructor parts → LOCAL midnight',
+                compute: () => new Date(2026, 2, 15),
+            },
+            {
+                id: 'utc',
+                label: 'new Date(Date.UTC(2026, 2, 15)) — explicit UTC midnight',
+                compute: () => new Date(Date.UTC(2026, 2, 15)),
+            },
+            {
+                id: 'arith',
+                label: 'new Date(ISO) + setDate(getDate()+30) — local arithmetic',
+                compute: () => {
+                    const d = new Date(baseISO);
+                    d.setDate(d.getDate() + 30);
+                    return d;
+                },
+            },
+            {
+                id: 'arithUTC',
+                label: 'new Date(ISO) + setUTCDate(getUTCDate()+30) — UTC arithmetic',
+                compute: () => {
+                    const d = new Date(baseISO);
+                    d.setUTCDate(d.getUTCDate() + 30);
+                    return d;
+                },
+            },
+            {
+                id: 'safe',
+                label: 'toISOString().split("T")[0] after +30d — safe string extract',
+                compute: () => {
+                    const d = new Date(baseISO);
+                    d.setDate(d.getDate() + 30);
+                    return d.toISOString().split('T')[0];
+                },
+            },
+            {
+                id: 'locale',
+                label: 'toLocaleDateString("en-US") — locale formatted string',
+                compute: () => {
+                    const d = new Date(baseISO);
+                    return d.toLocaleDateString('en-US');
+                },
+            },
+        ];
+
+        const allResults = [];
+
+        for (const pattern of patterns) {
+            for (const configKey of targetConfigs) {
+                const fieldName = FIELD_MAP[configKey].field;
+                const computedValue = pattern.compute();
+                const isDateObj = computedValue instanceof Date;
+                const serialized = isDateObj ? computedValue.toJSON() : computedValue;
+
+                // Send to API — Date objects get JSON.stringify'd by the request library
+                const fieldValues = { [fieldName]: computedValue };
+                const created = await createFormRecord(fieldValues);
+                const record = await readFormRecord(created.instanceName);
+                const stored = extractDateFields(record, [configKey]);
+
+                const entry = buildResultEntry(configKey, {
+                    pattern: pattern.id,
+                    patternLabel: pattern.label,
+                    valueType: isDateObj ? 'Date' : 'string',
+                    serialized,
+                    stored: stored[configKey],
+                    recordID: created.instanceName,
+                });
+
+                if (isDateObj && isDebug) {
+                    entry.localString = computedValue.toString();
+                    entry.localDate = computedValue.getDate();
+                    entry.utcDate = computedValue.getUTCDate();
+                }
+
+                allResults.push(entry);
+            }
+        }
+
+        return {
+            action: 'WS-9',
+            targetConfigs,
+            serverTimezone: serverTz,
+            serverTime: new Date().toISOString(),
+            results: allResults,
+        };
     }
 
     /* ---------------------------------- Main ---------------------------------- */
@@ -529,22 +1080,29 @@ module.exports.main = async function (ffCollection, vvClient, response) {
                 output.data = await actionGetDate(targetConfigs, recordID, debug);
                 break;
             case 'WS-3':
-                output.data = await actionRoundTrip(targetConfigs, recordID, inputDate);
+                if (!inputDate) throw new Error('InputDate is required for WS-3');
+                output.data = await actionRoundTrip(targetConfigs, recordID, inputDate, debug);
                 break;
             case 'WS-4':
-                output.data = await actionApiToForms(targetConfigs, inputDate);
+                output.data = await actionApiToForms(targetConfigs, inputDate, debug);
                 break;
             case 'WS-5':
-                output.data = await actionFormsToApi(targetConfigs, recordID);
+                output.data = await actionFormatTolerance(targetConfigs, inputDate, debug);
                 break;
             case 'WS-6':
-                output.data = await actionFormatTolerance(targetConfigs, inputDate);
+                output.data = await actionEmptyNull(targetConfigs, inputDate, debug);
                 break;
             case 'WS-7':
-                output.data = await actionEmptyNull(targetConfigs);
+                output.data = await actionUpdatePath(targetConfigs, inputDate, debug);
+                break;
+            case 'WS-8':
+                output.data = await actionQueryFilter(targetConfigs, inputDate, debug);
+                break;
+            case 'WS-9':
+                output.data = await actionDateComputation(targetConfigs, inputDate, debug);
                 break;
             default:
-                throw new Error(`Unknown action: '${action}'. Valid: WS-1 through WS-7`);
+                throw new Error(`Unknown action: '${action}'. Valid: WS-1 through WS-9`);
         }
 
         // Enrich output with diagnostics
