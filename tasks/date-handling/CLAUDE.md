@@ -10,7 +10,7 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 | ---------------------------------------- | --------------------------------- | -------------------------- |
 | **Forms — Calendar Fields**              | IN PROGRESS (~120/242 tests done) | `forms-calendar/`          |
 | **Web Services (REST API)**              | IN PROGRESS (~118 slots, 0 done)  | `web-services/`            |
-| **Analytic Dashboards**                  | NOT STARTED                       | `dashboards/` (to create)  |
+| **Analytic Dashboards**                  | IN PROGRESS (8/44 tests done)     | `dashboards/`              |
 | **VisualVault Reports**                  | NOT STARTED                       | `reports/` (to create)     |
 | **Files (document dates)**               | NOT STARTED                       | `files/` (to create)       |
 | **Workflows (date triggers, deadlines)** | NOT STARTED                       | `workflows/` (to create)   |
