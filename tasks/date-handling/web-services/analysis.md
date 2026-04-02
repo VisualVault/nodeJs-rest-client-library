@@ -58,19 +58,42 @@ const result = JSON.parse(resp);
 // result.data[0].dataField7 — returned date value (format TBD)
 ```
 
+## Confirmed Infrastructure Findings
+
+### Node.js library is a transparent passthrough (confirmed 2026-04-02)
+
+Analysis of the upstream `VisualVault/nodeJs-rest-client-library` (stock code, zero local modifications to `lib/`) confirms:
+
+- **No date transformation** occurs at any layer between script code and the VV server
+- `postForms()` / `postFormRevision()` pass field data directly to the `request` library's `JSON.stringify()`
+- String values pass through as-is; JavaScript `Date` objects would be serialized to ISO 8601 with Z suffix
+- Response parsing (`JSON.parse()`) returns date values as strings — never converted to Date objects
+- `formFieldCollection` is a pure lookup wrapper with no value transformation
+- `dateHelper` utility class exists in `common.js` but is never invoked in the request/response flow
+- VV API returns field names **lowercased** (`datafield7` not `DataField7`) in responses
+
+**Implication**: Any date behavior differences between API and Forms must originate from either the **VV server** or the **Forms client-side JS** — not the Node.js intermediary.
+
+Full documentation: `docs/guides/scripting.md`
+
+---
+
 ## Hypothesized Behaviors
 
-Based on Forms UI analysis (`../forms-calendar/analysis.md`), these are expected API behaviors to verify:
+Based on Forms UI analysis (`../forms-calendar/analysis.md`) and upstream library analysis:
 
-| #    | Hypothesis                                                                   | Forms UI Equivalent                    | Priority |
-| ---- | ---------------------------------------------------------------------------- | -------------------------------------- | -------- |
-| WS-1 | API bypasses `normalizeCalValue()` — no Bug #7 (date-only wrong day in UTC+) | Bug #7 is client-side JS               | HIGH     |
-| WS-2 | API returns raw stored value — no Bug #5 (fake Z suffix)                     | Bug #5 is in `getCalendarFieldValue()` | HIGH     |
-| WS-3 | API returns empty string for empty fields — no Bug #6 ("Invalid Date")       | Bug #6 is in `getCalendarFieldValue()` | MEDIUM   |
-| WS-4 | API stores dates in UTC regardless of sender timezone                        | Server-side behavior                   | HIGH     |
-| WS-5 | API accepts multiple date formats (ISO, US, datetime)                        | Input format tolerance                 | MEDIUM   |
-| WS-6 | Date set via API and read via Forms UI matches original                      | Cross-layer round-trip                 | HIGH     |
-| WS-7 | Date set via Forms UI and read via API matches original                      | Cross-layer round-trip                 | HIGH     |
+| #    | Hypothesis                                                                    | Rationale                                                  | Category | Priority |
+| ---- | ----------------------------------------------------------------------------- | ---------------------------------------------------------- | :------: | -------- |
+| H-1  | API bypasses `normalizeCalValue()` — no Bug #7 (date-only wrong day in UTC+)  | Bug #7 is client-side JS; API sends strings                |   WS-1   | HIGH     |
+| H-2  | API returns raw stored value — no Bug #5 (fake Z suffix)                      | Bug #5 is in `getCalendarFieldValue()` (Forms JS only)     |   WS-2   | HIGH     |
+| H-3  | API returns empty/null for empty fields — no Bug #6 ("Invalid Date")          | Bug #6 is in `getCalendarFieldValue()` (Forms JS only)     |   WS-6   | MEDIUM   |
+| H-4  | Server TZ does not affect API write — strings stored as-is                    | Node.js library sends strings, no Date object conversion   |   WS-1   | HIGH     |
+| H-5  | API accepts ISO 8601 and US date formats at minimum                           | VV ecosystem uses both formats                             |   WS-5   | MEDIUM   |
+| H-6  | Date set via API displays correctly in Forms (BRT) but may show Bug #7 in IST | `initCalendarValueV1` applies `moment(e).toDate()` on load |   WS-4   | HIGH     |
+| H-7  | Forms-saved values (including buggy ones) are readable via API as-is          | API reads raw DB, no Forms JS overlay                      |   WS-2   | HIGH     |
+| H-8  | API round-trip is drift-free                                                  | No Bug #5 fake Z in API read path                          |   WS-3   | MEDIUM   |
+| H-9  | `postFormRevision` preserves unmentioned fields                               | Standard REST partial-update behavior                      |   WS-7   | MEDIUM   |
+| H-10 | OData date filters match stored format                                        | Query engine compares against DB column                    |   WS-8   | MEDIUM   |
 
 ## Confirmed Behaviors
 
@@ -87,6 +110,9 @@ Based on Forms UI analysis (`../forms-calendar/analysis.md`), these are expected
 | Forms calendar analysis | `../forms-calendar/analysis.md`                  |
 | Forms confirmed bugs    | `../forms-calendar/analysis.md` § Confirmed Bugs |
 | Test matrix             | `matrix.md`                                      |
+| Test harness            | `webservice-test-harness.js`                     |
+| Script pattern template | `webservice-pattern.js`                          |
+| Scripting data flow     | `docs/guides/scripting.md`                       |
 | Node.js client library  | `lib/VVRestApi/VVRestApiNodeJs/VVRestApi.js`     |
 | Forms API               | `lib/VVRestApi/VVRestApiNodeJs/FormsApi.js`      |
 | API config (endpoints)  | `lib/VVRestApi/VVRestApiNodeJs/config.yml`       |
