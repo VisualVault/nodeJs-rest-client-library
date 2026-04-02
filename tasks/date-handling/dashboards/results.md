@@ -55,3 +55,22 @@ Two records compared across BRT and IST browser timezones:
 - `testing/tmp/screenshots/dashboard-full.png` — Full page screenshot
 - `testing/tmp/screenshots/dashboard-v2.png` — V2 exploration
 - `testing/tmp/screenshots/dashboard-search.png` — Search toolbar visible
+
+---
+
+## DB-1 Batch Run — 2026-04-02
+
+**Environment**: Playwright headless Chrome, auth via `auth-state-pw.json`
+**Method**: `explore-dashboard.js` grid capture + per-field format verification
+**Records**: 267 total, 200 on page 1
+
+- 2026-04-02 [TC-DB-1-A Run 1](runs/tc-db-1-A-run-1.md) — PASS — Field7 date-only M/D/YYYY confirmed
+- 2026-04-02 [TC-DB-1-B Run 1](runs/tc-db-1-B-run-1.md) — PASS — Field10 date-only+ignoreTZ M/D/YYYY confirmed
+- 2026-04-02 [TC-DB-1-C Run 1](runs/tc-db-1-C-run-1.md) — PASS — Field6 DateTime M/D/YYYY H:MM AM/PM confirmed
+- 2026-04-02 [TC-DB-1-D Run 1](runs/tc-db-1-D-run-1.md) — PASS — Field5 DateTime+ignoreTZ M/D/YYYY H:MM AM/PM confirmed
+- 2026-04-02 [TC-DB-1-E Run 1](runs/tc-db-1-E-run-1.md) — PASS — Field12 legacy date-only M/D/YYYY confirmed
+- 2026-04-02 [TC-DB-1-F Run 1](runs/tc-db-1-F-run-1.md) — PASS — Field11 legacy date-only+ignoreTZ M/D/YYYY confirmed
+- 2026-04-02 [TC-DB-1-G Run 1](runs/tc-db-1-G-run-1.md) — PASS — Field14 legacy DateTime M/D/YYYY H:MM AM/PM confirmed
+- 2026-04-02 [TC-DB-1-H Run 1](runs/tc-db-1-H-run-1.md) — PASS — Field13 legacy DateTime+ignoreTZ M/D/YYYY H:MM AM/PM confirmed
+
+**Key finding**: Server-side display format is determined solely by `enableTime`. The `ignoreTZ` and `useLegacy` flags have zero effect on dashboard rendering.

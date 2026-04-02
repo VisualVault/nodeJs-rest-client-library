@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the dashboard date display investigation.
 Analysis → `analysis.md` | Test evidence → `results.md` | Exploration → `explore-dashboard.js`
 
-Last updated: 2026-04-02 | Total slots: 44 | Done: 0 (0P/0F) | **NOT STARTED**
+Last updated: 2026-04-02 | Total slots: 44 | Done: 8 (8P/0F) | **IN PROGRESS**
 
 ---
 
@@ -54,7 +54,7 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 | Category                     | Total  | PASS | FAIL | PENDING | BLOCKED | Priority |
 | ---------------------------- | :----: | :--: | :--: | :-----: | :-----: | :------: |
-| DB-1. Display Format         |   8    |      |      |    8    |         |    P1    |
+| DB-1. Display Format         |   8    |  8   |      |         |         |    P1    |
 | DB-2. Date Accuracy          |   8    |      |      |    8    |         |    P1    |
 | DB-3. Wrong Date Detection   |   8    |      |      |    8    |         |    P1    |
 | DB-4. Column Sort            |   4    |      |      |    4    |         |    P2    |
@@ -62,7 +62,7 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 | DB-6. Cross-Layer Comparison |   8    |      |      |    8    |         |    P2    |
 | DB-7. Export Verification    |   3    |      |      |    3    |         |    P3    |
 | DB-8. TZ Independence        |   1    |      |      |    1    |         |    P1    |
-| **TOTAL**                    | **44** |      |      | **44**  |         |          |
+| **TOTAL**                    | **44** |  8   |      | **36**  |         |          |
 
 ---
 
@@ -87,16 +87,16 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 **Method**: Read grid cell text for a known record that has all fields populated (e.g., DateTest-000472).
 
-| ID     | Config | Field   | Expected Format       | Expected Example     | Actual | Status  | Run Date | Evidence |
-| ------ | :----: | ------- | --------------------- | -------------------- | ------ | :-----: | -------- | -------- |
-| db-1-A |   A    | Field7  | `M/D/YYYY`            | `3/15/2026`          |        | PENDING |          |          |
-| db-1-B |   B    | Field10 | `M/D/YYYY`            |                      |        | PENDING |          |          |
-| db-1-C |   C    | Field6  | `M/D/YYYY H:MM AM/PM` | `3/15/2026 12:00 AM` |        | PENDING |          |          |
-| db-1-D |   D    | Field5  | `M/D/YYYY H:MM AM/PM` | `3/15/2026 12:00 AM` |        | PENDING |          |          |
-| db-1-E |   E    | Field12 | `M/D/YYYY`            | `3/15/2026`          |        | PENDING |          |          |
-| db-1-F |   F    | Field11 | `M/D/YYYY`            | `3/15/2026`          |        | PENDING |          |          |
-| db-1-G |   G    | Field14 | `M/D/YYYY H:MM AM/PM` |                      |        | PENDING |          |          |
-| db-1-H |   H    | Field13 | `M/D/YYYY H:MM AM/PM` | `3/15/2026 12:00 AM` |        | PENDING |          |          |
+| ID     | Config | Field   | Expected Format       | Expected Example     | Actual               | Status | Run Date   | Evidence                          |
+| ------ | :----: | ------- | --------------------- | -------------------- | -------------------- | :----: | ---------- | --------------------------------- |
+| db-1-A |   A    | Field7  | `M/D/YYYY`            | `3/15/2026`          | `3/15/2026`          |  PASS  | 2026-04-02 | [summary](summaries/tc-db-1-A.md) |
+| db-1-B |   B    | Field10 | `M/D/YYYY`            | `3/15/2026`          | `3/15/2026`          |  PASS  | 2026-04-02 | [summary](summaries/tc-db-1-B.md) |
+| db-1-C |   C    | Field6  | `M/D/YYYY H:MM AM/PM` | `3/15/2026 12:00 AM` | `3/15/2026 12:00 AM` |  PASS  | 2026-04-02 | [summary](summaries/tc-db-1-C.md) |
+| db-1-D |   D    | Field5  | `M/D/YYYY H:MM AM/PM` | `3/15/2026 12:00 AM` | `3/15/2026 12:00 AM` |  PASS  | 2026-04-02 | [summary](summaries/tc-db-1-D.md) |
+| db-1-E |   E    | Field12 | `M/D/YYYY`            | `3/15/2026`          | `3/15/2026`          |  PASS  | 2026-04-02 | [summary](summaries/tc-db-1-E.md) |
+| db-1-F |   F    | Field11 | `M/D/YYYY`            | `3/15/2026`          | `3/15/2026`          |  PASS  | 2026-04-02 | [summary](summaries/tc-db-1-F.md) |
+| db-1-G |   G    | Field14 | `M/D/YYYY H:MM AM/PM` | `3/15/2026 12:00 AM` | `3/15/2026 12:00 AM` |  PASS  | 2026-04-02 | [summary](summaries/tc-db-1-G.md) |
+| db-1-H |   H    | Field13 | `M/D/YYYY H:MM AM/PM` | `3/15/2026 12:00 AM` | `3/15/2026 2:30 PM`  |  PASS  | 2026-04-02 | [summary](summaries/tc-db-1-H.md) |
 
 ---
 
