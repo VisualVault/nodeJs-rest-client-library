@@ -156,16 +156,16 @@ Named SQL queries defined on top of a connection. Used in dashboards, reports, a
 
 Form field values are stored in SQL tables named after the form template. Each form template maps to one table.
 
-| Column                        | Description                                                                                              |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `DhDocID`                     | Form instance identifier — e.g., `DateTest-000004`. Used in `WHERE` clauses to target a specific record. |
-| `DataField1`, `DataField2`, … | One column per VV field, named after the VV field name                                                   |
-| Other `Dh*` columns           | System columns (status, revision, timestamps, etc.)                                                      |
+| Column                | Description                                                                                              |
+| --------------------- | -------------------------------------------------------------------------------------------------------- |
+| `DhDocID`             | Form instance identifier — e.g., `DateTest-000004`. Used in `WHERE` clauses to target a specific record. |
+| `Field1`, `Field2`, … | One column per VV field, named after the VV field name                                                   |
+| Other `Dh*` columns   | System columns (status, revision, timestamps, etc.)                                                      |
 
 Example query to inspect a saved record:
 
 ```sql
-SELECT DhDocID, DataField1, DataField2, DataField5, DataField6, DataField7
+SELECT DhDocID, Field1, Field2, Field5, Field6, Field7
 FROM DateTest
 WHERE DhDocID = 'DateTest-000004'
 ```
@@ -290,7 +290,7 @@ https://vvdemo.visualvault.com/app/EmanuelJofre/Main/DocumentLibrary
 
 ### Field Name Casing
 
-The VV REST API returns field names in **camelCase** in response objects (e.g., `dataField7` instead of `DataField7`). When writing data, the API accepts the original mixed casing. Scripts must account for this asymmetry when reading field values from API responses vs. constructing field data for writes.
+The VV REST API returns field names in **camelCase** in response objects (e.g., `dataField7` instead of `Field7`). When writing data, the API accepts the original mixed casing. Scripts must account for this asymmetry when reading field values from API responses vs. constructing field data for writes.
 
 ### Date Format Normalization
 

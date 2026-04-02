@@ -235,54 +235,54 @@ https://vvdemo.visualvault.com/FormViewer/app?DataID=2ae985b5-1892-4d26-94da-388
 
 ### Test Form Fields
 
-Full harness: 8 configs × 3 initial-value modes. DataField3 (duplicate of DataField1) and DataField4 (duplicate of DataField2) exist on the form but are not used in formal test cases. DataField8/9 do not exist (naming gap from 7 to 10).
+Full harness: 8 configs × 3 initial-value modes. Field3 (duplicate of Field1) and Field4 (duplicate of Field2) exist on the form but are not used in formal test cases. Field8/9 do not exist (naming gap from 7 to 10).
 
 **No initial value** — base fields for user-input and API tests (Categories 1–4, 7–12)
 
-| Field       | Config | enableTime | ignoreTZ | useLegacy | Purpose                             |
-| ----------- | :----: | :--------: | :------: | :-------: | ----------------------------------- |
-| DataField7  |   A    |    OFF     |   OFF    |    OFF    | Date-only baseline (Bug #7 in UTC+) |
-| DataField10 |   B    |    OFF     |    ON    |    OFF    | Date-only + ignoreTZ                |
-| DataField6  |   C    |     ON     |   OFF    |    OFF    | DateTime UTC — control              |
-| DataField5  |   D    |     ON     |    ON    |    OFF    | **Bug #5/#6 surface**               |
-| DataField12 |   E    |    OFF     |   OFF    |    ON     | Legacy date-only                    |
-| DataField11 |   F    |    OFF     |    ON    |    ON     | Legacy date-only + ignoreTZ         |
-| DataField14 |   G    |     ON     |   OFF    |    ON     | Legacy DateTime                     |
-| DataField13 |   H    |     ON     |    ON    |    ON     | Legacy DateTime + ignoreTZ          |
+| Field   | Config | enableTime | ignoreTZ | useLegacy | Purpose                             |
+| ------- | :----: | :--------: | :------: | :-------: | ----------------------------------- |
+| Field7  |   A    |    OFF     |   OFF    |    OFF    | Date-only baseline (Bug #7 in UTC+) |
+| Field10 |   B    |    OFF     |    ON    |    OFF    | Date-only + ignoreTZ                |
+| Field6  |   C    |     ON     |   OFF    |    OFF    | DateTime UTC — control              |
+| Field5  |   D    |     ON     |    ON    |    OFF    | **Bug #5/#6 surface**               |
+| Field12 |   E    |    OFF     |   OFF    |    ON     | Legacy date-only                    |
+| Field11 |   F    |    OFF     |    ON    |    ON     | Legacy date-only + ignoreTZ         |
+| Field14 |   G    |     ON     |   OFF    |    ON     | Legacy DateTime                     |
+| Field13 |   H    |     ON     |    ON    |    ON     | Legacy DateTime + ignoreTZ          |
 
 **Preset date initial value** — for Category 5 tests
 
-| Field       | Config | enableTime | ignoreTZ | useLegacy | Notes                        |
-| ----------- | :----: | :--------: | :------: | :-------: | ---------------------------- |
-| DataField2  |   A    |    OFF     |   OFF    |    OFF    | Preset 3/1/2026              |
-| DataField27 |   B    |    OFF     |    ON    |    OFF    | Preset 3/1/2026 + ignoreTZ   |
-| DataField15 |   C    |     ON     |   OFF    |    OFF    | Preset DateTime              |
-| DataField16 |   D    |     ON     |    ON    |    OFF    | Preset DateTime + ignoreTZ   |
-| DataField19 |   E    |    OFF     |   OFF    |    ON     | Legacy preset date-only      |
-| DataField20 |   F    |    OFF     |    ON    |    ON     | Legacy preset date-only + TZ |
-| DataField21 |   G    |     ON     |   OFF    |    ON     | Legacy preset DateTime       |
-| DataField22 |   H    |     ON     |    ON    |    ON     | Legacy preset DateTime + TZ  |
+| Field   | Config | enableTime | ignoreTZ | useLegacy | Notes                        |
+| ------- | :----: | :--------: | :------: | :-------: | ---------------------------- |
+| Field2  |   A    |    OFF     |   OFF    |    OFF    | Preset 3/1/2026              |
+| Field27 |   B    |    OFF     |    ON    |    OFF    | Preset 3/1/2026 + ignoreTZ   |
+| Field15 |   C    |     ON     |   OFF    |    OFF    | Preset DateTime              |
+| Field16 |   D    |     ON     |    ON    |    OFF    | Preset DateTime + ignoreTZ   |
+| Field19 |   E    |    OFF     |   OFF    |    ON     | Legacy preset date-only      |
+| Field20 |   F    |    OFF     |    ON    |    ON     | Legacy preset date-only + TZ |
+| Field21 |   G    |     ON     |   OFF    |    ON     | Legacy preset DateTime       |
+| Field22 |   H    |     ON     |    ON    |    ON     | Legacy preset DateTime + TZ  |
 
 **Current Date initial value** — for Category 6 tests
 
-| Field       | Config | enableTime | ignoreTZ | useLegacy | Notes                            |
-| ----------- | :----: | :--------: | :------: | :-------: | -------------------------------- |
-| DataField1  |   A    |    OFF     |   OFF    |    OFF    | Current Date                     |
-| DataField28 |   B    |    OFF     |    ON    |    OFF    | Current Date + ignoreTZ          |
-| DataField17 |   C    |     ON     |   OFF    |    OFF    | Current Date DateTime            |
-| DataField18 |   D    |     ON     |    ON    |    OFF    | Current Date DateTime + ignoreTZ |
-| DataField23 |   E    |    OFF     |   OFF    |    ON     | Legacy current date-only         |
-| DataField24 |   F    |    OFF     |    ON    |    ON     | Legacy current date-only + TZ    |
-| DataField25 |   G    |     ON     |   OFF    |    ON     | Legacy current DateTime          |
-| DataField26 |   H    |     ON     |    ON    |    ON     | Legacy current DateTime + TZ     |
+| Field   | Config | enableTime | ignoreTZ | useLegacy | Notes                            |
+| ------- | :----: | :--------: | :------: | :-------: | -------------------------------- |
+| Field1  |   A    |    OFF     |   OFF    |    OFF    | Current Date                     |
+| Field28 |   B    |    OFF     |    ON    |    OFF    | Current Date + ignoreTZ          |
+| Field17 |   C    |     ON     |   OFF    |    OFF    | Current Date DateTime            |
+| Field18 |   D    |     ON     |    ON    |    OFF    | Current Date DateTime + ignoreTZ |
+| Field23 |   E    |    OFF     |   OFF    |    ON     | Legacy current date-only         |
+| Field24 |   F    |    OFF     |    ON    |    ON     | Legacy current date-only + TZ    |
+| Field25 |   G    |     ON     |   OFF    |    ON     | Legacy current DateTime          |
+| Field26 |   H    |     ON     |    ON    |    ON     | Legacy current DateTime + TZ     |
 
 ### Key JavaScript for Inspecting Field State
 
 ```javascript
 VV.Form.VV.FormPartition.fieldMaster; // field definitions (keyed by GUID)
-VV.Form.VV.FormPartition.getValueObjectValue('DataField5'); // raw stored value
-VV.Form.GetFieldValue('DataField5'); // processed return (Bug #5 adds fake Z)
-VV.Form.SetFieldValue('DataField5', value); // set value (goes through normalizeCalValue)
+VV.Form.VV.FormPartition.getValueObjectValue('Field5'); // raw stored value
+VV.Form.GetFieldValue('Field5'); // processed return (Bug #5 adds fake Z)
+VV.Form.SetFieldValue('Field5', value); // set value (goes through normalizeCalValue)
 // Verify V1 is active (expected: false) — works in DevTools console or Chrome extension
 VV.Form.calendarValueService.useUpdatedCalendarValueLogic;
 // false = V1 running (default) | true = V2 running (Object View or server flag)

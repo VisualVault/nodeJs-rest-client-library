@@ -29,7 +29,7 @@ const API_CONFIG = {
 
 // Field name to API response key mapping.
 // The VV API returns field values with lowercase property names in the response JSON.
-// e.g., DataField7 in the form → dataField7 in the API response.
+// e.g., Field7 in the form → dataField7 in the API response.
 const API_FIELD_KEY = (fieldName) => fieldName.charAt(0).toLowerCase() + fieldName.slice(1);
 
 // Standard date formats used in API input tests (WS-6)

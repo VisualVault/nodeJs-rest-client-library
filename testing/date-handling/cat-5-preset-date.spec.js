@@ -45,7 +45,7 @@ for (const tc of categoryTests) {
 
             // Verify preset field exists on the form.
             // Cannot use verifyField() here — Config A has two fields with enableInitialValue=true
-            // (DataField1 = Current Date, DataField2 = Preset Date) and verifyField returns the first match.
+            // (Field1 = Current Date, Field2 = Preset Date) and verifyField returns the first match.
             // Use the known preset field name directly from FIELD_MAP.
             const presetExists = await page.evaluate((name) => {
                 const fields = Object.values(VV.Form.VV.FormPartition.fieldMaster);

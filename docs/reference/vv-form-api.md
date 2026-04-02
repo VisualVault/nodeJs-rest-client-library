@@ -172,7 +172,7 @@ The core state manager for the form instance. Not part of the public API, but ac
 | Property            | Type     | Description                                                                                                                                                                                                |
 | ------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `fieldMaster`       | `object` | All field definitions keyed by field GUID. Each field has 65 properties including `name`, `fieldType`, `enableTime`, `ignoreTimezone`, `useLegacy`, `enableInitialValue`, `enableQListener`, `value`, etc. |
-| `fieldNameIdObject` | `object` | Map of field name → field GUID (e.g., `{"DataField7": "a5c96f2c-..."}`)                                                                                                                                    |
+| `fieldNameIdObject` | `object` | Map of field name → field GUID (e.g., `{"Field7": "a5c96f2c-..."}`)                                                                                                                                        |
 | `fieldArray`        | `array`  | Ordered array of all field definitions (28 entries)                                                                                                                                                        |
 | `fieldObject`       | `object` | Observable field state (RxJS BehaviorSubject)                                                                                                                                                              |
 | `valueObject`       | `object` | Observable value store (RxJS BehaviorSubject). Access raw values via `.source._value`                                                                                                                      |
@@ -421,7 +421,7 @@ Each field in `fieldMaster` is keyed by its GUID and contains the full field con
 
 | Property                | Type      | Description                                            |
 | ----------------------- | --------- | ------------------------------------------------------ |
-| `name`                  | `string`  | Field name (e.g., `"DataField7"`)                      |
+| `name`                  | `string`  | Field name (e.g., `"Field7"`)                          |
 | `id`                    | `string`  | Field GUID                                             |
 | `fieldType`             | `number`  | Field type enum. `13` = Calendar                       |
 | `enableTime`            | `boolean` | Whether time component is enabled                      |

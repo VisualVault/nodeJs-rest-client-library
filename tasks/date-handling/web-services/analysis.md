@@ -35,8 +35,8 @@ Node.js client methods:
 
 ```javascript
 const formData = {
-    DataField7: '2026-03-15', // date-only
-    DataField5: '2026-03-15T00:00:00', // datetime
+    Field7: '2026-03-15', // date-only
+    Field5: '2026-03-15T00:00:00', // datetime
 };
 
 const params = {};
@@ -70,7 +70,7 @@ Analysis of the upstream `VisualVault/nodeJs-rest-client-library` (stock code, z
 - Response parsing (`JSON.parse()`) returns date values as strings — never converted to Date objects
 - `formFieldCollection` is a pure lookup wrapper with no value transformation
 - `dateHelper` utility class exists in `common.js` but is never invoked in the request/response flow
-- VV API returns field names **lowercased** (`datafield7` not `DataField7`) in responses
+- VV API returns field names **lowercased** (`datafield7` not `Field7`) in responses
 
 **Implication**: Any date behavior differences between API and Forms must originate from either the **VV server** or the **Forms client-side JS** — not the Node.js intermediary.
 
@@ -232,7 +232,7 @@ From WS-1: the API writes `"2026-03-15T14:30:00"` to a date-only field and the s
 
 ### Impact
 
-1. **SQL queries**: `WHERE DataField7 = '2026-03-15'` may not match `"2026-03-15T03:00:00Z"` (preset) or `"2026-03-15T23:01:57Z"` (Current Date). Range queries (`>= '2026-03-15' AND < '2026-03-16'`) are needed but still fail for Bug #7 records where the day is wrong.
+1. **SQL queries**: `WHERE Field7 = '2026-03-15'` may not match `"2026-03-15T03:00:00Z"` (preset) or `"2026-03-15T23:01:57Z"` (Current Date). Range queries (`>= '2026-03-15' AND < '2026-03-16'`) are needed but still fail for Bug #7 records where the day is wrong.
 
 2. **Dashboard date filters**: May show inconsistent results for records created via different code paths (popup vs preset vs API vs Current Date).
 

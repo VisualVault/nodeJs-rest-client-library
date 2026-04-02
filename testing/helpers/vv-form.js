@@ -82,7 +82,7 @@ async function getCodePath(page) {
  * @param {boolean} config.ignoreTimezone - VV's timezone handling flag
  * @param {boolean} config.useLegacy - true for V1 legacy save/load code path
  * @param {boolean} config.enableInitialValue - true for Preset Date / Current Date fields
- * @returns {Promise<string>} field name (e.g., "DataField7")
+ * @returns {Promise<string>} field name (e.g., "Field7")
  * @throws if no matching field is found on the form
  */
 async function verifyField(page, config) {
@@ -111,7 +111,7 @@ async function verifyField(page, config) {
  * - `api` = what GetFieldValue() returns to developers (may differ due to Bug #5 fake Z)
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} fieldName - e.g., "DataField7"
+ * @param {string} fieldName - e.g., "Field7"
  * @returns {Promise<{raw: string, api: string}>}
  */
 async function captureFieldValues(page, fieldName) {
@@ -180,7 +180,7 @@ async function getBrowserTimezone(page) {
  * from `captureFieldValues` which reads VV's internal raw and API values.
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} fieldName - e.g., "DataField7"
+ * @param {string} fieldName - e.g., "Field7"
  * @returns {Promise<string>} the visible input value
  */
 async function captureDisplayValue(page, fieldName) {
@@ -262,7 +262,7 @@ async function saveFormAndReload(page, timeout = 60000) {
  * +5:30h per trip.
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} fieldName - e.g., "DataField5"
+ * @param {string} fieldName - e.g., "Field5"
  * @param {number} [times=3] - number of round-trip cycles
  * @returns {Promise<Array<{trip: number, raw: string, api: string, display: string}>>}
  */

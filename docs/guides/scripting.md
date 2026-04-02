@@ -62,7 +62,7 @@ VV Platform (POST /scripts)
 A pure lookup wrapper around the raw field array. **No data transformation occurs.**
 
 ```javascript
-ffCollection.getFormFieldByName('DataField7'); // case-insensitive lookup
+ffCollection.getFormFieldByName('Field7'); // case-insensitive lookup
 ffCollection.getFormFieldById('some-guid'); // case-insensitive lookup
 ffCollection.getFieldArray(); // returns raw array
 ```
@@ -111,22 +111,22 @@ VV Server responds with JSON
     │
     └── Script receives parsed JavaScript object
            - Dates are normalized to ISO 8601 datetime with Z suffix (e.g., "2026-03-15T00:00:00Z")
-           - Field names are in camelCase (e.g., "dataField7" not "DataField7")
+           - Field names are in camelCase (e.g., "dataField7" not "Field7")
 ```
 
 ### Field Name Casing
 
-The VV REST API returns field names in **camelCase** (e.g., `dataField7`, not `DataField7` or `datafield7`). When reading field values from API response objects (e.g., from `getForms()`), use camelCase:
+The VV REST API returns field names in **camelCase** (e.g., `dataField7`, not `Field7` or `datafield7`). When reading field values from API response objects (e.g., from `getForms()`), use camelCase:
 
 ```javascript
 const record = await getForms(...);
-const value = record.data[0]['dataField7'];  // camelCase, not 'DataField7'
+const value = record.data[0]['dataField7'];  // camelCase, not 'Field7'
 ```
 
 When **writing** field values (e.g., `postForms()`, `postFormRevision()`), the API accepts the original casing:
 
 ```javascript
-vvClient.forms.postForms(null, { DataField7: '2026-03-15' }, templateName); // original case
+vvClient.forms.postForms(null, { Field7: '2026-03-15' }, templateName); // original case
 ```
 
 ### Date Format Normalization
@@ -198,9 +198,9 @@ Send empty string `""` via `postFormRevision()` to clear an existing date value.
 
 The `q` parameter in `getForms()` normalizes date formats in filter expressions:
 
-- `[DataField7] eq '03/15/2026'` — US format works
-- `[DataField6] eq '2026-03-15T14:30:00Z'` — Z suffix works
-- `[DataField6] ge '2026-03-15' AND le '2026-03-16'` — date-only range on DateTime fields works
+- `[Field7] eq '03/15/2026'` — US format works
+- `[Field6] eq '2026-03-15T14:30:00Z'` — Z suffix works
+- `[Field6] ge '2026-03-15' AND le '2026-03-16'` — date-only range on DateTime fields works
 
 ### TZ-Safe Date Patterns for Scripts
 

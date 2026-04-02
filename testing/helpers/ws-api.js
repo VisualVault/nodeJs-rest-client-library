@@ -52,7 +52,7 @@ async function authenticate(request) {
  * @param {import('@playwright/test').APIRequestContext} request
  * @param {string} accessToken - Bearer token
  * @param {string} formTemplateId - Form template GUID
- * @param {Object} fieldData - Key-value pairs of field names and values (e.g., { DataField7: '2026-03-15' })
+ * @param {Object} fieldData - Key-value pairs of field names and values (e.g., { Field7: '2026-03-15' })
  * @returns {Promise<Object>} - The created form record data from the API response
  */
 async function createFormInstance(request, accessToken, formTemplateId, fieldData) {
@@ -182,11 +182,11 @@ async function updateFormInstance(request, accessToken, formTemplateId, formInst
  * Extract a field value from an API response record using the correct key casing.
  *
  * @param {Object} record - API response record
- * @param {string} fieldName - Field name as used in VV Forms (e.g., 'DataField7')
+ * @param {string} fieldName - Field name as used in VV Forms (e.g., 'Field7')
  * @returns {*} - The field value from the API response
  */
 function getFieldFromRecord(record, fieldName) {
-    // API returns lowercase-first keys (DataField7 → dataField7)
+    // API returns lowercase-first keys (Field7 → dataField7)
     const key = API_FIELD_KEY(fieldName);
     return record[key];
 }

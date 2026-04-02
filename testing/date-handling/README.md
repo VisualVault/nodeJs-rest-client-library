@@ -94,16 +94,16 @@ Shared config:
 
 All tests target one of 8 field configurations defined by three boolean flags on VV calendar fields:
 
-| Config | enableTime | ignoreTimezone | useLegacy | Field Name  | What It Tests                                    |
-| :----: | :--------: | :------------: | :-------: | ----------- | ------------------------------------------------ |
-|   A    |   false    |     false      |   false   | DataField7  | Date-only baseline. Bug #7 surface in UTC+       |
-|   B    |   false    |      true      |   false   | DataField10 | Date-only + ignoreTimezone. Same Bug #7 exposure |
-|   C    |    true    |     false      |   false   | DataField6  | DateTime with timezone. UTC-aware storage        |
-|   D    |    true    |      true      |   false   | DataField5  | **Primary bug surface**: Bug #5 (fake Z), Bug #6 |
-|   E    |   false    |     false      |   true    | DataField12 | Legacy date-only. Bug #2, Bug #4                 |
-|   F    |   false    |      true      |   true    | DataField11 | Legacy date-only + ignoreTimezone                |
-|   G    |    true    |     false      |   true    | DataField14 | Legacy DateTime                                  |
-|   H    |    true    |      true      |   true    | DataField13 | Legacy DateTime + ignoreTimezone                 |
+| Config | enableTime | ignoreTimezone | useLegacy | Field Name | What It Tests                                    |
+| :----: | :--------: | :------------: | :-------: | ---------- | ------------------------------------------------ |
+|   A    |   false    |     false      |   false   | Field7     | Date-only baseline. Bug #7 surface in UTC+       |
+|   B    |   false    |      true      |   false   | Field10    | Date-only + ignoreTimezone. Same Bug #7 exposure |
+|   C    |    true    |     false      |   false   | Field6     | DateTime with timezone. UTC-aware storage        |
+|   D    |    true    |      true      |   false   | Field5     | **Primary bug surface**: Bug #5 (fake Z), Bug #6 |
+|   E    |   false    |     false      |   true    | Field12    | Legacy date-only. Bug #2, Bug #4                 |
+|   F    |   false    |      true      |   true    | Field11    | Legacy date-only + ignoreTimezone                |
+|   G    |    true    |     false      |   true    | Field14    | Legacy DateTime                                  |
+|   H    |    true    |      true      |   true    | Field13    | Legacy DateTime + ignoreTimezone                 |
 
 **Flag definitions:**
 

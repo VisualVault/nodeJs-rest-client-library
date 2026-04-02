@@ -36,7 +36,7 @@ Before writing the import script, answer one question:
 
 ```javascript
 {
-    DataField6: `${row.datetime}Z`;
+    Field6: `${row.datetime}Z`;
 }
 // "2026-03-15T14:30:00Z" → stored as-is
 // EST user sees 9:30 AM, CST sees 8:30 AM — each sees their local time ✓
@@ -48,7 +48,7 @@ Before writing the import script, answer one question:
 ```javascript
 // Source timezone: US Eastern (EST = -05:00, EDT = -04:00)
 {
-    DataField6: `${row.date}T${row.time}-05:00`;
+    Field6: `${row.date}T${row.time}-05:00`;
 }
 // "2026-03-15T14:30:00-05:00" → stored as "2026-03-15T19:30:00Z"
 // EST user sees 2:30 PM ✓, CST sees 1:30 PM, PST sees 11:30 AM
@@ -60,7 +60,7 @@ Before writing the import script, answer one question:
 ```javascript
 // Field must have ignoreTZ=true in form designer
 {
-    DataField5: '2026-03-15T14:30:00Z';
+    Field5: '2026-03-15T14:30:00Z';
 }
 // Display shows "2:30 PM" for ALL users regardless of timezone
 // ⚠ rawValue in the form will shift per user TZ (CB-8) — but display is stable
@@ -97,13 +97,13 @@ Date-only fields are **not affected** by this issue. All these formats work corr
 
 ```javascript
 {
-    DataField7: '2026-03-15';
+    Field7: '2026-03-15';
 } // ISO — recommended
 {
-    DataField7: '03/15/2026';
+    Field7: '03/15/2026';
 } // US format — works
 {
-    DataField7: 'March 15, 2026';
+    Field7: 'March 15, 2026';
 } // English — works
 ```
 
@@ -174,7 +174,7 @@ const record = await vvClient.forms.getForms(
 // 14:30 Eastern (EDT) = 14:30 + 04:00 = 18:30 UTC
 const corrected = '2026-03-15T18:30:00Z';
 
-await vvClient.forms.postFormRevision(null, { DataField6: corrected }, 'MyFormTemplate', record.data[0].revisionId);
+await vvClient.forms.postFormRevision(null, { Field6: corrected }, 'MyFormTemplate', record.data[0].revisionId);
 ```
 
 For batch corrections, you need to know the original source timezone to compute the right offset. If the source timezone is unknown, there's no way to determine the correct UTC value programmatically.

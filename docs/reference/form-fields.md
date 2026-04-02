@@ -11,7 +11,7 @@ Known `fieldType` values in `VV.Form.VV.FormPartition.fieldMaster`:
 | `fieldType` | Field Kind      | XML `xsi:type`                     | Example                                          |
 | ----------- | --------------- | ---------------------------------- | ------------------------------------------------ |
 | `3`         | Text / textarea | `FieldTextbox3` / `FieldTextArea3` | `WSAction`, `WSResult`, `Subscription Pack Name` |
-| `13`        | Calendar / date | `FieldCalendar3`                   | `DataField7`, `Start Date`                       |
+| `13`        | Calendar / date | `FieldCalendar3`                   | `Field7`, `Start Date`                           |
 | `17`        | Button          | `FormButton`                       | `btnSave`, `btnCallWS`                           |
 | —           | Label           | `FieldLabel`                       | `Label5`, `Label22`                              |
 | —           | Dropdown        | `FieldDropDownList3`               | `Status`, `Type`                                 |
@@ -113,9 +113,9 @@ Object.values(VV.Form.VV.FormPartition.fieldMaster)
 
 ### Locating calendar field elements in the DOM
 
-Non-legacy calendar fields are rendered by Kendo and use **Kendo-internal GUIDs** as their `name` attribute (e.g., `k-c8505310-993b-4929-...`). They do **not** use the VV field name (`DataField11`) or the VV field GUID from `fieldMaster`. The `aria-label` attribute is on the **Kendo wrapper** element (`<kendo-datepicker aria-label="DataField7">` or `<kendo-datetimepicker aria-label="DataField6">`), with the actual `<input>` nested inside.
+Non-legacy calendar fields are rendered by Kendo and use **Kendo-internal GUIDs** as their `name` attribute (e.g., `k-c8505310-993b-4929-...`). They do **not** use the VV field name (`Field11`) or the VV field GUID from `fieldMaster`. The `aria-label` attribute is on the **Kendo wrapper** element (`<kendo-datepicker aria-label="Field7">` or `<kendo-datetimepicker aria-label="Field6">`), with the actual `<input>` nested inside.
 
-**Legacy fields** (`useLegacy=true`) have a completely different DOM structure: the `aria-label` is directly on a plain `<input>` element inside `<div class="d-picker">`. There is no Kendo wrapper. `document.querySelector('[aria-label="DataField13"]')` returns the `<input>` itself, not a container — using `.querySelector('input')` on it would fail.
+**Legacy fields** (`useLegacy=true`) have a completely different DOM structure: the `aria-label` is directly on a plain `<input>` element inside `<div class="d-picker">`. There is no Kendo wrapper. `document.querySelector('[aria-label="Field13"]')` returns the `<input>` itself, not a container — using `.querySelector('input')` on it would fail.
 
 To locate the correct `fd-cal-container` for a known field name:
 
@@ -125,10 +125,10 @@ const calFields = Object.values(VV.Form.VV.FormPartition.fieldMaster)
     .filter((f) => f.fieldType === 13)
     .sort((a, b) => a.layoutTop - b.layoutTop || a.layoutLeft - b.layoutLeft);
 
-const idx = calFields.findIndex((f) => f.name === 'DataField11');
+const idx = calFields.findIndex((f) => f.name === 'Field11');
 const containers = document.querySelectorAll('.fd-cal-container');
 const icon = containers[idx]?.querySelector('.k-icon.k-i-calendar');
-icon?.click(); // opens the calendar popup for DataField11
+icon?.click(); // opens the calendar popup for Field11
 ```
 
 The `fd-cal-container` NodeList order matches the `layoutTop`/`layoutLeft` sort order of fields in `fieldMaster`. Confirmed on the DateTest form (26 calendar fields, 2026-03-31).
@@ -204,4 +204,4 @@ Confirmed via direct SQL query on `DateTest-000004` (saved from BRT, UTC-3). Fie
 | Initial value — Preset                     | `enableInitialValue=true`, `initialValueMode=1` | UTC equivalent of local midnight | `3/1/2026 3:00:00 AM` = BRT midnight March 1 in UTC           |
 | User input — any config (C, D, A w/o init) | `enableInitialValue=false`                      | Local time, no offset            | `3/15/2026 12:00:00 AM` = BRT midnight March 15, stored as-is |
 
-The database stores no timezone context — there is no suffix distinguishing a UTC value from a local value. A SQL query or report filtering `WHERE DataField5 = '3/15/2026 12:00:00 AM'` from a UTC+ machine would match, but the meaning of that timestamp differs per field type. Reports or scheduled scripts that join or compare dates across field types will silently produce incorrect results.
+The database stores no timezone context — there is no suffix distinguishing a UTC value from a local value. A SQL query or report filtering `WHERE Field5 = '3/15/2026 12:00:00 AM'` from a UTC+ machine would match, but the meaning of that timestamp differs per field type. Reports or scheduled scripts that join or compare dates across field types will silently produce incorrect results.

@@ -43,72 +43,72 @@ const FORM_TEMPLATE_URL =
 //   - preset (enableInitialValue=true): pre-populated with a configured date — used for Cat 5
 //   - currentDate (enableInitialValue=true): auto-filled with today's date — used for Cat 6
 //
-// DataField3/4 are duplicates of DataField1/2 (not used in formal tests).
-// DataField8/9 do not exist (naming gap).
+// Field3/4 are duplicates of Field1/2 (not used in formal tests).
+// Field8/9 do not exist (naming gap).
 const FIELD_MAP = {
     A: {
-        field: 'DataField7',
+        field: 'Field7',
         enableTime: false,
         ignoreTimezone: false,
         useLegacy: false,
-        preset: 'DataField2',
-        currentDate: 'DataField1',
+        preset: 'Field2',
+        currentDate: 'Field1',
     },
     B: {
-        field: 'DataField10',
+        field: 'Field10',
         enableTime: false,
         ignoreTimezone: true,
         useLegacy: false,
-        preset: 'DataField27',
-        currentDate: 'DataField28',
+        preset: 'Field27',
+        currentDate: 'Field28',
     },
     C: {
-        field: 'DataField6',
+        field: 'Field6',
         enableTime: true,
         ignoreTimezone: false,
         useLegacy: false,
-        preset: 'DataField15',
-        currentDate: 'DataField17',
+        preset: 'Field15',
+        currentDate: 'Field17',
     },
     D: {
-        field: 'DataField5',
+        field: 'Field5',
         enableTime: true,
         ignoreTimezone: true,
         useLegacy: false,
-        preset: 'DataField16',
-        currentDate: 'DataField18',
+        preset: 'Field16',
+        currentDate: 'Field18',
     },
     E: {
-        field: 'DataField12',
+        field: 'Field12',
         enableTime: false,
         ignoreTimezone: false,
         useLegacy: true,
-        preset: 'DataField19',
-        currentDate: 'DataField23',
+        preset: 'Field19',
+        currentDate: 'Field23',
     },
     F: {
-        field: 'DataField11',
+        field: 'Field11',
         enableTime: false,
         ignoreTimezone: true,
         useLegacy: true,
-        preset: 'DataField20',
-        currentDate: 'DataField24',
+        preset: 'Field20',
+        currentDate: 'Field24',
     },
     G: {
-        field: 'DataField14',
+        field: 'Field14',
         enableTime: true,
         ignoreTimezone: false,
         useLegacy: true,
-        preset: 'DataField21',
-        currentDate: 'DataField25',
+        preset: 'Field21',
+        currentDate: 'Field25',
     },
     H: {
-        field: 'DataField13',
+        field: 'Field13',
         enableTime: true,
         ignoreTimezone: true,
         useLegacy: true,
-        preset: 'DataField22',
-        currentDate: 'DataField26',
+        preset: 'Field22',
+        currentDate: 'Field26',
     },
 };
 
@@ -126,9 +126,9 @@ const RECORD_DEFINITIONS = [
         key: 'cat3-A-BRT',
         tz: 'America/Sao_Paulo',
         fields: [
-            { name: 'DataField7', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+            { name: 'Field7', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
             {
-                name: 'DataField5',
+                name: 'Field5',
                 value: '03/15/2026 12:00 AM',
                 method: 'typed',
                 input: { year: 2026, month: 3, day: 15 },
@@ -140,9 +140,9 @@ const RECORD_DEFINITIONS = [
         key: 'cat3-AD-IST',
         tz: 'Asia/Calcutta',
         fields: [
-            { name: 'DataField7', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+            { name: 'Field7', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
             {
-                name: 'DataField5',
+                name: 'Field5',
                 value: '03/15/2026 12:00 AM',
                 method: 'typed',
                 input: { year: 2026, month: 3, day: 15 },
@@ -155,7 +155,7 @@ const RECORD_DEFINITIONS = [
         tz: 'America/Sao_Paulo',
         fields: [
             {
-                name: 'DataField6',
+                name: 'Field6',
                 value: '03/15/2026 12:00 AM',
                 method: 'popup',
                 input: { year: 2026, month: 3, day: 15 },
@@ -166,9 +166,7 @@ const RECORD_DEFINITIONS = [
     {
         key: 'cat3-B-BRT',
         tz: 'America/Sao_Paulo',
-        fields: [
-            { name: 'DataField10', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
-        ],
+        fields: [{ name: 'Field10', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } }],
         description: 'BRT save, Config B = 03/15/2026 via typed input',
     },
     {
@@ -176,7 +174,7 @@ const RECORD_DEFINITIONS = [
         tz: 'America/Sao_Paulo',
         fields: [
             {
-                name: 'DataField14',
+                name: 'Field14',
                 value: '03/15/2026 12:00 AM',
                 method: 'typed',
                 input: { year: 2026, month: 3, day: 15 },
@@ -188,8 +186,8 @@ const RECORD_DEFINITIONS = [
         key: 'cat3-EF-BRT',
         tz: 'America/Sao_Paulo',
         fields: [
-            { name: 'DataField12', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
-            { name: 'DataField11', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+            { name: 'Field12', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+            { name: 'Field11', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
         ],
         description: 'BRT save, Config E + F (legacy date-only) = 03/15/2026 via typed input',
     },
@@ -198,7 +196,7 @@ const RECORD_DEFINITIONS = [
         tz: 'America/Sao_Paulo',
         fields: [
             {
-                name: 'DataField13',
+                name: 'Field13',
                 value: '03/15/2026 12:00 AM',
                 method: 'typed',
                 input: { year: 2026, month: 3, day: 15 },
@@ -209,9 +207,7 @@ const RECORD_DEFINITIONS = [
     {
         key: 'cat3-B-IST',
         tz: 'Asia/Calcutta',
-        fields: [
-            { name: 'DataField10', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
-        ],
+        fields: [{ name: 'Field10', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } }],
         description: 'IST save, Config B (date-only + ignoreTZ) = 03/15/2026 via typed input',
     },
 ];

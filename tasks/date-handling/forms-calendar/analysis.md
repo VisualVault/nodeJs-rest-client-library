@@ -663,15 +663,15 @@ When a `Date` object is passed, `normalizeCalValue` converts it to ISO via `toIS
 
 **Observed DB values (DateTest-000004, saved from BRT UTC-3, target date 2026-03-15):**
 
-| Field                            | DB value                | Interpretation                                                  |
-| -------------------------------- | ----------------------- | --------------------------------------------------------------- |
-| DataField1 (CurrentDate)         | `3/27/2026 8:02:51 PM`  | UTC timestamp of the save action (BRT 5:02 PM = UTC 8:02 PM)    |
-| DataField2 (Preset Mar 1)        | `3/1/2026 3:00:00 AM`   | UTC equivalent of BRT midnight March 1 (`2026-03-01T03:00:00Z`) |
-| DataField5 (Config D user input) | `3/15/2026 12:00:00 AM` | Local BRT midnight, stored without any timezone offset          |
-| DataField6 (Config C user input) | `3/15/2026 12:00:00 AM` | Same — local BRT midnight                                       |
-| DataField7 (Config A user input) | `3/15/2026 12:00:00 AM` | Same — local BRT midnight                                       |
+| Field                        | DB value                | Interpretation                                                  |
+| ---------------------------- | ----------------------- | --------------------------------------------------------------- |
+| Field1 (CurrentDate)         | `3/27/2026 8:02:51 PM`  | UTC timestamp of the save action (BRT 5:02 PM = UTC 8:02 PM)    |
+| Field2 (Preset Mar 1)        | `3/1/2026 3:00:00 AM`   | UTC equivalent of BRT midnight March 1 (`2026-03-01T03:00:00Z`) |
+| Field5 (Config D user input) | `3/15/2026 12:00:00 AM` | Local BRT midnight, stored without any timezone offset          |
+| Field6 (Config C user input) | `3/15/2026 12:00:00 AM` | Same — local BRT midnight                                       |
+| Field7 (Config A user input) | `3/15/2026 12:00:00 AM` | Same — local BRT midnight                                       |
 
-**Consequence for queries and reports:** The database stores no timezone marker — no suffix, column, or metadata indicates whether `3/15/2026 12:00:00 AM` is UTC or BRT. Reports or scheduled scripts that compare dates across field types, or that filter `WHERE DataFieldX BETWEEN @start AND @end`, will silently return wrong results for users in UTC+ timezones (where the local-time and UTC representations of the same date diverge). DataField2 (`3/1/2026 3:00:00 AM`) and DataField5 (`3/15/2026 12:00:00 AM`) represent the same kind of value — midnight on the target date — stored in incompatible formats.
+**Consequence for queries and reports:** The database stores no timezone marker — no suffix, column, or metadata indicates whether `3/15/2026 12:00:00 AM` is UTC or BRT. Reports or scheduled scripts that compare dates across field types, or that filter `WHERE FieldX BETWEEN @start AND @end`, will silently return wrong results for users in UTC+ timezones (where the local-time and UTC representations of the same date diverge). Field2 (`3/1/2026 3:00:00 AM`) and Field5 (`3/15/2026 12:00:00 AM`) represent the same kind of value — midnight on the target date — stored in incompatible formats.
 
 **Root cause (code path):**
 

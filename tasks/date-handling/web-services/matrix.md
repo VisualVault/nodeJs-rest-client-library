@@ -18,16 +18,16 @@ For format/scenario variants: `ws-{category}-{config}-{variant}` (e.g., `ws-5-A-
 
 Same 8 field configurations as forms-calendar — tests target the same DateTest form:
 
-| Config | enableTime | ignoreTZ | useLegacy | Test Field  | Type                                    |
-| :----: | :--------: | :------: | :-------: | ----------- | --------------------------------------- |
-|   A    |   false    |  false   |   false   | DataField7  | Date-only baseline                      |
-|   B    |   false    |   true   |   false   | DataField10 | Date-only + ignoreTZ                    |
-|   C    |    true    |  false   |   false   | DataField6  | DateTime UTC-aware                      |
-|   D    |    true    |   true   |   false   | DataField5  | DateTime + ignoreTZ (Bug #5/#6 surface) |
-|   E    |   false    |  false   |   true    | DataField12 | Legacy date-only                        |
-|   F    |   false    |   true   |   true    | DataField11 | Legacy date-only + ignoreTZ             |
-|   G    |    true    |  false   |   true    | DataField14 | Legacy DateTime                         |
-|   H    |    true    |   true   |   true    | DataField13 | Legacy DateTime + ignoreTZ              |
+| Config | enableTime | ignoreTZ | useLegacy | Test Field | Type                                    |
+| :----: | :--------: | :------: | :-------: | ---------- | --------------------------------------- |
+|   A    |   false    |  false   |   false   | Field7     | Date-only baseline                      |
+|   B    |   false    |   true   |   false   | Field10    | Date-only + ignoreTZ                    |
+|   C    |    true    |  false   |   false   | Field6     | DateTime UTC-aware                      |
+|   D    |    true    |   true   |   false   | Field5     | DateTime + ignoreTZ (Bug #5/#6 surface) |
+|   E    |   false    |  false   |   true    | Field12    | Legacy date-only                        |
+|   F    |   false    |   true   |   true    | Field11    | Legacy date-only + ignoreTZ             |
+|   G    |    true    |  false   |   true    | Field14    | Legacy DateTime                         |
+|   H    |    true    |   true   |   true    | Field13    | Legacy DateTime + ignoreTZ              |
 
 ---
 
@@ -320,18 +320,18 @@ Test OData-style `q` parameter filters on date fields via `getForms()`. Requires
 
 **Prerequisite**: At least one WS-1 record with known stored values.
 
-| ID             | Config | Query Type      | Query                                                           | Expected | Status | Matched | Notes                                     |
-| -------------- | :----: | --------------- | --------------------------------------------------------------- | -------- | :----: | :-----: | ----------------------------------------- |
-| ws-8-A-eq      |   A    | Exact match     | `[DataField7] eq '2026-03-15'`                                  | Match    |  PASS  |   Yes   | ISO date-only matches stored T00:00:00Z   |
-| ws-8-A-gt      |   A    | Greater than    | `[DataField7] gt '2026-03-14'`                                  | Match    |  PASS  |   Yes   | Date comparison works ✓                   |
-| ws-8-A-range   |   A    | Range           | `[DataField7] ge '2026-03-15' AND [DataField7] le '2026-03-16'` | Match    |  PASS  |   Yes   | Inclusive range works ✓                   |
-| ws-8-A-fmtUS   |   A    | Format mismatch | `[DataField7] eq '03/15/2026'`                                  | TBD      |  PASS  |   Yes   | US format in query works! H-10 ✓          |
-| ws-8-A-noMatch |   A    | No match        | `[DataField7] eq '2026-03-16'`                                  | No match |  PASS  |   No    | Control — correct no-match ✓              |
-| ws-8-C-eq      |   C    | Exact match     | `[DataField6] eq '2026-03-15T14:30:00'`                         | Match    |  PASS  |   Yes   | DateTime equality works ✓                 |
-| ws-8-C-gt      |   C    | Greater than    | `[DataField6] gt '2026-03-15T14:00:00'`                         | Match    |  PASS  |   Yes   | DateTime comparison works ✓               |
-| ws-8-C-range   |   C    | Range           | `[DataField6] ge '2026-03-15' AND [DataField6] le '2026-03-16'` | Match    |  PASS  |   Yes   | Date-only range on DateTime field works ✓ |
-| ws-8-C-fmtZ    |   C    | Format mismatch | `[DataField6] eq '2026-03-15T14:30:00Z'`                        | TBD      |  PASS  |   Yes   | Z suffix in query matches stored Z ✓      |
-| ws-8-C-noMatch |   C    | No match        | `[DataField6] eq '2026-03-15T15:00:00'`                         | No match |  PASS  |   No    | Control — correct no-match ✓              |
+| ID             | Config | Query Type      | Query                                                   | Expected | Status | Matched | Notes                                     |
+| -------------- | :----: | --------------- | ------------------------------------------------------- | -------- | :----: | :-----: | ----------------------------------------- |
+| ws-8-A-eq      |   A    | Exact match     | `[Field7] eq '2026-03-15'`                              | Match    |  PASS  |   Yes   | ISO date-only matches stored T00:00:00Z   |
+| ws-8-A-gt      |   A    | Greater than    | `[Field7] gt '2026-03-14'`                              | Match    |  PASS  |   Yes   | Date comparison works ✓                   |
+| ws-8-A-range   |   A    | Range           | `[Field7] ge '2026-03-15' AND [Field7] le '2026-03-16'` | Match    |  PASS  |   Yes   | Inclusive range works ✓                   |
+| ws-8-A-fmtUS   |   A    | Format mismatch | `[Field7] eq '03/15/2026'`                              | TBD      |  PASS  |   Yes   | US format in query works! H-10 ✓          |
+| ws-8-A-noMatch |   A    | No match        | `[Field7] eq '2026-03-16'`                              | No match |  PASS  |   No    | Control — correct no-match ✓              |
+| ws-8-C-eq      |   C    | Exact match     | `[Field6] eq '2026-03-15T14:30:00'`                     | Match    |  PASS  |   Yes   | DateTime equality works ✓                 |
+| ws-8-C-gt      |   C    | Greater than    | `[Field6] gt '2026-03-15T14:00:00'`                     | Match    |  PASS  |   Yes   | DateTime comparison works ✓               |
+| ws-8-C-range   |   C    | Range           | `[Field6] ge '2026-03-15' AND [Field6] le '2026-03-16'` | Match    |  PASS  |   Yes   | Date-only range on DateTime field works ✓ |
+| ws-8-C-fmtZ    |   C    | Format mismatch | `[Field6] eq '2026-03-15T14:30:00Z'`                    | TBD      |  PASS  |   Yes   | Z suffix in query matches stored Z ✓      |
+| ws-8-C-noMatch |   C    | No match        | `[Field6] eq '2026-03-15T15:00:00'`                     | No match |  PASS  |   No    | Control — correct no-match ✓              |
 
 > **WS-8 Finding**: All 10 tests PASS. The OData query engine normalizes date formats — ISO date-only, US format (MM/DD/YYYY), and ISO datetime with Z all match correctly. Date-only range queries work on DateTime fields. H-10 confirmed: OData filters match stored format reliably. The query engine is more format-tolerant than expected.
 

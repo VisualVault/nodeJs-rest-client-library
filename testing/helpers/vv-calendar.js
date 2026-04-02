@@ -29,8 +29,8 @@ const MONTH_NAMES = [
  * Detect whether a field uses the date-only or datetime picker widget.
  *
  * The [aria-label] container IS the kendo widget element itself:
- *   - Date-only: <kendo-datepicker aria-label="DataField7">
- *   - DateTime:  <kendo-datetimepicker aria-label="DataField6">
+ *   - Date-only: <kendo-datepicker aria-label="Field7">
+ *   - DateTime:  <kendo-datetimepicker aria-label="Field6">
  *
  * @param {import('@playwright/test').Locator} fieldContainer
  * @returns {Promise<'datepicker'|'datetimepicker'>}
@@ -53,7 +53,7 @@ async function detectPickerType(fieldContainer) {
  * Time tab (defaults to 12:00 AM) → click Set button.
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} fieldName - e.g., "DataField7" (date-only) or "DataField6" (datetime)
+ * @param {string} fieldName - e.g., "Field7" (date-only) or "Field6" (datetime)
  * @param {number} year - e.g., 2026
  * @param {number} month - 1-indexed (1=Jan, 3=Mar, 12=Dec)
  * @param {number} day - day of month (1-31)
@@ -265,13 +265,13 @@ async function selectDateInDateTimePicker(page, year, month, day) {
  * For enableTime=true fields: pass "MM/dd/yyyy hh:mm AM" (e.g., "03/15/2026 12:00 AM")
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} fieldName - e.g., "DataField7"
+ * @param {string} fieldName - e.g., "Field7"
  * @param {string} dateStr - formatted date string with segments separated by / : or space
  */
 async function typeDateInField(page, fieldName, dateStr) {
     const fieldContainer = page.locator(`[aria-label="${fieldName}"]`);
     await fieldContainer.scrollIntoViewIfNeeded();
-    // Legacy fields (useLegacy=true) render as a plain <input aria-label="DataFieldN"> inside div.d-picker.
+    // Legacy fields (useLegacy=true) render as a plain <input aria-label="FieldN"> inside div.d-picker.
     // Non-legacy fields render inside a Kendo wrapper (<kendo-datepicker> or <kendo-datetimepicker>)
     // with the aria-label on the wrapper and the input nested inside.
     const tagName = await fieldContainer.evaluate((el) => el.tagName.toLowerCase());

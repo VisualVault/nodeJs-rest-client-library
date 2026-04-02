@@ -19,14 +19,14 @@ const fs = require('fs');
 
 // Field configuration map — mirrors the harness FIELD_MAP
 const FIELD_MAP = {
-    A: { field: 'DataField7', enableTime: false, ignoreTimezone: false, useLegacy: false },
-    B: { field: 'DataField10', enableTime: false, ignoreTimezone: true, useLegacy: false },
-    C: { field: 'DataField6', enableTime: true, ignoreTimezone: false, useLegacy: false },
-    D: { field: 'DataField5', enableTime: true, ignoreTimezone: true, useLegacy: false },
-    E: { field: 'DataField12', enableTime: false, ignoreTimezone: false, useLegacy: true },
-    F: { field: 'DataField11', enableTime: false, ignoreTimezone: true, useLegacy: true },
-    G: { field: 'DataField14', enableTime: true, ignoreTimezone: false, useLegacy: true },
-    H: { field: 'DataField13', enableTime: true, ignoreTimezone: true, useLegacy: true },
+    A: { field: 'Field7', enableTime: false, ignoreTimezone: false, useLegacy: false },
+    B: { field: 'Field10', enableTime: false, ignoreTimezone: true, useLegacy: false },
+    C: { field: 'Field6', enableTime: true, ignoreTimezone: false, useLegacy: false },
+    D: { field: 'Field5', enableTime: true, ignoreTimezone: true, useLegacy: false },
+    E: { field: 'Field12', enableTime: false, ignoreTimezone: false, useLegacy: true },
+    F: { field: 'Field11', enableTime: false, ignoreTimezone: true, useLegacy: true },
+    G: { field: 'Field14', enableTime: true, ignoreTimezone: false, useLegacy: true },
+    H: { field: 'Field13', enableTime: true, ignoreTimezone: true, useLegacy: true },
 };
 
 // VV environment constants (vvdemo EmanuelJofre/Main)
