@@ -50,8 +50,9 @@ for (const tc of categoryTests) {
             });
             expect(fieldName).toBe(fieldCfg.field);
 
-            // Set baseline value
-            await setFieldValue(page, fieldCfg.field, tc.inputDateStr);
+            // Set baseline value (skip wait for empty/invalid inputs that won't populate)
+            const waitForValue = tc.inputDateStr !== '' && tc.inputDateStr !== 'not-a-date';
+            await setFieldValue(page, fieldCfg.field, tc.inputDateStr, { waitForValue });
 
             // Execute round-trip(s) if specified
             if (tc.action === 'gfvRoundTrip' && tc.trips) {
