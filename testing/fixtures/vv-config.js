@@ -184,6 +184,36 @@ const RECORD_DEFINITIONS = [
         ],
         description: 'BRT save, Config G (legacy DateTime) = 03/15/2026 12:00 AM via typed input',
     },
+    {
+        key: 'cat3-EF-BRT',
+        tz: 'America/Sao_Paulo',
+        fields: [
+            { name: 'DataField12', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+            { name: 'DataField11', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+        ],
+        description: 'BRT save, Config E + F (legacy date-only) = 03/15/2026 via typed input',
+    },
+    {
+        key: 'cat3-H-BRT',
+        tz: 'America/Sao_Paulo',
+        fields: [
+            {
+                name: 'DataField13',
+                value: '03/15/2026 12:00 AM',
+                method: 'typed',
+                input: { year: 2026, month: 3, day: 15 },
+            },
+        ],
+        description: 'BRT save, Config H (legacy DateTime + ignoreTZ) = 03/15/2026 12:00 AM via typed input',
+    },
+    {
+        key: 'cat3-B-IST',
+        tz: 'Asia/Calcutta',
+        fields: [
+            { name: 'DataField10', value: '03/15/2026', method: 'typed', input: { year: 2026, month: 3, day: 15 } },
+        ],
+        description: 'IST save, Config B (date-only + ignoreTZ) = 03/15/2026 via typed input',
+    },
 ];
 
 // Fallback saved records for backward compatibility — used when saved-records.json
@@ -200,6 +230,12 @@ const HARDCODED_SAVED_RECORDS = {
         '/FormViewer/app?DataID=c63dea33-867e-49e2-b929-fb226b6d3933&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
     'cat3-C-IST':
         '/FormViewer/app?DataID=278aee29-1141-4165-8769-e33869a5056e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
+    'cat3-EF-BRT':
+        '/FormViewer/app?DataID=bd05735a-f322-4ba5-9f49-d974c797489f&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
+    'cat3-H-BRT':
+        '/FormViewer/app?DataID=e154623d-d931-411b-a7e8-3699447e0ddf&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
+    'cat3-B-IST':
+        '/FormViewer/app?DataID=6335170b-6803-4dc9-8390-d5617e1d7f64&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
 };
 
 const SAVED_RECORDS_PATH = path.join(__dirname, '..', 'config', 'saved-records.json');

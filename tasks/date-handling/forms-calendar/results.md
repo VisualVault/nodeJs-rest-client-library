@@ -1611,3 +1611,19 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-01 [TC-9-GDOC-D-BRT-1 Run 1](runs/tc-9-GDOC-D-BRT-1-run-1.md) — BRT — PASS — GDOC round-trip stable (0 drift); real UTC parsed correctly, matrix prediction corrected from -3h to 0
 - 2026-04-01 [TC-9-H-BRT-1 Run 1](runs/tc-9-H-BRT-1-run-1.md) — BRT — PASS — Config H GFV round-trip stable (0 drift); useLegacy=true prevents Bug #5 fake-Z drift
 - 2026-04-01 [TC-12-utc-0-control Run 1](runs/tc-12-utc-0-control-run-1.md) — UTC+0 — PASS — Config D round-trip 0 drift at UTC+0; fake Z coincidentally correct (local=UTC)
+
+## Session 2026-04-02 (BRT)
+
+**Purpose**: Category 3 server reload for legacy configs E, F, H in same-TZ (BRT→BRT).
+**Key outcomes**: All three PASS; legacy date-only (E, F) and legacy DateTime + ignoreTZ (H) survive same-TZ reload intact.
+
+- 2026-04-02 [TC-3-E-BRT-BRT Run 1](runs/tc-3-E-BRT-BRT-run-1.md) — BRT — PASS — Config E legacy date-only same-TZ reload; value survives intact
+- 2026-04-02 [TC-3-F-BRT-BRT Run 1](runs/tc-3-F-BRT-BRT-run-1.md) — BRT — PASS — Config F legacy date-only + ignoreTZ same-TZ reload; ignoreTZ inert
+- 2026-04-02 [TC-3-H-BRT-BRT Run 1](runs/tc-3-H-BRT-BRT-run-1.md) — BRT — PASS — Config H legacy DateTime + ignoreTZ same-TZ reload; useLegacy bypasses Bug #5
+- 2026-04-02 [TC-3-E-BRT-IST Run 1](runs/tc-3-E-BRT-IST-run-1.md) — IST — PASS — Config E legacy date-only cross-TZ reload; date-only string survives BRT→IST
+- 2026-04-02 [TC-3-H-BRT-IST Run 1](runs/tc-3-H-BRT-IST-run-1.md) — IST — PASS — Config H legacy DateTime + ignoreTZ cross-TZ reload; useLegacy bypasses Bug #5 in IST
+- 2026-04-02 [TC-12-near-midnight-1-IST Run 1](runs/tc-12-near-midnight-1-IST-run-1.md) — IST — FAIL-1 — ISO+Z near midnight: no day cross in IST (contrast BRT); Bug #5 fake Z on GFV
+- 2026-04-02 [TC-12-near-midnight-2-IST Run 1](runs/tc-12-near-midnight-2-IST-run-1.md) — IST — FAIL-2 — Near-midnight round-trip: +5:30h drift crosses day FORWARD (opposite BRT)
+- 2026-04-02 [TC-12-year-boundary-IST Run 1](runs/tc-12-year-boundary-IST-run-1.md) — IST — FAIL-2 — Year boundary: +5:30h stays in 2026 (opposite BRT year crossing to 2025)
+- 2026-04-02 [TC-12-leap-day-IST Run 1](runs/tc-12-leap-day-IST-run-1.md) — IST — FAIL-2 — Leap day: +5:30h preserves Feb 29 (opposite BRT leap day loss)
+- 2026-04-02 [TC-3-B-IST-BRT Run 1](runs/tc-3-B-IST-BRT-run-1.md) — BRT — FAIL-3 — Config B Bug #7 baked in during IST save; ignoreTZ inert. Cat 3 complete (14P/4F)
