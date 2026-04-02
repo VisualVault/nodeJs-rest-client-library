@@ -360,12 +360,15 @@ module.exports.main = async function (ffCollection, vvClient, response) {
     }
 
     function extractDateFields(record, targetConfigs) {
-        // VV API returns field names lowercased (e.g. "datafield7")
+        // VV API returns field names in camelCase (e.g. "dataField7").
+        // Do a case-insensitive lookup to be safe across API versions.
+        const recordKeys = Object.keys(record);
         const extracted = {};
         for (const configKey of targetConfigs) {
             const config = FIELD_MAP[configKey];
-            const apiFieldName = config.field.toLowerCase();
-            extracted[configKey] = record[apiFieldName] != null ? record[apiFieldName] : '';
+            const targetLower = config.field.toLowerCase();
+            const matchedKey = recordKeys.find((k) => k.toLowerCase() === targetLower);
+            extracted[configKey] = matchedKey && record[matchedKey] != null ? record[matchedKey] : '';
         }
         return extracted;
     }

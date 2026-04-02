@@ -116,11 +116,11 @@ VV Server responds with JSON
 
 ### Field Name Casing
 
-The VV REST API returns field names in **lowercase**. When reading field values from API response objects (e.g., from `getForms()`), use lowercase:
+The VV REST API returns field names in **camelCase** (e.g., `dataField7`, not `DataField7` or `datafield7`). When reading field values from API response objects (e.g., from `getForms()`), use camelCase:
 
 ```javascript
 const record = await getForms(...);
-const value = record.data[0]['datafield7'];  // lowercase, not 'DataField7'
+const value = record.data[0]['dataField7'];  // camelCase, not 'DataField7'
 ```
 
 When **writing** field values (e.g., `postForms()`, `postFormRevision()`), the API accepts the original casing:

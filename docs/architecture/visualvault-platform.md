@@ -290,7 +290,7 @@ https://vvdemo.visualvault.com/app/EmanuelJofre/Main/DocumentLibrary
 
 ### Field Name Casing
 
-The VV REST API returns field names **lowercased** in response objects (e.g., `datafield7` instead of `DataField7`). When writing data, the API accepts the original mixed casing. Scripts must account for this asymmetry when reading field values from API responses vs. constructing field data for writes.
+The VV REST API returns field names in **camelCase** in response objects (e.g., `dataField7` instead of `DataField7`). When writing data, the API accepts the original mixed casing. Scripts must account for this asymmetry when reading field values from API responses vs. constructing field data for writes.
 
 ### Data Passthrough
 
