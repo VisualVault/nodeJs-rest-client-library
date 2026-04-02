@@ -6,15 +6,15 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 
 ## Scope
 
-| Component                                | Status                           | Folder                      |
-| ---------------------------------------- | -------------------------------- | --------------------------- |
-| **Forms — Calendar Fields**              | IN PROGRESS (~71/225 tests done) | `forms-calendar/`           |
-| **Web Services (REST API)**              | NOT STARTED                      | `web-services/` (to create) |
-| **Analytic Dashboards**                  | NOT STARTED                      | `dashboards/` (to create)   |
-| **VisualVault Reports**                  | NOT STARTED                      | `reports/` (to create)      |
-| **Files (document dates)**               | NOT STARTED                      | `files/` (to create)        |
-| **Workflows (date triggers, deadlines)** | NOT STARTED                      | `workflows/` (to create)    |
-| **Node.js Client Library**               | NOT STARTED                      | `node-client/` (to create)  |
+| Component                                | Status                           | Folder                     |
+| ---------------------------------------- | -------------------------------- | -------------------------- |
+| **Forms — Calendar Fields**              | IN PROGRESS (~71/225 tests done) | `forms-calendar/`          |
+| **Web Services (REST API)**              | IN PROGRESS (0 tests done)       | `web-services/`            |
+| **Analytic Dashboards**                  | NOT STARTED                      | `dashboards/` (to create)  |
+| **VisualVault Reports**                  | NOT STARTED                      | `reports/` (to create)     |
+| **Files (document dates)**               | NOT STARTED                      | `files/` (to create)       |
+| **Workflows (date triggers, deadlines)** | NOT STARTED                      | `workflows/` (to create)   |
+| **Node.js Client Library**               | NOT STARTED                      | `node-client/` (to create) |
 
 ## Folder Structure
 
@@ -24,7 +24,13 @@ tasks/date-handling/
   forms-calendar/                    # Forms calendar field investigation
     analysis.md                # Code review + confirmed bug analysis
     test/results.md                  # Live browser test evidence (source of truth)
-  web-services/                      # (future) REST API date handling
+  web-services/                      # REST API date handling investigation
+    analysis.md                      # API analysis, hypotheses, confirmed behaviors
+    matrix.md                        # Test matrix — WS-1 through WS-7 categories
+    results.md                       # Live test evidence
+    test-cases/                      # Individual TC spec files
+    runs/                            # Immutable execution records
+    summaries/                       # Per-TC status files
   dashboards/                        # (future) Analytic Dashboard dates
   reports/                           # (future) VV Reports date filtering/display
   files/                             # (future) Document date metadata
