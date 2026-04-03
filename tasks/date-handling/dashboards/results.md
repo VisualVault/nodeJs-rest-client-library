@@ -192,3 +192,22 @@ Two records compared across BRT and IST browser timezones:
 - 2026-04-02 [TC-DB-8-TZ Run 1](runs/tc-db-8-tz-run-1.md) — PASS — 10 records × all fields: BRT ≡ IST ≡ UTC0, 0 mismatches
 
 **Key finding**: Dashboard is 100% server-side rendered. Browser timezone has zero effect on displayed date values. All DB-1 through DB-7 tests validly used a single TZ (BRT).
+
+---
+
+## Session 2026-04-03 — DB-7 Export Verification
+
+**Environment**: Playwright headless Chrome, `test-export-v1.js`
+**Method**: Download Excel/Word/XML exports via Telerik RadGrid \_\_doPostBack triggers, parse exported files, compare date values against grid display for 5 baseline records.
+
+- 2026-04-03 [TC-DB-7-EXCEL Run 1](runs/tc-db-7-excel-run-1.md) — PASS — 432 records, dates match (HTML table adds 12:00:00 AM to date-only)
+- 2026-04-03 [TC-DB-7-WORD Run 1](runs/tc-db-7-word-run-1.md) — PASS — 432 records, identical to Excel (both HTML tables)
+- 2026-04-03 [TC-DB-7-XML Run 1](runs/tc-db-7-xml-run-1.md) — PASS — 432 records, ISO 8601 dates match grid calendar dates
+
+**Key findings**:
+
+- Excel and Word exports are HTML tables with different extensions — structurally identical
+- XML export uses proper XML with ISO 8601 dates (`2026-03-15T00:00:00+00:00`)
+- All exports include ALL records (432), not just the current page (200)
+- Export dock panel starts hidden (`display:none`) — requires JS toggle or direct `__doPostBack`
+- **Dashboard investigation complete: 44/44 tests (36 PASS, 8 FAIL, 0 PENDING)**

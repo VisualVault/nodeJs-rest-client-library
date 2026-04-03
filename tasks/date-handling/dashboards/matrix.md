@@ -60,7 +60,7 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 | DB-4. Column Sort            |   4    |  4   |      |         |         |    P2    |
 | DB-5. Search / SQL Filter    |   4    |  4   |      |         |         |    P2    |
 | DB-6. Cross-Layer Comparison |   8    |      |  8   |         |         |    P2    |
-| DB-7. Export Verification    |   3    |      |      |    3    |         |    P3    |
+| DB-7. Export Verification    |   3    |  3   |      |         |         |    P3    |
 | DB-8. TZ Independence        |   1    |  1   |      |         |         |    P1    |
 | **TOTAL**                    | **44** |  33  |  8   |  **3**  |         |          |
 
@@ -193,11 +193,11 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 **Method**: Click Export → download file → parse and compare date values.
 
-| ID         | Variant | Format  | Dates Match Grid? | Format Preserved? | Status  | Run Date | Evidence |
-| ---------- | ------- | ------- | :---------------: | :---------------: | :-----: | -------- | -------- |
-| db-7-excel | Excel   | `.xlsx` |                   |                   | PENDING |          |          |
-| db-7-word  | Word    | `.doc`  |                   |                   | PENDING |          |          |
-| db-7-xml   | XML     | `.xml`  |                   |                   | PENDING |          |          |
+| ID         | Variant | Format        |                Dates Match Grid?                | Format Preserved? | Status | Run Date   | Evidence                              |
+| ---------- | ------- | ------------- | :---------------------------------------------: | :---------------: | :----: | ---------- | ------------------------------------- |
+| db-7-excel | Excel   | `.xls` (HTML) | Yes (date-equiv, adds 12:00:00 AM to date-only) |    HTML table     |  PASS  | 2026-04-03 | [summary](summaries/tc-db-7-excel.md) |
+| db-7-word  | Word    | `.doc` (HTML) |         Yes (date-equiv, same as Excel)         |    HTML table     |  PASS  | 2026-04-03 | [summary](summaries/tc-db-7-word.md)  |
+| db-7-xml   | XML     | `.xml`        |   Yes (ISO 8601: `2026-03-15T00:00:00+00:00`)   |     ISO 8601      |  PASS  | 2026-04-03 | [summary](summaries/tc-db-7-xml.md)   |
 
 ---
 
