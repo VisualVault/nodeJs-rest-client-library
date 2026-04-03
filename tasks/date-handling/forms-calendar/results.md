@@ -1810,3 +1810,17 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-03 [TC-6-C-BRT Run 1](runs/tc-6-C-BRT-run-1.md) — BRT — PASS — Config C DateTime Current Date stores real UTC ISO
 - 2026-04-03 [TC-6-D-BRT Run 1](runs/tc-6-D-BRT-run-1.md) — BRT — FAIL — Bug #5 fake Z on GFV (-3h shift)
 - 2026-04-03 [TC-6-A-UTC0 Run 1](runs/tc-6-A-UTC0-run-1.md) — UTC0 — PASS — Config A Current Date trivially correct at UTC+0
+
+## Session 2026-04-03 (BRT + IST — Cat 6 Legacy E/F/G/H + IST B/C)
+
+**Purpose**: Complete Category 6 Current Date — legacy configs BRT + remaining IST non-legacy.
+**Key outcomes**: 8 PASS, 0 FAIL. **Category 6 complete: 15/15 (13P, 2F).** All current date fields correct — `new Date()` bypasses all parsing bugs. Legacy configs safe from Bug #5. Cross-midnight edge demonstrated in IST.
+
+- 2026-04-03 [TC-6-E-BRT Run 1](runs/tc-6-E-BRT-run-1.md) — BRT — PASS — Legacy date-only correct (identical to non-legacy)
+- 2026-04-03 [TC-6-F-BRT Run 1](runs/tc-6-F-BRT-run-1.md) — BRT — PASS — Legacy + ignoreTZ both inert
+- 2026-04-03 [TC-6-G-BRT Run 1](runs/tc-6-G-BRT-run-1.md) — BRT — PASS — Legacy DateTime stores correct UTC
+- 2026-04-03 [TC-6-H-BRT Run 1](runs/tc-6-H-BRT-run-1.md) — BRT — PASS — Legacy avoids Bug #5 (compare 6-D-BRT FAIL)
+- 2026-04-03 [TC-6-B-IST Run 1](runs/tc-6-B-IST-run-1.md) — IST — PASS — Cross-midnight: IST April 4, UTC April 3
+- 2026-04-03 [TC-6-C-IST Run 1](runs/tc-6-C-IST-run-1.md) — IST — PASS — Config C DateTime real UTC ISO
+- 2026-04-03 [TC-6-E-IST Run 1](runs/tc-6-E-IST-run-1.md) — IST — PASS — No Bug #7 (compare preset 5-E-IST FAIL)
+- 2026-04-03 [TC-6-F-IST Run 1](runs/tc-6-F-IST-run-1.md) — IST — PASS — No Bug #7 on current date path
