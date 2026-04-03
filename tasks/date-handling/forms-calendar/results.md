@@ -1778,3 +1778,25 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-03 [TC-5-D-BRT Run 1](runs/tc-5-D-BRT-run-1.md) — BRT — FAIL — Bug #5 fake Z on GFV (-3h shift in BRT)
 - 2026-04-03 [TC-5-B-IST Run 1](runs/tc-5-B-IST-run-1.md) — IST — FAIL — Bug #7 stores Feb 28 instead of Mar 1
 - 2026-04-03 [TC-5-C-IST Run 1](runs/tc-5-C-IST-run-1.md) — IST — PASS — Config C DateTime preset identical to BRT
+
+## Session 2026-04-03 (UTC0 + PST — Cat 5 Preset A/C/D + A-PST)
+
+**Purpose**: Category 5 preset date UTC0 controls and PST negative-offset verification.
+**Key outcomes**: 3 PASS, 1 FAIL. Config A Bug #7 boundary confirmed at UTC0. Config C TZ-independence confirmed across all 3 TZs. Bug #5 structurally present but invisible at UTC0. PST (UTC-8) confirms Bug #7 absent in deep UTC-.
+
+- 2026-04-03 [TC-5-A-UTC0 Run 1](runs/tc-5-A-UTC0-run-1.md) — UTC0 — PASS — Bug #7 boundary control (local midnight = UTC midnight)
+- 2026-04-03 [TC-5-C-UTC0 Run 1](runs/tc-5-C-UTC0-run-1.md) — UTC0 — PASS — Config C TZ-independent (identical to BRT/IST)
+- 2026-04-03 [TC-5-D-UTC0 Run 1](runs/tc-5-D-UTC0-run-1.md) — UTC0 — FAIL — Bug #5 fake Z (0h shift, numerically invisible at UTC+0)
+- 2026-04-03 [TC-5-A-PST Run 1](runs/tc-5-A-PST-run-1.md) — PST — PASS — UTC-8 confirms Bug #7 absent in negative-offset TZs
+
+## Session 2026-04-03 (BRT + IST — Cat 5 Legacy E/F/G/H)
+
+**Purpose**: Category 5 legacy preset date testing. Final 6 PENDING slots — completes Category 5.
+**Key outcomes**: 4 PASS, 2 FAIL. Legacy date-only (E/F) identical to non-legacy (A/B). Legacy DateTime (G/H) stores raw Date unchanged — no Bug #5 fake Z. Bug #7 confirmed on legacy preset path in IST. **Category 5 complete: 18/18 (11P, 7F).**
+
+- 2026-04-03 [TC-5-E-BRT Run 1](runs/tc-5-E-BRT-run-1.md) — BRT — PASS — Legacy date-only preset correct (identical to Config A)
+- 2026-04-03 [TC-5-F-BRT Run 1](runs/tc-5-F-BRT-run-1.md) — BRT — PASS — Legacy date-only + ignoreTZ preset correct (identical to Config B)
+- 2026-04-03 [TC-5-G-BRT Run 1](runs/tc-5-G-BRT-run-1.md) — BRT — PASS — Legacy DateTime preset stores raw Date from initialDate
+- 2026-04-03 [TC-5-H-BRT Run 1](runs/tc-5-H-BRT-run-1.md) — BRT — PASS — Legacy DateTime + ignoreTZ: no Bug #5 fake Z (useLegacy=true safe)
+- 2026-04-03 [TC-5-E-IST Run 1](runs/tc-5-E-IST-run-1.md) — IST — FAIL — Bug #7 on legacy preset (useLegacy does not protect)
+- 2026-04-03 [TC-5-F-IST Run 1](runs/tc-5-F-IST-run-1.md) — IST — FAIL — Bug #7 on legacy preset (neither ignoreTZ nor useLegacy protects)
