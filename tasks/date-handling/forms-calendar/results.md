@@ -1767,3 +1767,14 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-03 [TC-1-A-UTC0 Run 3](runs/tc-1-A-UTC0-run-3.md) — UTC0 — PASS — Firefox confirms Config A Calendar Popup stores correctly
 - 2026-04-03 [TC-1-D-UTC0 Run 3](runs/tc-1-D-UTC0-run-3.md) — UTC0 — FAIL — Firefox confirms known bug — Bug #5
 - 2026-04-03 [TC-12-utc-0-control Run 3](runs/tc-12-utc-0-control-run-3.md) — UTC0 — PASS — Firefox confirms Config D Edge Cases stores correctly
+
+## Session 2026-04-03 (BRT + IST — Cat 5 Preset B/C/D)
+
+**Purpose**: Category 5 preset date testing for Configs B, C, D across BRT and IST. Playwright CLI verification.
+**Key outcomes**: 3 PASS, 2 FAIL. Bug #7 confirmed for B-IST. Bug #5 confirmed for D-BRT. Config C DateTime presets are TZ-independent. DateTime presets bypass parseDateString truncation.
+
+- 2026-04-03 [TC-5-B-BRT Run 1](runs/tc-5-B-BRT-run-1.md) — BRT — PASS — Config B date-only preset correct in BRT (negative offset safe)
+- 2026-04-03 [TC-5-C-BRT Run 1](runs/tc-5-C-BRT-run-1.md) — BRT — PASS — Config C DateTime preset stores raw initialDate, TZ-independent
+- 2026-04-03 [TC-5-D-BRT Run 1](runs/tc-5-D-BRT-run-1.md) — BRT — FAIL — Bug #5 fake Z on GFV (-3h shift in BRT)
+- 2026-04-03 [TC-5-B-IST Run 1](runs/tc-5-B-IST-run-1.md) — IST — FAIL — Bug #7 stores Feb 28 instead of Mar 1
+- 2026-04-03 [TC-5-C-IST Run 1](runs/tc-5-C-IST-run-1.md) — IST — PASS — Config C DateTime preset identical to BRT
