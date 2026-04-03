@@ -39,7 +39,10 @@ const TZ_ENV = {
  * Multiple test slots may be covered by one invocation (--configs ALL).
  */
 const TEST_INVOCATIONS = [
-    // WS-1: API Write Path — date-only configs use date string, DateTime configs use datetime string
+    // ═══════════════════════════════════════════════════════════════
+    // WS-1: API Write Path (Create) — 16 slots
+    // Date-only configs (A,B,E,F) use date string, DateTime (C,D,G,H) use datetime
+    // ═══════════════════════════════════════════════════════════════
     { action: 'WS-1', tz: 'BRT', configs: 'A,B,E,F', inputDate: '2026-03-15', extraArgs: '' },
     { action: 'WS-1', tz: 'BRT', configs: 'C,D,G,H', inputDate: '2026-03-15T14:30:00', extraArgs: '' },
     { action: 'WS-1', tz: 'IST', configs: 'A', inputDate: '2026-03-15', extraArgs: '' },
@@ -47,29 +50,63 @@ const TEST_INVOCATIONS = [
     { action: 'WS-1', tz: 'UTC', configs: 'A', inputDate: '2026-03-15', extraArgs: '' },
     { action: 'WS-1', tz: 'UTC', configs: 'C,D,H', inputDate: '2026-03-15T14:30:00', extraArgs: '' },
 
-    // WS-2: API Read — reads existing records (no TZ effect on read)
+    // ═══════════════════════════════════════════════════════════════
+    // WS-2: API Read + Cross-Layer — 16 slots
+    // Reads existing Forms-saved records. BRT reads 000080, IST reads 000084.
+    // ═══════════════════════════════════════════════════════════════
     { action: 'WS-2', tz: 'BRT', configs: 'ALL', inputDate: '', extraArgs: '--record-id DateTest-000080' },
     { action: 'WS-2', tz: 'IST', configs: 'ALL', inputDate: '', extraArgs: '--record-id DateTest-000084' },
 
-    // WS-3: API Round-Trip — BRT only (TZ independent)
-    { action: 'WS-3', tz: 'BRT', configs: 'A,C,D,H', inputDate: '2026-03-15', extraArgs: '' },
+    // ═══════════════════════════════════════════════════════════════
+    // WS-3: API Round-Trip — 4 slots
+    // Write, read back, write read-back, read again. BRT only (TZ independent).
+    // ═══════════════════════════════════════════════════════════════
+    { action: 'WS-3', tz: 'BRT', configs: 'A', inputDate: '2026-03-15', extraArgs: '' },
+    { action: 'WS-3', tz: 'BRT', configs: 'C,D,H', inputDate: '2026-03-15T14:30:00', extraArgs: '' },
 
-    // WS-5: Input Format Tolerance — BRT primary
-    { action: 'WS-5', tz: 'BRT', configs: 'A,C,D,H', inputDate: '2026-03-15', extraArgs: '' },
+    // ═══════════════════════════════════════════════════════════════
+    // WS-4: API→Forms Cross-Layer — 10 slots — SKIPPED
+    // Requires browser verification (Playwright/Chrome MCP). Not runnable
+    // via run-ws-test.js alone. Use /@-test-ws-date-pw for these.
+    // ═══════════════════════════════════════════════════════════════
 
-    // WS-6: Empty/Null Handling — BRT primary
-    { action: 'WS-6', tz: 'BRT', configs: 'A,C,D,H', inputDate: '', extraArgs: '' },
+    // ═══════════════════════════════════════════════════════════════
+    // WS-5: Input Format Tolerance — 35 slots
+    // Harness iterates format variants internally. Configs A and C.
+    // ═══════════════════════════════════════════════════════════════
+    { action: 'WS-5', tz: 'BRT', configs: 'A,C', inputDate: '2026-03-15', extraArgs: '' },
+    // Config D tested separately for .NET and epoch formats
+    { action: 'WS-5', tz: 'BRT', configs: 'D', inputDate: '2026-03-15', extraArgs: '' },
 
-    // WS-7: API Update Path — BRT primary
-    { action: 'WS-7', tz: 'BRT', configs: 'A,C,D,H', inputDate: '2026-03-15', extraArgs: '' },
+    // ═══════════════════════════════════════════════════════════════
+    // WS-6: Empty/Null Handling — 12 slots
+    // Tests empty, null, "null", "Invalid Date", field omission, clear-via-update.
+    // Configs A and D.
+    // ═══════════════════════════════════════════════════════════════
+    { action: 'WS-6', tz: 'BRT', configs: 'A,D', inputDate: '', extraArgs: '' },
 
-    // WS-8: Query Date Filtering — BRT primary
-    { action: 'WS-8', tz: 'BRT', configs: 'A,C,D,H', inputDate: '2026-03-15', extraArgs: '' },
+    // ═══════════════════════════════════════════════════════════════
+    // WS-7: API Update Path — 12 slots
+    // Change, preserve, and add scenarios. Configs A,C,D,H.
+    // ═══════════════════════════════════════════════════════════════
+    { action: 'WS-7', tz: 'BRT', configs: 'A', inputDate: '2026-03-15', extraArgs: '' },
+    { action: 'WS-7', tz: 'BRT', configs: 'C,D,H', inputDate: '2026-03-15T14:30:00', extraArgs: '' },
 
-    // WS-9: Date Computation — needs multiple TZs
-    { action: 'WS-9', tz: 'BRT', configs: 'A,C,D,H', inputDate: '2026-03-15', extraArgs: '' },
-    { action: 'WS-9', tz: 'IST', configs: 'A,C,D,H', inputDate: '2026-03-15', extraArgs: '' },
-    { action: 'WS-9', tz: 'UTC', configs: 'A,C,D,H', inputDate: '2026-03-15', extraArgs: '' },
+    // ═══════════════════════════════════════════════════════════════
+    // WS-8: Query Date Filtering — 10 slots
+    // OData q= parameter tests. Requires WS-1 records to exist.
+    // Configs A and C.
+    // ═══════════════════════════════════════════════════════════════
+    { action: 'WS-8', tz: 'BRT', configs: 'A,C', inputDate: '2026-03-15', extraArgs: '' },
+
+    // ═══════════════════════════════════════════════════════════════
+    // WS-9: Date Computation in Scripts — 23 slots
+    // Tests JS Date patterns across server TZs. Config A primary + one C.
+    // Harness iterates computation patterns internally per TZ.
+    // ═══════════════════════════════════════════════════════════════
+    { action: 'WS-9', tz: 'BRT', configs: 'A,C', inputDate: '2026-03-15', extraArgs: '' },
+    { action: 'WS-9', tz: 'IST', configs: 'A', inputDate: '2026-03-15', extraArgs: '' },
+    { action: 'WS-9', tz: 'UTC', configs: 'A', inputDate: '2026-03-15', extraArgs: '' },
 ];
 
 function main() {
