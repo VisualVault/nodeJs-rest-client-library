@@ -50,7 +50,7 @@ nodeV2/
     date-handling/                   # Active: cross-platform date bug investigation
       forms-calendar/                # Forms calendar field testing (8 bugs, ~242 slots)
       web-services/                  # REST API date handling testing (150 slots, complete)
-      dashboards/                    # Dashboard date display testing (8/44 done, DB-1 complete)
+      dashboards/                    # Dashboard date display testing (41/44 done, DB-1 thru DB-6 + DB-8 complete)
     form-templates/                  # XML template analysis, generator, redesigned DateTest v2
         README.md                    # Environment setup, runner usage, execution modes
         matrix.md                    # Test matrix — 9 categories (WS-1 through WS-9)

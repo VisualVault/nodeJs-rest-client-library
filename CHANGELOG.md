@@ -21,7 +21,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - ESLint (flat config) + Prettier + Husky + lint-staged for code quality and pre-commit formatting
 - Claude Code custom commands (`[@]-update-docs`, `[@]-smart-commit-push`, `[@]-sync-with-develop`, `[@]-vv-learn`, `[@]-test-forms-date-pw`, `[@]-test-ws-date-pw`, `[@]-test-dash-date-pw`, `[@]-cleanup`)
 - `[@]-test-dash-date-pw` command: dashboard date display test execution + artifact generation (TC spec, run file, summary, matrix update). Playwright-based against Telerik RadGrid
-- `tasks/date-handling/dashboards/` — dashboard date display investigation: README, matrix (8 categories, 44 slots), analysis (server-side rendering, TZ independence), exploration script
+- `tasks/date-handling/dashboards/` — dashboard date display investigation: README, matrix (8 categories, 44 slots), analysis (server-side rendering, TZ independence), exploration script, category-specific test scripts (`test-sort-v4.js`, `test-filter-v3.js`, `test-cross-layer.js`)
 - Dashboard architecture documentation in `docs/architecture/visualvault-platform.md`: Telerik RadGrid rendering, DOM selectors, date format rules, DateTest Dashboard GUID
 - `[@]-test-forms-date-pw` batch mode: multiple space-separated IDs, grouped by TZ. `--skip-verify` flag: backfill test-data.js entries from existing run files without browser session
 - `[@]-test-ws-date-pw` command: WS test execution + artifact generation (TC spec, run file, summary, matrix update). Script and browser modes, batch support, TZ simulation

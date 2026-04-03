@@ -125,14 +125,50 @@ The `ignoreTimezone` and `useLegacy` flags do **not** affect the server-side dis
 
 ### Features
 
-| Feature          | Details                                                                                                               |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **Sort**         | Click any column header to sort ascending/descending (server postback)                                                |
-| **Search**       | SQL filter builder (`a[title="Toggle search toolbar display"]`) with field/operator/value conditions and AND/OR joins |
-| **Export**       | Excel (`.xlsx`), Word (`.doc`), XML (`.xml`) — available via toolbar buttons                                          |
-| **Print**        | Print dialog with page range selection                                                                                |
-| **Record click** | `__doPostBack` opens the form record in FormViewer (server postback, same window)                                     |
-| **Pagination**   | Server-side paging with configurable page size                                                                        |
+| Feature          | Details                                                                                                        |
+| ---------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Sort**         | Click any column header to sort ascending/descending (server postback via `__doPostBack`)                      |
+| **Search**       | SQL filter builder (`a[title="Toggle search toolbar display"]`) — see [SQL Filter](#sql-filter-behavior) below |
+| **Export**       | Excel (`.xlsx`), Word (`.doc`), XML (`.xml`) — available via toolbar buttons                                   |
+| **Print**        | Print dialog with page range selection                                                                         |
+| **Record click** | `__doPostBack` opens the form record in FormViewer (server postback, same window)                              |
+| **Pagination**   | Server-side paging with configurable page size                                                                 |
+
+### Sort Behavior
+
+Dates sort **chronologically** (as proper datetime values), not alphabetically as text. Time components are included in DateTime sort (e.g., `3/15 5:30 PM` sorts after `3/15 2:30 PM` on the same date).
+
+**Empty cell positioning:** Empty cells sort to **TOP** in ascending order and **BOTTOM** in descending order.
+
+**Playwright note:** `__doPostBack` in Playwright's `page.evaluate()` fails because ASP.NET's `PageRequestManager._doPostBack` accesses `arguments.callee`, forbidden in strict mode. Workaround: inject via `page.addScriptTag({ content: '...__doPostBack(...)...' })`.
+
+### SQL Filter Behavior
+
+The dashboard has a **hidden SQL filter panel** (`txtSQLFilter` textarea) that accepts raw SQL WHERE clauses. It can be driven programmatically by setting the textarea value and triggering `__doPostBack` on the Update button.
+
+**Date comparison semantics on DateTime columns:**
+
+| Query                                     | Behavior                                                                          |
+| ----------------------------------------- | --------------------------------------------------------------------------------- |
+| `Field6 = '3/15/2026'`                    | Matches **midnight only** — server treats date-only input as `3/15/2026 12:00 AM` |
+| `Field6 >= '3/15' AND <= '3/15 11:59 PM'` | Matches **all times** on that date — use range queries for DateTime columns       |
+
+Date-only columns (`enableTime=false`) are unaffected — `=` works as expected because all values store midnight.
+
+### Cross-Layer Format Difference
+
+The dashboard and the Forms Angular SPA use different date format strings:
+
+| Layer     | Format       | Example      |
+| --------- | ------------ | ------------ |
+| Dashboard | `M/d/yyyy`   | `3/15/2026`  |
+| Forms SPA | `MM/dd/yyyy` | `03/15/2026` |
+
+For DateTime fields with `ignoreTZ=false`, there is also a **time shift**: the dashboard renders UTC time directly (e.g., `2:30 PM` for `T14:30:00Z`), while Forms V1 converts UTC to local time (e.g., `11:30 AM` in BRT). Fields with `ignoreTZ=true` preserve the display time but still differ in leading-zero format.
+
+### DataID = revisionId
+
+The `DataID` parameter in the FormViewer URL corresponds to the `revisionId` returned by the VV REST API (also available as the last path segment of the `href` field in form query results). There is no separate `dataId` field in API responses.
 
 ---
 
@@ -315,7 +351,7 @@ The Microservice registered in VV points to `{nodeV2 server URL}/scripts` or `/s
 | Form                          | Template GUID                                    | Template URL                                                                                                                                                                                             | Notes                                                                     |
 | ----------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | DateTest                      | `6be0265c-152a-f111-ba23-0afff212cc87`           | `https://vvdemo.visualvault.com/FormViewer/app?hidemenu=true&formid=6be0265c-152a-f111-ba23-0afff212cc87&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939`           | 8 date fields across all calendar configs; creates new instance each load |
-| DateTest Dashboard            | ReportID: `e522c887-e72e-f111-ba23-0e3ceb11fc25` | `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25`                                                                       | 267 records (as of 2026-04-02); Telerik RadGrid, server-rendered          |
+| DateTest Dashboard            | ReportID: `e522c887-e72e-f111-ba23-0e3ceb11fc25` | `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25`                                                                       | 272 records (as of 2026-04-02); Telerik RadGrid, server-rendered          |
 | DateTest-000004 Rev 1 (saved) | —                                                | `https://vvdemo.visualvault.com/FormViewer/app?DataID=2ae985b5-1892-4d26-94da-388121b0907e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939` | Saved record from BRT session; use for reload/cross-TZ tests              |
 
 ---

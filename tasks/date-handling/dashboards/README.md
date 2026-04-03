@@ -25,7 +25,7 @@ This means:
 | Property       | Value                                                        |
 | -------------- | ------------------------------------------------------------ |
 | Grid component | Telerik RadGrid (`.RadGrid`, `.rgMasterTable`)               |
-| Total records  | 267 (as of 2026-04-02)                                       |
+| Total records  | 272 (as of 2026-04-02)                                       |
 | Pages          | 2 (page size 200)                                            |
 | Columns        | 33 (Form ID + 28 date fields + 4 WS fields + pager)          |
 | Column sort    | All columns sortable via header click (`.GridHeaderLink`)    |
@@ -89,25 +89,29 @@ The `ignoreTZ` and `useLegacy` flags do **not** affect the dashboard display for
 node tasks/date-handling/dashboards/explore-dashboard.js
 ```
 
-### Playwright spec files (future)
-
-Spec files will live in `testing/date-handling/` alongside forms specs, prefixed `db-`:
+### Category-specific test scripts
 
 ```bash
-npx playwright test date-handling/db-*.spec.js --project BRT-chromium
+node tasks/date-handling/dashboards/test-sort-v4.js --field Field7      # DB-4: column sort
+node tasks/date-handling/dashboards/test-filter-v3.js --batch           # DB-5: SQL filter
+node tasks/date-handling/dashboards/test-cross-layer.js                 # DB-6: dashboard vs form
+node tasks/date-handling/dashboards/explore-dashboard.js --compare      # DB-8: TZ independence
 ```
 
 ---
 
 ## Files
 
-| File                   | Purpose                                                   |
-| ---------------------- | --------------------------------------------------------- |
-| `README.md`            | This file — setup, architecture, selectors                |
-| `analysis.md`          | Server-side rendering analysis, format rules, bug surface |
-| `matrix.md`            | Test matrix — DB-1 through DB-8, ~44 slots                |
-| `results.md`           | Live test evidence (console output, screenshots)          |
-| `explore-dashboard.js` | Reusable Playwright exploration utility                   |
-| `test-cases/`          | Individual TC spec files                                  |
-| `runs/`                | Immutable execution records                               |
-| `summaries/`           | Per-TC status + run history                               |
+| File                   | Purpose                                                     |
+| ---------------------- | ----------------------------------------------------------- |
+| `README.md`            | This file — setup, architecture, selectors                  |
+| `analysis.md`          | Server-side rendering analysis, format rules, bug surface   |
+| `matrix.md`            | Test matrix — DB-1 through DB-8, 44 slots (41 done, 33P/8F) |
+| `results.md`           | Live test evidence — session-indexed run entries            |
+| `explore-dashboard.js` | Playwright grid capture + TZ comparison (`--compare`)       |
+| `test-sort-v4.js`      | DB-4: column sort test (handles `__doPostBack` strict mode) |
+| `test-filter-v3.js`    | DB-5: SQL filter test via hidden `txtSQLFilter` textarea    |
+| `test-cross-layer.js`  | DB-6: dashboard vs FormViewer value comparison              |
+| `test-cases/`          | Individual TC spec files (immutable after creation)         |
+| `runs/`                | Immutable execution records (one per test run)              |
+| `summaries/`           | Per-TC status + run history                                 |
