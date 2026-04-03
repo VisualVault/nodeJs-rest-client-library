@@ -36,12 +36,16 @@ const FIELD_TO_CONFIG = {
     Field13: 'H',
 };
 
-// Known test records per category
-const CATEGORY_RECORDS = {
-    'DB-1': ['DateTest-000472'],
-    'DB-2': ['DateTest-000889', 'DateTest-000890'],
-    'DB-3': ['DateTest-001077', 'DateTest-001078', 'DateTest-001079', 'DateTest-001081'],
+// Expected display format patterns per config type (DB-1 validation)
+// Date-only: M/D/YYYY (no leading zeros, no time)
+// DateTime: M/D/YYYY H:MM AM/PM (no leading zeros, 12h with AM/PM)
+const FORMAT_PATTERNS = {
+    dateOnly: /^\d{1,2}\/\d{1,2}\/\d{4}$/,
+    dateTime: /^\d{1,2}\/\d{1,2}\/\d{4} \d{1,2}:\d{2} [AP]M$/,
 };
+
+// Configs that include time (enableTime=true)
+const DATETIME_CONFIGS = new Set(['C', 'D', 'G', 'H']);
 
 function main() {
     const args = process.argv.slice(2);
@@ -72,70 +76,89 @@ function main() {
     }
     console.log(`Grid data: ${gridLookup.size} records, ${data.totalResults} cell values`);
 
-    // Process DB-1/2/3 tests by looking up specific records × configs
+    // Process tests per category
     const testResults = [];
 
     for (const [tcId, expected] of matrixExpected) {
-        // Filter by category if specified
         if (categoryFilter && !tcId.startsWith(`db-${categoryFilter.replace('DB-', '')}`)) continue;
 
-        // Skip categories that need special handling (DB-4,5,6,7,8) — grid capture covers DB-1/2/3
         const catMatch = tcId.match(/^db-(\d+)/);
         if (!catMatch) continue;
         const catNum = parseInt(catMatch[1]);
 
-        // DB-1/2/3: find the record and field, compare cell value
-        if (catNum >= 1 && catNum <= 3) {
+        // DB-1: Format pattern validation — no specific records needed.
+        // Validates that ALL populated cells for each config match the expected format.
+        if (catNum === 1) {
             const config = tcId.match(/db-\d+-([A-H])/)?.[1];
             if (!config) continue;
 
             const field = Object.entries(FIELD_TO_CONFIG).find(([, c]) => c === config)?.[0];
             if (!field) continue;
 
-            // Find matching record in grid
-            const records = CATEGORY_RECORDS[`DB-${catNum}`] || [];
-            let actual = null;
-            let matchedRecord = null;
+            const isDateTime = DATETIME_CONFIGS.has(config);
+            const pattern = isDateTime ? FORMAT_PATTERNS.dateTime : FORMAT_PATTERNS.dateOnly;
 
-            for (const recId of records) {
-                const row = gridLookup.get(recId);
-                if (row && row[field] !== undefined) {
-                    actual = row[field];
-                    matchedRecord = recId;
-                    break;
+            // Check format across all records with this field populated
+            let totalChecked = 0;
+            let totalPassed = 0;
+            let sampleValue = null;
+            let sampleRecord = null;
+            let failExample = null;
+
+            for (const [formId, fields] of gridLookup) {
+                const val = fields[field];
+                if (!val) continue;
+                totalChecked++;
+                if (!sampleValue) {
+                    sampleValue = val;
+                    sampleRecord = formId;
+                }
+                if (pattern.test(val)) {
+                    totalPassed++;
+                } else if (!failExample) {
+                    failExample = { formId, value: val };
                 }
             }
 
-            // If no specific record found, try any record with the field populated
-            if (actual === null) {
-                for (const [formId, fields] of gridLookup) {
-                    if (fields[field]) {
-                        actual = fields[field];
-                        matchedRecord = formId;
-                        break;
-                    }
-                }
-            }
-
-            const expectedValue = expected.expectedValue;
-            const status = actual === expectedValue ? 'PASS' : actual !== null ? 'FAIL' : 'NO_DATA';
+            const status =
+                totalChecked > 0 && totalPassed === totalChecked ? 'PASS' : totalChecked === 0 ? 'NO_DATA' : 'FAIL';
 
             testResults.push({
                 tcId,
-                category: `DB-${catNum}`,
+                category: 'DB-1',
                 config,
                 field,
-                record: matchedRecord,
-                expected: expectedValue,
-                actual,
+                record: sampleRecord,
+                expected: isDateTime ? 'M/D/YYYY H:MM AM/PM' : 'M/D/YYYY',
+                actual:
+                    status === 'PASS'
+                        ? `${totalPassed}/${totalChecked} match pattern (e.g. ${sampleValue})`
+                        : `${totalPassed}/${totalChecked} match; fail: ${failExample?.value} (${failExample?.formId})`,
                 status,
+                matrixStatus: expected.status,
+                detail: { totalChecked, totalPassed },
+            });
+        }
+
+        // DB-2/3: Require specific test records — skip in automated regression.
+        // These verify accuracy against known stored values and need records created
+        // via WS-1 API or bug-simulation scripts. Use /@-test-dash-date-pw for these.
+        if (catNum === 2 || catNum === 3) {
+            testResults.push({
+                tcId,
+                category: `DB-${catNum}`,
+                config: tcId.match(/db-\d+-([A-H])/)?.[1] || null,
+                field: null,
+                record: null,
+                expected: expected.expectedValue,
+                actual: '(requires specific test records — use /@-test-dash-date-pw)',
+                status: 'SKIPPED',
                 matrixStatus: expected.status,
             });
         }
 
-        // DB-4/5/6/8: these need special verification (sort, filter, cross-layer, TZ)
-        // For regression, just check if they're still in the matrix with known status
-        if ([4, 5, 6, 8].includes(catNum)) {
+        // DB-4/5/6/7/8: Specialized tests (sort, filter, cross-layer, export, TZ)
+        if (catNum >= 4) {
             testResults.push({
                 tcId,
                 category: `DB-${catNum}`,
@@ -143,7 +166,7 @@ function main() {
                 field: null,
                 record: null,
                 expected: expected.expectedValue,
-                actual: '(requires specialized test)',
+                actual: '(requires specialized test — use /@-test-dash-date-pw)',
                 status: 'SKIPPED',
                 matrixStatus: expected.status,
             });
