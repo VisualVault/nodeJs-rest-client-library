@@ -39,6 +39,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `testing/README.md` — entry-point documentation for testing infrastructure
 - PST timezone project (`America/Los_Angeles`, UTC-8/UTC-7) added to Playwright test matrix — 4 TZ × 3 browsers = 12 projects
 - Category 5 (Preset Date) testing complete: 18/18 slots (11P, 7F), 17 test-data entries. Key findings: Bug #7 on all date-only presets in UTC+, Bug #5 on Config D presets (invisible at UTC0), legacy configs safe from Bug #5, Config C presets TZ-independent
+- Category 6 (Current Date) testing complete: 15/15 slots (13P, 2F), 14 test-data entries. Key finding: `new Date()` init path is the only fully correct initialization — no Bug #7, no Bug #5 except on non-legacy Config D GFV
+- Dashboard DB-7 export verification complete: Excel (.xls/HTML), Word (.doc/HTML), and XML exports all preserve date accuracy. `test-export-v1.js` script for reproducible testing. Dashboard investigation fully complete: 44/44 (36P, 8F)
+- `xlsx` npm package added as dev dependency for Excel export parsing in dashboard tests
 - Playwright testing infrastructure under `testing/` (4-TZ projects, global auth, reusable helpers, data-driven specs)
 - Regression-to-artifact pipelines for Forms (`test:pw:regression`), WS (`test:ws:regression`), and Dashboards (`test:dash:regression`). Run tests → capture results → auto-generate run files, summaries, and session index entries. Matrix-based PASS/FAIL for WS and Dashboards.
 - Custom Playwright reporter (`testing/reporters/regression-reporter.js`) that captures test results and actual values to JSON for artifact generation

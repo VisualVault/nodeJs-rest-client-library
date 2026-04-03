@@ -125,14 +125,14 @@ The `ignoreTimezone` and `useLegacy` flags do **not** affect the server-side dis
 
 ### Features
 
-| Feature          | Details                                                                                                        |
-| ---------------- | -------------------------------------------------------------------------------------------------------------- |
-| **Sort**         | Click any column header to sort ascending/descending (server postback via `__doPostBack`)                      |
-| **Search**       | SQL filter builder (`a[title="Toggle search toolbar display"]`) — see [SQL Filter](#sql-filter-behavior) below |
-| **Export**       | Excel (`.xlsx`), Word (`.doc`), XML (`.xml`) — available via toolbar buttons                                   |
-| **Print**        | Print dialog with page range selection                                                                         |
-| **Record click** | `__doPostBack` opens the form record in FormViewer (server postback, same window)                              |
-| **Pagination**   | Server-side paging with configurable page size                                                                 |
+| Feature          | Details                                                                                                                                                                              |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Sort**         | Click any column header to sort ascending/descending (server postback via `__doPostBack`)                                                                                            |
+| **Search**       | SQL filter builder (`a[title="Toggle search toolbar display"]`) — see [SQL Filter](#sql-filter-behavior) below                                                                       |
+| **Export**       | Excel (`.xls`), Word (`.doc`), XML (`.xml`) — inside a collapsible dock panel (hidden by default, toggle via toolbar "Export" button). See [Export Behavior](#export-behavior) below |
+| **Print**        | Print dialog with page range selection                                                                                                                                               |
+| **Record click** | `__doPostBack` opens the form record in FormViewer (server postback, same window)                                                                                                    |
+| **Pagination**   | Server-side paging with configurable page size                                                                                                                                       |
 
 ### Sort Behavior
 
@@ -140,7 +140,7 @@ Dates sort **chronologically** (as proper datetime values), not alphabetically a
 
 **Empty cell positioning:** Empty cells sort to **TOP** in ascending order and **BOTTOM** in descending order.
 
-**Playwright note:** `__doPostBack` in Playwright's `page.evaluate()` fails because ASP.NET's `PageRequestManager._doPostBack` accesses `arguments.callee`, forbidden in strict mode. Workaround: inject via `page.addScriptTag({ content: '...__doPostBack(...)...' })`.
+**Playwright note:** `__doPostBack` in Playwright's `page.evaluate()` fails because ASP.NET's `PageRequestManager._doPostBack` accesses `arguments.callee`, forbidden in strict mode. Workaround: use `page.goto('javascript:void(__doPostBack(...))')` — the navigation may reject but the postback still fires. Alternative: `page.addScriptTag({ content: '...__doPostBack(...)...' })`.
 
 ### SQL Filter Behavior
 
@@ -165,6 +165,35 @@ The dashboard and the Forms Angular SPA use different date format strings:
 | Forms SPA | `MM/dd/yyyy` | `03/15/2026` |
 
 For DateTime fields with `ignoreTZ=false`, there is also a **time shift**: the dashboard renders UTC time directly (e.g., `2:30 PM` for `T14:30:00Z`), while Forms V1 converts UTC to local time (e.g., `11:30 AM` in BRT). Fields with `ignoreTZ=true` preserve the display time but still differ in leading-zero format.
+
+### Export Behavior
+
+The export dock panel (`dockExport`) starts **hidden** (`display: none`). The "Export" toolbar button toggles its visibility. Export buttons inside the panel use `__doPostBack` to trigger server-side file generation.
+
+**Format details:**
+
+| Format | Extension | Actual Type | Structure                                                                                                                                                                       |
+| ------ | --------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Excel  | `.xls`    | HTML        | Single `<table>` with `<td>` cells — same as grid display. Opens in Excel via HTML import.                                                                                      |
+| Word   | `.doc`    | HTML        | Identical to Excel (same HTML table). Only the MIME type differs.                                                                                                               |
+| XML    | `.xml`    | XML         | `<VisualVault>` root with XSD schema. Row elements: `<DateTest>`. Field names use `_x0020_` for spaces (e.g., `Form_x0020_ID`). Dates in ISO 8601: `2026-03-15T00:00:00+00:00`. |
+
+**Scope:** All exports include **ALL records** across all pages (not just the current page). A dashboard with 432 records and page size 200 still exports all 432 rows.
+
+**Date format differences from grid:**
+
+- Excel/Word: Date-only fields get `12:00:00 AM` appended (e.g., grid `3/15/2026` → export `3/15/2026 12:00:00 AM`). DateTime fields match grid format.
+- XML: All dates are ISO 8601 with `+00:00` UTC offset. Calendar dates match grid.
+
+**Export button IDs** (for automation):
+
+| Button | ID                                                                    |
+| ------ | --------------------------------------------------------------------- |
+| Excel  | `ctl00_ContentBody_ctrlPanelHolder_ctl0_dockExport_C_btnExcelExport2` |
+| Word   | `ctl00_ContentBody_ctrlPanelHolder_ctl0_dockExport_C_btnWordExport2`  |
+| XML    | `ctl00_ContentBody_ctrlPanelHolder_ctl0_dockExport_C_btnXMLExport2`   |
+
+**Reproducible test:** `node tasks/date-handling/dashboards/test-export-v1.js [--format excel|word|xml|all]`
 
 ### DataID = revisionId
 
