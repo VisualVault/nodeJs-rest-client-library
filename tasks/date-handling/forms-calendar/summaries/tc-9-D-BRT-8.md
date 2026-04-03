@@ -1,7 +1,7 @@
 # TC-9-D-BRT-8 — Summary
 
 **Spec**: [tc-9-D-BRT-8.md](../test-cases/tc-9-D-BRT-8.md)
-**Current status**: FAIL-1 — last run 2026-03-27 (BRT)
+**Current status**: FAIL — last run 2026-04-03 (BRT, Firefox)
 **Bug surface**: Bug #5 (fake Z in GetFieldValue), Bug #5 consequence (−3h drift per round-trip in BRT, full day lost after 8 trips)
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                   |
 | --- | ---------- | --- | ------- | -------------------------------------- |
 | 1   | 2026-03-27 | BRT | FAIL-1  | [run-1](../runs/tc-9-D-BRT-8-run-1.md) |
+| 2   | 2026-04-03 | BRT | FAIL    | [run-2](../runs/tc-9-D-BRT-8-run-2.md) |
 
 ## Current Interpretation
 
-Config D (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) in BRT accumulates −3h per `SetFieldValue(GetFieldValue())` round-trip due to Bug #5. Starting from `"2026-03-15T00:00:00"`, Trip 8 stores `"2026-03-14T00:00:00"` — a full calendar day lost. Trip 10 stores `"2026-03-13T18:00:00"` (−30h total). The mechanism is identical to the single-trip case (9-D-BRT-1): `getCalendarFieldValue()` appends a fake `Z`, making the local midnight appear to be UTC midnight; `SetFieldValue` parses UTC midnight as BRT 21:00, compounding on every call. Eight trips are needed to cross the next midnight boundary because the starting point is exactly midnight (8 × 3h = 24h). Any non-midnight start would alter the trip count at which the calendar date changes.
+Run 2 (2026-04-03, Firefox): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

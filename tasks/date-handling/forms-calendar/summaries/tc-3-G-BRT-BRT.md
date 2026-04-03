@@ -1,7 +1,7 @@
 # TC-3-G-BRT-BRT — Summary
 
 **Spec**: [tc-3-G-BRT-BRT.md](../test-cases/tc-3-G-BRT-BRT.md)
-**Current status**: PASS — last run 2026-04-01 (BRT)
+**Current status**: PASS — last run 2026-04-03 (BRT, Firefox)
 **Bug surface**: none — value survives same-TZ reload intact
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                     |
 | --- | ---------- | --- | ------- | ---------------------------------------- |
 | 1   | 2026-04-01 | BRT | PASS    | [run-1](../runs/tc-3-G-BRT-BRT-run-1.md) |
+| 2   | 2026-04-03 | BRT | PASS    | [run-2](../runs/tc-3-G-BRT-BRT-run-2.md) |
 
 ## Current Interpretation
 
-Config G legacy DateTime (`enableTime=true, ignoreTimezone=false, useLegacy=true`) survives same-TZ save/reload in BRT without any shift. The stored value `"2026-03-15T00:00:00"` (typed input, local midnight, no Z suffix) is unchanged after reload through `initCalendarValueV1` → `parseDateString()`. GFV returns raw value unchanged (legacy path). Consistent with Config C (non-legacy equivalent) same-TZ behavior.
+Run 2 (2026-04-03, Firefox): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

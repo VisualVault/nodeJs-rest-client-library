@@ -1,7 +1,7 @@
 # TC-3-H-BRT-BRT — Summary
 
 **Spec**: [tc-3-H-BRT-BRT.md](../test-cases/tc-3-H-BRT-BRT.md)
-**Current status**: PASS — last run 2026-04-02 (BRT)
+**Current status**: PASS — last run 2026-04-03 (BRT, Firefox)
 **Bug surface**: none — useLegacy=true bypasses Bug #5; value survives same-TZ reload intact
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                     |
 | --- | ---------- | --- | ------- | ---------------------------------------- |
 | 1   | 2026-04-02 | BRT | PASS    | [run-1](../runs/tc-3-H-BRT-BRT-run-1.md) |
+| 2   | 2026-04-03 | BRT | PASS    | [run-2](../runs/tc-3-H-BRT-BRT-run-2.md) |
 
 ## Current Interpretation
 
-Config H legacy DateTime + ignoreTZ (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=true`) survives same-TZ save/reload in BRT. The stored value `"2026-03-15T00:00:00"` is unchanged after reload. GFV returns raw value without transformation — `useLegacy=true` bypasses Bug #5 fake Z (consistent with TC-8-H-BRT and TC-3-G-BRT-BRT). Both legacy DateTime configs (G and H) behave identically on same-TZ reload regardless of ignoreTimezone.
+Run 2 (2026-04-03, Firefox): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

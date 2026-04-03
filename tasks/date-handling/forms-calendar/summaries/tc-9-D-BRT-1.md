@@ -1,7 +1,7 @@
 # TC-9-D-BRT-1 — Summary
 
 **Spec**: [tc-9-D-BRT-1.md](../test-cases/tc-9-D-BRT-1.md)
-**Current status**: FAIL-2 — last run 2026-03-27 (BRT)
+**Current status**: FAIL — last run 2026-04-03 (BRT, Firefox)
 **Bug surface**: Bug #5 (fake Z in GetFieldValue), Bug #5 consequence (-3h drift per round-trip in BRT)
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                   |
 | --- | ---------- | --- | ------- | -------------------------------------- |
 | 1   | 2026-03-27 | BRT | FAIL-2  | [run-1](../runs/tc-9-D-BRT-1-run-1.md) |
+| 2   | 2026-04-03 | BRT | FAIL    | [run-2](../runs/tc-9-D-BRT-1-run-2.md) |
 
 ## Current Interpretation
 
-Config D (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) in BRT loses -3h per `SetFieldValue(GetFieldValue())` round-trip. The root cause is Bug #5: `getCalendarFieldValue()` appends a fake `Z` to the local time string, making the value appear to be UTC midnight. When `SetFieldValue` receives `"2026-03-15T00:00:00.000Z"`, it parses it as UTC midnight; in BRT (UTC-3) that is 21:00 March 14, which `getSaveValue()` stores as `"2026-03-14T21:00:00"`. One trip shifts -3h; 8 trips lose a full day; a single round-trip starting from Jan 1 midnight crosses the year boundary. This is a data-corruption bug for any script that reads then writes Config D fields.
+Run 2 (2026-04-03, Firefox): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

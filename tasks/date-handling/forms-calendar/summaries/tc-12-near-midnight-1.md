@@ -1,18 +1,19 @@
 # TC-12-near-midnight-1 — Summary
 
 **Spec**: [tc-12-near-midnight-1.md](../test-cases/tc-12-near-midnight-1.md)
-**Current status**: FAIL — verified 2026-04-02 (Layer 2 regression)
+**Current status**: FAIL — last run 2026-04-03 (BRT, Firefox)
 **Bug surface**: Bug #5 — ISO+Z near midnight crosses day in BRT
 
 ## Run History
 
-| Run | Date       | TZ  | Outcome | Notes                                      |
-| --- | ---------- | --- | ------- | ------------------------------------------ |
-| L2  | 2026-04-02 | —   | FAIL    | Playwright Layer 2 regression verification |
+| Run | Date       | TZ  | Outcome | Notes                                           |
+| --- | ---------- | --- | ------- | ----------------------------------------------- |
+| L2  | 2026-04-02 | —   | FAIL    | Playwright Layer 2 regression verification      |
+| 1   | 2026-04-03 | BRT | FAIL    | [run-1](../runs/tc-12-near-midnight-1-run-1.md) |
 
 ## Current Interpretation
 
-ISO+Z input near midnight (00:30 UTC) → BRT Mar 14 21:30. Day crossed on input. Bug #5 fake Z creates double jeopardy.
+Run 1 (2026-04-03, Firefox): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

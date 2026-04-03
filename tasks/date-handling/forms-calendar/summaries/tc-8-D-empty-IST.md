@@ -1,7 +1,7 @@
 # TC-8-D-empty-IST — Summary
 
 **Spec**: [tc-8-D-empty-IST.md](../test-cases/tc-8-D-empty-IST.md)
-**Current status**: FAIL — last run 2026-04-01 (IST)
+**Current status**: FAIL — last run 2026-04-03 (IST, Firefox)
 **Bug surface**: Bug #6 — GetFieldValue returns "Invalid Date" for empty Config D field
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                       |
 | --- | ---------- | --- | ------- | ------------------------------------------ |
 | 1   | 2026-04-01 | IST | FAIL    | [run-1](../runs/tc-8-D-empty-IST-run-1.md) |
+| 2   | 2026-04-03 | IST | FAIL    | [run-2](../runs/tc-8-D-empty-IST-run-2.md) |
 
 ## Current Interpretation
 
-Bug #6 is confirmed TZ-independent. An empty Config D field (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) returns `"Invalid Date"` from GetFieldValue in IST, matching the BRT result. The bug is purely config-driven — the `getCalendarFieldValue()` code path that produces `"Invalid Date"` is triggered by the field's configuration flags, not by the browser's timezone. This means Bug #6 affects all users globally when the field is empty.
+Run 2 (2026-04-03, Firefox): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

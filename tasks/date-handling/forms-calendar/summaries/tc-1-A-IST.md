@@ -1,7 +1,7 @@
 # TC-1-A-IST — Summary
 
 **Spec**: [tc-1-A-IST.md](../test-cases/tc-1-A-IST.md)
-**Current status**: FAIL-1 — last run 2026-03-30 (IST)
+**Current status**: FAIL — last run 2026-04-03 (IST, Firefox)
 **Bug surface**: Bug #7 — date-only popup stores -1 day for UTC+ timezones
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                 |
 | --- | ---------- | --- | ------- | ------------------------------------ |
 | 1   | 2026-03-30 | IST | FAIL-1  | [run-1](../runs/tc-1-A-IST-run-1.md) |
+| 2   | 2026-04-03 | IST | FAIL    | [run-2](../runs/tc-1-A-IST-run-2.md) |
 
 ## Current Interpretation
 
-Config A (date-only, ignoreTZ=false, modern path) in IST confirms Bug #7: selecting March 15 from the calendar popup stores `"2026-03-14"` (one day earlier). The mechanism is `normalizeCalValue()` parsing the date string as local IST midnight, then `getSaveValue()` extracting the UTC date — at UTC+5:30, local midnight falls on the previous UTC calendar day. The form display correctly shows `03/15/2026` (re-converting to local) while storage holds March 14. This establishes the primary Bug #7 evidence for popup input. Paired with tc-1-A-BRT.md (PASS) and tc-1-A-UTC0.md (PASS) to show the timezone-dependent nature of the defect.
+Run 2 (2026-04-03, Firefox): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

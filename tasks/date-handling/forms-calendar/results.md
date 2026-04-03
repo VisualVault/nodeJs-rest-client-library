@@ -1627,3 +1627,143 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-02 [TC-12-year-boundary-IST Run 1](runs/tc-12-year-boundary-IST-run-1.md) — IST — FAIL-2 — Year boundary: +5:30h stays in 2026 (opposite BRT year crossing to 2025)
 - 2026-04-02 [TC-12-leap-day-IST Run 1](runs/tc-12-leap-day-IST-run-1.md) — IST — FAIL-2 — Leap day: +5:30h preserves Feb 29 (opposite BRT leap day loss)
 - 2026-04-02 [TC-3-B-IST-BRT Run 1](runs/tc-3-B-IST-BRT-run-1.md) — BRT — FAIL-3 — Config B Bug #7 baked in during IST save; ignoreTZ inert. Cat 3 complete (14P/4F)
+
+## Session 2026-04-03 (BRT — Firefox cross-browser verification)
+
+**Purpose**: Re-run all 116 test cases in Firefox to verify cross-browser consistency. First Firefox execution for forms date-handling tests.
+**Key outcomes**: In progress — updating artifacts per test.
+
+- 2026-04-03 [TC-1-A-BRT Run 5](runs/tc-1-A-BRT-run-5.md) — BRT — PASS — Firefox confirms Config A date-only stores correctly; all 4 engines agree
+
+## Session 2026-04-03 (Firefox regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Firefox.
+**Key outcomes**: 63 tests documented.
+
+- 2026-04-03 [TC-1-A-BRT Run 6](runs/tc-1-A-BRT-run-6.md) — BRT — PASS — Firefox confirms Config A Calendar Popup stores correctly
+- 2026-04-03 [TC-1-B-BRT Run 3](runs/tc-1-B-BRT-run-3.md) — BRT — PASS — Firefox confirms Config B Calendar Popup stores correctly
+- 2026-04-03 [TC-1-C-BRT Run 2](runs/tc-1-C-BRT-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #4
+- 2026-04-03 [TC-1-D-BRT Run 2](runs/tc-1-D-BRT-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-near-midnight-1 Run 1](runs/tc-12-near-midnight-1-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-near-midnight-2 Run 1](runs/tc-12-near-midnight-2-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-dst-transition Run 1](runs/tc-12-dst-transition-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-year-boundary Run 1](runs/tc-12-year-boundary-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-leap-day Run 1](runs/tc-12-leap-day-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-empty-value Run 1](runs/tc-12-empty-value-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #6
+- 2026-04-03 [TC-12-invalid-string Run 1](runs/tc-12-invalid-string-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #6
+- 2026-04-03 [TC-12-far-future Run 1](runs/tc-12-far-future-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-pre-epoch Run 1](runs/tc-12-pre-epoch-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-2-A-BRT Run 3](runs/tc-2-A-BRT-run-3.md) — BRT — PASS — Firefox confirms Config A Typed Input stores correctly
+- 2026-04-03 [TC-2-B-BRT Run 2](runs/tc-2-B-BRT-run-2.md) — BRT — PASS — Firefox confirms Config B Typed Input stores correctly
+- 2026-04-03 [TC-2-C-BRT Run 2](runs/tc-2-C-BRT-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #4
+- 2026-04-03 [TC-2-D-BRT Run 2](runs/tc-2-D-BRT-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-2-E-BRT Run 2](runs/tc-2-E-BRT-run-2.md) — BRT — PASS — Firefox confirms Config E Typed Input stores correctly
+- 2026-04-03 [TC-2-F-BRT Run 2](runs/tc-2-F-BRT-run-2.md) — BRT — PASS — Firefox confirms Config F Typed Input stores correctly
+- 2026-04-03 [TC-2-G-BRT Run 2](runs/tc-2-G-BRT-run-2.md) — BRT — PASS — Firefox confirms Config G Typed Input stores correctly
+- 2026-04-03 [TC-2-H-BRT Run 2](runs/tc-2-H-BRT-run-2.md) — BRT — PASS — Firefox confirms Config H Typed Input stores correctly
+- 2026-04-03 [TC-3-A-BRT-BRT Run 5](runs/tc-3-A-BRT-BRT-run-5.md) — BRT — PASS — Firefox confirms Config A Server Reload stores correctly
+- 2026-04-03 [TC-3-B-BRT-BRT Run 2](runs/tc-3-B-BRT-BRT-run-2.md) — BRT — PASS — Firefox confirms Config B Server Reload stores correctly
+- 2026-04-03 [TC-3-A-IST-BRT Run 2](runs/tc-3-A-IST-BRT-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-3-B-IST-BRT Run 2](runs/tc-3-B-IST-BRT-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-3-C-BRT-BRT Run 4](runs/tc-3-C-BRT-BRT-run-4.md) — BRT — FAIL — Firefox confirms known bug — Bug #4
+- 2026-04-03 [TC-3-D-BRT-BRT Run 4](runs/tc-3-D-BRT-BRT-run-4.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-3-D-IST-BRT Run 2](runs/tc-3-D-IST-BRT-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-3-G-BRT-BRT Run 2](runs/tc-3-G-BRT-BRT-run-2.md) — BRT — PASS — Firefox confirms Config G Server Reload stores correctly
+- 2026-04-03 [TC-3-E-BRT-BRT Run 2](runs/tc-3-E-BRT-BRT-run-2.md) — BRT — PASS — Firefox confirms Config E Server Reload stores correctly
+- 2026-04-03 [TC-3-F-BRT-BRT Run 2](runs/tc-3-F-BRT-BRT-run-2.md) — BRT — PASS — Firefox confirms Config F Server Reload stores correctly
+- 2026-04-03 [TC-3-H-BRT-BRT Run 2](runs/tc-3-H-BRT-BRT-run-2.md) — BRT — PASS — Firefox confirms Config H Server Reload stores correctly
+- 2026-04-03 [TC-3-C-IST-BRT Run 2](runs/tc-3-C-IST-BRT-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #1, Bug #4
+- 2026-04-03 [TC-7-D-dateObj Run 1](runs/tc-7-D-dateObj-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-D-isoZ Run 1](runs/tc-7-D-isoZ-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-D-isoNoZ Run 1](runs/tc-7-D-isoNoZ-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-D-dateOnly Run 1](runs/tc-7-D-dateOnly-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-D-usFormat Run 1](runs/tc-7-D-usFormat-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-D-usFormatTime Run 1](runs/tc-7-D-usFormatTime-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-D-epoch Run 1](runs/tc-7-D-epoch-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-C-isoZ Run 1](runs/tc-7-C-isoZ-run-1.md) — BRT — PASS — Firefox confirms Config C SetFieldValue Formats stores correctly
+- 2026-04-03 [TC-7-C-isoNoZ Run 1](runs/tc-7-C-isoNoZ-run-1.md) — BRT — PASS — Firefox confirms Config C SetFieldValue Formats stores correctly
+- 2026-04-03 [TC-7-A-dateOnly Run 1](runs/tc-7-A-dateOnly-run-1.md) — BRT — PASS — Firefox confirms Config A SetFieldValue Formats stores correctly
+- 2026-04-03 [TC-7-A-isoZ Run 1](runs/tc-7-A-isoZ-run-1.md) — BRT — PASS — Firefox confirms Config A SetFieldValue Formats stores correctly
+- 2026-04-03 [TC-8-A-empty Run 2](runs/tc-8-A-empty-run-2.md) — BRT — PASS — Firefox confirms Config A GetFieldValue Return stores correctly
+- 2026-04-03 [TC-8-C-empty Run 2](runs/tc-8-C-empty-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #6
+- 2026-04-03 [TC-8-H-BRT Run 2](runs/tc-8-H-BRT-run-2.md) — BRT — PASS — Firefox confirms Config H GetFieldValue Return stores correctly
+- 2026-04-03 [TC-8-A Run 1](runs/tc-8-A-run-1.md) — BRT — PASS — Firefox confirms Config A GetFieldValue Return stores correctly
+- 2026-04-03 [TC-8-C-BRT Run 1](runs/tc-8-C-BRT-run-1.md) — BRT — PASS — Firefox confirms Config C GetFieldValue Return stores correctly
+- 2026-04-03 [TC-8-D-BRT Run 1](runs/tc-8-D-BRT-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-8-D-empty Run 1](runs/tc-8-D-empty-run-1.md) — BRT — FAIL — Firefox confirms known bug — Bug #6
+- 2026-04-03 [TC-8-B Run 1](runs/tc-8-B-run-1.md) — BRT — PASS — Firefox confirms Config B GetFieldValue Return stores correctly
+- 2026-04-03 [TC-8-H-empty Run 2](runs/tc-8-H-empty-run-2.md) — BRT — PASS — Firefox confirms Config H GetFieldValue Return stores correctly
+- 2026-04-03 [TC-8B-D-BRT Run 2](runs/tc-8B-D-BRT-run-2.md) — BRT — PASS — Firefox confirms Config D GetDateObject Return stores correctly
+- 2026-04-03 [TC-8B-D-empty Run 2](runs/tc-8B-D-empty-run-2.md) — BRT — PASS — Firefox confirms Config D GetDateObject Return stores correctly
+- 2026-04-03 [TC-9-GDOC-D-BRT-1 Run 2](runs/tc-9-GDOC-D-BRT-1-run-2.md) — BRT — PASS — Firefox confirms Config D GDOC Round-Trip stores correctly
+- 2026-04-03 [TC-9-H-BRT-1 Run 2](runs/tc-9-H-BRT-1-run-2.md) — BRT — PASS — Firefox confirms Config H GFV Round-Trip stores correctly
+- 2026-04-03 [TC-9-C-BRT-1 Run 2](runs/tc-9-C-BRT-1-run-2.md) — BRT — PASS — Firefox confirms Config C GFV Round-Trip stores correctly
+- 2026-04-03 [TC-9-D-BRT-1 Run 2](runs/tc-9-D-BRT-1-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-9-D-BRT-8 Run 2](runs/tc-9-D-BRT-8-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-9-D-BRT-10 Run 2](runs/tc-9-D-BRT-10-run-2.md) — BRT — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-9-A-any Run 1](runs/tc-9-A-any-run-1.md) — BRT — PASS — Firefox confirms Config A GFV Round-Trip stores correctly
+- 2026-04-03 [TC-9-B-any Run 1](runs/tc-9-B-any-run-1.md) — BRT — PASS — Firefox confirms Config B GFV Round-Trip stores correctly
+
+## Session 2026-04-03 (Firefox regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Firefox.
+**Key outcomes**: 40 tests documented.
+
+- 2026-04-03 [TC-1-C-IST Run 2](runs/tc-1-C-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #4
+- 2026-04-03 [TC-1-A-IST Run 2](runs/tc-1-A-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-1-B-IST Run 2](runs/tc-1-B-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-1-D-IST Run 2](runs/tc-1-D-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-near-midnight-1-IST Run 2](runs/tc-12-near-midnight-1-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-near-midnight-2-IST Run 2](runs/tc-12-near-midnight-2-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-year-boundary-IST Run 2](runs/tc-12-year-boundary-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-leap-day-IST Run 2](runs/tc-12-leap-day-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-2-A-IST Run 2](runs/tc-2-A-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-2-B-IST Run 2](runs/tc-2-B-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-2-C-IST Run 2](runs/tc-2-C-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #4
+- 2026-04-03 [TC-2-D-IST Run 2](runs/tc-2-D-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-2-E-IST Run 2](runs/tc-2-E-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-2-F-IST Run 2](runs/tc-2-F-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-2-G-IST Run 2](runs/tc-2-G-IST-run-2.md) — IST — PASS — Firefox confirms Config G Typed Input stores correctly
+- 2026-04-03 [TC-2-H-IST Run 2](runs/tc-2-H-IST-run-2.md) — IST — PASS — Firefox confirms Config H Typed Input stores correctly
+- 2026-04-03 [TC-3-B-BRT-IST Run 2](runs/tc-3-B-BRT-IST-run-2.md) — IST — PASS — Firefox confirms Config B Server Reload stores correctly
+- 2026-04-03 [TC-3-C-BRT-IST Run 2](runs/tc-3-C-BRT-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #1, Bug #4
+- 2026-04-03 [TC-3-D-BRT-IST Run 4](runs/tc-3-D-BRT-IST-run-4.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-3-A-BRT-IST Run 3](runs/tc-3-A-BRT-IST-run-3.md) — IST — PASS — Firefox confirms Config A Server Reload stores correctly
+- 2026-04-03 [TC-3-E-BRT-IST Run 2](runs/tc-3-E-BRT-IST-run-2.md) — IST — PASS — Firefox confirms Config E Server Reload stores correctly
+- 2026-04-03 [TC-3-H-BRT-IST Run 2](runs/tc-3-H-BRT-IST-run-2.md) — IST — PASS — Firefox confirms Config H Server Reload stores correctly
+- 2026-04-03 [TC-5-A-IST Run 2](runs/tc-5-A-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-5-D-IST Run 2](runs/tc-5-D-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-6-A-IST Run 2](runs/tc-6-A-IST-run-2.md) — IST — PASS — Firefox confirms Config A Current Date stores correctly
+- 2026-04-03 [TC-6-D-IST Run 2](runs/tc-6-D-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-A-dateOnly-IST Run 1](runs/tc-7-A-dateOnly-IST-run-1.md) — IST — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-7-A-dateObj-IST Run 1](runs/tc-7-A-dateObj-IST-run-1.md) — IST — FAIL — Firefox confirms known bug — Bug #7
+- 2026-04-03 [TC-7-D-dateObj-IST Run 2](runs/tc-7-D-dateObj-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-D-isoZ-IST Run 2](runs/tc-7-D-isoZ-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-7-D-isoNoZ-IST Run 2](runs/tc-7-D-isoNoZ-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-8-C-IST Run 1](runs/tc-8-C-IST-run-1.md) — IST — PASS — Firefox confirms Config C GetFieldValue Return stores correctly
+- 2026-04-03 [TC-8-D-IST Run 1](runs/tc-8-D-IST-run-1.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-8-D-empty-IST Run 2](runs/tc-8-D-empty-IST-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #6
+- 2026-04-03 [TC-8B-D-IST Run 2](runs/tc-8B-D-IST-run-2.md) — IST — PASS — Firefox confirms Config D GetDateObject Return stores correctly
+- 2026-04-03 [TC-9-GDOC-D-IST-1 Run 2](runs/tc-9-GDOC-D-IST-1-run-2.md) — IST — PASS — Firefox confirms Config D GDOC Round-Trip stores correctly
+- 2026-04-03 [TC-9-D-IST-1 Run 2](runs/tc-9-D-IST-1-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-9-D-IST-5 Run 2](runs/tc-9-D-IST-5-run-2.md) — IST — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-9-C-IST-1 Run 1](runs/tc-9-C-IST-1-run-1.md) — IST — PASS — Firefox confirms Config C GFV Round-Trip stores correctly
+- 2026-04-03 [TC-9-H-IST-1 Run 2](runs/tc-9-H-IST-1-run-2.md) — IST — PASS — Firefox confirms Config H GFV Round-Trip stores correctly
+
+## Session 2026-04-03 (Firefox regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Firefox.
+**Key outcomes**: 3 tests documented.
+
+- 2026-04-03 [TC-1-A-UTC0 Run 2](runs/tc-1-A-UTC0-run-2.md) — UTC0 — PASS — Firefox confirms Config A Calendar Popup stores correctly
+- 2026-04-03 [TC-1-D-UTC0 Run 2](runs/tc-1-D-UTC0-run-2.md) — UTC0 — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-utc-0-control Run 2](runs/tc-12-utc-0-control-run-2.md) — UTC0 — PASS — Firefox confirms Config D Edge Cases stores correctly
+
+## Session 2026-04-03 (Firefox regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Firefox.
+**Key outcomes**: 3 tests documented.
+
+- 2026-04-03 [TC-1-A-UTC0 Run 3](runs/tc-1-A-UTC0-run-3.md) — UTC0 — PASS — Firefox confirms Config A Calendar Popup stores correctly
+- 2026-04-03 [TC-1-D-UTC0 Run 3](runs/tc-1-D-UTC0-run-3.md) — UTC0 — FAIL — Firefox confirms known bug — Bug #5
+- 2026-04-03 [TC-12-utc-0-control Run 3](runs/tc-12-utc-0-control-run-3.md) — UTC0 — PASS — Firefox confirms Config D Edge Cases stores correctly

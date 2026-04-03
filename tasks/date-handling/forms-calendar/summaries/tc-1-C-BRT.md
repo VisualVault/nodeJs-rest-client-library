@@ -1,7 +1,7 @@
 # TC-1-C-BRT — Summary
 
 **Spec**: [tc-1-C-BRT.md](../test-cases/tc-1-C-BRT.md)
-**Current status**: PASS — last run 2026-03-27 (BRT)
+**Current status**: FAIL — last run 2026-04-03 (BRT, Firefox)
 **Bug surface**: none — Config C (ignoreTZ=false) uses proper UTC conversion; round-trip stable
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date        | TZ  | Outcome | File                                 |
 | --- | ----------- | --- | ------- | ------------------------------------ |
 | 1   | ~2026-03-27 | BRT | PASS    | [run-1](../runs/tc-1-C-BRT-run-1.md) |
+| 2   | 2026-04-03  | BRT | FAIL    | [run-2](../runs/tc-1-C-BRT-run-2.md) |
 
 ## Current Interpretation
 
-Config C (DateTime, ignoreTZ=false, modern path) in BRT stores local midnight as `"2026-03-15T00:00:00"` and GetFieldValue returns the correct UTC conversion `"2026-03-15T03:00:00.000Z"`. This is the intended behavior: `getCalendarFieldValue()` uses `new Date(value).toISOString()` which produces a real UTC value that round-trips correctly through SetFieldValue. Config C is the stable DateTime reference — contrasted with Config D (same storage, but fake-Z in GetFieldValue causing drift). Round-trip confirmed stable in Test 2.3.
+Run 2 (2026-04-03, Firefox): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

@@ -1,7 +1,7 @@
 # TC-5-D-IST — Summary
 
 **Spec**: [tc-5-D-IST.md](../test-cases/tc-5-D-IST.md)
-**Current status**: FAIL — last run 2026-04-01 (IST)
+**Current status**: FAIL — last run 2026-04-03 (IST, Firefox)
 **Bug surface**: Bug #5 — fake Z on preset DateTime field at form load (+5:30h shift in IST)
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                 |
 | --- | ---------- | --- | ------- | ------------------------------------ |
 | 1   | 2026-04-01 | IST | FAIL    | [run-1](../runs/tc-5-D-IST-run-1.md) |
+| 2   | 2026-04-03 | IST | FAIL    | [run-2](../runs/tc-5-D-IST-run-2.md) |
 
 ## Current Interpretation
 
-Bug #5 affects preset DateTime Config D fields at form load, not just user-input values. The preset Date object has a correct raw UTC representation (`T11:28:54.627Z`), but `getCalendarFieldValue()` applies its fake Z transformation, producing GFV = `T16:58:54.627Z` — shifted by exactly +5:30h (the IST offset). Any developer code calling `GetFieldValue()` on a preset Config D field gets a corrupted value before any user interaction occurs. The display shows the correct date, masking the corruption from users but exposing it to programmatic consumers.
+Run 2 (2026-04-03, Firefox): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

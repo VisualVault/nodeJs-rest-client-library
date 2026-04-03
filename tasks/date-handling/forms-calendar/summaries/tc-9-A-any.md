@@ -1,7 +1,7 @@
 # TC-9-A-any — Summary
 
 **Spec**: [tc-9-A-any.md](../test-cases/tc-9-A-any.md)
-**Current status**: PASS — verified 2026-04-02 (Layer 2 regression)
+**Current status**: PASS — last run 2026-04-03 (BRT, Firefox)
 **Bug surface**: none — Config A round-trip stable (date-only)
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | Notes                                      |
 | --- | ---------- | --- | ------- | ------------------------------------------ |
 | L2  | 2026-04-02 | —   | PASS    | Playwright Layer 2 regression verification |
+| 1   | 2026-04-03 | BRT | PASS    | [run-1](../runs/tc-9-A-any-run-1.md)       |
 
 ## Current Interpretation
 
-Config A GFV round-trip: 0 drift. Date-only strings survive round-trip unchanged.
+Run 1 (2026-04-03, Firefox): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

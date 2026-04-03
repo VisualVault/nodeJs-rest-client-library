@@ -1,7 +1,7 @@
 # TC-2-F-BRT — Summary
 
 **Spec**: [tc-2-F-BRT.md](../test-cases/tc-2-F-BRT.md)
-**Current status**: PASS — last run 2026-03-31 (BRT)
+**Current status**: PASS — last run 2026-04-03 (BRT, Firefox)
 **Bug surface**: Bug #2 (popup vs typed format inconsistency) — confirmed by cross-reference with tc-1-F-BRT
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                 |
 | --- | ---------- | --- | ------- | ------------------------------------ |
 | 1   | 2026-03-31 | BRT | PASS    | [run-1](../runs/tc-2-F-BRT-run-1.md) |
+| 2   | 2026-04-03 | BRT | PASS    | [run-2](../runs/tc-2-F-BRT-run-2.md) |
 
 ## Current Interpretation
 
-Config F typed input in BRT stores `"2026-03-15"` correctly — no date shift (Bug #7 inactive at UTC-3). Behavior is identical to Config E (2-E-BRT), confirming `ignoreTimezone` has no effect on the legacy date-only typed input path. Bug #2 is confirmed by comparing with the popup result (1-F-BRT stores `"2026-03-15T03:00:00.000Z"`): same intended date, different storage format depending on input method.
+Run 2 (2026-04-03, Firefox): PASS. Cross-browser verification in progress.
 
 ## Next Action
 
