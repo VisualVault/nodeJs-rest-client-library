@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the dashboard date display investigation.
 Analysis → `analysis.md` | Test evidence → `results.md` | Exploration → `explore-dashboard.js`
 
-Last updated: 2026-04-02 | Total slots: 44 | Done: 8 (8P/0F) | **IN PROGRESS**
+Last updated: 2026-04-02 | Total slots: 44 | Done: 41 (33P/8F) | **IN PROGRESS**
 
 ---
 
@@ -55,14 +55,14 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 | Category                     | Total  | PASS | FAIL | PENDING | BLOCKED | Priority |
 | ---------------------------- | :----: | :--: | :--: | :-----: | :-----: | :------: |
 | DB-1. Display Format         |   8    |  8   |      |         |         |    P1    |
-| DB-2. Date Accuracy          |   8    |      |      |    8    |         |    P1    |
-| DB-3. Wrong Date Detection   |   8    |      |      |    8    |         |    P1    |
-| DB-4. Column Sort            |   4    |      |      |    4    |         |    P2    |
-| DB-5. Search / SQL Filter    |   4    |      |      |    4    |         |    P2    |
-| DB-6. Cross-Layer Comparison |   8    |      |      |    8    |         |    P2    |
+| DB-2. Date Accuracy          |   8    |  8   |      |         |         |    P1    |
+| DB-3. Wrong Date Detection   |   8    |  8   |      |         |         |    P1    |
+| DB-4. Column Sort            |   4    |  4   |      |         |         |    P2    |
+| DB-5. Search / SQL Filter    |   4    |  4   |      |         |         |    P2    |
+| DB-6. Cross-Layer Comparison |   8    |      |  8   |         |         |    P2    |
 | DB-7. Export Verification    |   3    |      |      |    3    |         |    P3    |
-| DB-8. TZ Independence        |   1    |      |      |    1    |         |    P1    |
-| **TOTAL**                    | **44** |  8   |      | **36**  |         |          |
+| DB-8. TZ Independence        |   1    |  1   |      |         |         |    P1    |
+| **TOTAL**                    | **44** |  33  |  8   |  **3**  |         |          |
 
 ---
 
@@ -106,16 +106,16 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 **Method**: For records created via WS tests (known input → known stored value), read the dashboard grid and compare.
 
-| ID     | Config | Field   | Record | WS Stored Value | Dashboard Display | Match? | Status  | Run Date | Evidence |
-| ------ | :----: | ------- | ------ | --------------- | ----------------- | :----: | :-----: | -------- | -------- |
-| db-2-A |   A    | Field7  | TBD    |                 |                   |        | PENDING |          |          |
-| db-2-B |   B    | Field10 | TBD    |                 |                   |        | PENDING |          |          |
-| db-2-C |   C    | Field6  | TBD    |                 |                   |        | PENDING |          |          |
-| db-2-D |   D    | Field5  | TBD    |                 |                   |        | PENDING |          |          |
-| db-2-E |   E    | Field12 | TBD    |                 |                   |        | PENDING |          |          |
-| db-2-F |   F    | Field11 | TBD    |                 |                   |        | PENDING |          |          |
-| db-2-G |   G    | Field14 | TBD    |                 |                   |        | PENDING |          |          |
-| db-2-H |   H    | Field13 | TBD    |                 |                   |        | PENDING |          |          |
+| ID     | Config | Field   | Record          | WS Stored Value        | Dashboard Display   | Match? | Status | Run Date   | Evidence                          |
+| ------ | :----: | ------- | --------------- | ---------------------- | ------------------- | :----: | :----: | ---------- | --------------------------------- |
+| db-2-A |   A    | Field7  | DateTest-000889 | `2026-03-15T00:00:00Z` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-A.md) |
+| db-2-B |   B    | Field10 | DateTest-000889 | `2026-03-15T00:00:00Z` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-B.md) |
+| db-2-C |   C    | Field6  | DateTest-000890 | `2026-03-15T14:30:00Z` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-C.md) |
+| db-2-D |   D    | Field5  | DateTest-000890 | `2026-03-15T14:30:00Z` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-D.md) |
+| db-2-E |   E    | Field12 | DateTest-000889 | `2026-03-15T00:00:00Z` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-E.md) |
+| db-2-F |   F    | Field11 | DateTest-000889 | `2026-03-15T00:00:00Z` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-F.md) |
+| db-2-G |   G    | Field14 | DateTest-000890 | `2026-03-15T14:30:00Z` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-G.md) |
+| db-2-H |   H    | Field13 | DateTest-000890 | `2026-03-15T14:30:00Z` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-H.md) |
 
 ---
 
@@ -123,18 +123,18 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 **Purpose**: Check if records affected by known bugs (Bug #7 wrong date in UTC+, Bug #4 DateTime UTC conversion) show the incorrect date in the dashboard. This tests whether bugs at the Forms/API write layer propagate to the read layer.
 
-**Method**: Identify records created from IST (known Bug #7 surface) and verify the dashboard shows the shifted date (e.g., `3/14/2026` instead of `3/15/2026`).
+**Method**: Create records via WS-1 API with bug-simulated stored values, then verify the dashboard shows the shifted/drifted dates.
 
-| ID     | Config | Field   | Bug | Record | Intended Date | Dashboard Shows | Shifted? | Status  | Run Date | Evidence |
-| ------ | :----: | ------- | --- | ------ | ------------- | --------------- | :------: | :-----: | -------- | -------- |
-| db-3-A |   A    | Field7  | #7  | TBD    | `3/15/2026`   |                 |          | PENDING |          |          |
-| db-3-B |   B    | Field10 | #7  | TBD    | `3/15/2026`   |                 |          | PENDING |          |          |
-| db-3-C |   C    | Field6  | #4  | TBD    |               |                 |          | PENDING |          |          |
-| db-3-D |   D    | Field5  | #5  | TBD    |               |                 |          | PENDING |          |          |
-| db-3-E |   E    | Field12 | #7  | TBD    | `3/15/2026`   |                 |          | PENDING |          |          |
-| db-3-F |   F    | Field11 | #7  | TBD    | `3/15/2026`   |                 |          | PENDING |          |          |
-| db-3-G |   G    | Field14 | —   | TBD    |               |                 |          | PENDING |          |          |
-| db-3-H |   H    | Field13 | —   | TBD    |               |                 |          | PENDING |          |          |
+| ID     | Config | Field   | Bug | Record          | Intended Date        | Dashboard Shows      | Shifted? | Status | Run Date   | Evidence                          |
+| ------ | :----: | ------- | --- | --------------- | -------------------- | -------------------- | :------: | :----: | ---------- | --------------------------------- |
+| db-3-A |   A    | Field7  | #7  | DateTest-001077 | `3/15/2026`          | `3/14/2026`          |   Yes    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-3-A.md) |
+| db-3-B |   B    | Field10 | #7  | DateTest-001077 | `3/15/2026`          | `3/14/2026`          |   Yes    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-3-B.md) |
+| db-3-C |   C    | Field6  | #7v | DateTest-001078 | `3/15/2026`          | `3/14/2026 12:00 AM` |   Yes    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-3-C.md) |
+| db-3-D |   D    | Field5  | #5  | DateTest-001079 | `3/15/2026 12:00 AM` | `3/14/2026 9:00 PM`  |   Yes    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-3-D.md) |
+| db-3-E |   E    | Field12 | #7  | DateTest-001077 | `3/15/2026`          | `3/14/2026`          |   Yes    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-3-E.md) |
+| db-3-F |   F    | Field11 | #7  | DateTest-001077 | `3/15/2026`          | `3/14/2026`          |   Yes    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-3-F.md) |
+| db-3-G |   G    | Field14 | leg | DateTest-001081 | `3/15/2026 12:00 AM` | `3/14/2026 6:30 PM`  |   Yes    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-3-G.md) |
+| db-3-H |   H    | Field13 | leg | DateTest-001081 | `3/15/2026 12:00 AM` | `3/14/2026 6:30 PM`  |   Yes    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-3-H.md) |
 
 ---
 
@@ -144,12 +144,12 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 **Method**: Click column header to sort, capture first/last few rows, verify order.
 
-| ID           | Variant | Column | Direction  | Correct Order? | Status  | Run Date | Evidence |
-| ------------ | ------- | ------ | ---------- | :------------: | :-----: | -------- | -------- |
-| db-4-f7-asc  | A       | Field7 | Ascending  |                | PENDING |          |          |
-| db-4-f7-desc | A       | Field7 | Descending |                | PENDING |          |          |
-| db-4-f6-asc  | C       | Field6 | Ascending  |                | PENDING |          |          |
-| db-4-f6-desc | C       | Field6 | Descending |                | PENDING |          |          |
+| ID           | Variant | Column | Direction  | Correct Order? | Status | Run Date   | Evidence                                |
+| ------------ | ------- | ------ | ---------- | :------------: | :----: | ---------- | --------------------------------------- |
+| db-4-f7-asc  | A       | Field7 | Ascending  |       ✓        |  PASS  | 2026-04-02 | [summary](summaries/tc-db-4-f7-asc.md)  |
+| db-4-f7-desc | A       | Field7 | Descending |       ✓        |  PASS  | 2026-04-02 | [summary](summaries/tc-db-4-f7-desc.md) |
+| db-4-f6-asc  | C       | Field6 | Ascending  |       ✓        |  PASS  | 2026-04-02 | [summary](summaries/tc-db-4-f6-asc.md)  |
+| db-4-f6-desc | C       | Field6 | Descending |       ✓        |  PASS  | 2026-04-02 | [summary](summaries/tc-db-4-f6-desc.md) |
 
 ---
 
@@ -159,12 +159,12 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 **Method**: Open filter builder, create date filter, verify results include/exclude expected records.
 
-| ID            | Variant        | Filter Query                                      | Expected Result                    | Actual | Status  | Run Date | Evidence |
-| ------------- | -------------- | ------------------------------------------------- | ---------------------------------- | ------ | :-----: | -------- | -------- |
-| db-5-exact    | Exact match    | `Field7 = '3/15/2026'`                            | Records with 3/15 only             |        | PENDING |          |          |
-| db-5-range    | Date range     | `Field7 >= '3/14/2026' AND Field7 <= '3/15/2026'` | Include shifted dates              |        | PENDING |          |          |
-| db-5-dt-exact | DateTime exact | `Field6 = '3/15/2026'`                            | Depends on time component handling |        | PENDING |          |          |
-| db-5-dt-range | DateTime range | `Field5 BETWEEN ...`                              | TBD                                |        | PENDING |          |          |
+| ID            | Variant        | Filter Query                                               | Expected Result                    | Actual                    | Status | Run Date   | Evidence                                 |
+| ------------- | -------------- | ---------------------------------------------------------- | ---------------------------------- | ------------------------- | :----: | ---------- | ---------------------------------------- |
+| db-5-exact    | Exact match    | `Field7 = '3/15/2026'`                                     | Records with 3/15 only             | 66 records, exact match   |  PASS  | 2026-04-02 | [summary](summaries/tc-db-5-exact.md)    |
+| db-5-range    | Date range     | `Field7 >= '3/14/2026' AND Field7 <= '3/15/2026'`          | Include shifted dates              | 85 records (66+19 #7)     |  PASS  | 2026-04-02 | [summary](summaries/tc-db-5-range.md)    |
+| db-5-dt-exact | DateTime exact | `Field6 = '3/15/2026'`                                     | Depends on time component handling | 25 records, midnight only |  PASS  | 2026-04-02 | [summary](summaries/tc-db-5-dt-exact.md) |
+| db-5-dt-range | DateTime range | `Field5 >= '3/14/2026' AND Field5 <= '3/15/2026 11:59 PM'` | All times in range                 | 50 records, all times     |  PASS  | 2026-04-02 | [summary](summaries/tc-db-5-dt-range.md) |
 
 ---
 
@@ -174,16 +174,16 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 **Method**: Note dashboard grid value → click record → wait for form load → capture field display value and raw value via `captureFieldValues()`.
 
-| ID     | Config | Field   | Dashboard Value | Form Display | Form Raw | All Match? | Status  | Run Date | Evidence |
-| ------ | :----: | ------- | --------------- | ------------ | -------- | :--------: | :-----: | -------- | -------- |
-| db-6-A |   A    | Field7  |                 |              |          |            | PENDING |          |          |
-| db-6-B |   B    | Field10 |                 |              |          |            | PENDING |          |          |
-| db-6-C |   C    | Field6  |                 |              |          |            | PENDING |          |          |
-| db-6-D |   D    | Field5  |                 |              |          |            | PENDING |          |          |
-| db-6-E |   E    | Field12 |                 |              |          |            | PENDING |          |          |
-| db-6-F |   F    | Field11 |                 |              |          |            | PENDING |          |          |
-| db-6-G |   G    | Field14 |                 |              |          |            | PENDING |          |          |
-| db-6-H |   H    | Field13 |                 |              |          |            | PENDING |          |          |
+| ID     | Config | Field   | Dashboard Value     | Form Display          | Form Raw              | All Match? | Status | Run Date   | Evidence                          |
+| ------ | :----: | ------- | ------------------- | --------------------- | --------------------- | :--------: | :----: | ---------- | --------------------------------- |
+| db-6-A |   A    | Field7  | `3/15/2026`         | `03/15/2026`          | `2026-03-15`          |  No (fmt)  | FAIL-1 | 2026-04-02 | [summary](summaries/tc-db-6-A.md) |
+| db-6-B |   B    | Field10 | `3/15/2026`         | `03/15/2026`          | `2026-03-15`          |  No (fmt)  | FAIL-1 | 2026-04-02 | [summary](summaries/tc-db-6-B.md) |
+| db-6-C |   C    | Field6  | `3/15/2026 2:30 PM` | `03/15/2026 11:30 AM` | `2026-03-15T11:30:00` | No (time)  | FAIL-2 | 2026-04-02 | [summary](summaries/tc-db-6-C.md) |
+| db-6-D |   D    | Field5  | `3/15/2026 2:30 PM` | `03/15/2026 02:30 PM` | `2026-03-15T11:30:00` |  No (fmt)  | FAIL-1 | 2026-04-02 | [summary](summaries/tc-db-6-D.md) |
+| db-6-E |   E    | Field12 | `3/15/2026`         | `03/15/2026`          | `2026-03-15`          |  No (fmt)  | FAIL-1 | 2026-04-02 | [summary](summaries/tc-db-6-E.md) |
+| db-6-F |   F    | Field11 | `3/15/2026`         | `03/15/2026`          | `2026-03-15`          |  No (fmt)  | FAIL-1 | 2026-04-02 | [summary](summaries/tc-db-6-F.md) |
+| db-6-G |   G    | Field14 | `3/15/2026 2:30 PM` | `03/15/2026 11:30 AM` | `2026-03-15T11:30:00` | No (time)  | FAIL-2 | 2026-04-02 | [summary](summaries/tc-db-6-G.md) |
+| db-6-H |   H    | Field13 | `3/15/2026 2:30 PM` | `03/15/2026 02:30 PM` | `2026-03-15T11:30:00` |  No (fmt)  | FAIL-1 | 2026-04-02 | [summary](summaries/tc-db-6-H.md) |
 
 ---
 
@@ -207,8 +207,8 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 **Method**: Load the same dashboard page in BRT, IST, and UTC0 browser contexts. Compare all date values for the same set of records.
 
-| ID      | Variant              | BRT ≡ IST? | BRT ≡ UTC0? | Status  | Run Date | Evidence |
-| ------- | -------------------- | :--------: | :---------: | :-----: | -------- | -------- |
-| db-8-tz | Full page comparison |            |             | PENDING |          |          |
+| ID      | Variant              | BRT ≡ IST? | BRT ≡ UTC0? | Status | Run Date   | Evidence                           |
+| ------- | -------------------- | :--------: | :---------: | :----: | ---------- | ---------------------------------- |
+| db-8-tz | Full page comparison |     ✓      |      ✓      |  PASS  | 2026-04-02 | [summary](summaries/tc-db-8-tz.md) |
 
 **Preliminary result** (2026-04-02 exploratory): BRT and IST showed identical values for DateTest-000472 and DateTest-000471 across all 28 fields. Formal test pending with all three TZs and a larger record sample.
