@@ -39,6 +39,15 @@ nodeV2/
     fixtures/                        # Shared test data and config
       vv-config.js                   # FIELD_MAP, form URLs, saved records
       test-data.js                   # All test case definitions (data-driven)
+    reporters/                       # Custom Playwright reporters
+      regression-reporter.js         # Captures results + actual values → JSON
+    scripts/                         # Regression pipeline orchestrators + generators
+      run-regression.js              # Forms pipeline: Playwright → artifacts
+      run-ws-regression.js           # WS pipeline: run-ws-test.js → artifacts
+      run-dash-regression.js         # Dashboard pipeline: grid capture → artifacts
+      generate-artifacts.js          # Forms artifact generator
+      generate-ws-artifacts.js       # WS artifact generator (matrix-based PASS/FAIL)
+      generate-dash-artifacts.js     # Dashboard artifact generator (format-pattern validation)
     date-handling/                   # Date-handling test specs (1 per category)
   docs/                              # Shared documentation
     architecture/                    # Platform architecture, component diagrams, data flow
@@ -149,6 +158,11 @@ npm run test:pw:firefox      # Firefox — all TZs
 npm run test:pw:webkit       # WebKit (Safari) — all TZs
 npm run test:pw:headed       # Headed mode (visible browser)
 npm run test:pw:report       # Open HTML report
+
+# Regression pipelines (run tests + generate artifacts)
+npm run test:pw:regression -- --browser firefox     # Forms: all TZs in Firefox
+npm run test:ws:regression -- --tz BRT              # WS: all categories in BRT
+npm run test:dash:regression                        # Dashboard: grid capture + DB-1 format check
 ```
 
 **Test infrastructure** (in `testing/`):

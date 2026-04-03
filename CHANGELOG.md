@@ -38,6 +38,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `[@]-cleanup` command: read-only 6-phase repository maintenance audit (staleness, orphans, bloat, doc consistency, config hygiene, git hygiene)
 - `testing/README.md` — entry-point documentation for testing infrastructure
 - Playwright testing infrastructure under `testing/` (3-TZ projects, global auth, reusable helpers, data-driven specs)
+- Regression-to-artifact pipelines for Forms (`test:pw:regression`), WS (`test:ws:regression`), and Dashboards (`test:dash:regression`). Run tests → capture results → auto-generate run files, summaries, and session index entries. Matrix-based PASS/FAIL for WS and Dashboards.
+- Custom Playwright reporter (`testing/reporters/regression-reporter.js`) that captures test results and actual values to JSON for artifact generation
+
+### Fixed
+
+- Firefox timezone IDs in `playwright.config.js`: `Asia/Calcutta` → `Asia/Kolkata`, `Etc/GMT` → `UTC`. Firefox's `setTimezoneOverride` rejects legacy IANA names.
 - `docs/guides/dev-setup.md` — canonical dev environment setup guide (single source of truth for all setup instructions)
 - Playwright helpers: `captureDisplayValue`, `saveFormAndReload`, `roundTripCycle` in `testing/helpers/vv-form.js`
 - Multi-browser Playwright testing: TZ × browser matrix (Chromium, Firefox, WebKit) with per-browser npm scripts (`test:pw:chromium`, `test:pw:firefox`, `test:pw:webkit`)
