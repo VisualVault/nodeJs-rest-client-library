@@ -1,0 +1,7 @@
+{
+    "browser": {
+        "contextOptions": {
+            "timezoneId": "America/Los_Angeles"
+        }
+    }
+}

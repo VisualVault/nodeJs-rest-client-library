@@ -2,7 +2,7 @@
  * Playwright configuration for VV date-handling tests.
  *
  * Generates a matrix of timezone × browser projects:
- *   BRT-chromium, BRT-firefox, BRT-webkit, IST-chromium, …, UTC0-webkit
+ *   BRT-chromium, BRT-firefox, BRT-webkit, IST-chromium, …, UTC0-webkit, PST-chromium, …
  *
  * All spec files run in all projects. Individual tests use test.skip()
  * to self-filter based on testInfo.project.name (prefix match on TZ),
@@ -22,6 +22,7 @@ const timezones = [
     { name: 'BRT', timezoneId: 'America/Sao_Paulo' }, // UTC-3
     { name: 'IST', timezoneId: 'Asia/Kolkata' }, // UTC+5:30
     { name: 'UTC0', timezoneId: 'UTC' }, // UTC+0
+    { name: 'PST', timezoneId: 'America/Los_Angeles' }, // UTC-8 (PST) / UTC-7 (PDT)
 ];
 
 const browsers = [
