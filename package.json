@@ -70,6 +70,7 @@
         "test:pw:report": "npx playwright show-report testing/tmp/playwright-report",
         "test:pw:regression": "node testing/scripts/run-regression.js",
         "test:ws:regression": "node testing/scripts/run-ws-regression.js",
+        "test:dash:regression": "node testing/scripts/run-dash-regression.js",
         "lint": "eslint lib/ scripts/",
         "lint:fix": "eslint --fix lib/ scripts/",
         "format": "prettier --write \"lib/**/*.js\" \"scripts/**/*.js\"",

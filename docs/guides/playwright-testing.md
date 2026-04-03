@@ -188,6 +188,33 @@ npm run test:ws:regression -- --tz BRT --skip-artifacts
 | Run files     | Per-test (`tc-{id}-run-{N}.md`) | Per-batch (`ws-1-brt-batch-run-{N}.md`) |
 | Test data     | `testing/fixtures/test-data.js` | Matrix.md + harness args                |
 
+### Dashboard Pipeline (Playwright)
+
+Captures the DateTest Dashboard grid (Telerik RadGrid, server-rendered) and compares cell values against matrix Expected. No TZ dimension — server-rendered dates are timezone-independent.
+
+```bash
+# Run all dashboard tests
+npm run test:dash:regression
+
+# Specific category
+npm run test:dash:regression -- --category DB-1
+
+# Generate artifacts from last capture
+npm run test:dash:regression -- --artifacts-only
+
+# Capture only, no artifacts
+npm run test:dash:regression -- --skip-artifacts
+```
+
+| Flag               | Description                           |
+| ------------------ | ------------------------------------- |
+| `--category DB-N`  | Run specific category only            |
+| `--artifacts-only` | Skip browser, generate from last JSON |
+| `--skip-artifacts` | Capture grid only                     |
+| `--headed`         | Show browser window                   |
+
+**Coverage**: DB-1/2/3 (24 grid-value tests) run automatically. DB-4 (sort), DB-5 (filter), DB-6 (cross-layer), DB-8 (TZ) require specialized scripts — marked as SKIPPED in regression output.
+
 ## Troubleshooting
 
 See [Dev Setup Guide — Troubleshooting](dev-setup.md#6-troubleshooting) for common issues (auth, timeouts, timezone mismatches, missing tools).
