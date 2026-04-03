@@ -1800,3 +1800,13 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-03 [TC-5-H-BRT Run 1](runs/tc-5-H-BRT-run-1.md) — BRT — PASS — Legacy DateTime + ignoreTZ: no Bug #5 fake Z (useLegacy=true safe)
 - 2026-04-03 [TC-5-E-IST Run 1](runs/tc-5-E-IST-run-1.md) — IST — FAIL — Bug #7 on legacy preset (useLegacy does not protect)
 - 2026-04-03 [TC-5-F-IST Run 1](runs/tc-5-F-IST-run-1.md) — IST — FAIL — Bug #7 on legacy preset (neither ignoreTZ nor useLegacy protects)
+
+## Session 2026-04-03 (BRT + UTC0 — Cat 6 Current Date B/C/D + A-UTC0)
+
+**Purpose**: Category 6 Current Date testing for Configs B, C, D in BRT and Config A UTC0 control.
+**Key outcomes**: 3 PASS, 1 FAIL. Current Date init path (`new Date()`) correct for all configs. Bug #5 fires on Config D GFV (-3h in BRT). Config A UTC0 completes 3-TZ spectrum.
+
+- 2026-04-03 [TC-6-B-BRT Run 1](runs/tc-6-B-BRT-run-1.md) — BRT — PASS — Config B Current Date correct (ignoreTZ inert on new Date())
+- 2026-04-03 [TC-6-C-BRT Run 1](runs/tc-6-C-BRT-run-1.md) — BRT — PASS — Config C DateTime Current Date stores real UTC ISO
+- 2026-04-03 [TC-6-D-BRT Run 1](runs/tc-6-D-BRT-run-1.md) — BRT — FAIL — Bug #5 fake Z on GFV (-3h shift)
+- 2026-04-03 [TC-6-A-UTC0 Run 1](runs/tc-6-A-UTC0-run-1.md) — UTC0 — PASS — Config A Current Date trivially correct at UTC+0
