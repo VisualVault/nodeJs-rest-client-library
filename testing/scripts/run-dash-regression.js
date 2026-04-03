@@ -43,14 +43,6 @@ const FIELD_MAP = {
     H: 'Field13',
 };
 
-// Known test records (from WS-1 and bug-simulated records)
-const TEST_RECORDS = {
-    // DB-1/2: Records with clean values (created via WS-1 API)
-    accuracy: ['DateTest-000889', 'DateTest-000890'],
-    // DB-3: Records with bug-simulated values
-    bugShift: ['DateTest-001077', 'DateTest-001078', 'DateTest-001079', 'DateTest-001081'],
-};
-
 const ALL_DATE_FIELDS = Object.values(FIELD_MAP);
 
 async function main() {

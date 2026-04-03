@@ -52,10 +52,12 @@ const TEST_INVOCATIONS = [
 
     // ═══════════════════════════════════════════════════════════════
     // WS-2: API Read + Cross-Layer — 16 slots
-    // Reads existing Forms-saved records. BRT reads 000080, IST reads 000084.
+    // Reads records created by WS-1 in this run. If WS-1 didn't run,
+    // WS-2 is skipped (no record ID available).
+    // Record IDs are injected dynamically — see resolveRecordIds().
     // ═══════════════════════════════════════════════════════════════
-    { action: 'WS-2', tz: 'BRT', configs: 'ALL', inputDate: '', extraArgs: '--record-id DateTest-000080' },
-    { action: 'WS-2', tz: 'IST', configs: 'ALL', inputDate: '', extraArgs: '--record-id DateTest-000084' },
+    { action: 'WS-2', tz: 'BRT', configs: 'ALL', inputDate: '', extraArgs: '', needsRecordId: true },
+    { action: 'WS-2', tz: 'IST', configs: 'ALL', inputDate: '', extraArgs: '', needsRecordId: true },
 
     // ═══════════════════════════════════════════════════════════════
     // WS-3: API Round-Trip — 4 slots
@@ -140,9 +142,23 @@ function main() {
         console.log(`\n=== Phase 1: Running ${invocations.length} WS test invocations ===\n`);
 
         const allResults = [];
+        // Track record IDs created by WS-1 for use by WS-2 (dynamic, no hardcoded IDs)
+        const createdRecords = {}; // { BRT: 'DateTest-NNNNNN', IST: '...', UTC: '...' }
         fs.mkdirSync(RESULTS_DIR, { recursive: true });
 
         for (const inv of invocations) {
+            // WS-2 needs a record ID from a prior WS-1 run
+            if (inv.needsRecordId) {
+                const recordId = createdRecords[inv.tz];
+                if (!recordId) {
+                    console.log(
+                        `  SKIP ${inv.action} ${inv.tz} — no record ID available (WS-1 for ${inv.tz} did not run or failed)\n`
+                    );
+                    continue;
+                }
+                inv.extraArgs = `--record-id ${recordId}`;
+            }
+
             const tzEnv = TZ_ENV[inv.tz] || 'UTC';
             const cmdParts = [`TZ=${tzEnv}`, 'node', RUNNER_PATH, `--action ${inv.action}`, `--configs ${inv.configs}`];
             if (inv.inputDate) cmdParts.push(`--input-date ${inv.inputDate}`);
@@ -198,7 +214,14 @@ function main() {
                 }));
 
                 allResults.push(...entries);
-                console.log(`  → ${entries.length} results captured\n`);
+
+                // Track record IDs created by WS-1 for downstream WS-2 use
+                if (inv.action === 'WS-1' && result.data?.recordID) {
+                    createdRecords[inv.tz] = result.data.recordID;
+                    console.log(`  → ${entries.length} results captured (record: ${result.data.recordID})\n`);
+                } else {
+                    console.log(`  → ${entries.length} results captured\n`);
+                }
             } catch (err) {
                 console.error(`  ERROR: ${err.message?.substring(0, 200)}\n`);
                 allResults.push({
