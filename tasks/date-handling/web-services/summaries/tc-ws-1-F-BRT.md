@@ -11,6 +11,8 @@
 | 1   | 2026-04-03 | BRT | FAIL    | [ws-1-brt-batch-run-1.md](../runs/ws-1-brt-batch-run-1.md) |
 | 2   | 2026-04-03 | BRT | PASS    | [ws-1-brt-batch-run-1.md](../runs/ws-1-brt-batch-run-1.md) |
 | 3   | 2026-04-03 | BRT | PASS    | [ws-1-brt-batch-run-1.md](../runs/ws-1-brt-batch-run-1.md) |
+| 4   | 2026-04-03 | BRT | PASS    | [ws-1-brt-batch-run-2.md](../runs/ws-1-brt-batch-run-2.md) |
+| 5   | 2026-04-03 | BRT | PASS    | [ws-1-brt-batch-run-3.md](../runs/ws-1-brt-batch-run-3.md) |
 
 ## Current Interpretation
 
