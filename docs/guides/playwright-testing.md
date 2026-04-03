@@ -61,6 +61,133 @@ The infrastructure is reusable for testing other VV form behaviors:
 
 The `gotoAndWaitForVVForm` pattern (networkidle + waitForFunction) applies to any VV Angular SPA page — just change the readiness condition.
 
+## Regression Pipelines
+
+Two parallel pipelines for automated test execution + artifact generation. Same outcomes, different execution engines.
+
+### Forms Pipeline (Playwright)
+
+Runs browser-based regression tests and generates Layer 1 artifacts. Built on Playwright spec files + `test-data.js`.
+
+### Architecture
+
+```
+run-regression.js (orchestrator)
+  → npx playwright test + regression-reporter.js → regression-results-latest.json
+  → generate-artifacts.js → run files, summaries, matrix.md, results.md
+```
+
+Three files in `testing/`:
+
+- `reporters/regression-reporter.js` — custom Playwright reporter that captures results + actual values to JSON
+- `scripts/run-regression.js` — CLI entry point (runs tests then triggers artifact generation)
+- `scripts/generate-artifacts.js` — reads JSON, creates/updates markdown artifacts
+
+### Usage
+
+```bash
+# Full pipeline: run tests in Firefox, generate artifacts
+npm run test:pw:regression -- --browser firefox
+
+# Specific TZ + browser
+npm run test:pw:regression -- --project BRT-firefox
+
+# Combine filters
+npm run test:pw:regression -- --browser webkit --tz IST
+
+# Generate artifacts from last results (no test execution)
+npm run test:pw:regression -- --artifacts-only
+
+# Run tests only (no artifact generation)
+npm run test:pw:regression -- --browser chromium --skip-artifacts
+
+# Headed mode (visible browser, for debugging)
+npm run test:pw:regression -- --browser firefox --headed
+```
+
+### Flags
+
+| Flag               | Value                           | Description                                         |
+| ------------------ | ------------------------------- | --------------------------------------------------- |
+| `--browser`        | `chromium`, `firefox`, `webkit` | Run all TZs for that browser                        |
+| `--tz`             | `BRT`, `IST`, `UTC0`            | Run all browsers for that TZ                        |
+| `--project`        | e.g. `BRT-firefox`              | Exact Playwright project (supports `*` wildcards)   |
+| `--artifacts-only` | _(flag)_                        | Skip tests, generate artifacts from last saved JSON |
+| `--skip-artifacts` | _(flag)_                        | Run tests only, don't generate artifacts            |
+| `--headed`         | _(flag)_                        | Show browser window                                 |
+
+At least one of `--browser`, `--tz`, or `--project` is required (unless using `--artifacts-only`).
+
+### Artifacts generated per executed test
+
+| Artifact      | Path                                                         | Behavior                                     |
+| ------------- | ------------------------------------------------------------ | -------------------------------------------- |
+| Run file      | `tasks/date-handling/forms-calendar/runs/tc-{id}-run-{N}.md` | New file (immutable), increments N           |
+| Summary       | `tasks/date-handling/forms-calendar/summaries/tc-{id}.md`    | Appends to Run History table, updates status |
+| Matrix row    | `tasks/date-handling/forms-calendar/matrix.md`               | Updates Status + Run Date columns            |
+| Session entry | `tasks/date-handling/forms-calendar/results.md`              | One-line index entry per test                |
+
+### Adding new test cases
+
+1. Add entries to `testing/fixtures/test-data.js`
+2. Create a `cat-*.spec.js` if the category is new
+3. Run the pipeline — new entries are picked up automatically
+
+### Standalone artifact generation
+
+The generator can also run independently with a custom input file:
+
+```bash
+node testing/scripts/generate-artifacts.js --input path/to/results.json
+```
+
+### WS Pipeline (Node.js)
+
+Runs API-based regression tests via `run-ws-test.js` and generates equivalent artifacts. No browser needed — tests call the VV REST API directly.
+
+```
+run-ws-regression.js (orchestrator)
+  → TZ={tz} node run-ws-test.js --action WS-N → JSON per invocation
+  → generate-ws-artifacts.js → batch run files, summaries, matrix.md, results.md
+```
+
+#### Usage
+
+```bash
+# Run all WS tests for a specific TZ
+npm run test:ws:regression -- --tz BRT
+
+# Run a specific action
+npm run test:ws:regression -- --action WS-1
+
+# Specific action + TZ
+npm run test:ws:regression -- --action WS-1 --tz IST
+
+# Generate artifacts from last results
+npm run test:ws:regression -- --artifacts-only
+
+# Run tests only
+npm run test:ws:regression -- --tz BRT --skip-artifacts
+```
+
+#### Flags
+
+| Flag               | Value                 | Description                         |
+| ------------------ | --------------------- | ----------------------------------- |
+| `--action`         | `WS-1` through `WS-9` | Run specific action category        |
+| `--tz`             | `BRT`, `IST`, `UTC`   | Run specific timezone               |
+| `--artifacts-only` | _(flag)_              | Skip tests, generate from last JSON |
+| `--skip-artifacts` | _(flag)_              | Run tests only                      |
+
+#### Key differences from Forms pipeline
+
+| Aspect        | Forms                           | WS                                      |
+| ------------- | ------------------------------- | --------------------------------------- |
+| Execution     | Playwright (browser)            | Node.js (API calls)                     |
+| TZ simulation | `timezoneId` in browser context | `TZ=` env var                           |
+| Run files     | Per-test (`tc-{id}-run-{N}.md`) | Per-batch (`ws-1-brt-batch-run-{N}.md`) |
+| Test data     | `testing/fixtures/test-data.js` | Matrix.md + harness args                |
+
 ## Troubleshooting
 
 See [Dev Setup Guide — Troubleshooting](dev-setup.md#6-troubleshooting) for common issues (auth, timeouts, timezone mismatches, missing tools).
