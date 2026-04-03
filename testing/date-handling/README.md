@@ -1,6 +1,6 @@
 # Date-Handling Playwright Test Suite
 
-Automated regression tests for VisualVault Forms calendar field date-handling behavior. Verifies how dates are stored, transformed, and returned across 8 field configurations and 3 timezones.
+Automated regression tests for VisualVault Forms calendar field date-handling behavior. Verifies how dates are stored, transformed, and returned across 8 field configurations and 4 timezones (BRT, IST, UTC0, PST).
 
 ## Why This Exists
 
@@ -83,7 +83,7 @@ Shared config:
 
 | File                           | Purpose                                                             |
 | ------------------------------ | ------------------------------------------------------------------- |
-| `../playwright.config.js`      | TZ × browser matrix (9 projects: 3 TZ × 3 browsers), auth state     |
+| `../playwright.config.js`      | TZ × browser matrix (12 projects: 4 TZ × 3 browsers), auth state    |
 | `../config/vv-config.json`     | VV credentials (gitignored)                                         |
 | `../config/saved-records.json` | Auto-created DataID URLs for cross-TZ tests (gitignored, cached 1h) |
 | `../config/tz-*.json`          | Timezone overrides for `playwright-cli` (Layer 1 only)              |
@@ -127,7 +127,7 @@ Tests run across 3 timezone contexts to expose timezone-dependent bugs:
 
 Playwright's `timezoneId` context option simulates these timezones at the browser level — no system timezone changes or Chrome restarts needed. `new Date().toString()` inside the page returns the simulated timezone.
 
-All spec files run in all 9 projects (3 TZ × 3 browsers). Each test uses `test.skip()` inside the test body to self-filter — it only executes when `testInfo.project.name` starts with its `tz` field in `test-data.js` (e.g., a BRT test runs in `BRT-chromium`, `BRT-firefox`, and `BRT-webkit`).
+All spec files run in all 12 projects (4 TZ × 3 browsers). Each test uses `test.skip()` inside the test body to self-filter — it only executes when `testInfo.project.name` starts with its `tz` field in `test-data.js` (e.g., a BRT test runs in `BRT-chromium`, `BRT-firefox`, and `BRT-webkit`).
 
 **To add a new timezone or browser:**
 

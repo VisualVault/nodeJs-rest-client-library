@@ -30,7 +30,7 @@ nodeV2/
     test-scripts/                    # Local test scripts
   testing/                           # Playwright testing infrastructure
     README.md                        # Testing infrastructure entry point
-    playwright.config.js             # 3-project config (BRT, IST, UTC0)
+    playwright.config.js             # 4-TZ config (BRT, IST, UTC0, PST) × 3 browsers = 12 projects
     global-setup.js                  # Auto-login + create saved records before test runs
     config/                          # Credentials, TZ configs, auth state
     helpers/                         # Reusable page helpers
@@ -150,7 +150,7 @@ Browser automation for VV platform testing. All infrastructure lives under `test
 2. **`npx playwright test`** — headless regression runner for parameterized spec files
 
 ```bash
-npm run test:pw              # All projects (3 TZ × 3 browsers)
+npm run test:pw              # All projects (4 TZ × 3 browsers)
 npm run test:pw:brt          # BRT — all browsers
 npm run test:pw:ist          # IST — all browsers
 npm run test:pw:chromium     # Chromium — all TZs

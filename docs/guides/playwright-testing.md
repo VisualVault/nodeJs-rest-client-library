@@ -41,7 +41,7 @@ This command:
 
 | File                             | Purpose                                                              |
 | -------------------------------- | -------------------------------------------------------------------- |
-| `testing/playwright.config.js`   | TZ × browser matrix (9 projects), auth state                         |
+| `testing/playwright.config.js`   | TZ × browser matrix (12 projects: 4 TZ × 3 browsers), auth state     |
 | `testing/fixtures/vv-config.js`  | Form URLs, field config map (A-H), record definitions, saved records |
 | `testing/fixtures/test-data.js`  | All test case definitions (data-driven parameterization)             |
 | `testing/helpers/vv-form.js`     | Generic VV form helpers: navigation, field ops, value capture, save  |

@@ -37,7 +37,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `docs/reference/vv-form-api.md` expanded: script event type IDs (onChange/onBlur/onClick), `VV.Form.Template` namespace correction, `CentralDateValidation` operator details, `CloseAndUnlockForm` method
 - `[@]-cleanup` command: read-only 6-phase repository maintenance audit (staleness, orphans, bloat, doc consistency, config hygiene, git hygiene)
 - `testing/README.md` — entry-point documentation for testing infrastructure
-- Playwright testing infrastructure under `testing/` (3-TZ projects, global auth, reusable helpers, data-driven specs)
+- PST timezone project (`America/Los_Angeles`, UTC-8/UTC-7) added to Playwright test matrix — 4 TZ × 3 browsers = 12 projects
+- Category 5 (Preset Date) testing complete: 18/18 slots (11P, 7F), 17 test-data entries. Key findings: Bug #7 on all date-only presets in UTC+, Bug #5 on Config D presets (invisible at UTC0), legacy configs safe from Bug #5, Config C presets TZ-independent
+- Playwright testing infrastructure under `testing/` (4-TZ projects, global auth, reusable helpers, data-driven specs)
 - Regression-to-artifact pipelines for Forms (`test:pw:regression`), WS (`test:ws:regression`), and Dashboards (`test:dash:regression`). Run tests → capture results → auto-generate run files, summaries, and session index entries. Matrix-based PASS/FAIL for WS and Dashboards.
 - Custom Playwright reporter (`testing/reporters/regression-reporter.js`) that captures test results and actual values to JSON for artifact generation
 
