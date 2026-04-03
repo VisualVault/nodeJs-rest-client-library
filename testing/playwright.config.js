@@ -20,8 +20,8 @@ const AUTH_STATE_PATH = path.join(__dirname, 'config', 'auth-state-pw.json');
 
 const timezones = [
     { name: 'BRT', timezoneId: 'America/Sao_Paulo' }, // UTC-3
-    { name: 'IST', timezoneId: 'Asia/Calcutta' }, // UTC+5:30
-    { name: 'UTC0', timezoneId: 'Etc/GMT' }, // UTC+0
+    { name: 'IST', timezoneId: 'Asia/Kolkata' }, // UTC+5:30
+    { name: 'UTC0', timezoneId: 'UTC' }, // UTC+0
 ];
 
 const browsers = [
