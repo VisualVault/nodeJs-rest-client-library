@@ -40,6 +40,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - PST timezone project (`America/Los_Angeles`, UTC-8/UTC-7) added to Playwright test matrix — 4 TZ × 3 browsers = 12 projects
 - Category 5 (Preset Date) testing complete: 18/18 slots (11P, 7F), 17 test-data entries. Key findings: Bug #7 on all date-only presets in UTC+, Bug #5 on Config D presets (invisible at UTC0), legacy configs safe from Bug #5, Config C presets TZ-independent
 - Category 6 (Current Date) testing complete: 15/15 slots (13P, 2F), 14 test-data entries. Key finding: `new Date()` init path is the only fully correct initialization — no Bug #7, no Bug #5 except on non-legacy Config D GFV
+- Category 7 (SetFieldValue Formats) major expansion: 33/39 slots done (24P, 9F), 34 test-data entries. All 8 configs tested. Key finding: `useLegacy=true` bypasses Bug #5 fake Z on GFV (Config G/H safe) but does NOT protect date-only fields from Bug #7 (Config E/F still shift in IST). Legacy DateTime GFV returns raw value directly — no UTC conversion (unlike Config C) and no fake Z (unlike Config D).
 - Dashboard DB-7 export verification complete: Excel (.xls/HTML), Word (.doc/HTML), and XML exports all preserve date accuracy. `test-export-v1.js` script for reproducible testing. Dashboard investigation fully complete: 44/44 (36P, 8F)
 - `xlsx` npm package added as dev dependency for Excel export parsing in dashboard tests
 - Playwright testing infrastructure under `testing/` (4-TZ projects, global auth, reusable helpers, data-driven specs)
