@@ -6,7 +6,7 @@ Automated regression tests for VisualVault Forms calendar field date-handling be
 
 The VisualVault platform has **7 confirmed date-handling bugs** affecting how calendar fields store and return dates depending on field configuration and user timezone. This test suite:
 
-- Runs the same scenarios across BRT (UTC-3), IST (UTC+5:30), and UTC+0 to expose timezone-dependent bugs
+- Runs the same scenarios across BRT (UTC-3), IST (UTC+5:30), UTC+0, and PST/PDT (UTC-8/-7) to expose timezone-dependent bugs
 - Covers ~242 test slots across 13 categories (popup, typed input, reload, SetFieldValue, GetFieldValue, round-trip, etc.)
 - Produces both human-readable test documentation (in `tasks/date-handling/`) and reusable Playwright specs (here)
 
