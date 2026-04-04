@@ -1824,3 +1824,39 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-03 [TC-6-C-IST Run 1](runs/tc-6-C-IST-run-1.md) — IST — PASS — Config C DateTime real UTC ISO
 - 2026-04-03 [TC-6-E-IST Run 1](runs/tc-6-E-IST-run-1.md) — IST — PASS — No Bug #7 (compare preset 5-E-IST FAIL)
 - 2026-04-03 [TC-6-F-IST Run 1](runs/tc-6-F-IST-run-1.md) — IST — PASS — No Bug #7 on current date path
+
+## Session 2026-04-03 (BRT — Cat 7 Config A remaining formats)
+
+**Purpose**: Complete Config A BRT format matrix — dateObj, isoNoZ, usFormat, usFormatTime, epoch.
+**Key outcomes**: 5 PASS, 0 FAIL. All formats produce identical `"2026-03-15"` in BRT. Config A date-only is format-agnostic in UTC- timezones. Cat 7 PASS 10→15, PENDING 24→19.
+
+- 2026-04-03 [TC-7-A-dateObj-BRT Run 1](runs/tc-7-A-dateObj-BRT-run-1.md) — BRT — PASS — Date object safe in BRT (IST sibling -2 days)
+- 2026-04-03 [TC-7-A-isoNoZ Run 1](runs/tc-7-A-isoNoZ-run-1.md) — BRT — PASS — ISO without Z parsed as local, time stripped
+- 2026-04-03 [TC-7-A-usFormat Run 1](runs/tc-7-A-usFormat-run-1.md) — BRT — PASS — US format parsed correctly
+- 2026-04-03 [TC-7-A-usFormatTime Run 1](runs/tc-7-A-usFormatTime-run-1.md) — BRT — PASS — Time component stripped for date-only
+- 2026-04-03 [TC-7-A-epoch Run 1](runs/tc-7-A-epoch-run-1.md) — BRT — PASS — Epoch input unambiguous, correct
+
+## Session 2026-04-03 (BRT + IST — Cat 7 Config B)
+
+**Purpose**: Config B SetFieldValue tests — 3 BRT formats + 2 IST formats. Verify ignoreTZ inert on date-only, confirm Bug #7 in IST.
+**Key outcomes**: 3 PASS, 2 FAIL. Config B identical to Config A for date-only — `ignoreTimezone` inert. Bug #7 confirmed in IST (-1 day string, -2 days dateObj). Cat 7 PASS 15→18, FAIL 5→7, PENDING 19→14.
+
+- 2026-04-03 [TC-7-B-dateOnly-BRT Run 1](runs/tc-7-B-dateOnly-BRT-run-1.md) — BRT — PASS — ignoreTZ inert on date-only
+- 2026-04-03 [TC-7-B-isoZ-BRT Run 1](runs/tc-7-B-isoZ-BRT-run-1.md) — BRT — PASS — ISO+Z stripped correctly
+- 2026-04-03 [TC-7-B-dateObj-BRT Run 1](runs/tc-7-B-dateObj-BRT-run-1.md) — BRT — PASS — Date object safe in BRT
+- 2026-04-03 [TC-7-B-dateOnly-IST Run 1](runs/tc-7-B-dateOnly-IST-run-1.md) — IST — FAIL-1 — Bug #7 stores -1 day
+- 2026-04-03 [TC-7-B-dateObj-IST Run 1](runs/tc-7-B-dateObj-IST-run-1.md) — IST — FAIL-1 — Bug #7 double-shift stores -2 days
+
+## Session 2026-04-03 (BRT + IST — Cat 7 Legacy E/F/G/H)
+
+**Purpose**: Legacy config SetFieldValue tests — 6 BRT + 2 IST. Verify useLegacy behavior on all field types.
+**Key outcomes**: 6 PASS, 2 FAIL. Legacy date-only (E/F) identical to non-legacy — useLegacy inert, Bug #7 fires in IST. Legacy DateTime (G/H) GFV returns raw value directly — no UTC conversion (unlike C), no fake Z (unlike D). useLegacy=true is the Bug #5 countermeasure. Cat 7 PASS 18→24, FAIL 7→9, PENDING 14→6.
+
+- 2026-04-03 [TC-7-E-dateOnly-BRT Run 1](runs/tc-7-E-dateOnly-BRT-run-1.md) — BRT — PASS — Legacy date-only same as Config A
+- 2026-04-03 [TC-7-E-dateOnly-IST Run 1](runs/tc-7-E-dateOnly-IST-run-1.md) — IST — FAIL-1 — Bug #7 -1 day, useLegacy no protection
+- 2026-04-03 [TC-7-F-dateOnly-IST Run 1](runs/tc-7-F-dateOnly-IST-run-1.md) — IST — FAIL-1 — Bug #7 -1 day, neither flag protects
+- 2026-04-03 [TC-7-G-isoNoZ-BRT Run 1](runs/tc-7-G-isoNoZ-BRT-run-1.md) — BRT — PASS — Legacy DateTime, GFV raw (no UTC conversion)
+- 2026-04-03 [TC-7-G-isoZ-BRT Run 1](runs/tc-7-G-isoZ-BRT-run-1.md) — BRT — PASS — UTC→local shift, GFV raw (no reconversion)
+- 2026-04-03 [TC-7-H-isoNoZ-BRT Run 1](runs/tc-7-H-isoNoZ-BRT-run-1.md) — BRT — PASS — No fake Z (useLegacy protects from Bug #5)
+- 2026-04-03 [TC-7-H-isoZ-BRT Run 1](runs/tc-7-H-isoZ-BRT-run-1.md) — BRT — PASS — Shifted, no fake Z (Bug #5 absent)
+- 2026-04-03 [TC-7-H-dateObj-BRT Run 1](runs/tc-7-H-dateObj-BRT-run-1.md) — BRT — PASS — Date object, no fake Z on GFV
