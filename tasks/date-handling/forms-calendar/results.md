@@ -1860,3 +1860,57 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-03 [TC-7-H-isoNoZ-BRT Run 1](runs/tc-7-H-isoNoZ-BRT-run-1.md) — BRT — PASS — No fake Z (useLegacy protects from Bug #5)
 - 2026-04-03 [TC-7-H-isoZ-BRT Run 1](runs/tc-7-H-isoZ-BRT-run-1.md) — BRT — PASS — Shifted, no fake Z (Bug #5 absent)
 - 2026-04-03 [TC-7-H-dateObj-BRT Run 1](runs/tc-7-H-dateObj-BRT-run-1.md) — BRT — PASS — Date object, no fake Z on GFV
+
+## Session 2026-04-03 (BRT — Cat 7 Config C remaining formats)
+
+**Purpose**: Complete Config C BRT format matrix — dateOnly, dateObj, usFormat, usFormatTime, epoch.
+**Key outcomes**: 5 PASS, 0 FAIL. All formats produce identical raw `"2026-03-15T00:00:00"` and API `"2026-03-15T03:00:00.000Z"`. Config C DateTime is format-agnostic. Cat 7 PASS 24→29, PENDING 6→1.
+
+- 2026-04-03 [TC-7-C-dateOnly Run 1](runs/tc-7-C-dateOnly-run-1.md) — BRT — PASS — Date string parsed as local midnight, GFV real UTC
+- 2026-04-03 [TC-7-C-dateObj Run 1](runs/tc-7-C-dateObj-run-1.md) — BRT — PASS — Date object at local midnight, no double-shift
+- 2026-04-03 [TC-7-C-usFormat Run 1](runs/tc-7-C-usFormat-run-1.md) — BRT — PASS — US format identical to date-only string
+- 2026-04-03 [TC-7-C-usFormatTime Run 1](runs/tc-7-C-usFormatTime-run-1.md) — BRT — PASS — Explicit midnight same as time-less
+- 2026-04-03 [TC-7-C-epoch Run 1](runs/tc-7-C-epoch-run-1.md) — BRT — PASS — Epoch unambiguous, correct UTC reconstruction
+
+## Session 2026-04-03 (UTC0 + BRT + IST — Cat 8 GFV remaining configs + V2)
+
+**Purpose**: Complete Category 8 GetFieldValue — legacy configs E/F/G/H, UTC0 boundary tests, V2 code path.
+**Key outcomes**: 6 PASS, 1 FAIL. Legacy date-only (E/F) identical to A/B. Legacy DateTime (G/H) returns raw — useLegacy skips UTC conversion. 8-G-BRT prediction corrected (raw, not real UTC). Bug #5 invisible at UTC+0. V2 bypasses all GFV transformations. Cat 8: 12P/6F/1P remaining.
+
+- 2026-04-03 [TC-8-C-UTC0 Run 1](runs/tc-8-C-UTC0-run-1.md) — UTC0 — PASS — Real UTC trivially correct at UTC+0
+- 2026-04-03 [TC-8-D-UTC0 Run 1](runs/tc-8-D-UTC0-run-1.md) — UTC0 — FAIL — Bug #5 fake Z, coincidentally correct (0h drift)
+- 2026-04-03 [TC-8-E Run 1](runs/tc-8-E-run-1.md) — BRT — PASS — Legacy date-only raw unchanged
+- 2026-04-03 [TC-8-F Run 1](runs/tc-8-F-run-1.md) — BRT — PASS — Legacy date-only+ignoreTZ raw unchanged
+- 2026-04-03 [TC-8-G-BRT Run 1](runs/tc-8-G-BRT-run-1.md) — BRT — PASS — Legacy DateTime raw (prediction corrected: no UTC conv)
+- 2026-04-03 [TC-8-H-IST Run 1](runs/tc-8-H-IST-run-1.md) — IST — PASS — TZ-invariant raw return confirmed
+- 2026-04-03 [TC-8-V2 Run 1](runs/tc-8-V2-run-1.md) — IST — PASS — V2 bypasses all GFV transformations, Bug #5 absent
+
+## Session 2026-04-03 (BRT + IST + UTC0 — Cat 8B GDOC remaining configs)
+
+**Purpose**: Complete Category 8B GetDateObjectFromCalendar — date-only (A, E), DateTime (C, H), empty field, cross-TZ.
+**Key outcomes**: 8 PASS, 1 FAIL. GDOC returns correct Date objects for all configs. Bug #7 upstream corrupts stored value for 8B-A-IST. Legacy configs identical to non-legacy. Cat 8B complete: 11P/1F/0P.
+
+- 2026-04-03 [TC-8B-A-BRT Run 1](runs/tc-8B-A-BRT-run-1.md) — BRT — PASS — Date-only GDOC correct at BRT midnight
+- 2026-04-03 [TC-8B-A-IST Run 1](runs/tc-8B-A-IST-run-1.md) — IST — FAIL — Bug #7 upstream: stored Mar 14, GDOC reads correctly
+- 2026-04-03 [TC-8B-A-UTC0 Run 1](runs/tc-8B-A-UTC0-run-1.md) — UTC0 — PASS — Date-only trivially correct at UTC+0
+- 2026-04-03 [TC-8B-C-BRT Run 1](runs/tc-8B-C-BRT-run-1.md) — BRT — PASS — Config C GDOC matches GFV (real UTC)
+- 2026-04-03 [TC-8B-C-IST Run 1](runs/tc-8B-C-IST-run-1.md) — IST — PASS — DateTime safe in IST, no Bug #7
+- 2026-04-03 [TC-8B-D-UTC0 Run 1](runs/tc-8B-D-UTC0-run-1.md) — UTC0 — PASS — GDOC matches GFV at UTC boundary
+- 2026-04-03 [TC-8B-A-empty Run 1](runs/tc-8B-A-empty-run-1.md) — BRT — PASS — Empty returns undefined (falsy, safe)
+- 2026-04-03 [TC-8B-E-BRT Run 1](runs/tc-8B-E-BRT-run-1.md) — BRT — PASS — Legacy date-only identical to Config A
+- 2026-04-03 [TC-8B-H-BRT Run 1](runs/tc-8B-H-BRT-run-1.md) — BRT — PASS — Legacy DateTime GDOC correct
+
+## Session 2026-04-03 (BRT + IST + UTC0 + PST + JST — Cat 9 GFV Round-Trip completion)
+
+**Purpose**: Complete Category 9 GFV Round-Trip — multi-trip drift, new TZs (PST/PDT, JST), legacy controls.
+**Key outcomes**: 3 PASS, 6 FAIL. Bug #5 drift confirmed proportional to TZ offset across 5 TZs. PST corrected to PDT (-7h, not -8h). 9-B-IST reveals Bug #7 drift on date-only round-trips in UTC+. Legacy configs (E, G) stable. **Cat 9 complete: 9P/11F/0P.**
+
+- 2026-04-03 [TC-9-D-BRT-3 Run 1](runs/tc-9-D-BRT-3-run-1.md) — BRT — FAIL — Bug #5: 3×-3h = -9h drift
+- 2026-04-03 [TC-9-E-any Run 1](runs/tc-9-E-any-run-1.md) — BRT — PASS — Legacy date-only 0 drift
+- 2026-04-03 [TC-9-G-BRT-1 Run 1](runs/tc-9-G-BRT-1-run-1.md) — BRT — PASS — Legacy DateTime 0 drift (GFV returns raw)
+- 2026-04-03 [TC-9-D-IST-8 Run 1](runs/tc-9-D-IST-8-run-1.md) — IST — FAIL — Bug #5: 8×+5:30h = +44h drift
+- 2026-04-03 [TC-9-D-IST-10 Run 1](runs/tc-9-D-IST-10-run-1.md) — IST — FAIL — Bug #5: 10×+5:30h = +55h drift
+- 2026-04-03 [TC-9-B-IST Run 1](runs/tc-9-B-IST-run-1.md) — IST — FAIL — Bug #7: date-only -1 day per SFV in IST
+- 2026-04-03 [TC-9-D-UTC0 Run 1](runs/tc-9-D-UTC0-run-1.md) — UTC0 — PASS — Bug #5 present but 0 drift (coincidental)
+- 2026-04-03 [TC-9-D-PST-1 Run 1](runs/tc-9-D-PST-1-run-1.md) — PST — FAIL — Bug #5: PDT -7h drift (DST active)
+- 2026-04-03 [TC-9-D-JST-1 Run 1](runs/tc-9-D-JST-1-run-1.md) — JST — FAIL — Bug #5: +9h drift (most extreme UTC+)
