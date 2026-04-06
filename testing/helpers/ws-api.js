@@ -7,7 +7,7 @@
  * These helpers use Playwright's APIRequestContext for HTTP calls,
  * keeping tests within the Playwright runner for timezone matrix support.
  *
- * See tasks/date-handling/web-services/analysis.md for API documentation.
+ * See tasks/date-handling/web-services/analysis/overview.md for API documentation.
  */
 const { API_CONFIG, API_FIELD_KEY } = require('../fixtures/ws-config');
 

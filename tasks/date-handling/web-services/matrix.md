@@ -1,9 +1,9 @@
 # Web Services — Test Matrix
 
 Authoritative permutation tracker for the web services date-handling investigation.
-API analysis → `analysis.md` | Test evidence → `results.md` | Harness → `webservice-test-harness.js`
+API analysis → `analysis/overview.md` | Test evidence → `results.md` | Harness → `webservice-test-harness.js`
 
-Last updated: 2026-04-06 | Total slots: 162 | Done: 162 (124P/38F) | **COMPLETE**
+Last updated: 2026-04-06 | Total slots: 148 | Done: 148 (116P/32F) | **COMPLETE**
 
 ---
 
@@ -64,13 +64,15 @@ WS-1 includes UTC spot-checks (ws-1-{A,C,D,H}-UTC) to prove that the cloud envir
 | WS-2. API Read + Cross-Layer      |   16    |  16  |  0   |    0    |         |    P1    |
 | WS-3. API Round-Trip              |    4    |  4   |  0   |    0    |         |    P2    |
 | WS-4. API→Forms Cross-Layer       |   10    |  3   |  7   |    0    |         |    P3    |
-| WS-5. Input Format Tolerance      |   35    |  24  |  11  |    0    |         |    P2    |
+| WS-5. Input Format Tolerance      |   33    |  24  |  9   |    0    |         |    P2    |
 | WS-6. Empty/Null Handling         |   12    |  12  |  0   |    0    |         |    P3    |
 | WS-7. API Update Path             |   12    |  12  |  0   |    0    |         |    P2    |
 | WS-8. Query Date Filtering        |   10    |  10  |  0   |    0    |         |    P3    |
 | WS-9. Date Computation            |   23    |  17  |  6   |    0    |         |    P2    |
 | WS-10. postForms vs forminstance/ |   12    |  2   |  10  |    0    |    0    |    P1    |
-| **TOTAL**                         | **162** | 116  |  34  |  **0**  |  **0**  |          |
+| **TOTAL**                         | **148** | 116  |  32  |  **0**  |  **0**  |          |
+
+> **Counting note**: WS-10A includes 7 additional forminstance/ comparison rows (all PASS) embedded in the detailed table for side-by-side analysis. These share test IDs with the postForms rows and are **not** counted as separate test slots. WS-5 counts 33 executed format/config combinations (2 planned LATAM variants for Config C were not needed — Config A results generalize).
 
 ---
 
@@ -258,7 +260,7 @@ Send various date string formats via `postForms()`. Verify which are accepted, r
 | ws-5-D-EPOCH  |   D    | Epoch  | `1773532800000` (number)          | TBD                     |  FAIL  | `null`                   |  Silent   | Numeric epoch silently stored null         |
 | ws-5-D-EPOCHS |   D    | Epoch  | `"1773532800000"` (string)        | TBD                     |  FAIL  | `null`                   |  Silent   | String epoch silently stored null          |
 
-> **WS-5 Finding**: 24 PASS, 11 FAIL. The VV server is very format-tolerant: ISO, US (MM/DD/YYYY), DB storage format, YYYY/MM/DD, YYYY.MM.DD, English month names, and all ISO datetime variants are accepted. **TZ offsets are converted to UTC** (BRT -03:00 → +3h, IST +05:30 → -5:30h). Milliseconds are stripped. **CRITICAL — Bug #8**: DD/MM/YYYY (LATAM) formats are silently accepted but stored as `null` — no error, no warning, complete data loss. **Bug #8b**: Ambiguous dates like `05/03/2026` are always interpreted as MM/DD (US) — a LATAM dev intending March 5 gets May 3 stored silently. Compact ISO `20260315`, invalid `2026-15-03`, and **epoch milliseconds** (both numeric and string) also silently fail. .NET `+00:00` offset works (equivalent to Z). H-5 confirmed for ISO/US/named formats.
+> **WS-5 Finding**: 24 PASS, 9 FAIL (33 slots). The VV server is very format-tolerant: ISO, US (MM/DD/YYYY), DB storage format, YYYY/MM/DD, YYYY.MM.DD, English month names, and all ISO datetime variants are accepted. **TZ offsets are converted to UTC** (BRT -03:00 → +3h, IST +05:30 → -5:30h). Milliseconds are stripped. **CRITICAL — Bug #8**: DD/MM/YYYY (LATAM) formats are silently accepted but stored as `null` — no error, no warning, complete data loss. **Bug #8b**: Ambiguous dates like `05/03/2026` are always interpreted as MM/DD (US) — a LATAM dev intending March 5 gets May 3 stored silently. Compact ISO `20260315`, invalid `2026-15-03`, and **epoch milliseconds** (both numeric and string) also silently fail. .NET `+00:00` offset works (equivalent to Z). H-5 confirmed for ISO/US/named formats.
 
 ---
 
@@ -392,8 +394,8 @@ Test what gets stored when scripts perform date arithmetic or create JavaScript 
 
 **Three sub-actions**:
 
-- **WS-10A**: Verify postForms cross-layer mutation (forminstance/ comparison BLOCKED on vvdemo)
-- **WS-10B**: Side-by-side endpoint comparison — **BLOCKED** (forminstance/ returns 500 on vvdemo)
+- **WS-10A**: Verify postForms cross-layer mutation + forminstance/ comparison (forminstance/ initially BLOCKED on vvdemo; resolved post-run via browser verification)
+- **WS-10B**: Side-by-side endpoint comparison — initially BLOCKED (forminstance/ returned 500 on vvdemo); resolved post-run
 - **WS-10C**: Save-and-stabilize — confirm first save commits mutation, subsequent saves are stable
 
 **Harness action**: `WS-10` (creates records via both endpoints, returns DataIDs for browser verification)

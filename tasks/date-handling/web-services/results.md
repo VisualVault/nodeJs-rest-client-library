@@ -17,10 +17,10 @@ Live test evidence for date handling behavior in the VisualVault REST API. Tests
 
 ## Related Files
 
-- **API analysis**: `analysis.md` — hypotheses, confirmed behaviors, confirmed bugs
+- **API analysis**: `analysis/overview.md` — hypotheses, confirmed behaviors, confirmed bugs
 - **Test matrix**: `matrix.md` — authoritative coverage tracker
 - **Overall context**: `../CLAUDE.md` — full investigation scope across all VV components
-- **Forms comparison**: `../forms-calendar/analysis.md` — Forms UI bugs (reference for cross-layer tests)
+- **Forms comparison**: `../forms-calendar/analysis/overview.md` — Forms UI bugs (reference for cross-layer tests)
 
 ---
 

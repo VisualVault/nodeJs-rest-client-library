@@ -7,7 +7,7 @@
  * - Field map (reused from vv-config.js — same form, same fields)
  * - API-specific constants (endpoints, expected response formats)
  *
- * See tasks/date-handling/web-services/analysis.md for API documentation.
+ * See tasks/date-handling/web-services/analysis/overview.md for API documentation.
  */
 const { vvConfig, FIELD_MAP } = require('./vv-config');
 

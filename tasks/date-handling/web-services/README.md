@@ -4,18 +4,18 @@ REST API date handling investigation. Tests how dates are sent, stored, and retu
 
 ## Files
 
-| File                          | Purpose                                                       |
-| ----------------------------- | ------------------------------------------------------------- |
-| `matrix.md`                   | Test matrix — 9 categories, ~118 slots                        |
-| `analysis.md`                 | Hypotheses, confirmed behaviors, confirmed bugs               |
-| `results.md`                  | Live test evidence                                            |
-| `webservice-test-harness.js`  | Server-side harness — all 9 categories via `Action` parameter |
-| `webservice-pattern.js`       | Clean VV web service template (reference)                     |
-| `ws-harness-button.js`        | Client-side form button script to call the harness            |
-| `web-service-call-pattern.js` | Generic VV web service call pattern (reference)               |
-| `test-cases/`                 | Individual TC spec files                                      |
-| `runs/`                       | Immutable execution records                                   |
-| `summaries/`                  | Per-TC status files                                           |
+| File                          | Purpose                                                        |
+| ----------------------------- | -------------------------------------------------------------- |
+| `matrix.md`                   | Test matrix — 10 categories, 148 slots                         |
+| `analysis/`                   | Analysis & conclusions (overview + per-bug documents)          |
+| `results.md`                  | Live test evidence                                             |
+| `webservice-test-harness.js`  | Server-side harness — all 10 categories via `Action` parameter |
+| `webservice-pattern.js`       | Clean VV web service template (reference)                      |
+| `ws-harness-button.js`        | Client-side form button script to call the harness             |
+| `web-service-call-pattern.js` | Generic VV web service call pattern (reference)                |
+| `test-cases/`                 | Individual TC spec files                                       |
+| `runs/`                       | Immutable execution records                                    |
+| `summaries/`                  | Per-TC status files                                            |
 
 ---
 
@@ -172,4 +172,4 @@ This only affects the Node.js process — no need to change macOS system TZ or r
 |  8   | WS-8     | Query filtering — uses WS-1 records                 |
 |  9   | WS-9     | Date computation — requires TZ= env var switching   |
 
-See `matrix.md` for full slot tables and `analysis.md` for hypotheses.
+See `matrix.md` for full slot tables and `analysis/overview.md` for hypotheses and conclusions.
