@@ -42,7 +42,9 @@ tasks/date-handling/
     runs/                            # Immutable execution records
     summaries/                       # Per-TC status files
   dashboards/                        # Dashboard date display investigation (COMPLETE — 44/44)
-    analysis.md                      # Architecture, confirmed behaviors, design observations, test coverage
+    analysis/                        # Analysis & conclusions
+      overview.md                    # Architecture, confirmed behaviors, design observations, test coverage
+      formdashboard-bug-1-format-inconsistency.md  # FORMDASHBOARD-BUG-1: .NET vs Angular format mismatch
     matrix.md                        # Test matrix — DB-1 through DB-8 (44 slots, complete)
     results.md                       # Live test evidence
     test-cases/                      # Individual TC spec files

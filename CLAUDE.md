@@ -67,6 +67,7 @@ nodeV2/
         verify-ws4-browser.js        # Playwright browser verification for WS-4 cross-layer
         verify-ws10-browser.js       # Playwright browser verification for WS-10 (postForms vs forminstance)
       dashboards/                    # Dashboard date display testing (44/44 complete — DB-1 thru DB-8 all done)
+        analysis/                    # Analysis & conclusions (overview + 1 bug document)
     form-templates/                  # XML template analysis, generator, redesigned DateTest v2
         README.md                    # Template format docs and generator usage
         datetest-v2.xml              # Redesigned DateTest form template

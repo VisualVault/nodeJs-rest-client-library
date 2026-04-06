@@ -1,7 +1,7 @@
 # Dashboards — Test Matrix
 
 Authoritative permutation tracker for the dashboard date display investigation.
-Analysis → `analysis.md` | Test evidence → `results.md` | Exploration → `explore-dashboard.js`
+Analysis → `analysis/overview.md` | Test evidence → `results.md` | Exploration → `explore-dashboard.js`
 
 Last updated: 2026-04-06 | Total slots: 44 | Done: 44 (36P/8F) | **COMPLETE**
 

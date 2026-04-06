@@ -4,7 +4,7 @@ How dates appear in VisualVault's Analytic Dashboards (Telerik RadGrid, server-s
 
 **Dashboard URL**: `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25`
 
-Analysis → `analysis.md` | Test matrix → `matrix.md` | Evidence → `results.md`
+Analysis → `analysis/overview.md` | Test matrix → `matrix.md` | Evidence → `results.md`
 
 ---
 
@@ -102,16 +102,17 @@ node tasks/date-handling/dashboards/explore-dashboard.js --compare      # DB-8: 
 
 ## Files
 
-| File                   | Purpose                                                     |
-| ---------------------- | ----------------------------------------------------------- |
-| `README.md`            | This file — setup, architecture, selectors                  |
-| `analysis.md`          | Server-side rendering analysis, format rules, bug surface   |
-| `matrix.md`            | Test matrix — DB-1 through DB-8, 44 slots (41 done, 33P/8F) |
-| `results.md`           | Live test evidence — session-indexed run entries            |
-| `explore-dashboard.js` | Playwright grid capture + TZ comparison (`--compare`)       |
-| `test-sort-v4.js`      | DB-4: column sort test (handles `__doPostBack` strict mode) |
-| `test-filter-v3.js`    | DB-5: SQL filter test via hidden `txtSQLFilter` textarea    |
-| `test-cross-layer.js`  | DB-6: dashboard vs FormViewer value comparison              |
-| `test-cases/`          | Individual TC spec files (immutable after creation)         |
-| `runs/`                | Immutable execution records (one per test run)              |
-| `summaries/`           | Per-TC status + run history                                 |
+| File                                                   | Purpose                                                               |
+| ------------------------------------------------------ | --------------------------------------------------------------------- |
+| `README.md`                                            | This file — setup, architecture, selectors                            |
+| `analysis/overview.md`                                 | Server-side rendering analysis, format rules, bug surface             |
+| `analysis/formdashboard-bug-1-format-inconsistency.md` | FORMDASHBOARD-BUG-1: date format mismatch between dashboard and Forms |
+| `matrix.md`                                            | Test matrix — DB-1 through DB-8, 44 slots (41 done, 33P/8F)           |
+| `results.md`                                           | Live test evidence — session-indexed run entries                      |
+| `explore-dashboard.js`                                 | Playwright grid capture + TZ comparison (`--compare`)                 |
+| `test-sort-v4.js`                                      | DB-4: column sort test (handles `__doPostBack` strict mode)           |
+| `test-filter-v3.js`                                    | DB-5: SQL filter test via hidden `txtSQLFilter` textarea              |
+| `test-cross-layer.js`                                  | DB-6: dashboard vs FormViewer value comparison                        |
+| `test-cases/`                                          | Individual TC spec files (immutable after creation)                   |
+| `runs/`                                                | Immutable execution records (one per test run)                        |
+| `summaries/`                                           | Per-TC status + run history                                           |

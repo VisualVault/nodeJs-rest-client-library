@@ -82,7 +82,7 @@ The VV Dashboard uses **Telerik RadGrid** (ASP.NET WebForms), which renders HTML
 - The displayed value is a direct reflection of what the .NET server reads from SQL and formats
 - Any incorrect dates visible in the dashboard were stored incorrectly at write time (Forms, API, etc.)
 
-**Evidence:** 10 records × all fields compared across BRT, IST, UTC0 browser contexts — 0 mismatches ([DB-8 run](runs/tc-db-8-tz-run-1.md)).
+**Evidence:** 10 records × all fields compared across BRT, IST, UTC0 browser contexts — 0 mismatches ([DB-8 run](../runs/tc-db-8-tz-run-1.md)).
 
 ### Display Format Rules
 
@@ -133,7 +133,7 @@ All confirmed behaviors (CBs) from 44 tests, reorganized by theme.
 | DB-CB-5 | Server renders the stored `datetime` value as-is — no timezone conversion (SQL `datetime` is TZ-unaware) | DB dump: `14:30:00.000` → dashboard `2:30 PM`, `00:00:00.000` → `12:00 AM`                            |
 | DB-CB-6 | All upstream bugs propagate faithfully — dashboard introduces no distortion                              | DB-3 all 8 configs PASS — FORM-BUG-7, FORM-BUG-5 drift, legacy UTC all visible. Confirmed by DB dump. |
 
-**Upstream bug propagation:** FORM-BUG-7 wrong dates ([`forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md) § FORM-BUG-7), FORM-BUG-5 drift ([`forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md) § FORM-BUG-5), and mixed time components from different write paths ([`web-services/analysis/overview.md`](../web-services/analysis/overview.md) § "No Server-Side Date-Only Enforcement") are all visible in the dashboard grid. The dashboard is transparent — fixes must be applied at the write layer.
+**Upstream bug propagation:** FORM-BUG-7 wrong dates ([`forms-calendar/analysis/overview.md`](../../forms-calendar/analysis/overview.md) § FORM-BUG-7), FORM-BUG-5 drift ([`forms-calendar/analysis/overview.md`](../../forms-calendar/analysis/overview.md) § FORM-BUG-5), and mixed time components from different write paths ([`web-services/analysis/overview.md`](../../web-services/analysis/overview.md) § "No Server-Side Date-Only Enforcement") are all visible in the dashboard grid. The dashboard is transparent — fixes must be applied at the write layer.
 
 ### TZ Independence
 
@@ -260,7 +260,7 @@ The dashboard reads the SQL `datetime` value directly and formats it as-is. A va
 
 The Forms Angular SPA, however, receives the same value through `FormInstance/Controls`, which serializes postForms-created records as `"2026-03-15T14:30:00Z"` (with Z suffix). Forms V1 `initCalendarValueV1` interprets the Z as real UTC and converts to local time: `14:30Z − 3h BRT = 11:30 AM`. **The form shows a shifted value.**
 
-**Result:** Users see different times for the same record — dashboard `2:30 PM` (correct, as stored) vs form `11:30 AM` (shifted by FormsAPI serialization + V1 parsing). The gap equals the user's UTC offset. Affects `ignoreTZ=false` DateTime configs (C, G). Evidence: [DB-6-C](runs/tc-db-6-C-run-1.md), [DB-6-G](runs/tc-db-6-G-run-1.md) (FAIL-2). DB dump (2026-04-06) confirms DB value is `14:30:00.000` — matching the dashboard, not the form.
+**Result:** Users see different times for the same record — dashboard `2:30 PM` (correct, as stored) vs form `11:30 AM` (shifted by FormsAPI serialization + V1 parsing). The gap equals the user's UTC offset. Affects `ignoreTZ=false` DateTime configs (C, G). Evidence: [DB-6-C](../runs/tc-db-6-C-run-1.md), [DB-6-G](../runs/tc-db-6-G-run-1.md) (FAIL-2). DB dump (2026-04-06) confirms DB value is `14:30:00.000` — matching the dashboard, not the form.
 
 **Why this is a defect:** Users should not see different times for the same record depending on which view they use. The root cause is the `FormInstance/Controls` serialization adding a Z suffix to a timezone-unaware `datetime` value (CB-29). The fix should be in the FormsAPI serialization layer — not the dashboard.
 
@@ -270,20 +270,13 @@ The Forms Angular SPA, however, receives the same value through `FormInstance/Co
 
 ### Format Inconsistency: .NET vs Angular — PLATFORM DEFECT
 
-| Layer            | Date Format  | DateTime Format      | Leading Zeros |
-| ---------------- | ------------ | -------------------- | ------------- |
-| Dashboard (.NET) | `M/d/yyyy`   | `M/d/yyyy h:mm tt`   | No            |
-| Forms (Angular)  | `MM/dd/yyyy` | `MM/dd/yyyy hh:mm a` | Yes           |
+See [FORMDASHBOARD-BUG-1](formdashboard-bug-1-format-inconsistency.md) for full analysis. Dashboard (.NET) renders `M/d/yyyy` (no leading zeros), Forms (Angular) renders `MM/dd/yyyy` (with leading zeros). All 8 configs affected. Cosmetic only, no data integrity impact. Low priority.
 
-Both layers display correct values — they just format them differently. All 8 configs show this mismatch (DB-6 FAIL-1). Evidence: [DB-6-A](runs/tc-db-6-A-run-1.md), [DB-6-B](runs/tc-db-6-B-run-1.md), [DB-6-E](runs/tc-db-6-E-run-1.md), [DB-6-F](runs/tc-db-6-F-run-1.md).
-
-**Why this is a defect:** Dates displayed across the same platform should use consistent formatting. The fix is trivial — change one format string to match the other (either the .NET Telerik RadGrid column format or the Angular Kendo date pipe). The VV team needs to decide which format is canonical.
-
-**Recommendation:** Report to VV platform team. Low priority — cosmetic only, no data integrity impact.
+Evidence: [DB-6-A](../runs/tc-db-6-A-run-1.md), [DB-6-B](../runs/tc-db-6-B-run-1.md), [DB-6-E](../runs/tc-db-6-E-run-1.md), [DB-6-F](../runs/tc-db-6-F-run-1.md).
 
 ### No Server-Side Date-Only Enforcement — PLATFORM DEFECT
 
-Fully documented in [`web-services/analysis/overview.md`](../web-services/analysis/overview.md) § "Cross-Layer Design Inconsistency: No Server-Side Date-Only Enforcement".
+Fully documented in [`web-services/analysis/overview.md`](../../web-services/analysis/overview.md) § "Cross-Layer Design Inconsistency: No Server-Side Date-Only Enforcement".
 
 The VV server has no date-only storage type — every date field is SQL `datetime` regardless of the `enableTime` flag. Different write paths store different time components for the same intended date (confirmed via DB dump 2026-04-06):
 
@@ -303,7 +296,7 @@ Dashboard hides the time component for date-only fields, so this is invisible to
 
 Standard SQL datetime comparison: `Field6 = '3/15/2026'` is interpreted as `Field6 = '3/15/2026 12:00:00 AM'`, matching only midnight records (25 of ~66 expected). This is standard SQL datetime semantics, not a bug.
 
-**Workaround:** Always use range queries for DateTime columns: `Field6 >= '3/15/2026' AND Field6 <= '3/15/2026 11:59 PM'`. For date-only columns, `=` works correctly. Evidence: [DB-5-DT-EXACT](runs/tc-db-5-dt-exact-run-1.md), [DB-5-DT-RANGE](runs/tc-db-5-dt-range-run-1.md).
+**Workaround:** Always use range queries for DateTime columns: `Field6 >= '3/15/2026' AND Field6 <= '3/15/2026 11:59 PM'`. For date-only columns, `=` works correctly. Evidence: [DB-5-DT-EXACT](../runs/tc-db-5-dt-exact-run-1.md), [DB-5-DT-RANGE](../runs/tc-db-5-dt-range-run-1.md).
 
 **Possible improvement:** The filter builder could offer an "on date" operator that auto-generates range queries for DateTime columns. This would be a UX enhancement, not a bug fix.
 
@@ -311,13 +304,13 @@ Standard SQL datetime comparison: `Field6 = '3/15/2026'` is interpreted as `Fiel
 
 Telerik RadGrid export serializes all date columns as datetime. Date-only values (`3/15/2026`) become `3/15/2026 12:00:00 AM` in Excel/Word exports. XML export uses ISO 8601 (`2026-03-15T00:00:00+00:00`).
 
-**Workaround:** Use XML export for programmatic consumption (clean ISO 8601). For Excel/Word, post-process to strip `12:00:00 AM` from date-only columns. All export formats include ALL records (432), not just the current page. Evidence: [DB-7-EXCEL](runs/tc-db-7-excel-run-1.md), [DB-7-XML](runs/tc-db-7-xml-run-1.md).
+**Workaround:** Use XML export for programmatic consumption (clean ISO 8601). For Excel/Word, post-process to strip `12:00:00 AM` from date-only columns. All export formats include ALL records (432), not just the current page. Evidence: [DB-7-EXCEL](../runs/tc-db-7-excel-run-1.md), [DB-7-XML](../runs/tc-db-7-xml-run-1.md).
 
 **Possible improvement:** Configure Telerik RadGrid export column format strings per field type — use date-only format for `enableTime=false` fields. Low priority.
 
 ### `postForms` vs `forminstance/` Serialization Difference — PLATFORM DEFECT
 
-Fully documented in [`web-services/analysis/overview.md`](../web-services/analysis/overview.md) § CB-29.
+Fully documented in [`web-services/analysis/overview.md`](../../web-services/analysis/overview.md) § CB-29.
 
 Both endpoints store **identical SQL `datetime` values** in the database (confirmed via DB dump 2026-04-06). The difference is in the FormsAPI's `FormInstance/Controls` HTTP response serialization:
 
@@ -330,20 +323,20 @@ Both endpoints store **identical SQL `datetime` values** in the database (confir
 
 ### Summary
 
-| Finding                                      | Classification        | Action                                                                              |
-| -------------------------------------------- | --------------------- | ----------------------------------------------------------------------------------- |
-| Dashboard correct, Forms shifted             | **Platform defect**   | Report to VV team — FormsAPI serialization adds false Z to TZ-unaware values        |
-| Format inconsistency (.NET vs Angular)       | **Platform defect**   | Report to VV team — trivial fix, low priority                                       |
-| No date-only enforcement                     | **Platform defect**   | Report to VV team — server should normalize on write                                |
-| `postForms` vs `forminstance/` serialization | **Platform defect**   | Report to VV team — FormsAPI should serialize consistently regardless of write path |
-| SQL filter midnight-only                     | **Platform behavior** | Document workaround (range queries); optional UX enhancement                        |
-| Export midnight append                       | **Platform behavior** | Document workaround (XML or post-process); optional config fix                      |
+| Finding                                      | Classification        | Action                                                                                         |
+| -------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------- |
+| Dashboard correct, Forms shifted             | **Platform defect**   | Report to VV team — FormsAPI serialization adds false Z to TZ-unaware values                   |
+| Format inconsistency (.NET vs Angular)       | **Platform defect**   | [FORMDASHBOARD-BUG-1](formdashboard-bug-1-format-inconsistency.md) — trivial fix, low priority |
+| No date-only enforcement                     | **Platform defect**   | Report to VV team — server should normalize on write                                           |
+| `postForms` vs `forminstance/` serialization | **Platform defect**   | Report to VV team — FormsAPI should serialize consistently regardless of write path            |
+| SQL filter midnight-only                     | **Platform behavior** | Document workaround (range queries); optional UX enhancement                                   |
+| Export midnight append                       | **Platform behavior** | Document workaround (XML or post-process); optional config fix                                 |
 
 ---
 
 ## 8. Test Coverage
 
-**44 tests executed** across 8 categories between 2026-04-02 and 2026-04-03. Full details in [`matrix.md`](matrix.md).
+**44 tests executed** across 8 categories between 2026-04-02 and 2026-04-03. Full details in [`matrix.md`](../matrix.md).
 
 | Category             | ID   | Tests  |  PASS  | FAIL  | Key Finding                                      |
 | -------------------- | ---- | :----: | :----: | :---: | ------------------------------------------------ |
@@ -370,12 +363,12 @@ Both endpoints store **identical SQL `datetime` values** in the database (confir
 
 ## 9. Related
 
-| Reference                                                    | Location                                                                                             |
-| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| Forms calendar analysis (Bugs #5, #6, #7 definitions)        | [`../forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md)                   |
-| Web services analysis (CB-1 through CB-32, WEBSERVICE-BUG-2) | [`../web-services/analysis/overview.md`](../web-services/analysis/overview.md)                       |
-| Dashboard test matrix (44 slots, per-test status)            | [`matrix.md`](matrix.md)                                                                             |
-| Dashboard test evidence (session logs)                       | [`results.md`](results.md)                                                                           |
-| Dashboard architecture & selectors                           | [`README.md`](README.md)                                                                             |
-| Freshdesk #124697 (postForms time mutation)                  | [`../web-services/analysis/overview.md`](../web-services/analysis/overview.md) § CB-29               |
-| VV platform architecture                                     | [`../../docs/architecture/visualvault-platform.md`](../../docs/architecture/visualvault-platform.md) |
+| Reference                                                    | Location                                                                                                |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Forms calendar analysis (FORM-BUG-5, FORM-BUG-6, FORM-BUG-7) | [`../forms-calendar/analysis/overview.md`](../../forms-calendar/analysis/overview.md)                   |
+| Web services analysis (CB-1 through CB-32, WEBSERVICE-BUG-2) | [`../web-services/analysis/overview.md`](../../web-services/analysis/overview.md)                       |
+| Dashboard test matrix (44 slots, per-test status)            | [`matrix.md`](../matrix.md)                                                                             |
+| Dashboard test evidence (session logs)                       | [`results.md`](../results.md)                                                                           |
+| Dashboard architecture & selectors                           | [`README.md`](../README.md)                                                                             |
+| Freshdesk #124697 (postForms time mutation)                  | [`../web-services/analysis/overview.md`](../../web-services/analysis/overview.md) § CB-29               |
+| VV platform architecture                                     | [`../../docs/architecture/visualvault-platform.md`](../../../docs/architecture/visualvault-platform.md) |
