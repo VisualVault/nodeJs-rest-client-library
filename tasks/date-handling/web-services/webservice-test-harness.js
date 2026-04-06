@@ -23,12 +23,12 @@ module.exports.main = async function (ffCollection, vvClient, response) {
     Script Name:    DateTest WS Harness
     Customer:       VisualVault
     Purpose:        Multi-purpose test harness for date-handling web service tests.
-                    Supports 7 test categories (WS-1 through WS-7) via an Action parameter.
+                    Supports 10 test categories (WS-1 through WS-10) via an Action parameter.
     Preconditions:
                     - DateTest form template must exist in the target environment
                     - For read actions (WS-2, WS-5): a saved record must exist
     Parameters:     Passed via ffCollection:
-                    Action:        Required. "WS-1" through "WS-7"
+                    Action:        Required. "WS-1" through "WS-10"
                     TargetConfigs: Optional. Comma-separated config letters (A-H) or "ALL". Default: "ALL"
                     RecordID:      Optional. Instance name (e.g. "DateTest-000080") for read actions
                     InputDate:     Optional. ISO date string (e.g. "2026-03-15") for write actions
@@ -42,6 +42,7 @@ module.exports.main = async function (ffCollection, vvClient, response) {
     Last Rev Date:  04/02/2026
 
     Revision Notes:
+                    04/06/2026 - Emanuel Jofré: Add WS-10 (postForms vs forminstance/) for Freshdesk #124697
                     04/02/2026 - Emanuel Jofré: Initial harness with WS-1 and WS-2 actions
   */
 
@@ -395,6 +396,46 @@ module.exports.main = async function (ffCollection, vvClient, response) {
             .then((res) => checkDataPropertyExists(res, shortDescription))
             .then((res) => checkDataIsNotEmpty(res, shortDescription))
             .then((res) => res.data);
+    }
+
+    // WS-10: Create record via FormsAPI forminstance/ endpoint (Freshdesk #124697).
+    // Uses vvClient.formsApi.formInstances.postForm() — requires FormsApi enabled + JWT.
+    // The forminstance/ endpoint requires the template REVISION ID (not the template ID or
+    // form definition GUID). We resolve it dynamically from the template name.
+    let _resolvedRevisionId = null;
+
+    async function getFormTemplateIds() {
+        if (_resolvedRevisionId) return _resolvedRevisionId;
+        const resp = await vvClient.forms.getFormTemplateIdByName(FORM_TEMPLATE_NAME);
+        _resolvedRevisionId = {
+            templateId: resp.templateIdGuid,
+            revisionId: resp.templateRevisionIdGuid,
+        };
+        if (!_resolvedRevisionId.revisionId) {
+            throw new Error(`Could not resolve revisionId for template "${FORM_TEMPLATE_NAME}"`);
+        }
+        return _resolvedRevisionId;
+    }
+
+    async function createFormRecordViaFormInstance(fieldValues) {
+        const shortDescription = 'Create DateTest record via forminstance/';
+        const ids = await getFormTemplateIds();
+
+        // The forminstance/ endpoint expects { fields: [{key, value}, ...] } array.
+        // Discovered via browser network intercept of VV.Form.CreateFormInstance.
+        const fieldsArray = Object.entries(fieldValues).map(([key, value]) => ({
+            key,
+            value,
+        }));
+        const data = { formName: '', fields: fieldsArray };
+
+        const rawResp = await vvClient.formsApi.formInstances.postForm(null, data, ids.revisionId);
+        const parsed = parseRes(rawResp);
+
+        checkMetaAndStatus(parsed, shortDescription);
+        checkDataPropertyExists(parsed, shortDescription);
+        checkDataIsNotEmpty(parsed, shortDescription);
+        return parsed.data;
     }
 
     function readFormRecord(instanceName) {
@@ -1050,6 +1091,87 @@ module.exports.main = async function (ffCollection, vvClient, response) {
         };
     }
 
+    async function actionFormInstanceCompare(targetConfigs, inputDate, isDebug) {
+        // WS-10: Compare postForms (core API) vs forminstance/ (FormsAPI) endpoints.
+        // Freshdesk #124697: postForms-created records have time mutated on form open;
+        // forminstance/-created records reportedly preserve time correctly.
+        //
+        // Sub-actions (controlled by InputDate format):
+        //   WS-10A/B: Create via both endpoints, return DataIDs for browser verification.
+        //   The browser step (verify-ws10-browser.js) handles comparison and save-stabilize.
+        if (!inputDate) throw new Error('InputDate is required for WS-10');
+
+        const fieldValues = {};
+        for (const configKey of targetConfigs) {
+            fieldValues[FIELD_MAP[configKey].field] = inputDate;
+        }
+
+        // --- postForms path (core API: /formtemplates/<id>/forms) ---
+        const postFormsCreated = await createFormRecord(fieldValues);
+        const postFormsRecord = await readFormRecord(postFormsCreated.instanceName);
+        const postFormsStored = extractDateFields(postFormsRecord, targetConfigs);
+
+        // --- forminstance/ path (FormsAPI: /forminstance) ---
+        let formInstanceCreated, formInstanceRecord, formInstanceStored;
+        let formInstanceError = null;
+
+        try {
+            formInstanceCreated = await createFormRecordViaFormInstance(fieldValues);
+            // forminstance/ response uses { name, formId } instead of { instanceName, revisionId }
+            const fiInstanceName = formInstanceCreated.name || formInstanceCreated.instanceName;
+            const fiDataId = formInstanceCreated.formId || formInstanceCreated.revisionId;
+            formInstanceCreated._instanceName = fiInstanceName;
+            formInstanceCreated._dataId = fiDataId;
+            formInstanceRecord = await readFormRecord(fiInstanceName);
+            formInstanceStored = extractDateFields(formInstanceRecord, targetConfigs);
+        } catch (err) {
+            formInstanceError =
+                err instanceof ReferenceError ? 'FormsApi not enabled on this environment' : err.message || String(err);
+            output.errors.push(`forminstance/ path failed: ${formInstanceError}`);
+        }
+
+        const results = targetConfigs.map((configKey) => {
+            const entry = buildResultEntry(configKey, {
+                sent: inputDate,
+                postForms: {
+                    apiStored: postFormsStored[configKey],
+                    recordID: postFormsCreated.instanceName,
+                    dataId: postFormsCreated.revisionId,
+                },
+            });
+
+            if (formInstanceCreated) {
+                entry.formInstance = {
+                    apiStored: formInstanceStored[configKey],
+                    recordID: formInstanceCreated._instanceName,
+                    dataId: formInstanceCreated._dataId,
+                };
+                entry.storedMatch = postFormsStored[configKey] === formInstanceStored[configKey];
+            } else {
+                entry.formInstance = { error: formInstanceError };
+                entry.storedMatch = null;
+            }
+
+            return entry;
+        });
+
+        const result = {
+            action: 'WS-10',
+            targetConfigs,
+            inputDate,
+            serverTime: new Date().toISOString(),
+            results,
+        };
+
+        if (isDebug) {
+            result.postFormsRaw = postFormsRecord;
+            if (formInstanceRecord) result.formInstanceRaw = formInstanceRecord;
+            result.fieldValuesSent = fieldValues;
+        }
+
+        return result;
+    }
+
     /* ---------------------------------- Main ---------------------------------- */
 
     logger.info(sanitizeLog(logEntry));
@@ -1100,8 +1222,11 @@ module.exports.main = async function (ffCollection, vvClient, response) {
             case 'WS-9':
                 output.data = await actionDateComputation(targetConfigs, inputDate, debug);
                 break;
+            case 'WS-10':
+                output.data = await actionFormInstanceCompare(targetConfigs, inputDate, debug);
+                break;
             default:
-                throw new Error(`Unknown action: '${action}'. Valid: WS-1 through WS-9`);
+                throw new Error(`Unknown action: '${action}'. Valid: WS-1 through WS-10`);
         }
 
         // Enrich output with diagnostics
