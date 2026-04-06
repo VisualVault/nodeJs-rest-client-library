@@ -48,7 +48,7 @@ A script reading a date-only field via `getForms()` receives a full datetime str
 
 ### Dashboard and report consumers
 
-Records for the "same" date may group differently in dashboards or reports if the grouping logic uses the full datetime rather than just the date portion. A March 15 record stored as `T00:00:00Z` and another as `T14:30:00Z` could appear in different time-based groupings.
+Records for the "same" date may group differently in dashboards or reports if the grouping logic uses the full datetime rather than just the date portion. A March 15 record with DB value `00:00:00.000` and another with `14:30:00.000` could appear in different time-based groupings.
 
 ### Not directly affected
 
@@ -110,12 +110,12 @@ From WS-1 testing (CB-6):
 ```bash
 # Send a datetime string to a date-only field (Config A, enableTime=false)
 node run-ws-test.js --action WS-1 --configs A --input-date "2026-03-15T14:30:00"
-# → stored: "2026-03-15T14:30:00Z"
+# → DB stores: 2026-03-15 14:30:00.000 (getForms returns "T14:30:00Z")
 # The server accepted a 2:30 PM time in a date-only field without error.
 
 # Send a date-only string to the same field
 node run-ws-test.js --action WS-1 --configs A --input-date "2026-03-15"
-# → stored: "2026-03-15T00:00:00Z"
+# → DB stores: 2026-03-15 00:00:00.000 (getForms returns "T00:00:00Z")
 # Both values accepted identically — server does not distinguish.
 ```
 
@@ -129,12 +129,12 @@ node run-ws-test.js --action WS-1 --configs A --input-date "2026-03-15"
 # 1. Create record via API with date-only string
 node tasks/date-handling/web-services/run-ws-test.js \
   --action WS-1 --configs A --input-date "2026-03-15"
-# → Field7 stored: "2026-03-15T00:00:00Z"
+# → Field7 DB: 2026-03-15 00:00:00.000
 
 # 2. Create another record via API with datetime string (same date, different time)
 node tasks/date-handling/web-services/run-ws-test.js \
   --action WS-1 --configs A --input-date "2026-03-15T14:30:00"
-# → Field7 stored: "2026-03-15T14:30:00Z"
+# → Field7 DB: 2026-03-15 14:30:00.000
 
 # 3. Query for "March 15" records
 node tasks/date-handling/web-services/run-ws-test.js \
@@ -150,9 +150,9 @@ node tasks/date-handling/web-services/run-ws-test.js \
 ### Demonstrate via Forms
 
 1. Create a new DateTest form in BRT
-2. Observe Current Date field (Config A, dataField1) — stores actual timestamp (e.g., `T23:01:57Z`)
-3. Observe Preset field (Config A, dataField2) — stores BRT midnight (`T03:00:00Z`)
-4. Use popup to set Config A field to March 15 — stores UTC midnight (`T00:00:00Z`)
+2. Observe Current Date field (Config A, dataField1) — DB has actual timestamp (e.g., `23:01:57.000`)
+3. Observe Preset field (Config A, dataField2) — DB has BRT midnight as UTC (`03:00:00.000`)
+4. Use popup to set Config A field to March 15 — DB has midnight (`00:00:00.000`)
 5. All three are date-only fields with `enableTime=false`, all have different time components
 
 ---
@@ -204,13 +204,13 @@ Exact-equality queries on date-only fields are unreliable when records have been
 [Field7] eq '2026-03-15'
 ```
 
-This query compares against `"2026-03-15T00:00:00Z"` (the normalized form of the date-only input). It will:
+This query compares against midnight. It will:
 
-- **Match**: records written via API with `"2026-03-15"` (stored as `T00:00:00Z`)
+- **Match**: records with DB value `2026-03-15 00:00:00.000` (API date-only input, Forms popup)
 - **Match**: records written via Forms popup in UTC+0
-- **Miss**: records written via Forms preset in BRT (stored as `T03:00:00Z`)
-- **Miss**: records written via Forms Current Date (stored as `T23:01:57Z` or similar)
-- **Miss**: records written via API with `"2026-03-15T14:30:00"` (stored as `T14:30:00Z`)
+- **Miss**: records with DB value `2026-03-15 03:00:00.000` (Forms preset in BRT)
+- **Miss**: records with DB value `2026-03-15 23:01:57.000` (Forms Current Date)
+- **Miss**: records with DB value `2026-03-15 14:30:00.000` (API datetime input in date-only field)
 
 Range queries are reliable: `[Field7] ge '2026-03-15' AND [Field7] lt '2026-03-16'` catches all March 15 records regardless of time component (CB-23), with the exception of Bug #7 records stored on the wrong day.
 
@@ -237,8 +237,8 @@ There is no way to programmatically determine whether a field is date-only witho
 
 For IST users, Forms Bug #7 stores the previous day for date-only fields:
 
-- March 15 via Forms popup in IST → stored as `"2026-03-14T00:00:00Z"` (wrong day)
-- March 15 via API → stored as `"2026-03-15T00:00:00Z"` (correct)
+- March 15 via Forms popup in IST → DB stores `2026-03-14 00:00:00.000` (wrong day — confirmed in DB dump, DateTest-000084)
+- March 15 via API → DB stores `2026-03-15 00:00:00.000` (correct)
 
 A query for March 15 records would match the API-created record but miss the IST Forms-created record (which is on March 14 in storage). This is Bug #7's fault, but the lack of server-side normalization means the API cannot detect or prevent it.
 

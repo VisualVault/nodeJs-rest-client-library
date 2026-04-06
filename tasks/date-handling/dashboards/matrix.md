@@ -102,20 +102,20 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 ## DB-2. Date Accuracy
 
-**Purpose**: Compare dashboard display values against known stored values from WS test results. Determines whether the server-side formatter accurately represents what's in the database.
+**Purpose**: Compare dashboard display values against known database values. Determines whether the server-side formatter accurately represents what's in the database.
 
-**Method**: For records created via WS tests (known input → known stored value), read the dashboard grid and compare.
+**Method**: For records created via WS tests (known input → known stored value), read the dashboard grid and compare. DB values confirmed via DB dump (2026-04-06).
 
-| ID     | Config | Field   | Record          | WS Stored Value        | Dashboard Display   | Match? | Status | Run Date   | Evidence                          |
-| ------ | :----: | ------- | --------------- | ---------------------- | ------------------- | :----: | :----: | ---------- | --------------------------------- |
-| db-2-A |   A    | Field7  | DateTest-000889 | `2026-03-15T00:00:00Z` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-A.md) |
-| db-2-B |   B    | Field10 | DateTest-000889 | `2026-03-15T00:00:00Z` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-B.md) |
-| db-2-C |   C    | Field6  | DateTest-000890 | `2026-03-15T14:30:00Z` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-C.md) |
-| db-2-D |   D    | Field5  | DateTest-000890 | `2026-03-15T14:30:00Z` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-D.md) |
-| db-2-E |   E    | Field12 | DateTest-000889 | `2026-03-15T00:00:00Z` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-E.md) |
-| db-2-F |   F    | Field11 | DateTest-000889 | `2026-03-15T00:00:00Z` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-F.md) |
-| db-2-G |   G    | Field14 | DateTest-000890 | `2026-03-15T14:30:00Z` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-G.md) |
-| db-2-H |   H    | Field13 | DateTest-000890 | `2026-03-15T14:30:00Z` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-H.md) |
+| ID     | Config | Field   | Record          | DB Value (`datetime`)     | Dashboard Display   | Match? | Status | Run Date   | Evidence                          |
+| ------ | :----: | ------- | --------------- | ------------------------- | ------------------- | :----: | :----: | ---------- | --------------------------------- |
+| db-2-A |   A    | Field7  | DateTest-000889 | `2026-03-15 00:00:00.000` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-A.md) |
+| db-2-B |   B    | Field10 | DateTest-000889 | `2026-03-15 00:00:00.000` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-B.md) |
+| db-2-C |   C    | Field6  | DateTest-000890 | `2026-03-15 14:30:00.000` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-C.md) |
+| db-2-D |   D    | Field5  | DateTest-000890 | `2026-03-15 14:30:00.000` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-D.md) |
+| db-2-E |   E    | Field12 | DateTest-000889 | `2026-03-15 00:00:00.000` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-E.md) |
+| db-2-F |   F    | Field11 | DateTest-000889 | `2026-03-15 00:00:00.000` | `3/15/2026`         |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-F.md) |
+| db-2-G |   G    | Field14 | DateTest-000890 | `2026-03-15 14:30:00.000` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-G.md) |
+| db-2-H |   H    | Field13 | DateTest-000890 | `2026-03-15 14:30:00.000` | `3/15/2026 2:30 PM` |   ✓    |  PASS  | 2026-04-02 | [summary](summaries/tc-db-2-H.md) |
 
 ---
 
@@ -155,7 +155,7 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 ## DB-5. Search / SQL Filter
 
-**Purpose**: Test the SQL filter builder with date-based queries. Verify that date filtering works correctly given the mixed timezone storage in the database.
+**Purpose**: Test the SQL filter builder with date-based queries. Verify that date filtering works correctly given records with mixed time components from different write paths (SQL `datetime` column is TZ-unaware).
 
 **Method**: Open filter builder, create date filter, verify results include/exclude expected records.
 

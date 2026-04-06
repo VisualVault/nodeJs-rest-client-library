@@ -2,27 +2,27 @@
 
 ## Classification
 
-| Field                  | Value                                                                                                                                                                 |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Severity**           | HIGH                                                                                                                                                                  |
-| **Evidence**           | `[LIVE]` — Confirmed via WS-4 and WS-10 browser verification in BRT and IST                                                                                           |
-| **Component**          | VV Server (core API) + FormViewer (V1 init path)                                                                                                                      |
-| **Code Path**          | `postForms()` → server appends Z → `initCalendarValueV1()` interprets as UTC                                                                                          |
-| **Affected Configs**   | C, D, G, H (all DateTime configs). Date-only A, B, E, F are immune (CB-10).                                                                                           |
-| **Affected TZs**       | All non-UTC timezones. Shift magnitude = TZ offset.                                                                                                                   |
-| **Affected Scenarios** | Any script creating/updating DateTime fields via `postForms` where users view records in Forms                                                                        |
-| **Related Bugs**       | Root cause: WS-BUG-4 (endpoint format mismatch). Amplified by Forms Bug #5 (fake Z on GFV for Config D). Upstream: Forms Bug #1 (Z stripping in `parseDateString()`). |
-| **Freshdesk**          | #124697 / WADNR-10407                                                                                                                                                 |
+| Field                  | Value                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Severity**           | HIGH                                                                                                                            |
+| **Evidence**           | `[LIVE]` — Confirmed via WS-4 and WS-10 browser verification in BRT and IST                                                     |
+| **Component**          | VV Server (core API) + FormViewer (V1 init path)                                                                                |
+| **Code Path**          | `postForms()` → DB stores correct value → `FormInstance/Controls` serializes with Z → `initCalendarValueV1()` interprets as UTC |
+| **Affected Configs**   | C, D, G, H (all DateTime configs). Date-only A, B, E, F are immune (CB-10).                                                     |
+| **Affected TZs**       | All non-UTC timezones. Shift magnitude = TZ offset.                                                                             |
+| **Affected Scenarios** | Any script creating/updating DateTime fields via `postForms` where users view records in Forms                                  |
+| **Related Bugs**       | Root cause: WS-4 (endpoint serialization inconsistency). Amplified by Forms Bug #5 (fake Z on GFV for Config D).                |
+| **Freshdesk**          | #124697 / WADNR-10407                                                                                                           |
 
 ---
 
 ## Summary
 
-When a datetime value is written via `postForms()` — for example `"2026-03-15T14:30:00"` — the VV server appends a Z suffix to the stored value: `"2026-03-15T14:30:00Z"`. The developer intended the time as local or timezone-agnostic, but the Z marks it as UTC.
+When a datetime value is written via `postForms()` — for example `"2026-03-15T14:30:00"` — the database stores the correct value: `2026-03-15 14:30:00.000` (SQL Server `datetime`, no timezone). The value is identical to what `forminstance/` or the Forms UI would store for the same input.
 
-When a user opens this record in the Forms UI, the V1 calendar init code (`initCalendarValueV1`) reads the Z suffix, interprets the value as real UTC, and converts it to the user's local time. The rawValue stored in the form component is permanently shifted by the user's timezone offset. If the user saves the form, the shifted value is committed to the database, permanently corrupting the original time.
+The problem occurs when a user opens the record in the Forms UI. The `FormInstance/Controls` endpoint — which Forms V1 uses to read field values — serializes the value as `"2026-03-15T14:30:00Z"` (with Z suffix) for records created by `postForms`, but as `"03/15/2026 2:30:00 PM"` (US format, no Z) for records created by `forminstance/`. The Z is incorrect — the DB column is timezone-unaware — but Forms V1 takes it literally, interprets the value as UTC, and converts to the user's local time. The rawValue is permanently shifted by the user's timezone offset. If the user saves the form, the shifted value overwrites the original in the database.
 
-This is the most impactful web services date handling defect. It affects **every production script** that writes datetime values via `postForms` where any user outside UTC+0 subsequently opens the record in Forms. It is the confirmed root cause of Freshdesk #124697 (WADNR-10407).
+This is the most impactful web services date handling defect. It affects **every production script** that writes datetime values via `postForms` where any user outside UTC+0 subsequently opens the record in Forms. The field's client-side configuration (`ignoreTZ`, `enableTime`, `useLegacy`) has no effect — the bug is in the server's serialization layer, not in field settings. It is the confirmed root cause of Freshdesk #124697 (WADNR-10407).
 
 ---
 
@@ -54,6 +54,8 @@ DB value:                     2026-03-15 14:30:00.000    (identical for both)
 Controls for postForms:       "2026-03-15T14:30:00Z"     (ISO+Z — triggers shift)
 Controls for forminstance/:   "03/15/2026 14:30:00"      (US format — no shift)
 ```
+
+**How does Controls know which endpoint created the record?** The form data table (`dbo.DateTest`) contains no flag or column that distinguishes records by creation endpoint — a column-by-column comparison of postForms vs forminstance/ records shows identical metadata (same user, same field values — only DhDocID/DhID/timestamps differ). The serialization decision must be based on **hidden metadata in VV's internal system tables** (revision history, form instance tracking, or similar) that are not part of the form data table. We have not identified the specific table or flag — this is an open question for the product team.
 
 This serialization difference is confirmed across all 8 field configurations (CB-6). The `getForms` API normalizes both to ISO+Z, masking the difference.
 
@@ -254,7 +256,7 @@ Config D is the most dangerous: the user sees the correct time on first open, tr
 ### Downstream Effects
 
 - **Forms Bug #5 compounds the issue** for Config D: `GetFieldValue()` appends a fake Z to the already-shifted local time, creating a value like `"2026-03-15T11:30:00.000Z"` — doubly wrong (shifted time marked as UTC). Any script that round-trips via `SetFieldValue(GetFieldValue())` will drift further.
-- **CSV/bulk imports**: Data migrated via `postForms` will have correct API read-back (`getForms` normalizes both storage formats — CB-30), but silently corrupted when viewed or edited in Forms.
+- **CSV/bulk imports**: Data migrated via `postForms` will have correct API read-back (`getForms` normalizes both serialization formats — CB-30), but silently corrupted when viewed or edited in Forms.
 - **Audit trail**: The form revision history will show the shift as a user edit, even though the user did not change the value.
 
 ---
@@ -310,74 +312,79 @@ If the datetime field is only read by scripts via `getForms()` (never opened in 
 
 ## Proposed Fix
 
-### Option A: Fix Forms V1 `initCalendarValueV1` (client-side)
+### Recommended: Fix `FormInstance/Controls` serialization (server-side)
 
-Modify `parseDateString()` to preserve the Z suffix and parse the string as-is, rather than stripping Z and re-interpreting:
+The root cause is that `FormInstance/Controls` serializes the same SQL Server `datetime` value differently based on which endpoint created the record. The Z it adds to postForms records is incorrect — the DB column is `datetime` (timezone-unaware), so no value in it is "UTC." The fix:
+
+**Remove the creation-path-dependent serialization logic in Controls.** All records should be serialized the same way, regardless of whether they were created by `postForms`, `forminstance/`, or the Forms UI.
+
+```
+Current (broken):
+  postForms record:     Controls returns "2026-03-15T14:30:00Z"     (Z added — incorrect)
+  forminstance/ record: Controls returns "03/15/2026 2:30:00 PM"    (no Z — correct)
+
+Fixed:
+  ANY record:           Controls returns "03/15/2026 2:30:00 PM"    (no Z — consistent)
+```
+
+**Why this is the right fix:**
+
+- The Z is a lie — the DB `datetime` column has no timezone context
+- forminstance/ serialization (US format, no Z) is already correct and consistent with Forms UI saves
+- One change in one code path fixes all existing and future records
+- No client-side changes needed — Forms V1 already handles US format correctly
+- No developer-side changes needed — scripts don't need to add offsets
+
+**What needs to happen:**
+
+1. Identify the metadata or code path that Controls uses to decide the serialization format (not in the `dbo.DateTest` table — likely in VV's internal revision/instance tracking tables)
+2. Remove or bypass that branching logic
+3. Apply consistent serialization (US format, no Z) for all records
+
+### Alternative: Fix Forms V1 client-side (defensive)
+
+If the Controls serialization cannot be changed, Forms V1 could be modified to not treat Z as a real UTC indicator when the source is a `datetime` column:
 
 ```javascript
-// CURRENT (broken):
-let stripped = input.replace('Z', '');
-result = moment(stripped); // Parses as local — wrong
+// Current V1: treats Z as UTC, converts to local
+new Date("2026-03-15T14:30:00Z")  → UTC 14:30 → local 11:30 BRT (wrong)
 
-// FIXED:
-if (input.endsWith('Z') || input.includes('+') || input.includes('-', 11)) {
-    // Has timezone info — parse as-is
-    result = moment(input); // Moment handles Z and offsets correctly
-} else {
-    // No timezone — treat as local (backwards compatible)
-    result = moment(input);
-}
+// Fixed V1: strip Z before parsing (treat all values as local)
+let value = input.replace("Z", "");
+new Date(value)  → local 14:30 BRT (correct)
 ```
 
-**Pros**: Fixes the issue for all existing data. No server changes needed.
-**Cons**: Changes behavior for every calendar field on form load. Requires extensive regression testing.
+This is a defensive fix — it works, but it papers over the inconsistent serialization rather than fixing it. It also changes behavior for every calendar field on every form load, requiring extensive regression testing.
 
-### Option B: Fix server normalization (server-side)
+### NOT recommended: requiring developers to send TZ offsets
 
-Stop appending Z to offset-less datetime strings. Store them without timezone indicator:
-
-```
-Current:  "2026-03-15T14:30:00"  →  stored as "2026-03-15T14:30:00Z"
-Fixed:    "2026-03-15T14:30:00"  →  stored as "2026-03-15T14:30:00"
-```
-
-**Pros**: The source of the problem. All downstream consumers see the value as intended.
-**Cons**: Changes storage format for all new records. Existing Z-suffixed records remain shifted. May affect other consumers that expect Z.
-
-### Option C: Both (recommended)
-
-1. Fix the server to not append Z to ambiguous inputs (or use the FormsAPI storage format consistently)
-2. Fix `parseDateString()` to handle both Z and Z-less values correctly
-3. Existing data with Z is correctly parsed by the fixed Forms code
-4. New data without Z is also correctly parsed
-
-### V2 Code Path Status
-
-The V2 code path (`initCalendarValueV2`, gated by `useUpdatedCalendarValueLogic`) uses `parseDateString()` with a `.tz("UTC", true).local()` recovery for `ignoreTimezone=false`. This partially addresses the issue for non-ignoreTZ configs but does not fix the `ignoreTimezone=true` path (Config D/H — the Freshdesk scenario).
+Requiring scripts to always include offsets (e.g., `"T14:30:00-03:00"`) puts the burden on developers to work around a platform bug. It also doesn't help with the Freshdesk #124697 scenario (existing records already stored without offsets).
 
 ---
 
 ## Fix Impact Assessment
 
-### What Changes If Fixed
+### What Changes If Fixed (Controls serialization fix)
 
-- DateTime values written via `postForms` display correctly in Forms regardless of user timezone
+- All records display consistently in Forms regardless of creation endpoint
 - Freshdesk #124697 behavior eliminated
-- The `forminstance/` workaround becomes unnecessary (though still functional)
-- Config D/H users no longer experience the "time changes after save" pattern
+- The `forminstance/` workaround becomes unnecessary
+- No developer-side changes needed — existing scripts work as-is
 
 ### Backwards Compatibility Risk
 
-**HIGH**: Existing records in the database have the Z suffix. If only the server is fixed (Option B), old records still have Z and will still shift. If only Forms is fixed (Option A), new and old records display correctly. Option C handles both.
+**LOW for Controls fix**: Existing postForms records currently have their `datetime` value serialized as ISO+Z by Controls. After the fix, they would be serialized as US format. Forms V1 would parse them as local time instead of UTC — which means existing shifted-then-saved records (like DateTest-001737 with `11:30:00` in the DB) would display as `11:30 AM` in both the old and new behavior. Records that have NOT been opened+saved yet (DB still has the original value) would now display correctly.
 
-Additionally, some applications may have implemented compensating logic (pre-shifting values, post-read adjustments). A fix could cause these workarounds to double-correct.
+**Risk area**: Applications that read `FormInstance/Controls` directly (not through Forms V1) and parse the ISO+Z format would need to handle the US format instead. This is an uncommon pattern but should be checked.
 
 ### Regression Risk
 
-- `parseDateString()` is called on **every form load** for **every calendar field**. A change here affects all forms across the platform.
-- Must be tested across all 8 configurations × multiple timezones × all code paths (saved data, preset, URL parameter, SetFieldValue)
-- Must verify that the `ignoreTimezone=false` branch still produces correct display for Config C/G
+**LOW**: The fix is in the Controls serialization layer, not in Forms V1 or the DB. The change affects how a `datetime` value is formatted as a string — not the value itself. Testing should verify:
+
+- Forms display is correct for records created by all endpoints
+- `getForms` API (separate from Controls) is unaffected
+- Dashboard display (uses server-rendered format, not Controls) is unaffected
 
 ### Migration Consideration
 
-For large-scale customers (like WA DNR with Freshdesk #124697), existing records written via `postForms` have Z-suffixed values that were correct at write time but display incorrectly. A Forms-side fix (Option A/C) would retroactively fix these records without data migration. A server-only fix (Option B) would not help existing records.
+No data migration needed. The DB values are correct — only the serialization was wrong. After the fix, all existing records display correctly without any data changes.

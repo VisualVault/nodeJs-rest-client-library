@@ -77,9 +77,9 @@ Six distinct findings identified — 3 bugs (software defects), 2 design flaws (
 | **Freshdesk** | #124697 / WADNR-10407                                                                  |
 | **Evidence**  | CB-8, CB-11, CB-31, CB-32 (WS-4, WS-10)                                                |
 
-**Description**: When a datetime value is written via `postForms()` (e.g., `"2026-03-15T14:30:00"`), the VV server appends a Z suffix, storing `"2026-03-15T14:30:00Z"`. When a user opens this record in the Forms UI, the V1 init code (`initCalendarValueV1`) interprets the Z as real UTC and converts to local time. The rawValue is permanently shifted by the user's TZ offset.
+**Description**: When a datetime value is written via `postForms()` (e.g., `"2026-03-15T14:30:00"`), the database stores the correct value (`2026-03-15 14:30:00.000`). However, the `FormInstance/Controls` endpoint serializes it as `"2026-03-15T14:30:00Z"` (with Z) for postForms-created records, while serializing the identical DB value as US format (no Z) for forminstance/-created records. Forms V1 takes the Z literally, interprets the value as UTC, and converts to local time. The rawValue is permanently shifted by the user's TZ offset.
 
-**Root Cause**: The server treats the missing timezone indicator as UTC and appends Z. The Forms V1 code path then faithfully converts UTC → local. The developer intended local time, but the system chain treats it as UTC.
+**Root Cause**: `FormInstance/Controls` adds a Z suffix to datetime values from postForms-created records based on hidden creation-path metadata. The Z is incorrect — the DB column is SQL Server `datetime` (timezone-unaware). Forms V1 interprets the Z as real UTC and shifts the value. Field configuration (`ignoreTZ`, `enableTime`) has no effect — the bug is in the serialization layer.
 
 **Impact**:
 
@@ -234,20 +234,20 @@ This means the same "date-only" field can contain different time components depe
 
 ### 5.1 API Write Path (WS-1)
 
-| #    | Behavior                                                                                                                                                               | Evidence                                               |
-| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| CB-1 | API bypasses Forms Bug #7 — date-only strings stored correctly in all TZs. `"2026-03-15"` → `"2026-03-15T00:00:00Z"` in BRT, IST, UTC                                  | [ws-1-ws-2-batch-run-1](runs/ws-1-ws-2-batch-run-1.md) |
-| CB-4 | Server TZ (`TZ=` env var) has no effect on API write — strings stored as-is. BRT, IST, UTC all produce identical stored values                                         | Same run                                               |
-| CB-6 | Field config flags (`enableTime`, `ignoreTimezone`, `useLegacy`) have NO effect on API write/read behavior — all 8 configs store and return identically per input type | Same run                                               |
-| CB-7 | API normalizes ALL dates to ISO 8601 datetime+Z on read — `"2026-03-15"` returns as `"2026-03-15T00:00:00Z"`                                                           | Same run                                               |
+| #    | Behavior                                                                                                                                                                   | Evidence                                               |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| CB-1 | API bypasses Forms Bug #7 — date-only strings stored correctly in all TZs. `"2026-03-15"` → DB stores `2026-03-15 00:00:00.000` (getForms returns with Z) in BRT, IST, UTC | [ws-1-ws-2-batch-run-1](runs/ws-1-ws-2-batch-run-1.md) |
+| CB-4 | Server TZ (`TZ=` env var) has no effect on API write — strings stored as-is. BRT, IST, UTC all produce identical stored values                                             | Same run                                               |
+| CB-6 | Field config flags (`enableTime`, `ignoreTimezone`, `useLegacy`) have NO effect on API write/read behavior — all 8 configs store and return identically per input type     | Same run                                               |
+| CB-7 | API normalizes ALL dates to ISO 8601 datetime+Z on read — `"2026-03-15"` returns as `"2026-03-15T00:00:00Z"`                                                               | Same run                                               |
 
 ### 5.2 API Read Path (WS-2)
 
-| #    | Behavior                                                                                                                                   | Evidence                                               |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
-| CB-2 | API returns raw stored values without Forms Bug #5 (fake Z suffix). Config D returns real Z from normalization, not client-side appended Z | [ws-1-ws-2-batch-run-1](runs/ws-1-ws-2-batch-run-1.md) |
-| CB-3 | Unset date fields return `null` from API (not `""` or `"Invalid Date"`)                                                                    | Same run                                               |
-| CB-5 | Forms Bug #7 damage persists in DB and is visible via API — IST Config A returns `"2026-03-14T00:00:00Z"` (wrong day stored by Forms)      | Same run                                               |
+| #    | Behavior                                                                                                                                | Evidence                                               |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| CB-2 | API returns stored values without Forms Bug #5 (fake Z). The Z in `getForms` output is API serialization, not a client-side artifact    | [ws-1-ws-2-batch-run-1](runs/ws-1-ws-2-batch-run-1.md) |
+| CB-3 | Unset date fields return `null` from API (not `""` or `"Invalid Date"`)                                                                 | Same run                                               |
+| CB-5 | Forms Bug #7 damage persists in DB — IST Config A has `2026-03-14 00:00:00.000` in DB (wrong day, confirmed in DB dump DateTest-000084) | Same run                                               |
 
 ### 5.3 API Round-Trip (WS-3)
 
@@ -259,7 +259,7 @@ This means the same "date-only" field can contain different time components depe
 
 | #     | Behavior                                                                                                                                                                                                                                                      | Evidence                                                                        |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| CB-8  | API Z normalization causes cross-layer datetime shift when opened in Forms. `"T14:30:00"` → stored `"T14:30:00Z"` → Forms displays 11:30 AM (BRT) / 8:00 PM (IST). See WS-BUG-1                                                                               | [ws-4-batch-run-1](runs/ws-4-batch-run-1.md)                                    |
+| CB-8  | Cross-layer datetime shift: DB stores correct value (`14:30:00.000`), but `FormInstance/Controls` serializes as `"T14:30:00Z"` for postForms records → Forms V1 interprets Z as UTC → displays 11:30 AM (BRT) / 8:00 PM (IST). See WS-BUG-1                   | [ws-4-batch-run-1](runs/ws-4-batch-run-1.md)                                    |
 | CB-10 | Bug #7 does NOT manifest on Forms load/display path for **date-only** fields loaded from API. Config A IST displays `03/15/2026` (correct) — Kendo shows local date from Date object                                                                          | Same run                                                                        |
 | CB-11 | `ignoreTZ=true` preserves display but not rawValue when loading API-stored datetimes. Config D/H display 2:30 PM but rawValue shifted to 11:30/20:00                                                                                                          | Same run                                                                        |
 | CB-29 | `FormInstance/Controls` returns dates in **different string formats** depending on which endpoint created the record: postForms → ISO+Z, forminstance/ → US format. DB values are identical (`datetime` type, confirmed via DB dump 2026-04-06). See WS-BUG-4 | [ws-10-batch-run-1](runs/ws-10-batch-run-1.md) + browser verification + DB dump |
@@ -342,15 +342,15 @@ Actionable recommendations for scripts that create or update date fields via the
 
 #### Safe Patterns (use these)
 
-| Pattern                       | Code Example                      | Why Safe                                        |
-| ----------------------------- | --------------------------------- | ----------------------------------------------- |
-| ISO date string               | `"2026-03-15"`                    | Unambiguous, stored as `"2026-03-15T00:00:00Z"` |
-| ISO datetime string           | `"2026-03-15T14:30:00"`           | Stored as-is with Z appended                    |
-| ISO datetime with Z           | `"2026-03-15T14:30:00Z"`          | Stored as-is                                    |
-| US format                     | `"03/15/2026"`                    | Accepted, normalized to ISO                     |
-| `Date.UTC()` constructor      | `new Date(Date.UTC(2026, 2, 15))` | Explicit UTC — TZ-independent                   |
-| `toISOString().split('T')[0]` | Extracts date from Date obj       | Always uses UTC date — TZ-safe                  |
-| ISO parse + serialize         | `new Date("2026-03-15")`          | ISO strings parse as UTC midnight in JS         |
+| Pattern                       | Code Example                      | Why Safe                                         |
+| ----------------------------- | --------------------------------- | ------------------------------------------------ |
+| ISO date string               | `"2026-03-15"`                    | Unambiguous, DB stores `2026-03-15 00:00:00.000` |
+| ISO datetime string           | `"2026-03-15T14:30:00"`           | DB stores `2026-03-15 14:30:00.000`              |
+| ISO datetime with Z           | `"2026-03-15T14:30:00Z"`          | DB stores same value as without Z                |
+| US format                     | `"03/15/2026"`                    | Accepted, normalized to ISO                      |
+| `Date.UTC()` constructor      | `new Date(Date.UTC(2026, 2, 15))` | Explicit UTC — TZ-independent                    |
+| `toISOString().split('T')[0]` | Extracts date from Date obj       | Always uses UTC date — TZ-safe                   |
+| ISO parse + serialize         | `new Date("2026-03-15")`          | ISO strings parse as UTC midnight in JS          |
 
 #### Unsafe Patterns (avoid these)
 
@@ -417,7 +417,7 @@ Issues that are not bugs in any single component but systemic inconsistencies in
 
 ### 8.1 No Shared Date Normalization Layer
 
-Two independent write paths (`postForms` and `forminstance/`) produce different physical storage formats for identical logical values. The read path (`getForms`) normalizes both to ISO+Z, hiding the divergence from API consumers. The Forms UI does not normalize on read — it parses format-sensitively, causing different runtime behavior.
+Both write paths (`postForms` and `forminstance/`) store identical `datetime` values in SQL Server. However, the `FormInstance/Controls` serialization layer produces different string formats for the same DB value depending on which endpoint created the record (ISO+Z for postForms, US format for forminstance/). The `getForms` API normalizes both to ISO+Z, hiding the serialization divergence from API consumers. Forms V1 reads via Controls (not getForms) and parses format-sensitively, causing different runtime behavior for identical DB values.
 
 ### 8.2 Client-Side Field Config Not Enforced Server-Side
 

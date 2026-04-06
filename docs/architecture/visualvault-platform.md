@@ -407,6 +407,8 @@ The difference is in how `FormInstance/Controls` **serializes its HTTP response*
 
 The core API's `getForms` normalizes both to ISO+Z, masking the serialization difference. The divergence is only visible through `FormInstance/Controls` or by observing the Forms UI behavior.
 
+**How Controls decides the format**: The form data table (`dbo.DateTest`) contains no column or flag that distinguishes records by creation endpoint — a column-by-column DB comparison of postForms vs forminstance/ records (DateTest-001679 vs DateTest-001680) shows identical metadata. The serialization decision is based on **hidden internal metadata** in VV's revision/instance tracking tables, not in the form data table. The specific table and field have not been identified.
+
 **Root cause**: The FormsAPI has two serialization paths that produce different string formats for the same `datetime` value. Forms V1 `initCalendarValueV1` parses the string format — ISO+Z triggers UTC→local conversion, US format does not.
 
 See `tasks/date-handling/web-services/analysis/overview.md` CB-29 for full evidence.

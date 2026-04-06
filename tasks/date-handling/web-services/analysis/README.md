@@ -18,10 +18,10 @@ See [`overview.md`](overview.md) for the comprehensive analysis including execut
 
 ### Design Flaws (architectural gaps — systemic inconsistencies, not single-point failures)
 
-| ID   | Document                                                                       | Severity | Title                                                   | Evidence   |
-| ---- | ------------------------------------------------------------------------------ | -------- | ------------------------------------------------------- | ---------- |
-| WS-4 | [`ws-bug-4-endpoint-format-mismatch.md`](ws-bug-4-endpoint-format-mismatch.md) | **HIGH** | postForms vs forminstance/ storage format inconsistency | `[LIVE]`   |
-| WS-6 | [`ws-bug-6-no-date-only-enforcement.md`](ws-bug-6-no-date-only-enforcement.md) | MEDIUM   | No server-side date-only type enforcement               | `[DESIGN]` |
+| ID   | Document                                                                       | Severity | Title                                                  | Evidence   |
+| ---- | ------------------------------------------------------------------------------ | -------- | ------------------------------------------------------ | ---------- |
+| WS-4 | [`ws-bug-4-endpoint-format-mismatch.md`](ws-bug-4-endpoint-format-mismatch.md) | **HIGH** | postForms vs forminstance/ serialization inconsistency | `[LIVE]`   |
+| WS-6 | [`ws-bug-6-no-date-only-enforcement.md`](ws-bug-6-no-date-only-enforcement.md) | MEDIUM   | No server-side date-only type enforcement              | `[DESIGN]` |
 
 ### Undocumented Behaviors (valid design decisions that need documentation)
 

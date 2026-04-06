@@ -96,30 +96,30 @@ WS-1 includes UTC spot-checks (ws-1-{A,C,D,H}-UTC) to prove that the cloud envir
 
 Create a new form record via `postForms()` with a date value in each target config field. Read back via `getForms()` and compare sent vs stored.
 
-**Hypothesis**: The VV server stores the string as-is. No Bug #7 (client-side only). Field config flags may or may not affect server-side storage format.
+**Hypothesis**: The VV server stores the value as a SQL `datetime` (no Z, no format). No Bug #7 (client-side only). Field config flags may or may not affect server-side behavior.
 
 **Test date**: `"2026-03-15"` for date-only configs (A/B/E/F), `"2026-03-15T14:30:00"` for DateTime configs (C/D/G/H). Using non-midnight time (14:30) to distinguish from date-only.
 
-| ID         | Config | TZ  | Input Sent              | Expected Stored          | Status | Actual                   | Bugs | Notes                        |
-| ---------- | :----: | :-: | ----------------------- | ------------------------ | :----: | ------------------------ | ---- | ---------------------------- |
-| ws-1-A-BRT |   A    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Date preserved; API adds T+Z |
-| ws-1-B-BRT |   B    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | ignoreTZ no effect on API    |
-| ws-1-C-BRT |   C    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Time preserved; API adds Z   |
-| ws-1-D-BRT |   D    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | ignoreTZ no effect on API    |
-| ws-1-E-BRT |   E    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Legacy = same as non-legacy  |
-| ws-1-F-BRT |   F    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Legacy + ignoreTZ = same     |
-| ws-1-G-BRT |   G    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Legacy DateTime = same       |
-| ws-1-H-BRT |   H    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Legacy + ignoreTZ = same     |
-| ws-1-A-IST |   A    | IST | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | TZ independent ✓ H-1,H-4     |
-| ws-1-C-IST |   C    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | TZ independent ✓             |
-| ws-1-D-IST |   D    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | TZ independent ✓             |
-| ws-1-H-IST |   H    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | TZ independent ✓             |
-| ws-1-A-UTC |   A    | UTC | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Cloud simulation ✓ H-4       |
-| ws-1-C-UTC |   C    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Cloud simulation ✓           |
-| ws-1-D-UTC |   D    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Cloud simulation ✓           |
-| ws-1-H-UTC |   H    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Cloud simulation ✓           |
+| ID         | Config | TZ  | Input Sent              | Expected Stored          | Status | Actual                   | Bugs | Notes                             |
+| ---------- | :----: | :-: | ----------------------- | ------------------------ | :----: | ------------------------ | ---- | --------------------------------- |
+| ws-1-A-BRT |   A    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Date preserved; getForms adds T+Z |
+| ws-1-B-BRT |   B    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | ignoreTZ no effect on API         |
+| ws-1-C-BRT |   C    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Time preserved; getForms adds Z   |
+| ws-1-D-BRT |   D    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | ignoreTZ no effect on API         |
+| ws-1-E-BRT |   E    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Legacy = same as non-legacy       |
+| ws-1-F-BRT |   F    | BRT | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Legacy + ignoreTZ = same          |
+| ws-1-G-BRT |   G    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Legacy DateTime = same            |
+| ws-1-H-BRT |   H    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Legacy + ignoreTZ = same          |
+| ws-1-A-IST |   A    | IST | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | TZ independent ✓ H-1,H-4          |
+| ws-1-C-IST |   C    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | TZ independent ✓                  |
+| ws-1-D-IST |   D    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | TZ independent ✓                  |
+| ws-1-H-IST |   H    | IST | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | TZ independent ✓                  |
+| ws-1-A-UTC |   A    | UTC | `"2026-03-15"`          | `"2026-03-15T00:00:00Z"` |  PASS  | `"2026-03-15T00:00:00Z"` |      | Cloud simulation ✓ H-4            |
+| ws-1-C-UTC |   C    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Cloud simulation ✓                |
+| ws-1-D-UTC |   D    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Cloud simulation ✓                |
+| ws-1-H-UTC |   H    | UTC | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` |  PASS  | `"2026-03-15T14:30:00Z"` |      | Cloud simulation ✓                |
 
-> **WS-1 Finding**: All 16 tests PASS. The VV server stores the date/time value as sent. The API read-back normalizes the format by appending `T00:00:00Z` (date-only) or `Z` (datetime). The date value itself is preserved perfectly. No Bug #7 (H-1 confirmed). Server TZ has no effect (H-4 confirmed). Field config flags (enableTime, ignoreTimezone, useLegacy) have no effect on API write behavior. Created records: DateTest-000889 through DateTest-000894.
+> **WS-1 Finding**: All 16 tests PASS. The VV server stores the value as a SQL `datetime` (DB dump confirmed: `2026-03-15 14:30:00.000`). The `getForms` API serializes the response as ISO+Z (`"T14:30:00Z"` for datetime, `"T00:00:00Z"` for date-only). The date value itself is preserved perfectly. No Bug #7 (H-1 confirmed). Server TZ has no effect (H-4 confirmed). Field config flags (enableTime, ignoreTimezone, useLegacy) have no effect on API write behavior. Created records: DateTest-000889 through DateTest-000894.
 
 ---
 
@@ -137,26 +137,26 @@ Read existing Forms-saved records via `getForms()` with `expand: true`. Two anal
 
 **Note**: These records have known stored values from Forms testing (see `forms-calendar/results.md`). Configs not explicitly set during save may have empty or preset values.
 
-| ID         | Config | Record Source | Forms Stored Value              | Expected API Return                  | Status | Actual                   | Bugs | Notes                                        |
-| ---------- | :----: | ------------- | ------------------------------- | ------------------------------------ | :----: | ------------------------ | ---- | -------------------------------------------- |
-| ws-2-A-BRT |   A    | 000080 (BRT)  | `"2026-03-15"`                  | `"2026-03-15T00:00:00Z"`             |  PASS  | `"2026-03-15T00:00:00Z"` |      | API normalizes date-only → datetime+Z; H-2 ✓ |
-| ws-2-B-BRT |   B    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset field returns null                     |
-| ws-2-C-BRT |   C    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset field returns null                     |
-| ws-2-D-BRT |   D    | 000080 (BRT)  | `"2026-03-15T00:00:00"`         | `"2026-03-15T00:00:00Z"` (real Z)    |  PASS  | `"2026-03-15T00:00:00Z"` |      | No fake Z — H-2 confirmed; API adds real Z   |
-| ws-2-E-BRT |   E    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
-| ws-2-F-BRT |   F    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
-| ws-2-G-BRT |   G    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
-| ws-2-H-BRT |   H    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
-| ws-2-A-IST |   A    | 000084 (IST)  | `"2026-03-14"` (Bug #7: -1 day) | `"2026-03-14T00:00:00Z"` (bug in DB) |  PASS  | `"2026-03-14T00:00:00Z"` | #7   | API confirms wrong date in storage; H-7 ✓    |
-| ws-2-B-IST |   B    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset                                        |
-| ws-2-C-IST |   C    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset                                        |
-| ws-2-D-IST |   D    | 000084 (IST)  | `"2026-03-15T00:00:00"`         | `"2026-03-15T00:00:00Z"` (real Z)    |  PASS  | `"2026-03-15T00:00:00Z"` |      | No fake Z — H-2 confirmed                    |
-| ws-2-E-IST |   E    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
-| ws-2-F-IST |   F    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
-| ws-2-G-IST |   G    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
-| ws-2-H-IST |   H    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                          |
+| ID         | Config | Record Source | Forms Stored Value              | Expected API Return                  | Status | Actual                   | Bugs | Notes                                                 |
+| ---------- | :----: | ------------- | ------------------------------- | ------------------------------------ | :----: | ------------------------ | ---- | ----------------------------------------------------- |
+| ws-2-A-BRT |   A    | 000080 (BRT)  | `"2026-03-15"`                  | `"2026-03-15T00:00:00Z"`             |  PASS  | `"2026-03-15T00:00:00Z"` |      | getForms serializes date-only → datetime+Z; H-2 ✓     |
+| ws-2-B-BRT |   B    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset field returns null                              |
+| ws-2-C-BRT |   C    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset field returns null                              |
+| ws-2-D-BRT |   D    | 000080 (BRT)  | `"2026-03-15T00:00:00"`         | `"2026-03-15T00:00:00Z"` (real Z)    |  PASS  | `"2026-03-15T00:00:00Z"` |      | No fake Z — H-2 confirmed; getForms serializes with Z |
+| ws-2-E-BRT |   E    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                                   |
+| ws-2-F-BRT |   F    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                                   |
+| ws-2-G-BRT |   G    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                                   |
+| ws-2-H-BRT |   H    | 000080 (BRT)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                                   |
+| ws-2-A-IST |   A    | 000084 (IST)  | `"2026-03-14"` (Bug #7: -1 day) | `"2026-03-14T00:00:00Z"` (bug in DB) |  PASS  | `"2026-03-14T00:00:00Z"` | #7   | API confirms wrong date in storage; H-7 ✓             |
+| ws-2-B-IST |   B    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset                                                 |
+| ws-2-C-IST |   C    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Unset                                                 |
+| ws-2-D-IST |   D    | 000084 (IST)  | `"2026-03-15T00:00:00"`         | `"2026-03-15T00:00:00Z"` (real Z)    |  PASS  | `"2026-03-15T00:00:00Z"` |      | No fake Z — H-2 confirmed                             |
+| ws-2-E-IST |   E    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                                   |
+| ws-2-F-IST |   F    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                                   |
+| ws-2-G-IST |   G    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                                   |
+| ws-2-H-IST |   H    | 000084 (IST)  | (not set)                       | `null`                               |  PASS  | `null`                   |      | Legacy unset = null                                   |
 
-> **WS-2 Finding**: All 16 tests PASS. The API returns values normalized to datetime+Z format. No Bug #5 fake Z (H-2 confirmed). No Bug #6 "Invalid Date" — unset fields return `null` (H-3 partially confirmed). API confirms Bug #7 damage: IST-saved Config A has `"2026-03-14"` in storage (H-7 confirmed — buggy value readable via API). Cross-layer: API return format differs from Forms `getValueObjectValue()` — API normalizes to `"...T00:00:00Z"` while Forms returns date-only string or datetime without Z.
+> **WS-2 Finding**: All 16 tests PASS. `getForms` serializes all values as ISO datetime+Z. No Bug #5 fake Z (H-2 confirmed). No Bug #6 "Invalid Date" — unset fields return `null` (H-3 partially confirmed). API confirms Bug #7 damage: IST-saved Config A has `2026-03-14 00:00:00.000` in DB (H-7 confirmed — wrong date readable via API). Cross-layer: `getForms` serialization format differs from Forms `getValueObjectValue()` — `getForms` serializes to `"...T00:00:00Z"` while Forms V1 rawValue is date-only string or datetime without Z.
 
 ---
 
@@ -173,7 +173,7 @@ Write a date via API (`postForms`), read back (`getForms`), write the read-back 
 | ws-3-D-BRT |   D    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` | `"2026-03-15T14:30:00Z"` | false  |  PASS  |      | No Bug #5 in API path; H-8 ✓  |
 | ws-3-H-BRT |   H    | BRT | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` | `"2026-03-15T14:30:00Z"` | false  |  PASS  |      | Legacy = same behavior; H-8 ✓ |
 
-> **WS-3 Finding**: All 4 tests PASS. API round-trip is completely drift-free across all configs. The API adds Z on read, and the Z-appended value is accepted without modification on write-back. No Bug #5 accumulation. H-8 confirmed. Contrast: Forms GFV round-trip drifts for Config D (Bug #5 fake Z causes progressive shift).
+> **WS-3 Finding**: All 4 tests PASS. API round-trip is completely drift-free across all configs. `getForms` serializes with Z on read, and the Z-serialized value is accepted without modification on write-back. No Bug #5 accumulation. H-8 confirmed. Contrast: Forms GFV round-trip drifts for Config D (Bug #5 fake Z causes progressive shift).
 
 ---
 
@@ -198,7 +198,7 @@ Create or update a record via API, then open the form in the browser. Verify tha
 | ws-4-D-mid-BRT |   D    |    BRT     | `"2026-03-15T02:00:00Z"` | 03/15/2026 2:00 AM     |  FAIL  | `03/15/2026 02:00 AM` | `"2026-03-14T23:00:00"` | CB-8    | **Midnight crossed! rawValue = Mar 14** (02:00Z = 23:00 BRT prev day) |
 | ws-4-D-mid-IST |   D    |    IST     | `"2026-03-15T02:00:00Z"` | 03/15/2026 2:00 AM     |  PASS  | `03/15/2026 02:00 AM` | `"2026-03-15T07:30:00"` |         | No crossing in IST (02:00Z + 5:30 = 07:30 same day)                   |
 
-> **WS-4 Finding**: 3 PASS, 7 FAIL. **Date-only (Config A): PASS** in both TZs — Bug #7 does NOT manifest on form load/display path. **DateTime (C/D/H): FAIL** — CB-8: API appends Z, Forms V1 interprets as UTC, shifts to local. Config D/H display correctly (ignoreTZ) but rawValue is wrong. **Midnight-crossing**: `T02:00:00Z` in BRT → rawValue crosses to **Mar 14** (`23:00 BRT`). Display says `02:00 AM Mar 15` but stored date is **wrong day** — critical for CSV imports with early-morning UTC times.
+> **WS-4 Finding**: 3 PASS, 7 FAIL. **Date-only (Config A): PASS** in both TZs — Bug #7 does NOT manifest on form load/display path. **DateTime (C/D/H): FAIL** — CB-8: `FormInstance/Controls` serializes postForms records with Z, Forms V1 interprets as UTC, shifts to local. Config D/H display correctly (ignoreTZ) but rawValue is wrong. **Midnight-crossing**: `T02:00:00Z` in BRT → rawValue crosses to **Mar 14** (`23:00 BRT`). Display says `02:00 AM Mar 15` but stored date is **wrong day** — critical for CSV imports with early-morning UTC times.
 
 ---
 
@@ -226,7 +226,7 @@ Send various date string formats via `postForms()`. Verify which are accepted, r
 
 | ID            | Config | Format | Input Sent                        | Expected Stored         | Status | Actual                   | Accepted? | Notes                                      |
 | ------------- | :----: | :----: | --------------------------------- | ----------------------- | :----: | ------------------------ | :-------: | ------------------------------------------ |
-| ws-5-A-ISO    |   A    |  ISO   | `"2026-03-15"`                    | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | Baseline; API adds T+Z                     |
+| ws-5-A-ISO    |   A    |  ISO   | `"2026-03-15"`                    | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | Baseline; getForms serializes with T+Z     |
 | ws-5-A-US     |   A    |   US   | `"03/15/2026"`                    | `"2026-03-15"`          |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | US format accepted and normalized          |
 | ws-5-A-DT     |   A    |   DT   | `"2026-03-15T14:30:00"`           | TBD                     |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Time preserved in date-only field!         |
 | ws-5-A-DTZ    |   A    |  DTZ   | `"2026-03-15T14:30:00Z"`          | TBD                     |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Z preserved as-is                          |
@@ -239,7 +239,7 @@ Send various date string formats via `postForms()`. Verify which are accepted, r
 | ws-5-A-LATAM3 |   A    | LATAM  | `"15.03.2026"` (DD.MM.YYYY)       | TBD                     |  FAIL  | `null`                   |  Silent   | Accepted but stored null — data loss!      |
 | ws-5-C-ISO    |   C    |  ISO   | `"2026-03-15"`                    | TBD                     |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | Date-only → DateTime: T+Z added            |
 | ws-5-C-US     |   C    |   US   | `"03/15/2026"`                    | TBD                     |  PASS  | `"2026-03-15T00:00:00Z"` |    Yes    | US → DateTime: normalized                  |
-| ws-5-C-DT     |   C    |   DT   | `"2026-03-15T14:30:00"`           | `"2026-03-15T14:30:00"` |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Baseline; API adds Z                       |
+| ws-5-C-DT     |   C    |   DT   | `"2026-03-15T14:30:00"`           | `"2026-03-15T14:30:00"` |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Baseline; getForms serializes with Z       |
 | ws-5-C-DTZ    |   C    |  DTZ   | `"2026-03-15T14:30:00Z"`          | TBD                     |  PASS  | `"2026-03-15T14:30:00Z"` |    Yes    | Z kept as-is                               |
 | ws-5-C-DTBRT  |   C    | DTBRT  | `"2026-03-15T14:30:00-03:00"`     | TBD                     |  PASS  | `"2026-03-15T17:30:00Z"` |    Yes    | BRT offset → UTC conversion (+3h)          |
 | ws-5-C-DTIST  |   C    | DTIST  | `"2026-03-15T14:30:00+05:30"`     | TBD                     |  PASS  | `"2026-03-15T09:00:00Z"` |    Yes    | IST offset → UTC conversion (-5:30h)       |
@@ -428,7 +428,7 @@ API read-back via WS-2: both return `"2026-03-15T14:30:00Z"` for all configs (st
 | ws-10a-H-IST |   H    |    IST     | postForms    | `"2026-03-15T14:30:00Z"` | `03/15/2026 02:30 PM`     | `"2026-03-15T20:00:00"`     | `"2026-03-15T20:00:00"`          |  FAIL  | CB-8    | Like D minus fake Z                           |
 | ws-10a-H-IST |   H    |    IST     | forminstance | `"2026-03-15T14:30:00Z"` | **`03/15/2026 02:30 PM`** | **`"2026-03-15T14:30:00"`** | `"2026-03-15T14:30:00"`          |  PASS  |         | **No shift!** ✓                               |
 
-> **WS-10A Finding**: **postForms: 2 PASS, 6 FAIL. forminstance/: 8 PASS, 0 FAIL.** The `forminstance/` endpoint completely avoids CB-8 and Bug #5. Root cause (CB-29): FormsAPI stores values in US format (`"03/15/2026 14:30:00"`) without Z suffix; core API stores in ISO+Z (`"2026-03-15T14:30:00Z"`). Forms V1 `initCalendarValueV1` parses US format as local time (no conversion), but ISO+Z as UTC (triggers local conversion = shift).
+> **WS-10A Finding**: **postForms: 2 PASS, 6 FAIL. forminstance/: 8 PASS, 0 FAIL.** The `forminstance/` endpoint completely avoids CB-8 and Bug #5. Root cause (CB-29): Both endpoints store identical SQL `datetime` values in the DB, but `FormInstance/Controls` serializes them differently — ISO+Z for postForms records, US format for forminstance/ records. Forms V1 parses US format as local time (no conversion), but ISO+Z as UTC (triggers local conversion = shift).
 
 ### WS-10B: Side-by-Side Endpoint Comparison
 

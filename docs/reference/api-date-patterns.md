@@ -148,14 +148,14 @@ d.setDate(d.getDate() + 30); // Local arithmetic — may vary per TZ
 
 ## What NOT to Send
 
-| Input                                     | Problem                                                          |
-| ----------------------------------------- | ---------------------------------------------------------------- |
-| `"2026-03-15T14:30:00"` (no offset, no Z) | Server adds Z → treated as UTC → wrong display if time was local |
-| `"15/03/2026"` (DD/MM/YYYY)               | Silently stored as null — complete data loss (Bug #8)            |
-| `"05/03/2026"` (ambiguous)                | Interpreted as May 3 (MM/DD), not March 5 — wrong date silently  |
-| `1773532800000` (epoch ms)                | Silently stored as null — numeric timestamps not supported       |
-| `"1773532800000"` (epoch string)          | Silently stored as null — numeric strings not parsed as dates    |
-| `new Date("03/15/2026")` (Date object)    | Serialized as local midnight → different UTC per server TZ       |
+| Input                                                       | Problem                                                                                                                                              |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `"2026-03-15T14:30:00"` (no offset, no Z) via **postForms** | Controls serializes with Z → V1 treats as UTC → wrong display. Use `forminstance/` instead, or add an offset (e.g., `"-03:00"`) for UTC-aware fields |
+| `"15/03/2026"` (DD/MM/YYYY)                                 | Silently stored as null — complete data loss (Bug #8)                                                                                                |
+| `"05/03/2026"` (ambiguous)                                  | Interpreted as May 3 (MM/DD), not March 5 — wrong date silently                                                                                      |
+| `1773532800000` (epoch ms)                                  | Silently stored as null — numeric timestamps not supported                                                                                           |
+| `"1773532800000"` (epoch string)                            | Silently stored as null — numeric strings not parsed as dates                                                                                        |
+| `new Date("03/15/2026")` (Date object)                      | Serialized as local midnight → different UTC per server TZ                                                                                           |
 
 ---
 

@@ -33,7 +33,7 @@ Forms V1 (`initCalendarValueV1`) is **format-sensitive**:
 - ISO+Z → interpreted as UTC → converted to local time → **shifted** (WS-BUG-1)
 - US format (no TZ) → interpreted as local time → **no conversion** → preserved
 
-This is why the Freshdesk #124697 workaround (switching from `postForms` to `forminstance/`) eliminates the datetime shift — it changes the storage format, which changes how Forms V1 parses the value.
+This is why the Freshdesk #124697 workaround (switching from `postForms` to `forminstance/`) eliminates the datetime shift — it changes the Controls serialization format (not the DB value), which changes how Forms V1 parses the value.
 
 ---
 
@@ -75,18 +75,18 @@ There is no shared date normalization layer between these paths. Each endpoint w
 
 ### Read path masks the divergence
 
-The core API read path (`getForms`) normalizes all date values to ISO+Z format on retrieval:
+Both endpoints store the same SQL Server `datetime` value (`2026-03-15 14:30:00.000`). The core API read path (`getForms`) serializes it as ISO+Z for both:
 
 ```
-postForms record:      DB has "2026-03-15T14:30:00Z"   → getForms returns "2026-03-15T14:30:00Z"
-forminstance/ record:  DB has "03/15/2026 14:30:00"     → getForms returns "2026-03-15T14:30:00Z"
+postForms record:      DB = 2026-03-15 14:30:00.000   → getForms returns "2026-03-15T14:30:00Z"
+forminstance/ record:  DB = 2026-03-15 14:30:00.000   → getForms returns "2026-03-15T14:30:00Z"
 ```
 
-Both return identical values. The storage difference is invisible to any consumer using `getForms()`. Only `FormInstance/Controls` (which returns raw field values) reveals the actual stored format.
+Both return identical values. The serialization difference is only visible through `FormInstance/Controls`, which formats the same DB value differently based on creation-path metadata.
 
-### Forms V1 reads raw storage, not normalized API output
+### Forms V1 reads via Controls, not the normalized getForms API
 
-When a user opens a form, Forms V1 does NOT go through the `getForms` API. It reads the raw stored value via `FormInstance/Controls`, which preserves the original storage format. The `initCalendarValueV1` function then parses this format-sensitively:
+When a user opens a form, Forms V1 does NOT go through the `getForms` API. It reads field values via `FormInstance/Controls`, which serializes the same DB `datetime` value differently depending on creation path. The `initCalendarValueV1` function then parses this serialized string format-sensitively:
 
 ```javascript
 // For postForms records (ISO+Z format):
@@ -235,17 +235,17 @@ Both records had identical `getForms` output (`storedMatch=true`), confirming th
 
 ### Architectural: Two Write Paths, No Contract
 
-The VV platform lacks a unified date storage contract. Two endpoints that create the same type of record (form instances) store dates in incompatible formats. This is not a bug in either endpoint individually — it's a systemic design inconsistency.
+The VV platform stores identical `datetime` values in SQL Server regardless of write path — but the `FormInstance/Controls` serialization layer applies different string formats based on hidden creation-path metadata. This is not a bug in either endpoint individually — it's an inconsistency in the serialization layer that sits between the DB and Forms V1.
 
-The absence of a shared normalization layer means:
+The absence of consistent serialization means:
 
-- Any new endpoint or code path could introduce yet another storage format
+- Any new endpoint could introduce yet another serialization format via its own metadata
 - Format-sensitive consumers (like Forms V1) produce unpredictable results depending on which endpoint created the record
-- The platform's behavior depends on implementation details that are invisible to developers
+- The platform's behavior depends on hidden metadata that is invisible to developers and not in the form data table
 
 ### Read Path Masking: Hidden Divergence
 
-The `getForms` normalization is well-intentioned (consistent API output) but creates a false sense of consistency. Developers testing their scripts via API see identical read-back values for both endpoints. They have no reason to suspect the storage formats differ. The problem only surfaces when a user opens the record in Forms — potentially months after the data was created.
+The `getForms` normalization is well-intentioned (consistent API output) but creates a false sense of consistency. Developers testing their scripts via API see identical read-back values for both endpoints. They have no reason to suspect the Controls serialization differs. The problem only surfaces when a user opens the record in Forms — potentially months after the data was created.
 
 ### Workaround Dependency
 
@@ -326,57 +326,9 @@ If the DateTime field is only consumed by scripts via `getForms()` and never ope
 
 ## Proposed Fix
 
-### Option A: Unify storage format (server-side)
+The DB values are identical regardless of endpoint. The fix is in the `FormInstance/Controls` serialization layer — see [WS-BUG-1 Proposed Fix](ws-bug-1-cross-layer-shift.md#proposed-fix) for the full recommendation.
 
-Align both endpoints to store dates in the same format. Two sub-choices:
-
-**A1: Unify to US format (no TZ)**:
-
-```
-postForms:      "2026-03-15T14:30:00"  → stored as "03/15/2026 14:30:00"
-forminstance/:  "2026-03-15T14:30:00"  → stored as "03/15/2026 14:30:00" (no change)
-```
-
-Forms V1 parses US format as local time → no shift. This effectively applies the `forminstance/` behavior to `postForms`.
-
-**A2: Unify to ISO without Z**:
-
-```
-postForms:      "2026-03-15T14:30:00"  → stored as "2026-03-15T14:30:00" (no Z)
-forminstance/:  "2026-03-15T14:30:00"  → stored as "2026-03-15T14:30:00" (changed)
-```
-
-Requires Forms V1 to handle Z-less ISO correctly (it currently does — `moment("2026-03-15T14:30:00")` parses as local).
-
-**Pros**: Eliminates format divergence at the source. All downstream consumers see consistent data.
-**Cons**: Changes storage format for one endpoint — existing data in the old format remains. Requires Forms V1 to handle both old and new formats during transition.
-
-### Option B: Fix Forms V1 to handle both formats correctly (client-side)
-
-Modify `initCalendarValueV1` / `parseDateString()` to correctly interpret both ISO+Z and US formats without shifting:
-
-```javascript
-// CURRENT: strips Z unconditionally, re-parses as local
-let stripped = input.replace('Z', '');
-
-// FIXED: detect format and parse appropriately
-if (input.match(/^\d{4}-\d{2}-\d{2}T/)) {
-    // ISO format — if Z present, it's real UTC; parse as UTC
-    result = moment.utc(input);
-} else {
-    // US format — parse as local (current behavior, correct)
-    result = moment(input);
-}
-```
-
-**Pros**: Fixes both existing and new data. No server changes. No data migration.
-**Cons**: Changes `parseDateString()` which runs on every form load for every calendar field. Extensive regression testing required.
-
-### Option C: Both — unify storage + fix Forms (recommended)
-
-1. **Server**: Stop appending Z to `postForms` datetime values (align with forminstance/ behavior)
-2. **Forms**: Fix `parseDateString()` to handle both ISO+Z (old data) and US/ISO-no-Z (new data)
-3. **Transition**: Old postForms data (with Z) is correctly parsed by fixed Forms code. New data (without Z) is also correct. Both endpoints produce consistent results.
+**Summary**: Remove the creation-path-dependent serialization logic in Controls. All records should be serialized the same way (US format, no Z) regardless of which endpoint created them. This is a single code path change — no DB migration, no client-side changes, no developer-side changes.
 
 ---
 
@@ -384,32 +336,25 @@ if (input.match(/^\d{4}-\d{2}-\d{2}T/)) {
 
 ### What Changes If Fixed
 
-- `postForms` and `forminstance/` produce identical storage formats → consistent Forms behavior
-- WS-BUG-1 (cross-layer shift) is eliminated as a side effect
+- Controls serializes all records consistently — no format depends on creation path
+- WS-BUG-1 (cross-layer shift) is eliminated as a direct consequence
 - The `forminstance/` workaround for Freshdesk #124697 becomes unnecessary
 - Developers can choose endpoints based on API preference, not date handling side effects
 
 ### Backwards Compatibility Risk
 
-**HIGH**: The database contains records in both formats:
+**LOW**: The DB values are not changing — only the Controls serialization. Existing postForms records that have already been opened+saved (shifted values in DB) will continue to display their shifted values. Existing postForms records that have NOT been opened in Forms will now display correctly (no more false Z).
 
-- Records created via `postForms`: ISO+Z format (e.g., `"2026-03-15T14:30:00Z"`)
-- Records created via `forminstance/`: US format (e.g., `"03/15/2026 14:30:00"`)
-- Records created via Forms UI save: may be in either format depending on how the field was populated
-
-A Forms-side fix (Option B/C) must handle both formats correctly. A server-only fix (Option A) does not help existing ISO+Z records.
+**Risk area**: Applications that read `FormInstance/Controls` directly and parse the ISO+Z format would need to handle the US format. This is uncommon but should be checked.
 
 ### Regression Risk
 
-**MEDIUM**: Server-side format change affects all new `postForms` writes. Client-side `parseDateString()` change affects all form loads. Both paths are high-traffic and require comprehensive testing:
+**LOW**: The fix is in the Controls serialization layer only. Testing should verify:
 
-- All 8 field configurations across BRT/IST/UTC
-- Records created via both endpoints (old and new format)
-- Round-trip integrity (write → read → display → save → read)
-- OData query behavior on both formats
+- Forms display is correct for records created by all endpoints
+- `getForms` API (separate from Controls) is unaffected
+- Dashboard display (server-rendered, not via Controls) is unaffected
 
-### Migration Consideration
+### Open Question
 
-Existing `postForms` records with ISO+Z format will continue to exist in the database indefinitely. The Forms-side fix must correctly parse ISO+Z **forever** — even after the server stops producing it — because old records are never automatically reformatted. There is no practical migration path for billions of existing field values.
-
-Customers who migrated from `postForms` to `forminstance/` (per #124697 workaround) will have records in both formats in the same form template. Their queries, reports, and dashboards already deal with this mixed state.
+The metadata that Controls uses to decide the serialization format is not in the form data table (`dbo.DateTest`). It's likely in VV's internal revision/instance tracking tables. The product team needs to identify where this branching logic lives.

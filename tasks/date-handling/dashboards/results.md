@@ -83,16 +83,16 @@ Two records compared across BRT and IST browser timezones:
 **Method**: Capture grid cell values for records with known WS stored values, compare
 **Records**: DateTest-000889 (date-only A,B,E,F), DateTest-000890 (DateTime C,D,G,H)
 
-- 2026-04-02 [TC-DB-2-A Run 1](runs/tc-db-2-A-run-1.md) — PASS — Field7 `3/15/2026` matches stored `2026-03-15T00:00:00Z`
-- 2026-04-02 [TC-DB-2-B Run 1](runs/tc-db-2-B-run-1.md) — PASS — Field10 `3/15/2026` matches stored `2026-03-15T00:00:00Z`
-- 2026-04-02 [TC-DB-2-C Run 1](runs/tc-db-2-C-run-1.md) — PASS — Field6 `3/15/2026 2:30 PM` matches stored `2026-03-15T14:30:00Z`
-- 2026-04-02 [TC-DB-2-D Run 1](runs/tc-db-2-D-run-1.md) — PASS — Field5 `3/15/2026 2:30 PM` matches stored `2026-03-15T14:30:00Z`
-- 2026-04-02 [TC-DB-2-E Run 1](runs/tc-db-2-E-run-1.md) — PASS — Field12 `3/15/2026` matches stored `2026-03-15T00:00:00Z`
-- 2026-04-02 [TC-DB-2-F Run 1](runs/tc-db-2-F-run-1.md) — PASS — Field11 `3/15/2026` matches stored `2026-03-15T00:00:00Z`
-- 2026-04-02 [TC-DB-2-G Run 1](runs/tc-db-2-G-run-1.md) — PASS — Field14 `3/15/2026 2:30 PM` matches stored `2026-03-15T14:30:00Z`
-- 2026-04-02 [TC-DB-2-H Run 1](runs/tc-db-2-H-run-1.md) — PASS — Field13 `3/15/2026 2:30 PM` matches stored `2026-03-15T14:30:00Z`
+- 2026-04-02 [TC-DB-2-A Run 1](runs/tc-db-2-A-run-1.md) — PASS — Field7 `3/15/2026` matches DB `2026-03-15 00:00:00.000`
+- 2026-04-02 [TC-DB-2-B Run 1](runs/tc-db-2-B-run-1.md) — PASS — Field10 `3/15/2026` matches DB `2026-03-15 00:00:00.000`
+- 2026-04-02 [TC-DB-2-C Run 1](runs/tc-db-2-C-run-1.md) — PASS — Field6 `3/15/2026 2:30 PM` matches DB `2026-03-15 14:30:00.000`
+- 2026-04-02 [TC-DB-2-D Run 1](runs/tc-db-2-D-run-1.md) — PASS — Field5 `3/15/2026 2:30 PM` matches DB `2026-03-15 14:30:00.000`
+- 2026-04-02 [TC-DB-2-E Run 1](runs/tc-db-2-E-run-1.md) — PASS — Field12 `3/15/2026` matches DB `2026-03-15 00:00:00.000`
+- 2026-04-02 [TC-DB-2-F Run 1](runs/tc-db-2-F-run-1.md) — PASS — Field11 `3/15/2026` matches DB `2026-03-15 00:00:00.000`
+- 2026-04-02 [TC-DB-2-G Run 1](runs/tc-db-2-G-run-1.md) — PASS — Field14 `3/15/2026 2:30 PM` matches DB `2026-03-15 14:30:00.000`
+- 2026-04-02 [TC-DB-2-H Run 1](runs/tc-db-2-H-run-1.md) — PASS — Field13 `3/15/2026 2:30 PM` matches DB `2026-03-15 14:30:00.000`
 
-**Key finding**: Dashboard accurately represents stored database values for all 8 configs. Server renders UTC time directly (no TZ conversion). The `ignoreTZ` and `useLegacy` flags remain invisible to the server-side formatter. Any incorrect dates in the dashboard were stored incorrectly at write time.
+**Key finding**: Dashboard accurately represents stored SQL `datetime` values for all 8 configs. Server renders the stored value directly (SQL `datetime` is TZ-unaware — confirmed via DB dump 2026-04-06). The `ignoreTZ` and `useLegacy` flags remain invisible to the server-side formatter. Any incorrect dates in the dashboard were stored incorrectly at write time.
 
 ---
 
@@ -176,9 +176,9 @@ Two records compared across BRT and IST browser timezones:
 **Key findings**:
 
 - **All 8 configs FAIL** — dashboard and form display NEVER match exactly
-- **Two failure modes**: FAIL-1 (format only: leading zeros) and FAIL-2 (UTC vs BRT time shift)
+- **Two failure modes**: FAIL-1 (format only: leading zeros) and FAIL-2 (FormsAPI serialization-induced time shift)
 - **Date-only (A,B,E,F)**: Format mismatch — server `M/d/yyyy` vs Angular `MM/dd/yyyy`. Date correct in both.
-- **DateTime ignoreTZ=false (C,G)**: Time shift — dashboard shows UTC (`2:30 PM`), form shows BRT local (`11:30 AM`). 3h gap = BRT offset.
+- **DateTime ignoreTZ=false (C,G)**: Dashboard shows stored value (`2:30 PM` = DB `14:30:00.000`), form shows shifted value (`11:30 AM`) — `FormInstance/Controls` serializes as ISO+Z, V1 converts to local. 3h gap = BRT offset.
 - **DateTime ignoreTZ=true (D,H)**: Display time matches (`2:30 PM` ≡ `02:30 PM`) — format differs only. But raw value diverged: form stores BRT local `T11:30:00` internally despite displaying `02:30 PM`.
 - **Bug #5 visible in Config D GFV**: `"2026-03-15T11:30:00.000Z"` — fake Z on local time. Legacy Config H GFV has no fake Z (`"2026-03-15T11:30:00"`).
 
