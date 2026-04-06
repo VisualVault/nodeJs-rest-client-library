@@ -131,17 +131,19 @@ Both display the same date to the user, but the stored representation differs. T
 
 ### Data Integrity
 
-- The date value is often correct in both paths — only the format differs
-- However, the format difference means:
-    - Reload behavior may differ (parseDateString handles Z-suffixed vs non-Z strings differently)
-    - String comparisons fail even for the same logical date
-    - SQL queries may produce different results depending on which format was stored
+- The two handlers produce different strings for the same intended date — and since all fields are SQL Server `datetime` (no `date` type), the format difference translates to an **actual data difference** in the database:
+    - Popup: `"2026-03-15T03:00:00.000Z"` → server stores as `2026-03-15 03:00:00.000` (3 AM)
+    - Typed: `"2026-03-15"` → server stores as `2026-03-15 00:00:00.000` (midnight)
+    - **3-hour difference** in the actual `datetime` column (equals BRT UTC-3 offset)
+- Reload behavior differs: `parseDateString()` handles Z-suffixed vs non-Z strings differently
+- SQL queries like `WHERE Field12 = '2026-03-15'` match typed but NOT popup values
+- The magnitude of the DB difference varies by timezone (3h for BRT, 5.5h for IST, etc.)
 
 ### Scope Limitation
 
 - Only affects legacy configs (`useLegacy=true`)
 - Non-legacy configs are unaffected because `normalizeCalValue()` in the popup path normalizes the Date object before it reaches the divergent handlers
-- Low severity because legacy configs are the older code path and most new deployments use non-legacy
+- Medium severity — while legacy configs are the older code path, the DB stores `datetime` (not strings), so the format difference translates to actual data differences (3h offset in BRT, 5.5h in IST). See [bug-2-audit.md](bug-2-audit.md) DB Evidence section.
 
 ---
 

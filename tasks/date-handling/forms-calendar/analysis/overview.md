@@ -748,23 +748,29 @@ Not a discrete code bug — a consequence of two separate storage code paths wri
 
 **Finding:** Calendar field values in the same form record are stored in different timezone contexts depending on how the field is populated:
 
-| Field type                               | Config                                          | Storage format          | Timezone of stored value                                                  |
-| ---------------------------------------- | ----------------------------------------------- | ----------------------- | ------------------------------------------------------------------------- |
-| Initial value — CurrentDate              | `enableInitialValue=true`, `initialValueMode=0` | `MM/dd/yyyy HH:mm:ss`   | **UTC** — captured via `new Date().toISOString()` at save time            |
-| Initial value — Preset                   | `enableInitialValue=true`, `initialValueMode=1` | `MM/dd/yyyy HH:mm:ss`   | **UTC** — preset local midnight converted to UTC via `toISOString()`      |
-| User input (popup, typed, SetFieldValue) | `enableInitialValue=false`, any config          | ISO-like or date string | **Local time** — stored via `getSaveValue()` which strips Z before saving |
+| Field type                               | Config                                          | JS value sent to server | SQL datetime stored             | Timezone semantics                                                    |
+| ---------------------------------------- | ----------------------------------------------- | ----------------------- | ------------------------------- | --------------------------------------------------------------------- |
+| Initial value — CurrentDate              | `enableInitialValue=true`, `initialValueMode=0` | `toISOString()` (UTC)   | e.g., `2026-04-06 15:53:43.000` | **UTC** — captured via `new Date().toISOString()` at save time        |
+| Initial value — Preset                   | `enableInitialValue=true`, `initialValueMode=1` | `toISOString()` (UTC)   | e.g., `2026-03-01 03:00:00.000` | **UTC** — preset local midnight converted to UTC via `toISOString()`  |
+| User input (popup, typed, SetFieldValue) | `enableInitialValue=false`, any config          | `getSaveValue()` (no Z) | e.g., `2026-03-15 00:00:00.000` | **Local time (ambiguous)** — `getSaveValue()` strips Z before sending |
 
-**Observed DB values (DateTest-000004, saved from BRT UTC-3, target date 2026-03-15):**
+**Observed DB values (confirmed via SQL Server dump 2026-04-06):**
 
-| Field                        | DB value                | Interpretation                                                  |
-| ---------------------------- | ----------------------- | --------------------------------------------------------------- |
-| Field1 (CurrentDate)         | `3/27/2026 8:02:51 PM`  | UTC timestamp of the save action (BRT 5:02 PM = UTC 8:02 PM)    |
-| Field2 (Preset Mar 1)        | `3/1/2026 3:00:00 AM`   | UTC equivalent of BRT midnight March 1 (`2026-03-01T03:00:00Z`) |
-| Field5 (Config D user input) | `3/15/2026 12:00:00 AM` | Local BRT midnight, stored without any timezone offset          |
-| Field6 (Config C user input) | `3/15/2026 12:00:00 AM` | Same — local BRT midnight                                       |
-| Field7 (Config A user input) | `3/15/2026 12:00:00 AM` | Same — local BRT midnight                                       |
+All calendar fields are SQL Server `datetime` type (no `date`-only type). Values shown in SSMS `YYYY-MM-DD HH:MM:SS.mmm` format. The `M/d/yyyy h:mm:ss tt` format seen in VV Query Admin is .NET display formatting, not the stored value.
 
-**Consequence for queries and reports:** The database stores no timezone marker — no suffix, column, or metadata indicates whether `3/15/2026 12:00:00 AM` is UTC or BRT. Reports or scheduled scripts that compare dates across field types, or that filter `WHERE FieldX BETWEEN @start AND @end`, will silently return wrong results for users in UTC+ timezones (where the local-time and UTC representations of the same date diverge). Field2 (`3/1/2026 3:00:00 AM`) and Field5 (`3/15/2026 12:00:00 AM`) represent the same kind of value — midnight on the target date — stored in incompatible formats.
+| Record               | Field                 | SQL datetime value        | Interpretation                                     |
+| -------------------- | --------------------- | ------------------------- | -------------------------------------------------- |
+| cat3-A-BRT (000080)  | Field7 (Config A)     | `2026-03-15 00:00:00.000` | Local BRT midnight, stored as midnight (no TZ)     |
+| cat3-A-BRT (000080)  | Field5 (Config D)     | `2026-03-15 00:00:00.000` | Local BRT midnight, stored as midnight (no TZ)     |
+| cat3-AD-IST (000084) | Field7 (Config A)     | `2026-03-14 00:00:00.000` | **Bug #7: IST user entered Mar 15, stored Mar 14** |
+| cat3-AD-IST (000084) | Field5 (Config D)     | `2026-03-15 00:00:00.000` | DateTime field correct (Bug #7 doesn't affect)     |
+| BRT records          | Field2 (Preset Mar 1) | `2026-03-01 03:00:00.000` | UTC of BRT midnight (`toISOString()` path)         |
+| IST records          | Field2 (Preset Mar 1) | `2026-02-28 18:30:00.000` | **Bug #7: IST midnight = prev UTC day**            |
+| BRT records          | Field1 (CurrentDate)  | `2026-04-06 15:53:43.000` | UTC (`toISOString()` path)                         |
+
+**VV server timezone**: Confirmed BRT (UTC-3). `VVCreateDate` stores server-local time; field values from `toISOString()` store UTC (3h ahead of `VVCreateDate`).
+
+**Consequence for queries and reports:** The `datetime` column is timezone-unaware — no suffix, column, or metadata indicates whether `2026-03-15 00:00:00.000` is UTC or BRT. Reports or scheduled scripts that compare dates across field types, or that filter `WHERE FieldX BETWEEN @start AND @end`, will silently return wrong results when mixing `toISOString()` fields (UTC) with `getSaveValue()` fields (local). Preset Field2 (`2026-03-01 03:00:00.000` = UTC) and user-input Field7 (`2026-03-15 00:00:00.000` = local midnight) represent the same kind of value stored in incompatible timezone semantics.
 
 **Root cause (code path):**
 

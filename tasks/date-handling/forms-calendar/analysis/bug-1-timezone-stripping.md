@@ -115,6 +115,8 @@ WITH Z:      "2026-03-15T00:00:00.000Z"   → March 15, midnight UTC
 WITHOUT Z:   "2026-03-15T00:00:00.000"    → March 15, midnight LOCAL
 ```
 
+Note: This Z-stripping happens **client-side** in the FormViewer JavaScript before the value reaches the VV server. The server stores whatever string it receives as a SQL Server `datetime` value (timezone-unaware). The ambiguity is permanent — once Z is stripped, neither the database nor the reload path can determine whether the stored time represents UTC or a specific local timezone.
+
 ### What Should Happen
 
 The function should **preserve the Z suffix** and parse the string as-is. For date-only fields, extract the date portion and anchor to UTC midnight:

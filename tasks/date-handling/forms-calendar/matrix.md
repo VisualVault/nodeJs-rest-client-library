@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the forms calendar date-handling investigation.
 Full test evidence → `results.md` | Bug analysis → `analysis.md`
 
-Last updated: 2026-04-06 | Total slots: 242 | Executed: 202 (130P, 72F) | Pending: 37 | Blocked: 0
+Last updated: 2026-04-06 | Total slots: 242 | Executed: 204 (111P, 93F) | Pending: 35 | Blocked: 0
 
 ---
 
@@ -41,22 +41,22 @@ All tests target one of 8 field configurations defined by three boolean flags:
 
 | Category                  |  Total  |  PASS   |  FAIL  | PENDING | BLOCKED | PARTIAL | SKIP  |
 | ------------------------- | :-----: | :-----: | :----: | :-----: | :-----: | :-----: | :---: |
-| 1. Calendar Popup         |   20    |    7    |   13   |    0    |    0    |    0    |   0   |
-| 2. Typed Input            |   16    |   11    |   5    |    0    |    0    |    0    |   0   |
-| 3. Server Reload          |   18    |   14    |   4    |    0    |    0    |    0    |   0   |
+| 1. Calendar Popup         |   20    |    4    |   16   |    0    |    0    |    0    |   0   |
+| 2. Typed Input            |   16    |    8    |   8    |    0    |    0    |    0    |   0   |
+| 3. Server Reload          |   18    |   10    |   8    |    0    |    0    |    0    |   0   |
 | 4. URL Parameters         |    5    |    0    |   0    |    5    |    0    |    0    |   0   |
 | 5. Preset Date            |   18    |   11    |   7    |    0    |    0    |    0    |   0   |
 | 6. Current Date           |   15    |   13    |   2    |    0    |    0    |    0    |   0   |
-| 7. SetFieldValue formats  |   39    |   29    |   9    |    1    |    0    |    0    |   0   |
-| 8. GetFieldValue return   |   19    |   12    |   6    |    1    |    0    |    0    |   0   |
+| 7. SetFieldValue formats  |   39    |   23    |   16   |    0    |    0    |    0    |   0   |
+| 8. GetFieldValue return   |   19    |   13    |   6    |    0    |    0    |    0    |   0   |
 | 8B. GetDateObject return  |   12    |   11    |   1    |    0    |    0    |    0    |   0   |
 | 9. Round-Trip (GFV)       |   20    |    9    |   11   |    0    |    0    |    0    |   0   |
 | 9-GDOC. Round-Trip (GDOC) |    5    |    2    |   0    |    3    |    0    |    0    |   0   |
 | 10. Web Service           |   11    |    4    |   5    |    1    |    0    |    0    |   1   |
 | 11. Cross-Timezone        |   14    |    0    |   0    |   13    |    0    |    1    |   0   |
-| 12. Edge Cases            |   20    |    5    |   9    |    5    |    0    |    0    |   1   |
+| 12. Edge Cases            |   20    |    1    |   13   |    5    |    0    |    0    |   1   |
 | 13. Database              |   10    |    2    |   0    |    8    |    0    |    0    |   0   |
-| **TOTAL**                 | **242** | **130** | **72** | **37**  |  **0**  |  **1**  | **2** |
+| **TOTAL**                 | **242** | **111** | **93** | **35**  |  **0**  |  **1**  | **2** |
 
 ---
 
@@ -137,7 +137,7 @@ Save form, open saved record in a new tab. Compare displayed dates and GFV retur
 | Test ID     | Config | Save TZ | Load TZ | Expected                                                                                           | Actual                                                                                                                             | Status | Run Date   | Evidence                               |
 | ----------- | :----: | :-----: | :-----: | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------- | -------------------------------------- |
 | 3-A-BRT-BRT |   A    |   BRT   |   BRT   | No shift; display identical on reload                                                              | No shift; display/GFV identical on reload                                                                                          | PASS   | 2026-04-03 | [summary](summaries/tc-3-A-BRT-BRT.md) |
-| 3-C-BRT-BRT |   C    |   BRT   |   BRT   | No shift; display identical on reload                                                              | No shift; display/GFV identical on reload                                                                                          | FAIL   | 2026-04-03 | [summary](summaries/tc-3-C-BRT-BRT.md) |
+| 3-C-BRT-BRT |   C    |   BRT   |   BRT   | No shift; display identical on reload                                                              | raw: `"2026-03-15T00:00:00"` survives; GFV: `"2026-03-15T03:00:00.000Z"` (Bug #4 — `new Date().toISOString()` adds +3h BRT shift)  | FAIL   | 2026-04-06 | [summary](summaries/tc-3-C-BRT-BRT.md) |
 | 3-D-BRT-BRT |   D    |   BRT   |   BRT   | No shift; GFV fake Z same on reload                                                                | No shift; GFV returns same fake Z on reload                                                                                        | FAIL   | 2026-04-03 | [summary](summaries/tc-3-D-BRT-BRT.md) |
 | 3-D-BRT-IST |   D    |   BRT   |   IST   | Display OK; raw TZ-invariant; GFV returns raw without fake Z                                       | Display OK; raw TZ-invariant; GFV appends fake Z (Bug #5)                                                                          | FAIL   | 2026-04-03 | [summary](summaries/tc-3-D-BRT-IST.md) |
 | 3-A-BRT-IST |   A    |   BRT   |   IST   | No shift; date-only string survives cross-TZ reload (prediction corrected 2026-04-01)              | No shift; display/GFV identical on reload                                                                                          | PASS   | 2026-04-03 | [summary](summaries/tc-3-A-BRT-IST.md) |
