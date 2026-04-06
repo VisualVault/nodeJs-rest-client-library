@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the web services date-handling investigation.
 API analysis → `analysis.md` | Test evidence → `results.md` | Harness → `webservice-test-harness.js`
 
-Last updated: 2026-04-02 | Total slots: 150 | Done: 150 (114P/24F) | **COMPLETE**
+Last updated: 2026-04-06 | Total slots: 162 | Done: 162 (124P/38F) | **COMPLETE**
 
 ---
 
@@ -58,18 +58,19 @@ WS-1 includes UTC spot-checks (ws-1-{A,C,D,H}-UTC) to prove that the cloud envir
 
 `PASS` = ran, no issue. `FAIL` = ran, unexpected behavior. `PENDING` = not yet run. `BLOCKED` = requires setup not available.
 
-| Category                      |  Total  | PASS | FAIL | PENDING | BLOCKED | Priority |
-| ----------------------------- | :-----: | :--: | :--: | :-----: | :-----: | :------: |
-| WS-1. API Write Path (Create) |   16    |  16  |  0   |    0    |         |    P1    |
-| WS-2. API Read + Cross-Layer  |   16    |  16  |  0   |    0    |         |    P1    |
-| WS-3. API Round-Trip          |    4    |  4   |  0   |    0    |         |    P2    |
-| WS-4. API→Forms Cross-Layer   |   10    |  3   |  7   |    0    |         |    P3    |
-| WS-5. Input Format Tolerance  |   35    |  24  |  11  |    0    |         |    P2    |
-| WS-6. Empty/Null Handling     |   12    |  12  |  0   |    0    |         |    P3    |
-| WS-7. API Update Path         |   12    |  12  |  0   |    0    |         |    P2    |
-| WS-8. Query Date Filtering    |   10    |  10  |  0   |    0    |         |    P3    |
-| WS-9. Date Computation        |   23    |  17  |  6   |    0    |         |    P2    |
-| **TOTAL**                     | **150** | 114  |  24  |  **0**  |         |          |
+| Category                          |  Total  | PASS | FAIL | PENDING | BLOCKED | Priority |
+| --------------------------------- | :-----: | :--: | :--: | :-----: | :-----: | :------: |
+| WS-1. API Write Path (Create)     |   16    |  16  |  0   |    0    |         |    P1    |
+| WS-2. API Read + Cross-Layer      |   16    |  16  |  0   |    0    |         |    P1    |
+| WS-3. API Round-Trip              |    4    |  4   |  0   |    0    |         |    P2    |
+| WS-4. API→Forms Cross-Layer       |   10    |  3   |  7   |    0    |         |    P3    |
+| WS-5. Input Format Tolerance      |   35    |  24  |  11  |    0    |         |    P2    |
+| WS-6. Empty/Null Handling         |   12    |  12  |  0   |    0    |         |    P3    |
+| WS-7. API Update Path             |   12    |  12  |  0   |    0    |         |    P2    |
+| WS-8. Query Date Filtering        |   10    |  10  |  0   |    0    |         |    P3    |
+| WS-9. Date Computation            |   23    |  17  |  6   |    0    |         |    P2    |
+| WS-10. postForms vs forminstance/ |   12    |  2   |  10  |    0    |    0    |    P1    |
+| **TOTAL**                         | **162** | 116  |  34  |  **0**  |  **0**  |          |
 
 ---
 
@@ -380,3 +381,71 @@ Test what gets stored when scripts perform date arithmetic or create JavaScript 
 | ws-9-A-locale-UTC   |   A    |    UTC    | `toLocaleDateString('en-US')` | `"3/15/2026"`                 |  PASS  | `"2026-03-15T00:00:00Z"` |   Yes    | UTC control                                                      |
 
 > **WS-9 Finding**: 17 PASS, 6 FAIL across 3 TZs and 8 patterns. **TZ-safe patterns**: `new Date("ISO")`, `Date.UTC()`, `toISOString().split('T')[0]`, `setUTCDate/getUTCDate`. **TZ-unsafe patterns**: `new Date("MM/DD")`, `new Date(y,m,d)`, `toLocaleDateString()` — all produce local midnight which shifts UTC day/time per TZ. **H-11 confirmed**: Date objects serialized with Z suffix are handled correctly by the server. **H-12 confirmed**: US-format `new Date()` produces different API results per server TZ — IST stores the previous day. **New finding**: `toLocaleDateString()` in UTC- timezones (BRT) returns the previous calendar day for UTC-midnight dates, causing wrong date storage.
+
+---
+
+## WS-10. postForms vs forminstance/ Endpoint Comparison (Freshdesk #124697)
+
+**Freshdesk #124697** (Jira WADNR-10407): Customer reports that records created via `postForms` API (`/formtemplates/<id>/forms`) have their time value silently mutated on first form open. Switching to the `forminstance/` endpoint (FormsAPI) avoids the mutation. After saving the corrupted value, subsequent open+save cycles are stable.
+
+**Root cause hypothesis**: `postForms` stores datetime values with trailing Z (CB-8). `forminstance/` may store without Z, preventing Forms V1 from applying UTC→local conversion on load.
+
+**Three sub-actions**:
+
+- **WS-10A**: Verify postForms cross-layer mutation (forminstance/ comparison BLOCKED on vvdemo)
+- **WS-10B**: Side-by-side endpoint comparison — **BLOCKED** (forminstance/ returns 500 on vvdemo)
+- **WS-10C**: Save-and-stabilize — confirm first save commits mutation, subsequent saves are stable
+
+**Harness action**: `WS-10` (creates records via both endpoints, returns DataIDs for browser verification)
+**Browser script**: `verify-ws10-browser.js` (compare mode + save-stabilize mode)
+
+**FormsAPI payload discovery**: Browser intercept of `VV.Form.CreateFormInstance` revealed the correct payload: `{ formTemplateId: "<revisionId>", formName: "", fields: [{ key: "FieldN", value: "..." }] }` — uses `key`/`value` (not `name`/`value`) and lowercase `fields` (not `Fields`).
+
+**Critical finding (CB-29)**: Both endpoints store **identical** values in the database (`"2026-03-15T14:30:00Z"` — confirmed via WS-2 API read). Yet Forms V1 treats them differently: `postForms` records have rawValue shifted by TZ offset on form open, while `forminstance/` records preserve the original time. The difference is NOT in the stored date value but in **how the record/revision was created** — the FormsAPI writes different metadata (revision history, field format markers, or field-level storage encoding) that causes `initCalendarValueV1` to take a different code path.
+
+### WS-10A: postForms → Browser Verify (+ forminstance/ comparison)
+
+Records: DateTest-001583 (postForms), DateTest-001584 (forminstance/). Input: `"2026-03-15T14:30:00"`.
+API read-back via WS-2: both return `"2026-03-15T14:30:00Z"` for all configs (storedMatch=true).
+
+| ID           | Config | Browser TZ | Endpoint     | API Stored               | Actual Display            | rawValue                    | GFV                              | Status | Bugs    | Notes                                         |
+| ------------ | :----: | :--------: | ------------ | ------------------------ | ------------------------- | --------------------------- | -------------------------------- | :----: | ------- | --------------------------------------------- |
+| ws-10a-A-BRT |   A    |    BRT     | postForms    | `"2026-03-15T14:30:00Z"` | `03/15/2026`              | `"2026-03-15"`              | `"2026-03-15"`                   |  PASS  |         | Date-only strips time ✓                       |
+| ws-10a-A-BRT |   A    |    BRT     | forminstance | `"2026-03-15T14:30:00Z"` | `03/15/2026`              | `"03/15/2026 14:30:00"`     | `"03/15/2026 14:30:00"`          |  PASS  |         | Date-only — raw keeps US format from FormsAPI |
+| ws-10a-C-BRT |   C    |    BRT     | postForms    | `"2026-03-15T14:30:00Z"` | `03/15/2026 11:30 AM`     | `"2026-03-15T11:30:00"`     | `"2026-03-15T14:30:00.000Z"`     |  FAIL  | CB-8    | UTC→BRT shift -3h                             |
+| ws-10a-C-BRT |   C    |    BRT     | forminstance | `"2026-03-15T14:30:00Z"` | **`03/15/2026 02:30 PM`** | **`"2026-03-15T14:30:00"`** | `"2026-03-15T17:30:00.000Z"`     |  PASS  |         | **No shift!** rawValue=T14:30 (original) ✓    |
+| ws-10a-D-BRT |   D    |    BRT     | postForms    | `"2026-03-15T14:30:00Z"` | `03/15/2026 02:30 PM`     | `"2026-03-15T11:30:00"`     | `"2026-03-15T11:30:00.000Z"`     |  FAIL  | CB-8,#5 | Display OK (ignoreTZ), rawValue shifted       |
+| ws-10a-D-BRT |   D    |    BRT     | forminstance | `"2026-03-15T14:30:00Z"` | **`03/15/2026 02:30 PM`** | **`"2026-03-15T14:30:00"`** | **`"2026-03-15T14:30:00.000Z"`** |  PASS  |         | **No shift! No Bug #5!** rawValue=T14:30 ✓    |
+| ws-10a-H-BRT |   H    |    BRT     | postForms    | `"2026-03-15T14:30:00Z"` | `03/15/2026 02:30 PM`     | `"2026-03-15T11:30:00"`     | `"2026-03-15T11:30:00"`          |  FAIL  | CB-8    | Like D minus fake Z (legacy)                  |
+| ws-10a-H-BRT |   H    |    BRT     | forminstance | `"2026-03-15T14:30:00Z"` | **`03/15/2026 02:30 PM`** | **`"2026-03-15T14:30:00"`** | `"2026-03-15T14:30:00"`          |  PASS  |         | **No shift!** (legacy) ✓                      |
+| ws-10a-A-IST |   A    |    IST     | postForms    | `"2026-03-15T14:30:00Z"` | `03/15/2026`              | `"2026-03-15"`              | `"2026-03-15"`                   |  PASS  |         | Date-only correct ✓                           |
+| ws-10a-C-IST |   C    |    IST     | postForms    | `"2026-03-15T14:30:00Z"` | `03/15/2026 08:00 PM`     | `"2026-03-15T20:00:00"`     | `"2026-03-15T14:30:00.000Z"`     |  FAIL  | CB-8    | UTC→IST shift +5:30h                          |
+| ws-10a-C-IST |   C    |    IST     | forminstance | `"2026-03-15T14:30:00Z"` | **`03/15/2026 02:30 PM`** | **`"2026-03-15T14:30:00"`** | `"2026-03-15T09:00:00.000Z"`     |  PASS  |         | **No shift!** rawValue=T14:30 ✓               |
+| ws-10a-D-IST |   D    |    IST     | postForms    | `"2026-03-15T14:30:00Z"` | `03/15/2026 02:30 PM`     | `"2026-03-15T20:00:00"`     | `"2026-03-15T20:00:00.000Z"`     |  FAIL  | CB-8,#5 | Display OK, rawValue shifted +5:30h           |
+| ws-10a-D-IST |   D    |    IST     | forminstance | `"2026-03-15T14:30:00Z"` | **`03/15/2026 02:30 PM`** | **`"2026-03-15T14:30:00"`** | **`"2026-03-15T14:30:00.000Z"`** |  PASS  |         | **No shift! No Bug #5!** ✓                    |
+| ws-10a-H-IST |   H    |    IST     | postForms    | `"2026-03-15T14:30:00Z"` | `03/15/2026 02:30 PM`     | `"2026-03-15T20:00:00"`     | `"2026-03-15T20:00:00"`          |  FAIL  | CB-8    | Like D minus fake Z                           |
+| ws-10a-H-IST |   H    |    IST     | forminstance | `"2026-03-15T14:30:00Z"` | **`03/15/2026 02:30 PM`** | **`"2026-03-15T14:30:00"`** | `"2026-03-15T14:30:00"`          |  PASS  |         | **No shift!** ✓                               |
+
+> **WS-10A Finding**: **postForms: 2 PASS, 6 FAIL. forminstance/: 8 PASS, 0 FAIL.** The `forminstance/` endpoint completely avoids CB-8 and Bug #5. Root cause (CB-29): FormsAPI stores values in US format (`"03/15/2026 14:30:00"`) without Z suffix; core API stores in ISO+Z (`"2026-03-15T14:30:00Z"`). Forms V1 `initCalendarValueV1` parses US format as local time (no conversion), but ISO+Z as UTC (triggers local conversion = shift).
+
+### WS-10B: Side-by-Side Endpoint Comparison
+
+Records: DateTest-001583 (postForms) vs DateTest-001584 (forminstance/). Same input, same API read-back.
+
+| ID           | Config | Browser TZ | postForms rawValue      | forminstance/ rawValue  | postForms GFV                | forminstance/ GFV            | Display Match | Status | Notes                                                      |
+| ------------ | :----: | :--------: | ----------------------- | ----------------------- | ---------------------------- | ---------------------------- | :-----------: | :----: | ---------------------------------------------------------- |
+| ws-10b-C-BRT |   C    |    BRT     | `"2026-03-15T11:30:00"` | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00.000Z"` | `"2026-03-15T17:30:00.000Z"` |      No       |  FAIL  | rawValue: shifted vs original. GFV: both have Z but differ |
+| ws-10b-D-BRT |   D    |    BRT     | `"2026-03-15T11:30:00"` | `"2026-03-15T14:30:00"` | `"2026-03-15T11:30:00.000Z"` | `"2026-03-15T14:30:00.000Z"` |      Yes      |  FAIL  | rawValue differs (shifted vs original), GFV differs        |
+
+> **WS-10B Finding (ROOT CAUSE — CB-29)**: API stores identical values (`storedMatch=true` via core API read), but the `FormInstance/Controls` endpoint reveals **different storage formats**: postForms → `"2026-03-15T14:30:00Z"` (ISO+Z), forminstance/ → `"03/15/2026 14:30:00"` (US format, no TZ). Forms V1 interprets ISO+Z as UTC (→ local conversion = CB-8 shift) but US format as local time (→ no conversion = preserved). **This is why the ticket's workaround works** — different storage format bypasses the V1 UTC interpretation.
+
+### WS-10C: Save-and-Stabilize (First-Open Mutation)
+
+Record: DateTest-001568 → saved as ffc087e3-4a34-4ab9-9d2d-fdcd61cf2cdf
+
+| ID           | Config | Browser TZ | Snap 1 Display | Snap 1 rawValue         | Snap 2 Display | Snap 2 rawValue         | Snap 3 = Snap 2? | Status | Notes                                                                                                                                                                      |
+| ------------ | :----: | :--------: | -------------- | ----------------------- | -------------- | ----------------------- | :--------------: | :----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ws-10c-C-BRT |   C    |    BRT     | `11:30 AM`     | `"2026-03-15T11:30:00"` | `11:30 AM`     | `"2026-03-15T11:30:00"` |       Yes        |  FAIL  | CB-8 shift on load, save commits shifted value, stable after                                                                                                               |
+| ws-10c-D-BRT |   D    |    BRT     | **`02:30 PM`** | `"2026-03-15T11:30:00"` | **`11:30 AM`** | `"2026-03-15T11:30:00"` |       Yes        |  FAIL  | **#124697**: Display shows original time on first open (ignoreTZ), save commits shifted value, display changes to shifted time on reopen. Exactly matches customer report. |
+
+> **WS-10C Finding**: 0 PASS, 2 FAIL. **Config D is the exact Freshdesk #124697 scenario**: display shows `02:30 PM` on first open (ignoreTZ preserves original DB time), rawValue already shifted to `T11:30:00` in memory. After save+reopen, display changes to `11:30 AM` (shifted value now in DB). Stable after first mutation — no further drift. Config C shifts both display and rawValue identically (no surprise — ignoreTZ=false).

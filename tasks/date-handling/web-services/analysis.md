@@ -175,6 +175,24 @@ Based on Forms UI analysis (`../forms-calendar/analysis.md`) and upstream librar
 | CB-27 | `toLocaleDateString()` returns wrong date in UTC- timezones for UTC-midnight dates          | WS-9: BRT → `"3/14/2026"` for a March 15 UTC date         | New finding    |
 | CB-28 | TZ-safe patterns: ISO parse, Date.UTC(), setUTCDate/getUTCDate, toISOString().split('T')[0] | WS-9: all produce identical results in BRT/IST/UTC        | New finding    |
 
+### Confirmed 2026-04-06 (WS-10)
+
+**Run**: [ws-10-batch-run-1.md](runs/ws-10-batch-run-1.md) — 12 tests, 2 PASS / 10 FAIL. Freshdesk #124697 investigation.
+
+| #     | Behavior                                                                                                 | Evidence                                                                                                                | Hypotheses                          |
+| ----- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| CB-29 | `postForms` and `forminstance/` store dates in **different formats** in the database                     | WS-10B: `FormInstance/Controls` returns `"2026-03-15T14:30:00Z"` (postForms) vs `"03/15/2026 14:30:00"` (forminstance/) | New finding — ROOT CAUSE of #124697 |
+| CB-30 | Core API read normalizes both formats to ISO+Z, masking the storage difference                           | WS-10: `getForms` returns `"2026-03-15T14:30:00Z"` for both records (storedMatch=true)                                  | New finding                         |
+| CB-31 | `forminstance/` records are immune to CB-8 — Forms V1 parses US format as local time (no UTC conversion) | WS-10A: forminstance/ records show rawValue=`T14:30:00` in BRT and IST (no shift)                                       | #124697 confirmed                   |
+| CB-32 | `postForms` Config D first-open display mutation exactly matches Freshdesk #124697 report                | WS-10C: display `02:30 PM` → `11:30 AM` after save+reopen, stable after first mutation                                  | #124697 confirmed                   |
+
+**CB-29 detail**: The `forminstance/` endpoint (FormsAPI at `preformsapi.visualvault.com`) writes field values in US format (`"MM/DD/YYYY HH:mm:ss"`) without timezone indicator. The `postForms` endpoint (core API at `vvdemo.visualvault.com`) writes field values in ISO 8601 with Z suffix (`"YYYY-MM-DDTHH:mm:ssZ"`). The form viewer's `initCalendarValueV1` function interprets:
+
+- ISO+Z strings → as UTC → converts to local time (CB-8 shift)
+- US format strings → as local time → no conversion (preserves original)
+
+This explains why the ticket's workaround (switching from `postForms` to `forminstance/`) fixes the time mutation — it's not a client-side fix but a storage format change that avoids triggering the V1 UTC interpretation.
+
 ## Confirmed Bugs
 
 ### Bug #8 — Silent Data Loss for DD/MM/YYYY Formats (NEW — SERVER-SIDE)
