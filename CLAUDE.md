@@ -60,7 +60,7 @@ nodeV2/
       forms-calendar/                # Forms calendar field testing (7 bugs, ~242 slots)
         analysis/                    # Analysis & conclusions (overview + 7 per-bug documents)
       web-services/                  # REST API date handling testing (148 slots, complete — WS-1 through WS-10)
-        analysis/                    # Analysis & conclusions (overview + 6 per-bug documents)
+        analysis/                    # Analysis & conclusions (overview + 6 finding documents)
         webservice-test-harness.js   # Server-side harness (all 10 categories via Action param)
         run-ws-test.js               # Direct Node.js CLI runner (auth + harness invocation)
         verify-ws4-browser.js        # Playwright browser verification for WS-4 cross-layer
@@ -172,9 +172,9 @@ npm run test:dash:regression                        # Dashboard: grid capture + 
 - `fixtures/vv-config.js` — form URLs, field config map (A-H), record definitions, saved records
 - `fixtures/test-data.js` — all test case definitions as structured data (data-driven)
 - `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture, save
-- `helpers/vv-calendar.js` — calendar helpers: popup selection (date-only + DateTime), typed input, legacy fields
+- `helpers/vv-calendar.js` — calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input, legacy fields
 - `global-setup.js` — auto-login + create saved records via browser UI (per-TZ, cached 1h)
-- `date-handling/cat-*.spec.js` — 11 parameterized spec files (cat-1, 2, 3, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 12)
+- `date-handling/cat-*.spec.js` — 12 parameterized spec files (cat-1, cat-1-legacy-popup, 2, 3, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 12)
 
 Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
 

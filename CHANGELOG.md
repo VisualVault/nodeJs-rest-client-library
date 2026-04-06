@@ -50,6 +50,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Playwright testing infrastructure under `testing/` (4-TZ projects, global auth, reusable helpers, data-driven specs)
 - Regression-to-artifact pipelines for Forms (`test:pw:regression`), WS (`test:ws:regression`), and Dashboards (`test:dash:regression`). Run tests → capture results → auto-generate run files, summaries, and session index entries. Matrix-based PASS/FAIL for WS and Dashboards.
 - Custom Playwright reporter (`testing/reporters/regression-reporter.js`) that captures test results and actual values to JSON for artifact generation
+- `selectDateViaLegacyPopup()` in `testing/helpers/vv-calendar.js`: opens legacy field popup via `.cal-icon` toggle, reuses Kendo calendar selection. Enables automated testing of legacy popup code path (Bug #2)
+- `testing/date-handling/cat-1-legacy-popup.spec.js`: Category 1 legacy popup tests for Configs E-H. Separate from `cat-1-calendar-popup.spec.js` which skips legacy fields
+- Bug #2 and Bug #3 audit reports with Playwright verification (`analysis/bug-2-audit.md`, `analysis/bug-3-audit.md`). Bug #2 independently confirmed via automated Playwright. Bug #3 verified via source code + `parseDateString()` direct invocation (V2 could not be activated on test env)
+- DB evidence script (`testing/scripts/audit-bug2-db-evidence.js`): saves popup vs typed records for DB comparison. Confirms Bug #2 causes different `datetime` values in SQL Server (3-hour offset in BRT)
+- VV demo server timezone confirmed as BRT (UTC-3) via VVCreateDate vs `toISOString()` offset analysis
+
+### Changed
+
+- Bug #2 severity upgraded from Low to **Medium** — DB schema shows all fields are `datetime` (no `date` type), making format inconsistency an actual data difference. SQL queries and reports affected
+- Cat 3 count corrected from 14P/4F to **10P/8F** in `tasks/date-handling/CLAUDE.md`
+- Legacy popup description in `docs/reference/form-fields.md` corrected: popup is Kendo calendar (not Angular UI Bootstrap as previously documented)
+- `docs/reference/api-date-patterns.md` corrected: server does not uniformly store UTC — stores whatever the client sends (mixed UTC/local in same column)
 
 ### Fixed
 

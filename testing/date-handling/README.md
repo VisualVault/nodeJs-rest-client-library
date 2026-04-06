@@ -65,9 +65,10 @@ Shared config:
 | `../fixtures/vv-config.js`        | Shared constants: form URL, field map (A-H), record definitions, saved record URLs      |
 | `../fixtures/test-data.js`        | All test case definitions as structured data (data-driven parameterization)             |
 | `../helpers/vv-form.js`           | Generic VV form helpers: navigation, field verification, value capture, save            |
-| `../helpers/vv-calendar.js`       | Calendar helpers: popup selection (date-only + DateTime), typed input                   |
+| `../helpers/vv-calendar.js`       | Calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input    |
 | `../global-setup.js`              | Runs before all tests: auth + creates saved records via browser UI per timezone         |
-| `cat-1-calendar-popup.spec.js`    | Category 1 — calendar popup date selection tests                                        |
+| `cat-1-calendar-popup.spec.js`    | Category 1 — calendar popup date selection tests (non-legacy Kendo fields)              |
+| `cat-1-legacy-popup.spec.js`      | Category 1 — legacy popup tests for Configs E-H (Bug #2 audit spec)                     |
 | `cat-2-typed-input.spec.js`       | Category 2 — keyboard segment-by-segment date entry tests                               |
 | `cat-3-server-reload.spec.js`     | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                   |
 | `cat-5-preset-date.spec.js`       | Category 5 — preset date default auto-population tests                                  |
