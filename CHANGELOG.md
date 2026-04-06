@@ -64,6 +64,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - DB wording audit across all 7 bug analysis docs: clarified SQL Server `datetime` storage semantics, replaced VV Query Admin display format with actual SSMS datetime values, updated Bug #7 double-shift from UNVERIFIED to VERIFIED (confirmed -2 days for Date objects in IST)
 - Legacy popup description in `docs/reference/form-fields.md` corrected: popup is Kendo calendar (not Angular UI Bootstrap as previously documented)
 - `docs/reference/api-date-patterns.md` corrected: server does not uniformly store UTC — stores whatever the client sends (mixed UTC/local in same column)
+- All 13 bug analysis documents (7 Forms, 6 Web Services) restructured for support/product readability: user-facing opening, progressive technical disclosure, concepts introduced before use. Bug IDs renamed: `Bug #X` → `FORM-BUG-X`, `WS-BUG-X` → `WEBSERVICE-BUG-X`. Audit findings merged into original documents (separate audit files removed). Classification tables replaced with narrative severity sections.
 
 ### Fixed
 

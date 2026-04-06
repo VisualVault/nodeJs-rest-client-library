@@ -1,38 +1,29 @@
-# WS-6: No Server-Side Date-Only Type Enforcement (Design Flaw)
+# WEBSERVICE-BUG-6: Date-Only Fields Accept and Store Time Components, Breaking Queries
 
-## Classification
+## What Happens
 
-| Field                  | Value                                                                                                                                                             |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Type**               | Design Flaw                                                                                                                                                       |
-| **Severity**           | MEDIUM                                                                                                                                                            |
-| **Evidence**           | `[DESIGN]` — Confirmed via WS-1, WS-2, WS-8, and cross-reference with Forms calendar testing                                                                      |
-| **Component**          | VV Server — field type enforcement (absent) + database schema (no date-only column type)                                                                          |
-| **Code Path**          | `postForms()` / `postFormRevision()` → server stores any datetime value in any date field                                                                         |
-| **Affected Configs**   | All date-only configs (A, B, E, F — `enableTime=false`). The issue does not exist for DateTime configs (C, D, G, H) where a time component is expected.           |
-| **Affected TZs**       | All — the inconsistency manifests differently per write path and user timezone                                                                                    |
-| **Affected Scenarios** | Queries, reports, dashboards filtering or grouping on date-only fields                                                                                            |
-| **Related Bugs**       | Compounds with Forms Bug #7 (UTC+ users store wrong day). Affects WS-BUG-1 remediation strategy (fixing the Z normalization does not fix the mixed-time problem). |
+When a calendar field is configured as "date-only" (`enableTime=false`), users see a clean date picker with no time input. But behind the scenes, the database column is a full `datetime` type — not a date-only type. The "date-only" concept is enforced only by the Forms UI in the browser. The server and database have no awareness of it.
+
+This means the same date-only field can contain wildly different time components depending on **how** the value was written:
+
+| How the Value Was Written                      | What Gets Stored for "March 15, 2026" | Time Component                                                                                      |
+| ---------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| User clicks date in popup (São Paulo)          | `2026-03-15 00:00:00.000`             | Midnight                                                                                            |
+| "Current Date" default on form load (8 PM BRT) | `2026-03-31 23:01:57.000`             | Actual timestamp at save time                                                                       |
+| Preset default "3/1/2026" (São Paulo)          | `2026-03-01 03:00:00.000`             | BRT midnight = 3:00 AM UTC                                                                          |
+| API with `"2026-03-15"` (date-only string)     | `2026-03-15 00:00:00.000`             | Midnight                                                                                            |
+| API with `"2026-03-15T14:30:00"` (with time)   | `2026-03-15 14:30:00.000`             | **2:30 PM — no enforcement**                                                                        |
+| User in Mumbai clicks date in popup            | `2026-03-14 00:00:00.000`             | Midnight of **wrong day** ([FORM-BUG-7](../../forms-calendar/analysis/bug-7-wrong-day-utc-plus.md)) |
+
+All six rows are in the **same date-only field**. All represent "March 15" (or intend to). Yet the stored values have five different time components and one wrong date entirely. A query for "March 15" cannot reliably find all of them.
+
+This is not a bug in any single component — it's a systemic design inconsistency where the date-only semantic exists in the UI but not at the storage layer.
 
 ---
 
-## Summary
+## Severity: MEDIUM (Design Flaw)
 
-The VV platform has no date-only storage type. Every calendar field — regardless of whether `enableTime` is true or false — is stored as a full datetime value in the database. The "date-only" concept exists only in the Forms client-side JavaScript, which formats and displays the value accordingly. The API and database have no awareness of this distinction.
-
-This means the same date-only field (`enableTime=false`) can contain wildly different time components depending on **which code path wrote the value**:
-
-| Write Path                         | Stored for "March 15, 2026"  | Time Component                          |
-| ---------------------------------- | ---------------------------- | --------------------------------------- |
-| Forms popup (BRT)                  | `"2026-03-15T00:00:00Z"`     | UTC midnight                            |
-| Forms popup (IST)                  | `"2026-03-14T00:00:00Z"`     | UTC midnight of **wrong day** (Bug #7)  |
-| Forms preset "3/1/2026" (BRT)      | `"2026-03-01T03:00:00Z"`     | BRT midnight = 3:00 AM UTC              |
-| Forms Current Date (BRT, 8pm)      | `"2026-03-31T23:01:57Z"`     | Actual timestamp at save time           |
-| Forms legacy popup (BRT)           | `"2026-03-15T03:00:00.000Z"` | BRT midnight as UTC, with ms            |
-| API string `"2026-03-15"`          | `"2026-03-15T00:00:00Z"`     | UTC midnight                            |
-| API string `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"`     | 2:30 PM — **arbitrary, no enforcement** |
-
-All seven rows represent the "same" date in the "same" date-only field — yet they have six different time components. This is not a bug in any single component; it's a systemic design inconsistency where the date-only semantic is not enforced at the storage layer.
+No data is lost or corrupted in isolation. The practical impact is on query reliability: exact-match queries on date-only fields miss records that have non-midnight time components. Range queries work correctly as a workaround.
 
 ---
 
@@ -40,236 +31,159 @@ All seven rows represent the "same" date in the "same" date-only field — yet t
 
 ### Query authors and report builders
 
-Anyone writing OData filters, SQL queries, dashboard filters, or report criteria against date-only fields. An exact-equality query like `[Field7] eq '2026-03-15'` may match records written via API (UTC midnight) but miss records written via Forms preset (3:00 AM UTC) or Forms Current Date (arbitrary timestamp).
+Anyone writing filters against date-only fields — whether through the VV OData API, SQL queries, dashboard filters, or report criteria. An exact-equality query like `Field7 = '2026-03-15'` matches records stored at midnight but **misses** records stored at 3:00 AM, 2:30 PM, or 11:01 PM — even though all represent the same intended date.
 
 ### Script developers reading date-only fields
 
-A script reading a date-only field via `getForms()` receives a full datetime string like `"2026-03-15T14:30:00Z"`. Without field metadata, the script cannot determine whether the `T14:30:00` time component is meaningful data or noise from a write path that didn't enforce date-only. Should the script preserve the time when writing back? Normalize to midnight? There is no programmatic way to decide.
+A script that reads a date-only field through the API receives a full datetime string:
+
+```javascript
+const value = result.data.datafield7;
+// → "2026-03-15T14:30:00Z"
+```
+
+Is the `T14:30:00` part meaningful? Should the script preserve it when writing back? Normalize to midnight? There is no way to determine whether a field is date-only from the API response alone — the field configuration is not included in the data.
 
 ### Dashboard and report consumers
 
-Records for the "same" date may group differently in dashboards or reports if the grouping logic uses the full datetime rather than just the date portion. A March 15 record with DB value `00:00:00.000` and another with `14:30:00.000` could appear in different time-based groupings.
+Records for the "same" date may group differently if the grouping logic uses the full datetime rather than just the date portion. Two March 15 records — one stored at midnight, one at 2:30 PM — could appear in different time-based groupings.
 
-### Not directly affected
+### Who is NOT directly affected
 
-Users interacting with Forms in the browser — the client-side JS strips the time component for display in date-only fields, so users always see a clean date regardless of the stored time component.
-
----
-
-## Root Cause
-
-### Field configuration flags are client-side only
-
-The three field configuration flags — `enableTime`, `ignoreTimezone`, and `useLegacy` — are defined in the form template and consumed by the Forms Angular client. They control:
-
-- Whether the Kendo date picker shows a time input (`enableTime`)
-- Whether the display applies timezone conversion (`ignoreTimezone`)
-- Whether the legacy code path is used (`useLegacy`)
-
-None of these flags are read, enforced, or even available to the VV server's API layer. When `postForms()` receives a field value, it processes it through the same date parser regardless of field configuration (CB-6).
-
-### Database stores datetime, not date
-
-The database column for every calendar field is a datetime type (or equivalent). There is no date-only column. Even Forms' own save logic (`getSaveValue()`) stores a full datetime — it just normalizes the time to midnight for date-only fields. But this normalization is client-side; other write paths don't apply it.
-
-### The API has no field metadata awareness
-
-The `postForms()` endpoint receives a flat key-value object: `{ Field7: "2026-03-15T14:30:00" }`. It does not look up Field7's configuration to check whether `enableTime=false`. It simply parses the date string and stores the result. The server is structurally incapable of enforcing date-only semantics without a design change.
+Users interacting with Forms in the browser — the Forms UI strips the time component for display on date-only fields. Users always see a clean date regardless of what time component is stored.
 
 ---
 
-## Expected vs Actual Behavior
+## Background
 
-### Expected: date-only fields should have consistent time components
+### How Calendar Fields Are Configured
 
-If a field is configured as `enableTime=false`, all stored values should normalize to midnight (or have no time component). The date portion should be the only meaningful data.
+Each calendar field in VisualVault has configuration properties that control its behavior in the Forms UI:
 
-### Actual: time components vary by write path
+| Property         | What It Controls                                                                   |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `enableTime`     | Whether the UI shows a time picker. `false` = date-only field, `true` = date+time. |
+| `ignoreTimezone` | Whether timezone conversion is skipped in the display.                             |
+| `useLegacy`      | Whether the field uses the older rendering/save code path.                         |
 
-Evidence from DB dump (`DataTest.xlsx`, 2026-04-06) for DateTest-000080 (BRT-saved record):
+These properties exist in the form template definition and are consumed by the Forms JavaScript application in the browser. **The server's API layer does not read or enforce these properties.** When the API receives a field value, it processes it through the same date parser regardless of the field's configuration — a date+time string sent to a date-only field is accepted without error.
 
-| Field  | Config | Write Source            | DB Value (`datetime`)     | Time Component              |
-| ------ | :----: | ----------------------- | ------------------------- | --------------------------- |
-| Field7 |   A    | Forms popup (BRT)       | `2026-03-15 00:00:00.000` | midnight                    |
-| Field1 |   A    | Current Date (BRT, 8pm) | `2026-03-31 23:01:57.000` | 23:01:57                    |
-| Field2 |   A    | Preset "3/1/2026" (BRT) | `2026-03-01 03:00:00.000` | 03:00 (BRT midnight as UTC) |
+### The Database Has No Date-Only Type
 
-And from DateTest-001711 / DateTest-001712 (API-created):
+The database column for every calendar field — date-only and date+time alike — is a SQL Server `datetime`. There is no `date` column type. The database stores whatever value the server parsed, including any time component.
 
-| Field  | Config | Input                              | DB Value (`datetime`)     | Time Component             |
-| ------ | :----: | ---------------------------------- | ------------------------- | -------------------------- |
-| Field7 |   A    | `"2026-03-15"` (date-only)         | `2026-03-15 00:00:00.000` | midnight                   |
-| Field7 |   A    | `"2026-03-15T14:30:00"` (datetime) | `2026-03-15 14:30:00.000` | **14:30 — no enforcement** |
+### OData Queries
 
-All fields have `enableTime=false` (date-only). The DB column is SQL Server `datetime` — it stores whatever value the server parsed, with no date-only normalization. The time component varies by write path.
+VisualVault's API supports OData-style filtering for querying form records. Queries like `[Field7] eq '2026-03-15'` compare the stored `datetime` value against the specified date. Since the database column is `datetime`, the comparison is against `2026-03-15 00:00:00.000` (midnight) — records with other time components don't match.
 
-### API write path — no enforcement
+---
 
-From WS-1 testing (CB-6):
+## The Problem in Detail
 
-```bash
-# Send a datetime string to a date-only field (Config A, enableTime=false)
-node run-ws-test.js --action WS-1 --configs A --input-date "2026-03-15T14:30:00"
-# → DB stores: 2026-03-15 14:30:00.000 (getForms returns "T14:30:00Z")
-# The server accepted a 2:30 PM time in a date-only field without error.
+### Why Different Write Paths Produce Different Time Components
 
-# Send a date-only string to the same field
-node run-ws-test.js --action WS-1 --configs A --input-date "2026-03-15"
-# → DB stores: 2026-03-15 00:00:00.000 (getForms returns "T00:00:00Z")
-# Both values accepted identically — server does not distinguish.
-```
+**Forms UI (browser):** The Forms JavaScript applies client-side normalization before saving. For date-only fields, the `getSaveValue()` function extracts just the date portion and stores it without a time. But other Forms paths don't normalize the same way:
+
+- **Calendar popup**: normalizes to midnight — consistent
+- **"Current Date" default**: uses `new Date()` which captures the actual current time — not normalized to midnight
+- **Preset defaults**: uses the moment.js library to parse, which converts through the user's timezone — the time component reflects the timezone offset
+- **Legacy popup**: stores the raw UTC string from JavaScript's `toISOString()` — includes timezone-offset time
+
+**REST API:** The server parses any valid date string and stores it as-is. A datetime string like `"2026-03-15T14:30:00"` is stored with the 2:30 PM time component, even in a date-only field. The server has no mechanism to check the field configuration and strip the time.
+
+### The Query Impact
+
+Given records in a date-only field (all representing "March 15"):
+
+| Record Source            | DB Value                  | `[Field7] eq '2026-03-15'` Matches? | `[Field7] ge '2026-03-15' AND lt '2026-03-16'` Matches? |
+| ------------------------ | ------------------------- | :---------------------------------: | :-----------------------------------------------------: |
+| Forms popup (UTC+0)      | `2026-03-15 00:00:00.000` |                 Yes                 |                           Yes                           |
+| API date-only string     | `2026-03-15 00:00:00.000` |                 Yes                 |                           Yes                           |
+| Forms preset (São Paulo) | `2026-03-15 03:00:00.000` |               **No**                |                           Yes                           |
+| Forms Current Date       | `2026-03-15 23:01:57.000` |               **No**                |                           Yes                           |
+| API datetime string      | `2026-03-15 14:30:00.000` |               **No**                |                           Yes                           |
+
+Exact-equality queries fail for any record not stored at midnight. Range queries work for all records.
+
+### Compounds with FORM-BUG-7
+
+For users in timezones east of London, [FORM-BUG-7](../../forms-calendar/analysis/bug-7-wrong-day-utc-plus.md) stores the previous day for date-only fields entered through the Forms UI. A March 15 entry from Mumbai stores `2026-03-14 00:00:00.000` — the wrong day entirely. A query for March 15 misses this record whether using exact match or range. The lack of server-side normalization means the API cannot detect or prevent this — the wrong date arrives from the Forms client and is stored as-is.
 
 ---
 
 ## Steps to Reproduce
 
-### Demonstrate mixed time components in a single date-only field
+### Demonstrate Mixed Time Components via API
 
 ```bash
-# 1. Create record via API with date-only string
+# 1. Create record with date-only string
 node tasks/date-handling/web-services/run-ws-test.js \
   --action WS-1 --configs A --input-date "2026-03-15"
-# → Field7 DB: 2026-03-15 00:00:00.000
+# → DB stores: 2026-03-15 00:00:00.000 (midnight)
 
-# 2. Create another record via API with datetime string (same date, different time)
+# 2. Create another record with datetime string (same field type, same date)
 node tasks/date-handling/web-services/run-ws-test.js \
   --action WS-1 --configs A --input-date "2026-03-15T14:30:00"
-# → Field7 DB: 2026-03-15 14:30:00.000
+# → DB stores: 2026-03-15 14:30:00.000 (2:30 PM — no enforcement!)
 
-# 3. Query for "March 15" records
+# Both records are in the same date-only field.
+# Both represent March 15.
+# The server accepted both without error.
+```
+
+### Demonstrate Query Impact
+
+```bash
+# Exact equality — only matches midnight records
 node tasks/date-handling/web-services/run-ws-test.js \
   --action WS-8 --configs A
 # OData: [Field7] eq '2026-03-15'
-# → May only match record 1 (T00:00:00Z), not record 2 (T14:30:00Z)
+# → Matches record 1 (midnight), MISSES record 2 (14:30)
 
-# 4. Range query catches both
+# Range query — matches both
 # OData: [Field7] ge '2026-03-15' AND [Field7] lt '2026-03-16'
-# → Matches both records (CB-23)
+# → Matches both records
 ```
 
 ### Demonstrate via Forms
 
-1. Create a new DateTest form in BRT
-2. Observe Current Date field (Config A, dataField1) — DB has actual timestamp (e.g., `23:01:57.000`)
-3. Observe Preset field (Config A, dataField2) — DB has BRT midnight as UTC (`03:00:00.000`)
-4. Use popup to set Config A field to March 15 — DB has midnight (`00:00:00.000`)
-5. All three are date-only fields with `enableTime=false`, all have different time components
-
----
-
-## Test Evidence
-
-### WS-1: API Write Path (16 PASS)
-
-Run: [`ws-1-ws-2-batch-run-1.md`](../runs/ws-1-ws-2-batch-run-1.md)
-
-**CB-6**: All 8 field configs (A through H) store and return identically per input type. The server treats every field the same — `enableTime`, `ignoreTimezone`, and `useLegacy` are invisible to the API. A datetime string stored in a date-only field (Config A) produces the same result as in a DateTime field (Config C).
-
-### WS-2: API Read Path (16 PASS)
-
-Same run — reading DateTest-000080 (BRT-saved record) shows mixed time components across date-only fields:
-
-| Field      | Config | enableTime | Stored Value             | Time Component |
-| ---------- | :----: | :--------: | ------------------------ | :------------: |
-| dataField7 |   A    |   false    | `"2026-03-15T00:00:00Z"` |  `T00:00:00Z`  |
-| dataField1 |   A    |   false    | `"2026-03-31T23:01:57Z"` |  `T23:01:57Z`  |
-| dataField2 |   A    |   false    | `"2026-03-01T03:00:00Z"` |  `T03:00:00Z`  |
-
-### WS-8: Query Filtering (10 PASS)
-
-Run: [`ws-8-batch-run-1.md`](../runs/ws-8-batch-run-1.md)
-
-**CB-22**: OData query engine normalizes date formats — exact match and range queries work. But exact equality on date-only fields is only reliable when the stored time is midnight.
-
-**CB-23**: Date-only range queries work on DateTime fields. `[Field7] ge '2026-03-15' AND [Field7] le '2026-03-16'` matches records with any time on March 15. This is the recommended query pattern for date-only fields.
-
-### Confirmed Behaviors
-
-| CB    | Description                                                            | Source     |
-| ----- | ---------------------------------------------------------------------- | ---------- |
-| CB-6  | Field config flags have NO effect on API write/read behavior           | WS-1       |
-| CB-7  | API normalizes ALL dates to ISO 8601 datetime+Z on read                | WS-1, WS-2 |
-| CB-22 | OData filters normalize date formats — match works for midnight values | WS-8       |
-| CB-23 | Range queries work across time components                              | WS-8       |
-
----
-
-## Impact Analysis
-
-### Query Reliability
-
-Exact-equality queries on date-only fields are unreliable when records have been created through different paths:
-
-```
-[Field7] eq '2026-03-15'
-```
-
-This query compares against midnight. It will:
-
-- **Match**: records with DB value `2026-03-15 00:00:00.000` (API date-only input, Forms popup)
-- **Match**: records written via Forms popup in UTC+0
-- **Miss**: records with DB value `2026-03-15 03:00:00.000` (Forms preset in BRT)
-- **Miss**: records with DB value `2026-03-15 23:01:57.000` (Forms Current Date)
-- **Miss**: records with DB value `2026-03-15 14:30:00.000` (API datetime input in date-only field)
-
-Range queries are reliable: `[Field7] ge '2026-03-15' AND [Field7] lt '2026-03-16'` catches all March 15 records regardless of time component (CB-23), with the exception of Bug #7 records stored on the wrong day.
-
-### Dashboard and Report Grouping
-
-If a dashboard groups records by date, and the grouping logic uses the full datetime rather than truncating to the date portion, records from different write paths will group differently even though they represent the "same" date.
-
-### API Ambiguity for Script Developers
-
-A script reading a date-only field gets:
-
-```javascript
-const value = result.data.datafield7; // "2026-03-15T14:30:00Z"
-```
-
-Is the `T14:30:00` meaningful? Should the script:
-
-- Preserve it when writing back? (Preserves the noise)
-- Strip it to `"2026-03-15"` on write? (Normalizes, but loses data if the time was intentional in a misconfigured field)
-
-There is no way to programmatically determine whether a field is date-only without querying the form template metadata separately.
-
-### Compounds with Forms Bug #7
-
-For IST users, Forms Bug #7 stores the previous day for date-only fields:
-
-- March 15 via Forms popup in IST → DB stores `2026-03-14 00:00:00.000` (wrong day — confirmed in DB dump, DateTest-000084)
-- March 15 via API → DB stores `2026-03-15 00:00:00.000` (correct)
-
-A query for March 15 records would match the API-created record but miss the IST Forms-created record (which is on March 14 in storage). This is Bug #7's fault, but the lack of server-side normalization means the API cannot detect or prevent it.
+1. Create a new form in São Paulo
+2. Check the "Current Date" field (date-only) — DB stores the actual timestamp (e.g., `23:01:57.000`)
+3. Check the "Preset" field (date-only) — DB stores `03:00:00.000` (São Paulo midnight as UTC)
+4. Click the popup to set another date-only field to March 15 — DB stores `00:00:00.000` (midnight)
+5. All three are in date-only fields — all have different time components
 
 ---
 
 ## Workarounds
 
-### For API writes: always send date-only strings to date-only fields
+### For API Writes: Always Send Date-Only Strings to Date-Only Fields
 
 ```javascript
-// RECOMMENDED: send date-only string — server normalizes to T00:00:00Z
+// RECOMMENDED: date-only string — server normalizes to T00:00:00Z
 const data = { Field7: '2026-03-15' };
 
 // ALSO SAFE: explicit midnight
 const data2 = { Field7: '2026-03-15T00:00:00' };
 
 // AVOID: datetime with non-midnight time in a date-only field
-const data3 = { Field7: '2026-03-15T14:30:00' }; // Server accepts but creates inconsistency
+const data3 = { Field7: '2026-03-15T14:30:00' };
+// Server accepts this without error, creating query inconsistency
 ```
 
-### For queries: always use range instead of exact equality
+### For Queries: Always Use Range Instead of Exact Equality
 
 ```javascript
-// UNRELIABLE: exact equality on date-only fields
+// UNRELIABLE for date-only fields:
 const params = { q: "[Field7] eq '2026-03-15'" };
+// Misses records with non-midnight time components
 
-// RELIABLE: range query covers all time components
+// RELIABLE for date-only fields:
 const params2 = { q: "[Field7] ge '2026-03-15' AND [Field7] lt '2026-03-16'" };
+// Catches all March 15 records regardless of time component
 ```
 
-### For scripts reading date-only fields: extract date portion only
+### For Scripts Reading Date-Only Fields: Extract Date Portion Only
 
 ```javascript
 const apiValue = result.data.datafield7; // "2026-03-15T14:30:00Z"
@@ -277,15 +191,60 @@ const dateOnly = apiValue ? apiValue.split('T')[0] : null; // "2026-03-15"
 // Use dateOnly for display, comparison, and write-back
 ```
 
-### Accept that Forms-created records have mixed time components
+### Accept That Forms-Created Records Have Mixed Time Components
 
-Records created via Forms popup, preset, and Current Date will have different time components. This is a Forms-side issue that cannot be fixed via the API. The workarounds above ensure API-created records are consistent and that queries account for the inconsistency.
+Records created via the Forms popup, preset defaults, and "Current Date" will always have different time components. This is a client-side issue that cannot be fixed through the API. The workarounds above ensure API-created records are consistent and that queries account for the existing inconsistency.
+
+---
+
+## Test Evidence
+
+### API Ignores Field Configuration
+
+Records created through the API with the same input stored identically regardless of field type. The server treats every calendar field the same — `enableTime`, `ignoreTimezone`, and `useLegacy` are invisible to the API:
+
+```bash
+# Date-only field (enableTime=false):
+Input: "2026-03-15T14:30:00" → Stored: 2026-03-15 14:30:00.000
+# Date+time field (enableTime=true):
+Input: "2026-03-15T14:30:00" → Stored: 2026-03-15 14:30:00.000
+# Identical. The server makes no distinction.
+```
+
+### Mixed Time Components in Real Records
+
+From database dump (2026-04-06), examining a single form record saved from São Paulo:
+
+| Field  | Field Type | Write Source           | DB Value                  | Time Component              |
+| ------ | ---------- | ---------------------- | ------------------------- | --------------------------- |
+| Field7 | Date-only  | Forms popup            | `2026-03-15 00:00:00.000` | Midnight                    |
+| Field1 | Date-only  | "Current Date" default | `2026-03-31 23:01:57.000` | 23:01:57                    |
+| Field2 | Date-only  | Preset "3/1/2026"      | `2026-03-01 03:00:00.000` | 03:00 (BRT midnight as UTC) |
+
+All three fields have `enableTime=false`. All stored in the same `datetime` column type. Three different time components.
+
+From API-created records:
+
+| Field  | Field Type | API Input                          | DB Value                  | Time Component             |
+| ------ | ---------- | ---------------------------------- | ------------------------- | -------------------------- |
+| Field7 | Date-only  | `"2026-03-15"` (date string)       | `2026-03-15 00:00:00.000` | Midnight                   |
+| Field7 | Date-only  | `"2026-03-15T14:30:00"` (datetime) | `2026-03-15 14:30:00.000` | **14:30 — no enforcement** |
+
+The server accepted a 2:30 PM time in a date-only field without any error.
+
+### Query Behavior
+
+OData query testing confirmed:
+
+- **Exact equality** on date-only fields is only reliable when the stored time is midnight
+- **Range queries** work correctly across all time components — `ge '2026-03-15' AND lt '2026-03-16'` matches any record on March 15 regardless of time
+- The OData engine normalizes date formats, so both `'2026-03-15'` and `'2026-03-15T00:00:00Z'` work in filters
 
 ---
 
 ## Proposed Fix
 
-### Option A: Server-side normalization for date-only fields
+### Option A: Server-Side Normalization for Date-Only Fields (Recommended Long-Term)
 
 When writing to a field with `enableTime=false`, the server normalizes the stored value to UTC midnight, stripping any time component:
 
@@ -294,38 +253,35 @@ Input: "2026-03-15T14:30:00"  → field has enableTime=false
 Stored: "2026-03-15T00:00:00Z"  (time stripped, normalized to midnight)
 ```
 
-**Requirements**: The API layer must have access to field configuration metadata. Currently it does not — the field template definitions are stored in the database but not consulted during `postForms` processing.
+**Requirement**: The API layer must have access to field configuration metadata. Currently it does not — field properties are stored in the form template but not consulted during write operations. This is an architectural change.
 
-**Pros**: Eliminates time-component inconsistency for all future API writes. Exact-equality queries become reliable for API-created records.
-**Cons**: Requires architectural change — the API must read field metadata before writing. Does not fix existing records or Forms-created records.
+**Pros**: Eliminates time-component inconsistency for all future API writes. Exact-equality queries become reliable.
+**Cons**: Requires the API to read field metadata before writing. Does not fix existing records or Forms-created records with non-midnight times.
 
-### Option B: Query-layer normalization
+### Option B: Query-Layer Normalization (Pragmatic Short-Term)
 
-Instead of fixing storage, fix the query layer. When filtering on a field with `enableTime=false`, the OData engine should compare only the date portion:
+Instead of fixing storage, fix the query layer. When filtering on a date-only field, the query engine compares only the date portion:
 
-```
-[Field7] eq '2026-03-15'
-→ internally: CAST(Field7 AS DATE) = '2026-03-15'
-→ matches T00:00:00Z, T03:00:00Z, T14:30:00Z, T23:01:57Z
+```sql
+-- Current: compares full datetime (misses non-midnight records)
+WHERE Field7 = '2026-03-15'
+
+-- Fixed: compares date portion only for date-only fields
+WHERE CAST(Field7 AS DATE) = '2026-03-15'
 ```
 
 **Pros**: Fixes queries without changing storage. Works for existing data.
-**Cons**: Requires query engine to be field-metadata-aware. May have performance implications (function on column prevents index use). Does not fix the semantic ambiguity for API consumers.
+**Cons**: Requires query engine awareness of field metadata. May impact index performance. Doesn't fix the semantic ambiguity for API consumers.
 
-### Option C: Both — normalize on write + fix queries (recommended)
+### Option C: Both (Recommended)
 
-1. **New writes**: API normalizes date-only fields to midnight (Option A)
+1. **New writes**: Server normalizes date-only fields to midnight (Option A)
 2. **Existing data**: Query layer compares date portion only for date-only fields (Option B)
-3. **Forms-side**: `getSaveValue()` already normalizes to midnight — no change needed there
+3. **Forms-side**: The Forms UI already normalizes popup-entered dates to midnight — no change needed there
 
-This ensures consistency going forward while handling the existing mixed data correctly.
+### Option D: Documentation Only (Minimum)
 
-### Option D: Documentation only (minimum)
-
-Document that date-only fields may contain arbitrary time components. Recommend range queries. Do not change server behavior.
-
-**Pros**: No code change, no risk.
-**Cons**: Developers continue to encounter unexpected query results. The design inconsistency persists.
+Document that date-only fields may contain arbitrary time components. Recommend range queries. No code change.
 
 ---
 
@@ -333,27 +289,25 @@ Document that date-only fields may contain arbitrary time components. Recommend 
 
 ### What Changes If Fixed
 
-- Date-only fields written via API always have `T00:00:00Z` time component
-- Exact-equality queries work reliably on date-only fields (for new data; Option B for old data)
+- Date-only fields written via API always have a midnight time component
+- Exact-equality queries work reliably on date-only fields (for new data; Option B for existing data)
 - Scripts reading date-only fields always see midnight — no ambiguity about whether the time is meaningful
 
 ### Backwards Compatibility Risk
 
-**HIGH for Option A**: Existing records have mixed time components. If the server normalizes new writes but queries are not updated, old records behave differently from new ones.
+**HIGH for Option A**: Existing records have mixed time components. If the server normalizes new writes but queries aren't updated, old and new records behave differently.
 
 **LOW for Option B**: Query normalization is additive — it makes more records match, not fewer.
 
-**LOW for Option D**: No behavior change.
+### Complexity: HIGH
 
-### Complexity
+This is the most architecturally complex fix across all six web services bugs. It requires:
 
-**HIGH**: This is the most architecturally complex fix of all six WS bugs. It requires:
-
-- Exposing field configuration metadata to the API layer (currently isolated)
-- Modifying the `postForms` write path to consult field metadata per field
-- Potentially modifying the OData query engine for date-only field awareness
+- Exposing field configuration metadata to the API write layer (currently isolated)
+- Modifying the write path to consult field metadata per field
+- Potentially modifying the query engine for date-only field awareness
 - Regression testing across all components that read/write date fields
 
-### Migration Consideration
+### No Practical Migration Path for Existing Data
 
-There is no practical migration path for existing mixed-time data. The time components in existing records are artifacts of different write paths, and the "correct" midnight value cannot be determined retroactively without knowing which records were written via which path. The recommended approach is to normalize going forward and use range queries for existing data.
+The time components in existing records are artifacts of different write paths. The "correct" midnight value cannot be determined retroactively without knowing which path wrote each record. The recommended approach is to normalize going forward and use range queries for existing data.

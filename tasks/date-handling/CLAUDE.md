@@ -21,16 +21,18 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 ```
 tasks/date-handling/
   CLAUDE.md                          # This file — overall context
+  analysis/                          # Cross-cutting root cause analysis
+    temporal-models.md               # Four temporal mental models — maps every bug to model confusion
   forms-calendar/                    # Forms calendar field investigation
     analysis/                        # Analysis & conclusions
       overview.md                    # Executive summary, confirmed bugs, code paths, V1/V2 comparison
-      bug-{1-7}.md                   # Individual bug documents (1 per bug)
+      bug-{1-7}.md                   # Individual bug documents (FORM-BUG-1 through FORM-BUG-7)
     results.md                       # Live browser test evidence (source of truth)
   web-services/                      # REST API date handling investigation
     README.md                        # Test environment setup, harness usage, architecture
     analysis/                        # Analysis & conclusions
       overview.md                    # Executive summary, issues registry, confirmed behaviors, developer guidance
-      ws-bug-{1-6}.md               # Individual bug documents (1 per issue)
+      ws-bug-{1-6}.md               # Individual bug documents (WEBSERVICE-BUG-1 through WEBSERVICE-BUG-6)
     matrix.md                        # Test matrix — WS-1 through WS-10 categories (148 slots, complete)
     results.md                       # Live test evidence
     webservice-test-harness.js       # VV form button script — runs tests inside FormViewer
@@ -81,7 +83,7 @@ tasks/date-handling/
 
 ### Progress
 
-**~150 of ~242 test cases completed**. 7 bugs confirmed (5 from original analysis + 2 new, Bug #6 scope expanded). Testing across five timezones: BRT (UTC-3), IST (UTC+5:30), UTC+0 (GMT), PST (UTC-8/UTC-7), JST (UTC+9). 12 Playwright spec files with 191 test-data entries covering Categories 1, 1-legacy-popup, 2, 3, 5, 6, 7, 8, 8B, 9, 9-GDOC, 12. **Cat 1 fully backfilled** (20/20 entries). **Cat 2 fully backfilled** (16/16 entries). **Cat 3 fully complete** 18/18 (10P, 8F — corrected from 14P/4F per Playwright audit 2026-04-06; legacy E/F/H added, B-IST-BRT closes category). **Cat 5 fully complete** 18/18 (11P, 7F) — 17 test-data entries; Bug #7 on all date-only presets in IST, Bug #5 on Config D presets (invisible at UTC0), legacy configs E-H safe from Bug #5 (useLegacy=true bypasses fake Z), Config C presets TZ-independent. **Cat 6 fully complete** 15/15 (13P, 2F) — 14 test-data entries; Current Date uses `new Date()` directly → no Bug #7; Bug #5 only on non-legacy Config D; all legacy configs pass; cross-midnight edge demonstrated in IST. Cat 7 (SFV Formats) 39 entries across all 8 configs × 2 TZs, 39/39 done (23P, 16F) — all Config D BRT/IST formats tested; all date-only configs (A/B/E/F) tested BRT+IST; **Config C fully tested (7 formats) — Config C is format-agnostic for all local-midnight inputs**; legacy DateTime (G/H) BRT done; **key finding: useLegacy=true bypasses Bug #5 fake Z on GFV, but does NOT protect date-only fields from Bug #7**. Cat 8 (GFV Return) 19 entries (13P, 6F) — all 8 configs tested; Bug #5 on Config D all TZs; Bug #6 on empty Config C/D; **legacy DateTime (G/H) returns raw (not UTC) — 8-G-BRT prediction corrected**; V2 code path bypasses all GFV transformations (Bug #5 absent under V2); Bug #5 invisible at UTC+0. **Cat 8B (GDOC) complete** 12 entries (11P, 1F) — GDOC returns correct Date for all configs; 8B-A-IST FAIL is Bug #7 upstream (not GDOC fault); empty fields return undefined (falsy, safe). **Cat 9 (GFV Round-Trip) complete** 20 entries (9P, 11F) — Bug #5 drift proportional to TZ offset: BRT -3h, IST +5:30h, PST/PDT -7h, JST +9h, UTC0 0h (coincidental); **9-B-IST reveals Bug #7 causes -1 day/trip on date-only round-trips in UTC+**; PST corrected to PDT (-7h, DST active Mar 15); legacy configs (E, G, H) stable. Cat 9-GDOC 2P. Cat 12 (Edge Cases) 20 entries (1P, 13F, 5 PENDING + 1 SKIP — near-midnight, year/leap boundary, DST, empty, invalid, far-future, pre-epoch; IST shows opposite drift direction).
+**~150 of ~242 test cases completed**. 7 bugs confirmed (5 from original analysis + 2 new, FORM-BUG-6 scope expanded). Testing across five timezones: BRT (UTC-3), IST (UTC+5:30), UTC+0 (GMT), PST (UTC-8/UTC-7), JST (UTC+9). 12 Playwright spec files with 191 test-data entries covering Categories 1, 1-legacy-popup, 2, 3, 5, 6, 7, 8, 8B, 9, 9-GDOC, 12. **Cat 1 fully backfilled** (20/20 entries). **Cat 2 fully backfilled** (16/16 entries). **Cat 3 fully complete** 18/18 (10P, 8F — corrected from 14P/4F per Playwright audit 2026-04-06; legacy E/F/H added, B-IST-BRT closes category). **Cat 5 fully complete** 18/18 (11P, 7F) — 17 test-data entries; FORM-BUG-7 on all date-only presets in IST, FORM-BUG-5 on Config D presets (invisible at UTC0), legacy configs E-H safe from FORM-BUG-5 (useLegacy=true bypasses fake Z), Config C presets TZ-independent. **Cat 6 fully complete** 15/15 (13P, 2F) — 14 test-data entries; Current Date uses `new Date()` directly → no FORM-BUG-7; FORM-BUG-5 only on non-legacy Config D; all legacy configs pass; cross-midnight edge demonstrated in IST. Cat 7 (SFV Formats) 39 entries across all 8 configs × 2 TZs, 39/39 done (23P, 16F) — all Config D BRT/IST formats tested; all date-only configs (A/B/E/F) tested BRT+IST; **Config C fully tested (7 formats) — Config C is format-agnostic for all local-midnight inputs**; legacy DateTime (G/H) BRT done; **key finding: useLegacy=true bypasses FORM-BUG-5 fake Z on GFV, but does NOT protect date-only fields from FORM-BUG-7**. Cat 8 (GFV Return) 19 entries (13P, 6F) — all 8 configs tested; FORM-BUG-5 on Config D all TZs; FORM-BUG-6 on empty Config C/D; **legacy DateTime (G/H) returns raw (not UTC) — 8-G-BRT prediction corrected**; V2 code path bypasses all GFV transformations (FORM-BUG-5 absent under V2); FORM-BUG-5 invisible at UTC+0. **Cat 8B (GDOC) complete** 12 entries (11P, 1F) — GDOC returns correct Date for all configs; 8B-A-IST FAIL is FORM-BUG-7 upstream (not GDOC fault); empty fields return undefined (falsy, safe). **Cat 9 (GFV Round-Trip) complete** 20 entries (9P, 11F) — FORM-BUG-5 drift proportional to TZ offset: BRT -3h, IST +5:30h, PST/PDT -7h, JST +9h, UTC0 0h (coincidental); **9-B-IST reveals FORM-BUG-7 causes -1 day/trip on date-only round-trips in UTC+**; PST corrected to PDT (-7h, DST active Mar 15); legacy configs (E, G, H) stable. Cat 9-GDOC 2P. Cat 12 (Edge Cases) 20 entries (1P, 13F, 5 PENDING + 1 SKIP — near-midnight, year/leap boundary, DST, empty, invalid, far-future, pre-epoch; IST shows opposite drift direction).
 
 ### Files
 
@@ -125,19 +127,19 @@ All live tests use a standard standalone form (no ObjectID, no modelId, no serve
 **`useUpdatedCalendarValueLogic` is a service-level flag** (`CalendarValueService`, line ~104098) — not per-field; flipping it affects all calendar fields on the form simultaneously.
 
 **V2 fix scope — not complete:**
-V2 partially fixes Bug #7 for date-only fields by routing through `parseDateString()` which uses `.tz("UTC",true).local()` (treats the parsed time as UTC before converting to local). However, for `ignoreTimezone=true` date-only fields, V2 still falls through to plain `moment(stripped).toDate()` — **Bug #7 persists in V2 for those fields.**
+V2 partially fixes FORM-BUG-7 for date-only fields by routing through `parseDateString()` which uses `.tz("UTC",true).local()` (treats the parsed time as UTC before converting to local). However, for `ignoreTimezone=true` date-only fields, V2 still falls through to plain `moment(stripped).toDate()` — **FORM-BUG-7 persists in V2 for those fields.**
 
-**V1 Bug #7 scope is wider than SetFieldValue:**
+**V1 FORM-BUG-7 scope is wider than SetFieldValue:**
 In V1, every code path that handles a date-only string ends at `moment(e).toDate()` — not just `normalizeCalValue()`. This includes the form load path in `initCalendarValueV1` (lines ~102886–102931): saved data, URL parameter input, and preset initial values all parse via local midnight. UTC+ users see the wrong day on form load, before any `SetFieldValue` is called.
 
-| Scenario                         | V1                                                            | V2                                                                               |
-| -------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| DateTime, ignoreTZ=false — load  | `new Date(value)` — Z preserved, correct                      | `parseDateString()` → strips Z → `.tz("UTC",true).local()`                       |
-| DateTime, ignoreTZ=true — load   | Strip Z → `new Date(e)` → local parse                         | Strip Z → `moment(stripped)` → local (same as V1)                                |
-| Date-only, ignoreTZ=false — load | Strip T → `moment(e).toDate()` → **Bug #7**                   | Strip T → `parseDateString()` → UTC → **fixed**                                  |
-| Date-only, ignoreTZ=true — load  | Strip T → `moment(e).toDate()` → **Bug #7**                   | Strip T → `moment(stripped)` → **Bug #7 persists**                               |
-| Preset date (date-only)          | `moment(initialDate).toDate()` → **Bug #7**                   | `parseDateString()` path → fixed for non-ignoreTZ                                |
-| SetFieldValue (date-only)        | `normalizeCalValue()` → `moment(input).toDate()` → **Bug #7** | `normalizeCalValue()` checks flag → `parseDateString()` → fixed for non-ignoreTZ |
+| Scenario                         | V1                                                                | V2                                                                               |
+| -------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| DateTime, ignoreTZ=false — load  | `new Date(value)` — Z preserved, correct                          | `parseDateString()` → strips Z → `.tz("UTC",true).local()`                       |
+| DateTime, ignoreTZ=true — load   | Strip Z → `new Date(e)` → local parse                             | Strip Z → `moment(stripped)` → local (same as V1)                                |
+| Date-only, ignoreTZ=false — load | Strip T → `moment(e).toDate()` → **FORM-BUG-7**                   | Strip T → `parseDateString()` → UTC → **fixed**                                  |
+| Date-only, ignoreTZ=true — load  | Strip T → `moment(e).toDate()` → **FORM-BUG-7**                   | Strip T → `moment(stripped)` → **FORM-BUG-7 persists**                           |
+| Preset date (date-only)          | `moment(initialDate).toDate()` → **FORM-BUG-7**                   | `parseDateString()` path → fixed for non-ignoreTZ                                |
+| SetFieldValue (date-only)        | `normalizeCalValue()` → `moment(input).toDate()` → **FORM-BUG-7** | `normalizeCalValue()` checks flag → `parseDateString()` → fixed for non-ignoreTZ |
 
 ### Confirmed Code Paths (main.js line references)
 
@@ -147,7 +149,7 @@ In V1, every code path that handles a date-only string ends at `moment(e).toDate
 VV.Form.SetFieldValue()
   → SetFieldValueInternal()          sets raw value in partition + sends component message
   → applyCalChange()                 component receives message
-  → normalizeCalValue()  ~102793     converts input to a Date object (Bug #7 lives here)
+  → normalizeCalValue()  ~102793     converts input to a Date object (FORM-BUG-7 lives here)
   → calChange()          ~102824     calls toISOString() + getSaveValue()
   → getSaveValue()       ~104100     strips Z and formats for storage
   → updateFormValueSubject()         stores final value
@@ -158,14 +160,14 @@ VV.Form.SetFieldValue()
 ```
 VV.Form.GetFieldValue()
   → getValueObjectValue()            reads raw stored value
-  → getCalendarFieldValue()  104114  applies output transformation (Bug #5, Bug #6 live here)
+  → getCalendarFieldValue()  104114  applies output transformation (FORM-BUG-5, FORM-BUG-6 live here)
 ```
 
 **Form load path (V1 — default):**
 
 ```
 initCalendarValueV1()    ~102886
-  → parseDateString()    ~104126    strips Z, re-parses as local (Bug #1 lives here)
+  → parseDateString()    ~104126    strips Z, re-parses as local (FORM-BUG-1 lives here)
   → getSaveValue()       ~104100    strips Z and formats for storage
   → setValueObjectValueByName()     stores final value
 ```
@@ -179,7 +181,7 @@ initCalendarValueV1()    ~102886
 
 ### Confirmed Bugs
 
-**Bug #5 — Fake [Z] in GetFieldValue (HIGH SEVERITY)**
+**FORM-BUG-5 — Fake [Z] in GetFieldValue (HIGH SEVERITY)**
 
 `getCalendarFieldValue()` adds a literal `[Z]` to local time values when `enableTime=true && ignoreTimezone=true && !useLegacy`. Causes progressive date drift on every `SetFieldValue(GetFieldValue())` round-trip:
 
@@ -191,7 +193,7 @@ initCalendarValueV1()    ~102886
 
 ---
 
-**Bug #6 — GetFieldValue returns `"Invalid Date"` string for empty Config D fields (MEDIUM)**
+**FORM-BUG-6 — GetFieldValue returns `"Invalid Date"` string for empty Config D fields (MEDIUM)**
 
 When a `enableTime=true && ignoreTimezone=true` field is cleared (set via `""` or `null`):
 
@@ -201,7 +203,7 @@ When a `enableTime=true && ignoreTimezone=true` field is cleared (set via `""` o
 
 ---
 
-**Bug #7 — SetFieldValue on date-only fields stores wrong day for UTC+ timezones (HIGH SEVERITY)**
+**FORM-BUG-7 — SetFieldValue on date-only fields stores wrong day for UTC+ timezones (HIGH SEVERITY)**
 
 `normalizeCalValue()` uses `moment(input).toDate()` which parses date-only strings as **local midnight**. For UTC+ users (e.g., IST UTC+5:30), local midnight = previous UTC day. `getSaveValue()` then extracts the UTC date → stores the previous day.
 
@@ -225,11 +227,11 @@ Initial value fields (Current Date, Preset) store UTC; user-input fields store l
 
 ---
 
-**Bug #2 — Inconsistent Handlers (NOT REPRODUCED with useLegacy=false in BRT)**
+**FORM-BUG-2 — Inconsistent Handlers (NOT REPRODUCED with useLegacy=false in BRT)**
 
 With `useLegacy=false` in BRT, popup and typed input produce identical values. May only exist with `useLegacy=true` (no access to test).
 
-**Tested in IST (2026-03-30)**: The predicted -2 day double-shift was wrong. Both popup (1-A-IST) and typed input (2-A-IST) store `"2026-03-14"` — single -1 day shift (Bug #7). Bug #2 asymmetry absent for non-legacy configs in IST. Legacy configs (useLegacy=true) store raw `toISOString()` which is a different format entirely — Bug #2 is moot for legacy.
+**Tested in IST (2026-03-30)**: The predicted -2 day double-shift was wrong. Both popup (1-A-IST) and typed input (2-A-IST) store `"2026-03-14"` — single -1 day shift (FORM-BUG-7). FORM-BUG-2 asymmetry absent for non-legacy configs in IST. Legacy configs (useLegacy=true) store raw `toISOString()` which is a different format entirely — FORM-BUG-2 is moot for legacy.
 
 ### Test Forms
 
@@ -263,16 +265,16 @@ Full harness: 8 configs × 3 initial-value modes. Field3 (duplicate of Field1) a
 
 **No initial value** — base fields for user-input and API tests (Categories 1–4, 7–12)
 
-| Field   | Config | enableTime | ignoreTZ | useLegacy | Purpose                             |
-| ------- | :----: | :--------: | :------: | :-------: | ----------------------------------- |
-| Field7  |   A    |    OFF     |   OFF    |    OFF    | Date-only baseline (Bug #7 in UTC+) |
-| Field10 |   B    |    OFF     |    ON    |    OFF    | Date-only + ignoreTZ                |
-| Field6  |   C    |     ON     |   OFF    |    OFF    | DateTime UTC — control              |
-| Field5  |   D    |     ON     |    ON    |    OFF    | **Bug #5/#6 surface**               |
-| Field12 |   E    |    OFF     |   OFF    |    ON     | Legacy date-only                    |
-| Field11 |   F    |    OFF     |    ON    |    ON     | Legacy date-only + ignoreTZ         |
-| Field14 |   G    |     ON     |   OFF    |    ON     | Legacy DateTime                     |
-| Field13 |   H    |     ON     |    ON    |    ON     | Legacy DateTime + ignoreTZ          |
+| Field   | Config | enableTime | ignoreTZ | useLegacy | Purpose                                 |
+| ------- | :----: | :--------: | :------: | :-------: | --------------------------------------- |
+| Field7  |   A    |    OFF     |   OFF    |    OFF    | Date-only baseline (FORM-BUG-7 in UTC+) |
+| Field10 |   B    |    OFF     |    ON    |    OFF    | Date-only + ignoreTZ                    |
+| Field6  |   C    |     ON     |   OFF    |    OFF    | DateTime UTC — control                  |
+| Field5  |   D    |     ON     |    ON    |    OFF    | **FORM-BUG-5/#6 surface**               |
+| Field12 |   E    |    OFF     |   OFF    |    ON     | Legacy date-only                        |
+| Field11 |   F    |    OFF     |    ON    |    ON     | Legacy date-only + ignoreTZ             |
+| Field14 |   G    |     ON     |   OFF    |    ON     | Legacy DateTime                         |
+| Field13 |   H    |     ON     |    ON    |    ON     | Legacy DateTime + ignoreTZ              |
 
 **Preset date initial value** — for Category 5 tests
 
@@ -305,7 +307,7 @@ Full harness: 8 configs × 3 initial-value modes. Field3 (duplicate of Field1) a
 ```javascript
 VV.Form.VV.FormPartition.fieldMaster; // field definitions (keyed by GUID)
 VV.Form.VV.FormPartition.getValueObjectValue('Field5'); // raw stored value
-VV.Form.GetFieldValue('Field5'); // processed return (Bug #5 adds fake Z)
+VV.Form.GetFieldValue('Field5'); // processed return (FORM-BUG-5 adds fake Z)
 VV.Form.SetFieldValue('Field5', value); // set value (goes through normalizeCalValue)
 // Verify V1 is active (expected: false) — works in DevTools console or Chrome extension
 VV.Form.calendarValueService.useUpdatedCalendarValueLogic;
@@ -335,7 +337,7 @@ Tests run via **Claude-in-Chrome MCP extension**. The extension tab must be crea
 ### What Has NOT Been Tested (Forms)
 
 - `useUpdatedCalendarValueLogic=true` — V2 code path never exercised; flag confirmed `false` via live `CalendarValueService` instance scan (`__ngContext__` approach) on 2026-03-30. Re-verify if testing on a different account or with `?ObjectID=` URL param.
-- **V1 load path Bug #7 in IST** — `initCalendarValueV1` uses `moment(e).toDate()` for saved data and preset dates; UTC+ users should get wrong day on form load; code-confirmed but no live test (DateTest-000009 was not saved)
+- **V1 load path FORM-BUG-7 in IST** — `initCalendarValueV1` uses `moment(e).toDate()` for saved data and preset dates; UTC+ users should get wrong day on form load; code-confirmed but no live test (DateTest-000009 was not saved)
 - URL parameter input — needs `enableQListener=true` fields
 - Web service / scheduled script input — needs server-side execution (Category 10)
 - Preset/Current Date with `enableTime=true` fields — needs new test form fields

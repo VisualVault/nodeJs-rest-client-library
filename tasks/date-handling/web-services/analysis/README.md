@@ -10,11 +10,11 @@ See [`overview.md`](overview.md) for the comprehensive analysis including execut
 
 ### Bugs (defects — software produces incorrect/unexpected results)
 
-| ID       | Document                                                             | Severity | Title                                             | Evidence |
-| -------- | -------------------------------------------------------------------- | -------- | ------------------------------------------------- | -------- |
-| WS-BUG-1 | [`ws-bug-1-cross-layer-shift.md`](ws-bug-1-cross-layer-shift.md)     | **HIGH** | postForms Z suffix causes datetime shift in Forms | `[LIVE]` |
-| WS-BUG-2 | [`ws-bug-2-latam-data-loss.md`](ws-bug-2-latam-data-loss.md)         | **HIGH** | DD/MM/YYYY formats silently stored as null        | `[LIVE]` |
-| WS-BUG-5 | [`ws-bug-5-silent-null-formats.md`](ws-bug-5-silent-null-formats.md) | LOW      | Compact/epoch formats silently stored as null     | `[LIVE]` |
+| ID               | Document                                                             | Severity | Title                                             | Evidence |
+| ---------------- | -------------------------------------------------------------------- | -------- | ------------------------------------------------- | -------- |
+| WEBSERVICE-BUG-1 | [`ws-bug-1-cross-layer-shift.md`](ws-bug-1-cross-layer-shift.md)     | **HIGH** | postForms Z suffix causes datetime shift in Forms | `[LIVE]` |
+| WEBSERVICE-BUG-2 | [`ws-bug-2-latam-data-loss.md`](ws-bug-2-latam-data-loss.md)         | **HIGH** | DD/MM/YYYY formats silently stored as null        | `[LIVE]` |
+| WEBSERVICE-BUG-5 | [`ws-bug-5-silent-null-formats.md`](ws-bug-5-silent-null-formats.md) | LOW      | Compact/epoch formats silently stored as null     | `[LIVE]` |
 
 ### Design Flaws (architectural gaps — systemic inconsistencies, not single-point failures)
 

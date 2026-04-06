@@ -1,185 +1,154 @@
-# Bug #3: Hardcoded Parameters in initCalendarValueV2()
+# FORM-BUG-3: Form Load Ignores Field Configuration, Uses Hardcoded Settings
 
-## Classification
+## What Happens
 
-| Field                  | Value                                                                                                                                                                                                                                               |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Severity**           | Medium                                                                                                                                                                                                                                              |
-| **Evidence**           | `[CODE]` + `[PLAYWRIGHT AUDIT 2026-04-06]` — Confirmed in source code + functional verification via parseDateString direct invocation. V2 code path only; V1 has equivalent hardcoding. Not end-to-end tested (V2 cannot be activated on test env). |
-| **Component**          | FormViewer → Calendar Component → `initCalendarValueV2()`                                                                                                                                                                                           |
-| **Code Path**          | V2 only (`useUpdatedCalendarValueLogic=true`) — but V1 has analogous issues                                                                                                                                                                         |
-| **Affected Configs**   | All configs — any field where the hardcoded value differs from the actual setting                                                                                                                                                                   |
-| **Affected TZs**       | All                                                                                                                                                                                                                                                 |
-| **Affected Scenarios** | 3 (Saved Data — hardcodes `enableTime=true`), 5 (Preset Date — hardcodes both params)                                                                                                                                                               |
-| **Related Bugs**       | Amplifies Bug #1 by feeding wrong parameters to `parseDateString()`                                                                                                                                                                                 |
+When a form loads saved data or preset dates using the updated code path (V2), the system calls its date-parsing function with **hardcoded parameter values** instead of reading the field's actual configuration. This means the parsing behavior is disconnected from what the field is actually configured to do:
+
+- A **date-only field** loading saved data is processed as if it were a **date+time field** — the time component from the database value is preserved instead of being collapsed to midnight, potentially causing unexpected display behavior.
+- A **date+time field** loading a preset default is processed as if it were **date-only** — the time component of the preset is discarded. Additionally, the timezone handling flag is hardcoded to "ignore timezone" regardless of the field's actual setting, which skips the UTC recovery logic that would otherwise correct the value.
+
+**Current scope**: Like [FORM-BUG-1](bug-1-timezone-stripping.md), this defect exists in the V2 code path that is **not active in standard production forms**. V2 activates only in specific contexts (Object View mode, server flag). The current production code (V1) has analogous hardcoding — implicit rather than explicit — but its effects manifest through other bugs in this investigation.
+
+**Critical dependency**: One of the hardcoded values accidentally **prevents** a different, more severe bug ([FORM-BUG-7](bug-7-wrong-day-utc-plus.md)) from appearing on the V2 load path. Fixing FORM-BUG-3 without fixing FORM-BUG-7 first would make dates worse, not better. See [Critical Dependency](#critical-dependency-fixing-this-bug-would-expose-form-bug-7).
 
 ---
 
-## Summary
+## Severity: MEDIUM
 
-`initCalendarValueV2()` calls `parseDateString()` with **hardcoded** parameter values instead of using the actual field configuration (`this.data.enableTime`, `this.data.ignoreTimezone`). When loading saved data, it hardcodes `enableTime=true` regardless of whether the field is date-only. When loading preset dates, it hardcodes both `enableTime=false` and `ignoreTimezone=true`. This means the parsing behavior is detached from the field's actual configuration, producing incorrect results when the hardcoded values don't match reality.
+Currently dormant — V2 is not active in standard forms. Becomes Medium-High when V2 is activated globally, as the wrong parsing parameters would affect every form load for every calendar field.
 
 ---
 
 ## Who Is Affected
 
-- **V2 code path users only**: Forms opened with `?ObjectID=` parameter, non-empty `modelId`, or server flag `useUpdatedCalendarValueLogic=true`
-- Standard standalone forms use V1 (default) and bypass this specific bug
-- However, V1 has analogous hardcoding in `initCalendarValueV1()` — the parameters are implicit rather than explicit
+**Only when V2 is active** (not the default):
+
+- Forms opened in **Object View mode** (`?ObjectID=` URL parameter)
+- Forms with a non-empty `modelId` context
+- Accounts where the `useUpdatedCalendarValueLogic` server flag is enabled
+
+Standard standalone forms use V1 (the default) and bypass the defective function entirely.
 
 ---
 
-## Root Cause
+## Background
 
-### The Defective Code
+### V1 and V2 Code Paths
 
-**File**: `main.js`
-**Function**: `initCalendarValueV2()` — line ~102886
+The FormViewer has two versions of its calendar field initialization logic, controlled by an internal flag:
 
-```javascript
-initCalendarValueV2() {
-    let isNewValue = false;
+- **V1** (`useUpdatedCalendarValueLogic = false`, the default): The current production code. Processes saved dates through inline code in `initCalendarValueV1()`.
+- **V2** (`useUpdatedCalendarValueLogic = true`): An updated code path that routes all date parsing through a centralized function called `parseDateString()`. FORM-BUG-3 is about the **call sites** that invoke `parseDateString()` — specifically, two of the three call sites pass wrong parameter values.
 
-    if (this.data.enableQListener && this.data.text) {
-        // URL Query String — uses actual field settings ✓
-        this.data.value = this.calendarValueService.parseDateString(
-            this.data.text,
-            this.data.enableTime,      // ✓ Correct — uses actual setting
-            this.data.ignoreTimezone   // ✓ Correct — uses actual setting
-        );
-        // ...
-    } else if (this.data.value) {
-        // Server/Database — HARDCODED ✗
-        this.data.value = this.calendarValueService.parseDateString(
-            this.data.value,
-            true,                      // ✗ HARDCODED enableTime=true (ignores field type)
-            this.data.ignoreTimezone   // ✓ Uses actual setting
-        );
-        // ...
-    } else if (this.data.enableInitialValue && this.docInfo.isFormTemplate) {
-        switch (this.data.initialValueMode) {
-            case CalendarInitialValueMode.CurrentDate:
-                this.value = new Date();  // ✓ No parsing needed
-                break;
-            case CalendarInitialValueMode.PresetDate:
-                this.data.value = this.calendarValueService.parseDateString(
-                    this.data.initialDate,
-                    false,             // ✗ HARDCODED enableTime=false
-                    true               // ✗ HARDCODED ignoreTimezone=true
-                );
-                break;
-        }
-        isNewValue = true;
-    }
-    // ...
-}
-```
+### Field Configuration Flags
 
-### Why This Is Wrong
+Each calendar field has three boolean configuration properties:
 
-The `enableTime` and `ignoreTimezone` parameters in `parseDateString()` control how the date is parsed:
+| Flag             | What It Controls                                                           |
+| ---------------- | -------------------------------------------------------------------------- |
+| `enableTime`     | Whether the field stores time in addition to date (date-only vs date+time) |
+| `ignoreTimezone` | Whether timezone conversion is skipped (treat value as display time)       |
+| `useLegacy`      | Whether the field uses the older rendering/save code path                  |
 
-- `enableTime=true` → preserves time component
-- `enableTime=false` → applies `.startOf("day")` (collapses to midnight)
+### What `parseDateString()` Does With These Flags
+
+The `parseDateString(value, enableTime, ignoreTimezone)` function uses the two flags to decide how to parse a date string:
+
+- `enableTime=true` → preserves the full time component
+- `enableTime=false` → collapses to midnight (`.startOf("day")`)
 - `ignoreTimezone=true` → parses as local time
-- `ignoreTimezone=false` → attempts UTC-to-local conversion
+- `ignoreTimezone=false` → attempts a UTC-to-local conversion
 
-When these are hardcoded to values that don't match the field definition:
+When the wrong flags are passed, the parsing behavior doesn't match the field's intended type — a date-only field gets DateTime parsing, or a DateTime field gets date-only parsing.
 
-**Saved data path** (hardcodes `enableTime=true`):
+---
 
-- A **date-only field** (actual `enableTime=false`) loading saved data is processed as DateTime
-- The `.startOf("day")` step is skipped — the time component from the DB value is preserved instead of being collapsed to midnight
-- This can cause different display behavior than what `getSaveValue()` produced on save
+## The Problem in Detail
 
-**Preset date path** (hardcodes `enableTime=false`, `ignoreTimezone=true`):
+### Three Call Sites, Two Are Wrong
 
-- A **DateTime field** (actual `enableTime=true`) with a preset is processed as date-only — time component is lost
-- A field with `ignoreTimezone=false` is processed as `ignoreTimezone=true` — the UTC recovery logic in parseDateString is skipped
+The V2 initialization function `initCalendarValueV2()` calls `parseDateString()` in three scenarios. One uses the correct field settings; two use hardcoded values:
 
-### What Should Happen
-
-All calls to `parseDateString()` should use the field's actual settings:
+**1. URL query string path — CORRECT:**
 
 ```javascript
-this.calendarValueService.parseDateString(
-    this.data.value,
-    this.data.enableTime, // ← Use actual field setting
-    this.data.ignoreTimezone // ← Use actual field setting
-);
+parseDateString(this.data.text, this.data.enableTime, this.data.ignoreTimezone);
+//                               ✓ actual setting      ✓ actual setting
 ```
 
+**2. Saved data path — HARDCODED `enableTime`:**
+
+```javascript
+parseDateString(this.data.value, true, this.data.ignoreTimezone);
+//                                ✗ hardcoded true   ✓ actual setting
+```
+
+A date-only field (`enableTime=false`) loading saved data is told `enableTime=true` — the `.startOf("day")` step is skipped, and the time component from the database value leaks through.
+
+**3. Preset date path — BOTH HARDCODED:**
+
+```javascript
+parseDateString(this.data.initialDate, false, true);
+//                                      ✗ hardcoded false   ✗ hardcoded true
+```
+
+A date+time field (`enableTime=true`) loading a preset is told `enableTime=false` — the preset's time component is discarded. A field with `ignoreTimezone=false` is told `true` — the UTC recovery logic is skipped.
+
+### Concrete Examples
+
+**Date-only field (Config A, `enableTime=false`), loading saved value `"2026-03-15"`:**
+
+| Parameter      | Should Be | Hardcoded Value   | Effect                                                                |
+| -------------- | --------- | ----------------- | --------------------------------------------------------------------- |
+| enableTime     | `false`   | **`true`**        | `.startOf("day")` is NOT applied — time from DB parsing leaks through |
+| ignoreTimezone | `false`   | `false` (correct) | N/A                                                                   |
+
+With correct parameters: `parseDateString("2026-03-15", false, false)` → collapses to midnight, produces a clean date.
+With hardcoded parameters: `parseDateString("2026-03-15", true, false)` → preserves full datetime, produces a different result.
+
+**Date+time field (Config C, `enableTime=true`, `ignoreTimezone=false`), loading a preset:**
+
+| Parameter      | Should Be | Hardcoded Value | Effect                                             |
+| -------------- | --------- | --------------- | -------------------------------------------------- |
+| enableTime     | `true`    | **`false`**     | `.startOf("day")` IS applied — preset time is lost |
+| ignoreTimezone | `false`   | **`true`**      | UTC recovery logic skipped — value parsed as local |
+
 ---
 
-## Expected vs Actual Behavior
+## Critical Dependency: Fixing This Bug Would Expose FORM-BUG-7
 
-**Date-only field (Config A, enableTime=false), saved value `"2026-03-15"`, loaded via V2:**
+The hardcoded `enableTime=true` on the saved data path has an unintended positive side effect: it **accidentally prevents [FORM-BUG-7](bug-7-wrong-day-utc-plus.md)** from appearing on the V2 load path.
 
-| Parameter        | Expected | Actual (hardcoded) | Effect                                                            |
-| ---------------- | -------- | ------------------ | ----------------------------------------------------------------- |
-| `enableTime`     | `false`  | `true`             | `.startOf("day")` is NOT applied — time from DB parsing preserved |
-| `ignoreTimezone` | `false`  | `false` (correct)  | N/A                                                               |
+Here's why: when `parseDateString` receives a date-only string like `"2026-03-15"` with `enableTime=true`, it skips the `.startOf("day")` call and preserves the full datetime. This produces a correct date. But with the "fixed" parameter `enableTime=false`, the function collapses to local midnight — and for UTC+ users, local midnight is the previous UTC day, storing March 14 instead of March 15 (this is exactly FORM-BUG-7).
 
-**DateTime+ignoreTimezone field (Config D), preset value, loaded via V2:**
+| parseDateString("2026-03-15", ...) | enableTime         | Result in São Paulo          | Correct Date?   |
+| ---------------------------------- | ------------------ | ---------------------------- | --------------- |
+| Current (hardcoded)                | `true` (hardcoded) | `"2026-03-15T00:00:00.000Z"` | **Yes**         |
+| "Fixed" (actual setting)           | `false` (actual)   | `"2026-03-14T03:00:00.000Z"` | **No** (-1 day) |
 
-| Parameter        | Expected | Actual (hardcoded) | Effect                                             |
-| ---------------- | -------- | ------------------ | -------------------------------------------------- |
-| `enableTime`     | `true`   | `false`            | `.startOf("day")` IS applied — preset time is lost |
-| `ignoreTimezone` | `true`   | `true` (correct)   | N/A                                                |
+**Fixing FORM-BUG-3 without fixing FORM-BUG-7 first would INTRODUCE wrong dates on the V2 load path.** The fix order must be:
 
-**DateTime field (Config C, ignoreTimezone=false), preset value, loaded via V2:**
-
-| Parameter        | Expected | Actual (hardcoded) | Effect                                             |
-| ---------------- | -------- | ------------------ | -------------------------------------------------- |
-| `enableTime`     | `true`   | `false`            | `.startOf("day")` IS applied — preset time is lost |
-| `ignoreTimezone` | `false`  | `true`             | UTC recovery logic skipped — value parsed as local |
-
----
-
-## Steps to Reproduce
-
-1. Configure a **date-only field** (Config A) with `enableTime=false`
-2. Save a form with a date value
-3. Reopen the form in a context where V2 is active (`?ObjectID=` URL param or `modelId` present)
-4. The saved date is parsed with `enableTime=true` (hardcoded) — time component is not collapsed to midnight
-5. Observe that the displayed value may include unexpected time information or behave differently than when saved
-
-**Note**: V2 is not active in standard standalone forms. This bug requires Object View or server flag context to reproduce.
+1. Fix FORM-BUG-7 (date-only local-midnight parsing) first
+2. Then fix FORM-BUG-3 (hardcoded parameters) — now safe because the underlying parsing is correct
 
 ---
 
 ## Test Evidence
 
-- **Code analysis**: Hardcoded parameters confirmed at lines ~102886–102960
-- **No live test coverage**: V2 was never activated during testing (all tests used standard standalone form → V1)
-- The `useUpdatedCalendarValueLogic` flag was confirmed `false` via live CalendarValueService scan (2026-03-30)
+### Functional Verification via Direct Invocation
 
-### Audit Status `[PLAYWRIGHT AUDIT 2026-04-06]`
+Since V2 could not be activated on the test environment (see V2 Activation Probe below), `parseDateString()` was called directly in the browser with hardcoded vs correct parameters:
 
-**Three-pronged verification**: source code reading, parseDateString functional testing, and V2 activation probe.
-
-**1. Source Code Verification — CONFIRMED**
-
-Hardcoded parameters verified at exact line numbers in main.js:
-
-- Line 102939: `!0` (true) hardcoded for `enableTime` in saved data path
-- Lines 102947-102949: `!1` (false) hardcoded for `enableTime`, `!0` (true) hardcoded for `ignoreTimezone` in preset path
-- Contrast: URL query string path (lines 102934-102935) **correctly** uses actual settings `this.data.enableTime` / `this.data.ignoreTimezone`
-
-**2. parseDateString Functional Test — BUG CONFIRMED**
-
-Direct invocation in browser with hardcoded vs correct parameters:
-
-| Input                        | Scenario                   | V2 Hardcoded Params                 | Correct Params                   | V2 Result                          | Correct Result               | Match  |
+| Input                        | Scenario                   | Hardcoded Params                    | Correct Params                   | Hardcoded Result                   | Correct Result               | Match  |
 | ---------------------------- | -------------------------- | ----------------------------------- | -------------------------------- | ---------------------------------- | ---------------------------- | ------ |
-| `"2026-03-15"`               | Date-only saved (Config A) | enableTime=true, ignoreTZ=false     | enableTime=false, ignoreTZ=false | `"2026-03-15T00:00:00.000Z"`       | `"2026-03-14T03:00:00.000Z"` | **NO** |
-| `"2026-03-15T00:00:00"`      | DateTime preset (Config C) | enableTime=false, ignoreTZ=true     | enableTime=true, ignoreTZ=false  | `"2026-03-15T03:00:00.000Z"`       | `"2026-03-15T00:00:00.000Z"` | **NO** |
-| `"2026-03-15T03:00:00.000Z"` | Legacy-stored UTC          | enableTime=true                     | enableTime=false                 | `"2026-03-15T03:00:00.000Z"`       | `"2026-03-15T03:00:00.000Z"` | YES    |
-| `"2026-03-15T00:00:00"`      | Config D saved vs preset   | enableTime=true/false,ignoreTZ=true | —                                | Both: `"2026-03-15T03:00:00.000Z"` | —                            | YES    |
+| `"2026-03-15"`               | Date-only saved (Config A) | enableTime=true, ignoreTZ=false     | enableTime=false, ignoreTZ=false | `"2026-03-15T00:00:00.000Z"`       | `"2026-03-14T03:00:00.000Z"` | **No** |
+| `"2026-03-15T00:00:00"`      | DateTime preset (Config C) | enableTime=false, ignoreTZ=true     | enableTime=true, ignoreTZ=false  | `"2026-03-15T03:00:00.000Z"`       | `"2026-03-15T00:00:00.000Z"` | **No** |
+| `"2026-03-15T03:00:00.000Z"` | Legacy-stored UTC          | enableTime=true                     | enableTime=false                 | `"2026-03-15T03:00:00.000Z"`       | `"2026-03-15T03:00:00.000Z"` | Yes    |
+| `"2026-03-15T00:00:00"`      | Config D saved vs preset   | enableTime=true/false,ignoreTZ=true | —                                | Both: `"2026-03-15T03:00:00.000Z"` | —                            | Yes    |
 
-Key finding: hardcoded parameters produce materially different results for date-only fields loading saved data and DateTime presets with ignoreTZ=false.
+The hardcoded parameters produce materially different results for date-only fields loading saved data and date+time presets with `ignoreTimezone=false`. Some inputs coincidentally produce the same result (UTC-suffixed strings, Config D values), but the mismatch for standard date-only and DateTime fields is definitive.
 
-**3. V2 Activation Probe — V2 COULD NOT BE ACTIVATED**
+### V2 Activation Probe — V2 Could Not Be Activated
 
 | Method                                                                     | Result                           |
 | -------------------------------------------------------------------------- | -------------------------------- |
@@ -187,132 +156,143 @@ Key finding: hardcoded parameters produce materially different results for date-
 | `?ObjectID=` as first URL param                                            | V2 flag remains `false`          |
 | Manual `calendarValueService.useUpdatedCalendarValueLogic = true` + reload | Flag resets to `false` on reload |
 
-Conclusion: V2 cannot be activated on vvdemo test environment. Bug #3 is **code-confirmed + functionally verified, NOT end-to-end tested**.
+The `?ObjectID=` path likely requires a valid object that exists in the VV system (not just any GUID). The server flag is not set for the test account. FORM-BUG-3 remains **code-confirmed + functionally verified, not end-to-end tested**.
 
-**4. Category 3 V1 Regression — 10P/8F (matches matrix)**
+### Category 3 (Server Reload) V1 Regression — 10 PASS / 8 FAIL
 
-BRT-chromium (12 tests: 6P/6F):
+Re-run via Playwright to verify existing V1 behavior is consistent with the matrix:
 
-| Test        | Status | Bug                                        |
-| ----------- | ------ | ------------------------------------------ |
-| 3-A-BRT-BRT | PASS   | —                                          |
-| 3-B-BRT-BRT | PASS   | —                                          |
-| 3-E-BRT-BRT | PASS   | —                                          |
-| 3-F-BRT-BRT | PASS   | —                                          |
-| 3-G-BRT-BRT | PASS   | —                                          |
-| 3-H-BRT-BRT | PASS   | —                                          |
-| 3-A-IST-BRT | FAIL   | Bug #7                                     |
-| 3-B-IST-BRT | FAIL   | Bug #7                                     |
-| 3-C-BRT-BRT | FAIL   | Bug #4                                     |
-| 3-C-IST-BRT | FAIL   | Bug #1+#4 (RangeError: Invalid time value) |
-| 3-D-BRT-BRT | FAIL   | Bug #5                                     |
-| 3-D-IST-BRT | FAIL   | Bug #5                                     |
+**São Paulo (12 tests: 6P/6F):**
 
-IST-chromium (6 tests: 4P/2F):
+| Test        | Status | Bug Triggered                               |
+| ----------- | ------ | ------------------------------------------- |
+| 3-A-BRT-BRT | PASS   | —                                           |
+| 3-B-BRT-BRT | PASS   | —                                           |
+| 3-E-BRT-BRT | PASS   | —                                           |
+| 3-F-BRT-BRT | PASS   | —                                           |
+| 3-G-BRT-BRT | PASS   | —                                           |
+| 3-H-BRT-BRT | PASS   | —                                           |
+| 3-A-IST-BRT | FAIL   | FORM-BUG-7 (date saved from Mumbai, -1 day) |
+| 3-B-IST-BRT | FAIL   | FORM-BUG-7                                  |
+| 3-C-BRT-BRT | FAIL   | FORM-BUG-4 (Z stripped on save)             |
+| 3-C-IST-BRT | FAIL   | FORM-BUG-1 + FORM-BUG-4 (RangeError)        |
+| 3-D-BRT-BRT | FAIL   | FORM-BUG-5 (fake Z)                         |
+| 3-D-IST-BRT | FAIL   | FORM-BUG-5                                  |
 
-| Test        | Status | Bug       |
-| ----------- | ------ | --------- |
-| 3-A-BRT-IST | PASS   | —         |
-| 3-B-BRT-IST | PASS   | —         |
-| 3-E-BRT-IST | PASS   | —         |
-| 3-H-BRT-IST | PASS   | —         |
-| 3-C-BRT-IST | FAIL   | Bug #1+#4 |
-| 3-D-BRT-IST | FAIL   | Bug #5    |
+**Mumbai (6 tests: 4P/2F):**
 
-**Note**: date-handling CLAUDE.md claims "Cat 3 fully complete 18/18 (14P, 4F)" — this is incorrect. The correct count is **10P/8F**.
+| Test        | Status | Bug Triggered           |
+| ----------- | ------ | ----------------------- |
+| 3-A-BRT-IST | PASS   | —                       |
+| 3-B-BRT-IST | PASS   | —                       |
+| 3-E-BRT-IST | PASS   | —                       |
+| 3-H-BRT-IST | PASS   | —                       |
+| 3-C-BRT-IST | FAIL   | FORM-BUG-1 + FORM-BUG-4 |
+| 3-D-BRT-IST | FAIL   | FORM-BUG-5              |
 
-### DB Context `[PLAYWRIGHT AUDIT 2026-04-06]`
+**Note**: The date-handling CLAUDE.md previously stated "Cat 3 fully complete 18/18 (14P, 4F)." The correct count is **10P/8F** — corrected during this audit.
 
-**Schema**: All fields are SQL Server `datetime` — no `date` column type. `parseDateString()` output passes through `getSaveValue()` to become a `datetime` value in the DB.
+### Database Evidence
 
-**V2 Bug #3 / Bug #7 Interaction — Critical Irony**: The hardcoded `enableTime=true` on V2 saved data path **accidentally prevents Bug #7** for date-only fields in UTC+:
+All calendar fields in the `dbo.DateTest` table are SQL Server `datetime` type — there is no `date` column type. This means `parseDateString()` output, after passing through `getSaveValue()`, becomes a `datetime` value in the database.
 
-| parseDateString("2026-03-15", ...) | enableTime         | Result                       | Bug #7?                             |
-| ---------------------------------- | ------------------ | ---------------------------- | ----------------------------------- |
-| V2 hardcoded                       | `true` (hardcoded) | `"2026-03-15T00:00:00.000Z"` | **No** — preserves correct date     |
-| V2 "fixed"                         | `false` (actual)   | `"2026-03-14T03:00:00.000Z"` | **Yes** — shifts to March 14 in BRT |
+Cross-referencing saved records with actual DB values:
 
-**Fixing Bug #3 without fixing Bug #7 first would INTRODUCE Bug #7 on the V2 load path.**
+| Record               | Field   | DB Value                  | Expected                  | Bug                          |
+| -------------------- | ------- | ------------------------- | ------------------------- | ---------------------------- |
+| cat3-A-BRT (000080)  | Field7  | `2026-03-15 00:00:00.000` | `2026-03-15 00:00:00.000` | None (same-TZ reload)        |
+| cat3-AD-IST (000084) | Field7  | `2026-03-14 00:00:00.000` | `2026-03-15 00:00:00.000` | FORM-BUG-7: -1 day in DB     |
+| cat3-B-IST (000485)  | Field10 | `2026-03-14 00:00:00.000` | `2026-03-15 00:00:00.000` | FORM-BUG-7: -1 day in DB     |
+| cat3-EF-BRT (000471) | Field12 | `2026-03-15 00:00:00.000` | `2026-03-15 00:00:00.000` | None (legacy typed, same-TZ) |
+| cat3-C-BRT (000106)  | Field6  | `2026-03-15 00:00:00.000` | `2026-03-15 00:00:00.000` | None (date+time, same-TZ)    |
 
-**Cat 3 DB Evidence** — Cross-referencing saved records with actual DB values:
-
-| Record               | Field   | DB Value                  | Expected                  | Bug                              |
-| -------------------- | ------- | ------------------------- | ------------------------- | -------------------------------- |
-| cat3-A-BRT (000080)  | Field7  | `2026-03-15 00:00:00.000` | `2026-03-15 00:00:00.000` | None (BRT same-TZ)               |
-| cat3-AD-IST (000084) | Field7  | `2026-03-14 00:00:00.000` | `2026-03-15 00:00:00.000` | **#7: -1 day permanently in DB** |
-| cat3-B-IST (000485)  | Field10 | `2026-03-14 00:00:00.000` | `2026-03-15 00:00:00.000` | **#7: -1 day permanently in DB** |
-| cat3-EF-BRT (000471) | Field12 | `2026-03-15 00:00:00.000` | `2026-03-15 00:00:00.000` | None (legacy typed)              |
-| cat3-C-BRT (000106)  | Field6  | `2026-03-15 00:00:00.000` | `2026-03-15 00:00:00.000` | None (DateTime same-TZ)          |
-
-**Mixed Timezone Storage**: DB contains a mix of UTC and timezone-ambiguous values in the same `datetime` columns. VV server confirmed running in **BRT (UTC-3)** — VVCreateDate is 3 hours behind Field1 `toISOString()` values.
-
-**Artifacts created**: `testing/scripts/audit-bug3-v2-probe.js` (V2 probe + parseDateString functional test), `testing/scripts/audit-bug2-db-evidence.js`
+The DB also contains mixed timezone semantics within the same `datetime` columns — some values are UTC (from `toISOString()`), others are timezone-ambiguous local time (from `getSaveValue()`). The VV server runs in São Paulo (UTC-3), confirmed by a 3-hour offset between `VVCreateDate` (server local) and Field1 `toISOString()` (UTC).
 
 ---
 
-## Impact Analysis
+## Technical Root Cause
 
-### Current Impact
+### The Defective Code
 
-- **Limited** — V2 is not the default code path. Standard forms use V1.
-- Only affects forms opened in Object View context or with server flag enabled
+**File**: `main.js` (bundled FormViewer application)
+**Function**: `initCalendarValueV2()` — lines ~102932–102958
 
-### Future Impact
+```javascript
+initCalendarValueV2() {
+    let isNewValue = false;
 
-- **Higher** — V2 is the intended successor to V1. As VV migrates to V2, this bug will affect more users
-- If V2 is enabled globally via the server flag, all forms will be affected
+    if (this.data.enableQListener && this.data.text) {
+        // URL Query String — CORRECT: uses actual field settings
+        this.data.value = this.calendarValueService.parseDateString(
+            this.data.text,
+            this.data.enableTime,      // ✓ actual setting
+            this.data.ignoreTimezone   // ✓ actual setting
+        );
+    } else if (this.data.value) {
+        // Saved Data — HARDCODED enableTime
+        this.data.value = this.calendarValueService.parseDateString(
+            this.data.value,
+            true,                      // ✗ HARDCODED (ignores field type)
+            this.data.ignoreTimezone   // ✓ actual setting
+        );
+    } else if (this.data.enableInitialValue && this.docInfo.isFormTemplate) {
+        switch (this.data.initialValueMode) {
+            case CalendarInitialValueMode.CurrentDate:
+                this.value = new Date();   // ✓ No parsing needed
+                break;
+            case CalendarInitialValueMode.PresetDate:
+                this.data.value = this.calendarValueService.parseDateString(
+                    this.data.initialDate,
+                    false,             // ✗ HARDCODED (ignores field type)
+                    true               // ✗ HARDCODED (ignores field setting)
+                );
+                break;
+        }
+        isNewValue = true;
+    }
+}
+```
 
-### Interaction with Other Bugs
+### The V1 Analog
 
-- Bug #3 feeds incorrect parameters to `parseDateString()`, which already has Bug #1 (Z stripping)
-- The combination compounds the error: wrong parameter values + wrong timezone handling
+V1 (`initCalendarValueV1()`) does not call `parseDateString()` — it handles each case with inline code. The inline code also has implicit hardcoding (e.g., the date-only branch always uses `moment(e).toDate()` regardless of `ignoreTimezone`), but the effects manifest as other bugs rather than this one.
 
 ---
 
 ## Workarounds
 
-- **Use V1**: Ensure `useUpdatedCalendarValueLogic=false` (the default). This bypasses the V2 code path entirely.
-- **Avoid Object View for date-critical forms**: If dates must be accurate, open forms in standard mode (no `?ObjectID=` param)
+This bug is currently dormant because V2 is not active in standard form usage. The default V1 code path is the effective workaround.
+
+- **Avoid Object View for date-critical forms**: If dates must be accurate, open forms in standard mode (no `?ObjectID=` URL parameter)
+- **Do not enable the V2 server flag** until this bug and FORM-BUG-7 are both fixed
 
 ---
 
 ## Proposed Fix
 
-### Before
+### Before (Current)
 
 ```javascript
 // Saved data — hardcodes enableTime
-this.data.value = this.calendarValueService.parseDateString(
-    this.data.value,
-    true, // ← HARDCODED
-    this.data.ignoreTimezone
-);
+parseDateString(this.data.value, true, this.data.ignoreTimezone);
 
 // Preset — hardcodes both
-this.data.value = this.calendarValueService.parseDateString(
-    this.data.initialDate,
-    false, // ← HARDCODED
-    true // ← HARDCODED
-);
+parseDateString(this.data.initialDate, false, true);
 ```
 
-### After
+### After (Fixed)
 
 ```javascript
 // Saved data — use actual settings
-this.data.value = this.calendarValueService.parseDateString(
-    this.data.value,
-    this.data.enableTime, // ← ACTUAL field setting
-    this.data.ignoreTimezone
-);
+parseDateString(this.data.value, this.data.enableTime, this.data.ignoreTimezone);
 
 // Preset — use actual settings
-this.data.value = this.calendarValueService.parseDateString(
-    this.data.initialDate,
-    this.data.enableTime, // ← ACTUAL field setting
-    this.data.ignoreTimezone // ← ACTUAL field setting
-);
+parseDateString(this.data.initialDate, this.data.enableTime, this.data.ignoreTimezone);
 ```
+
+The fix is straightforward: replace the hardcoded values with the field's actual configuration properties at both call sites.
+
+**However**: This fix **must not be deployed before FORM-BUG-7 is fixed**. With the current `parseDateString` implementation, passing the correct `enableTime=false` for date-only fields would trigger FORM-BUG-7's local-midnight parsing on the V2 load path, storing the wrong day for UTC+ users.
 
 ---
 
@@ -320,17 +300,24 @@ this.data.value = this.calendarValueService.parseDateString(
 
 ### What Changes If Fixed
 
-- Date-only fields loading saved data correctly apply `.startOf("day")`
-- DateTime presets retain their time component
+- Date-only fields loading saved data correctly apply `.startOf("day")` (midnight collapse)
+- Date+time presets retain their time component
 - Preset dates respect the field's `ignoreTimezone` setting
+- All three `parseDateString` call sites in V2 use consistent, correct parameters
 
-### Backwards Compatibility Risk
+### Backwards Compatibility Risk: MEDIUM
 
-- **LOW for saved data path**: The fix makes parsing match the field's actual type, which aligns with how the value was originally saved
-- **MEDIUM for preset path**: Changing preset parsing could produce different initial values for existing form templates. Templates with presets would need regression testing.
+- **Saved data path**: The fix makes parsing match the field's actual type, which aligns with how the value was originally saved — low risk
+- **Preset path**: Changing preset parsing could produce different initial values for existing form templates. Templates with presets would need regression testing.
 
-### Regression Risk
+### Regression Risk: MODERATE
 
-- Moderate — `initCalendarValueV2()` runs on every form load when V2 is active
-- Must test all 8 configs with saved data reload and preset date load under V2
-- Must verify that V1 behavior is completely unaffected (V1 uses `initCalendarValueV1()`, a separate function)
+- `initCalendarValueV2()` runs on every V2 form load for every calendar field
+- Must test all 8 field configurations with saved data reload and preset date load under V2
+- Must verify V1 behavior is completely unaffected (V1 uses a separate function)
+- **Must coordinate with FORM-BUG-7 fix** — deploying this fix alone would introduce date-only wrong-day errors on V2
+
+### Artifacts Created During Investigation
+
+- `testing/scripts/audit-bug3-v2-probe.js` — V2 activation probe + `parseDateString` functional test
+- `testing/scripts/audit-bug2-db-evidence.js` — DB comparison script (shared with FORM-BUG-2 audit)

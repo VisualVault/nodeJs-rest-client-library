@@ -1,175 +1,143 @@
-# Bug #6: GetFieldValue Returns "Invalid Date" for Empty Fields
+# FORM-BUG-6: GetFieldValue Crashes or Returns Truthy Garbage for Empty Date+Time Fields
 
-## Classification
+## What Happens
 
-| Field                  | Value                                                                                                                                                                                                                  |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Severity**           | Medium (Config D: truthy garbage). **High for Config C** (uncaught RangeError — crash). Three failure modes confirmed.                                                                                                 |
-| **Evidence**           | `[LIVE]` + `[PLAYWRIGHT AUDIT 2026-04-06]` — Confirmed for Config D (returns `"Invalid Date"`) and Config C (throws `RangeError`). Tested in BRT, IST. Audit discovered third failure mode: Config C + `null` → epoch. |
-| **Component**          | FormViewer → CalendarValueService → `getCalendarFieldValue()`                                                                                                                                                          |
-| **Code Path**          | V1 (default) — V2 bypasses this entirely (returns raw value `""`)                                                                                                                                                      |
-| **Affected Configs**   | C (`enableTime=true`, `ignoreTimezone=false`, `useLegacy=false`) and D (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) — two different failure modes                                                     |
-| **Affected TZs**       | All — timezone-independent (empty is empty everywhere)                                                                                                                                                                 |
-| **Affected Scenarios** | 8 (GetFieldValue on empty/cleared fields)                                                                                                                                                                              |
-| **Related Bugs**       | Same function as Bug #5. Both are fixed by the same empty-guard addition.                                                                                                                                              |
+The standard way to check whether a calendar field has a value in VV form scripts is:
+
+```javascript
+if (VV.Form.GetFieldValue('dateField')) {
+    // Field has a value — process it
+}
+```
+
+This pattern breaks for two specific date+time field configurations when the field is **empty**:
+
+- **Config D** (date+time, ignore-timezone, non-legacy): `GetFieldValue()` returns the string `"Invalid Date"` instead of an empty string. Because `"Invalid Date"` is a non-empty string, it evaluates as **truthy** — the processing block executes even though the field is empty. Any attempt to parse this value as a date fails silently or produces garbage.
+
+- **Config C** (date+time, standard timezone, non-legacy): `GetFieldValue()` **throws an uncaught `RangeError`** — crashing the entire script. The developer never gets a chance to check the value; the call itself explodes.
+
+- **Config C with `null` stored value**: Instead of throwing, `GetFieldValue()` silently returns `"1970-01-01T00:00:00.000Z"` — the Unix epoch (January 1, 1970). This is a valid-looking ISO date string that passes all format checks, but represents a completely wrong date that was never entered by anyone.
+
+Date-only fields, legacy fields, and the V2 code path all correctly return an empty string for empty fields. Only date+time non-legacy fields are affected.
 
 ---
 
-## Summary
+## Severity: MEDIUM (Config D) / HIGH (Config C)
 
-When a Config C or D calendar field is empty (value is `""` or `null`), `getCalendarFieldValue()` does not guard against empty input before applying its transformation. This produces **three different failure modes**: Config D (`ignoreTimezone=true`) with `""` or `null` calls `moment("").format(...)` which returns the literal string `"Invalid Date"` — a truthy value that breaks developer conditionals. Config C (`ignoreTimezone=false`) with `""` calls `new Date("").toISOString()` which throws an uncaught `RangeError` — crashing any script that doesn't wrap the call in try/catch. Config C with `null` calls `new Date(null).toISOString()` which silently returns `"1970-01-01T00:00:00.000Z"` (Unix epoch) — a valid-looking but completely wrong date. All three failures are absent in date-only configs, legacy configs, and the V2 code path.
+Config C's uncaught exception crashes scripts entirely — any form button script or event handler that reads an optional Config C field without try/catch protection will fail on empty fields. Config D's truthy `"Invalid Date"` is more insidious — scripts silently enter processing blocks they shouldn't, potentially corrupting data or producing incorrect results downstream.
 
 ---
 
 ## Who Is Affected
 
-- **Developers** writing form scripts that check whether a DateTime field has a value before processing it — the standard pattern `if (VV.Form.GetFieldValue('field'))` silently passes for empty Config D fields and crashes for empty Config C fields
-- **Form event scripts** that run on form load or button click and read Config C/D fields without try/catch protection — a single empty Config C field crashes the entire script
-- **All timezones** equally — the bug is not timezone-dependent
-- **End users** indirectly — they see script failures or incorrect conditional behavior triggered by empty date fields
+- **Developers** writing form scripts that check whether a date+time field has a value before processing it — the most basic conditional pattern in VV scripting is broken for these two field types
+- **Form event scripts** that run on form load or button click and read optional date+time fields — a single empty Config C field crashes the entire script
+- **End users** see script failures or incorrect behavior triggered by empty date fields — they may not understand why a form button stopped working when the date field is simply blank
+- **All timezones equally** — this bug is not timezone-dependent; empty is empty everywhere
 
-### Failure Mode Summary
+### The Three Failure Modes
 
-| Config | `ignoreTimezone` | Input  | GFV Return                       | Type      | Truthy? | Crashes? |
-| ------ | :--------------: | ------ | -------------------------------- | --------- | :-----: | :------: |
-| A      |      false       | `""`   | `""`                             | String    |   No    |    No    |
-| B      |       true       | `""`   | `""`                             | String    |   No    |    No    |
-| **C**  |      false       | `""`   | **throws `RangeError`**          | Exception |   N/A   | **YES**  |
-| **C**  |      false       | `null` | **`"1970-01-01T00:00:00.000Z"`** | String    | **YES** |    No    |
-| **D**  |       true       | `""`   | **`"Invalid Date"`**             | String    | **YES** |    No    |
-| **D**  |       true       | `null` | **`"Invalid Date"`**             | String    | **YES** |    No    |
-| E      |      false       | `""`   | `""`                             | String    |   No    |    No    |
-| F      |       true       | `""`   | `""`                             | String    |   No    |    No    |
-| G      |      false       | `""`   | `""`                             | String    |   No    |    No    |
-| H      |       true       | `""`   | `""`                             | String    |   No    |    No    |
-
-Only configs where `enableTime=true` AND `useLegacy=false` are affected. The `useLegacy` guard causes the function to `return value` early (the raw `""` string), which is correct.
-
-**Third failure mode** `[PLAYWRIGHT AUDIT 2026-04-06]`: Config C with `null` input does NOT throw — instead `new Date(null)` creates the Unix epoch (`1970-01-01T00:00:00.000Z`), which is a valid ISO string. This means Config C with null silently returns a wrong date instead of crashing. This is arguably worse than the crash because it's undetectable at runtime.
+| Config | Field   | Stored Value | GetFieldValue Returns            | Truthy? | Crashes? | Problem                               |
+| :----: | ------- | ------------ | -------------------------------- | :-----: | :------: | ------------------------------------- |
+| **C**  | Field6  | `""`         | **throws `RangeError`**          |   N/A   | **Yes**  | Script crashes                        |
+| **C**  | Field6  | `null`       | **`"1970-01-01T00:00:00.000Z"`** | **Yes** |    No    | Returns epoch — looks valid, is wrong |
+| **D**  | Field5  | `""`         | **`"Invalid Date"`**             | **Yes** |    No    | Truthy garbage string                 |
+| **D**  | Field5  | `null`       | **`"Invalid Date"`**             | **Yes** |    No    | Same truthy garbage                   |
+|   A    | Field7  | `""`         | `""`                             |   No    |    No    | Correct                               |
+|   B    | Field10 | `""`         | `""`                             |   No    |    No    | Correct                               |
+|   E    | Field12 | `""`         | `""`                             |   No    |    No    | Correct                               |
+|   G    | Field14 | `""`         | `""`                             |   No    |    No    | Correct                               |
+|   H    | Field13 | `""`         | `""`                             |   No    |    No    | Correct                               |
 
 ---
 
-## Root Cause
+## Which Fields Are Affected
 
-### The Defective Code
+Calendar fields have three configuration flags:
 
-**File**: `main.js`
-**Function**: `CalendarValueService.getCalendarFieldValue()` — line ~104114
+| Flag             | What It Controls                                                           |
+| ---------------- | -------------------------------------------------------------------------- |
+| `enableTime`     | Whether the field stores time in addition to date (date-only vs date+time) |
+| `ignoreTimezone` | Whether timezone conversion is skipped (treat value as display time)       |
+| `useLegacy`      | Whether the field uses the older rendering/save code path                  |
 
-```javascript
-getCalendarFieldValue(fieldDef, value) {
-    if (this.useUpdatedCalendarValueLogic)
-        return value;  // V2: returns "" for empty — CORRECT
+FORM-BUG-6 requires **`enableTime=true` AND `useLegacy=false`**. Within that set, the failure mode depends on `ignoreTimezone`:
 
-    // NO EMPTY GUARD HERE — value="" falls through to transformations below
+| Config | enableTime | ignoreTimezone | useLegacy | Empty Behavior                                      |
+| :----: | :--------: | :------------: | :-------: | --------------------------------------------------- |
+| **C**  |  **true**  |    **off**     |  **off**  | Throws RangeError (crash) or returns epoch for null |
+| **D**  |  **true**  |     **on**     |  **off**  | Returns `"Invalid Date"` (truthy)                   |
+|   G    |    true    |      off       |  **on**   | Returns `""` — safe (legacy guard)                  |
+|   H    |    true    |       on       |  **on**   | Returns `""` — safe (legacy guard)                  |
+|  A-F   |    off     |       \*       |    \*     | Returns `""` — safe (date-only passthrough)         |
 
-    if (!fieldDef.useLegacy && fieldDef.enableTime) {
-        if (fieldDef.ignoreTimezone) {
-            // Config D path — Bug #6a:
-            const format = "YYYY-MM-DD[T]HH:mm:ss.SSS[Z]";
-            return moment(value).format(format);
-            // moment("") → invalid moment → .format() → "Invalid Date"
-        }
-        // Config C path — Bug #6b:
-        return new Date(value).toISOString();
-        // new Date("") → Invalid Date object → .toISOString() → throws RangeError
-    }
+The `useLegacy=true` guard causes the function to return the raw value (`""`) before reaching the transformation code. Date-only fields (`enableTime=false`) also return the raw value early. Only the non-legacy date+time path reaches the defective code.
 
-    return value;  // Legacy or date-only: returns "" correctly
-}
-```
+---
 
-### Why This Is Wrong — Config D Path
+## The Problem in Detail
 
-`moment("")` creates an **invalid moment object**. When `.format()` is called on an invalid moment, it does not throw — it returns the literal string `"Invalid Date"`:
+### Why Config D Returns "Invalid Date"
+
+The function that transforms `GetFieldValue()` output uses the moment.js library to format the value. When it receives an empty string:
 
 ```javascript
-moment('').isValid(); // → false
-moment('').format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]'); // → "Invalid Date"
-typeof moment('').format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]'); // → "string"
+moment('').format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+// → "Invalid Date"
 ```
 
-The string `"Invalid Date"` is:
+`moment("")` creates an **invalid moment object**. When `.format()` is called on an invalid moment, it doesn't throw — it returns the literal string `"Invalid Date"`. This string is:
 
 - **Truthy**: `!!"Invalid Date"` → `true`
 - **Non-empty**: `"Invalid Date".length` → 12
-- **Not parseable**: `new Date("Invalid Date")` → Invalid Date object
+- **Unparseable**: `new Date("Invalid Date")` → Invalid Date object
 - **Not a valid ISO string**: No date parser will accept it
 
-### Why This Is Wrong — Config C Path
+### Why Config C Throws a RangeError
 
-`new Date("")` creates an **Invalid Date object** (the internal time value is `NaN`). When `.toISOString()` is called on an Invalid Date, it throws:
+The Config C path uses native JavaScript instead of moment.js:
 
 ```javascript
-new Date(''); // → Invalid Date (NaN internally)
-new Date('').toISOString(); // → throws RangeError: Invalid time value
+new Date('').toISOString();
+// → throws RangeError: Invalid time value
 ```
 
-This is **worse** than Config D's behavior because it's an uncaught exception that propagates up the call stack, crashing the script unless the developer wrapped `GetFieldValue()` in a try/catch block — which is not a standard pattern for a getter function.
+`new Date("")` creates an **Invalid Date object** (the internal time value is `NaN`). When `.toISOString()` is called on an Invalid Date, JavaScript throws a `RangeError`. This is an uncaught exception that propagates up the call stack, crashing the script.
 
-### What Should Happen
+### Why Config C with `null` Returns the Unix Epoch
 
-Both paths should guard against empty input and return `""` (empty string) or `null` — consistent with other field types and with the V2 code path:
+When the stored value is `null` (rather than empty string):
 
 ```javascript
-getCalendarFieldValue(fieldDef, value) {
-    if (this.useUpdatedCalendarValueLogic)
-        return value;
+new Date(null).toISOString();
+// → "1970-01-01T00:00:00.000Z"
+```
 
-    if (!value || value.length === 0)
-        return "";  // ← Empty guard — return empty string for empty fields
+Unlike `new Date("")`, `new Date(null)` is valid JavaScript — it creates a Date at Unix epoch (timestamp 0). The `.toISOString()` call succeeds and returns a perfectly formatted ISO string. This is arguably the worst failure mode because:
 
-    // ... rest of function
+- It doesn't crash (no error to catch)
+- It returns a truthy, parseable, valid-looking date
+- The date (January 1, 1970) was never entered by anyone
+- Code downstream has no way to distinguish this from a real value
+
+### The Common Pattern and How It Breaks
+
+```javascript
+// Developer writes the standard emptiness check:
+const dateVal = VV.Form.GetFieldValue('dateField');
+if (dateVal) {
+    // Process the date — assumes field has a value
+    const parsed = new Date(dateVal);
+    // ... use parsed date
 }
 ```
 
----
-
-## Expected vs Actual Behavior
-
-### Config D — Empty Field
-
-| Step                                     | Expected                 | Actual                              |
-| ---------------------------------------- | ------------------------ | ----------------------------------- |
-| Raw stored value (`getValueObjectValue`) | `""`                     | `""` ✓                              |
-| `GetFieldValue()` return                 | `""`                     | **`"Invalid Date"`** ✗              |
-| `if (GetFieldValue('Field5'))`           | `false` (field is empty) | **`true`** (truthy string) ✗        |
-| `typeof GetFieldValue('Field5')`         | `"string"`               | `"string"` (same type, wrong value) |
-
-### Config C — Empty Field
-
-| Step                                     | Expected | Actual                    |
-| ---------------------------------------- | -------- | ------------------------- |
-| Raw stored value (`getValueObjectValue`) | `""`     | `""` ✓                    |
-| `GetFieldValue()` return                 | `""`     | **throws `RangeError`** ✗ |
-| Script continues after call              | Yes      | **No — crash** ✗          |
-
-### Control — Config A (Date-Only, Empty)
-
-| Step                           | Expected | Actual    |
-| ------------------------------ | -------- | --------- |
-| Raw stored value               | `""`     | `""` ✓    |
-| `GetFieldValue()` return       | `""`     | `""` ✓    |
-| `if (GetFieldValue('Field7'))` | `false`  | `false` ✓ |
-
-### Control — Config H (Legacy DateTime, Empty)
-
-| Step                     | Expected | Actual |
-| ------------------------ | -------- | ------ |
-| Raw stored value         | `""`     | `""` ✓ |
-| `GetFieldValue()` return | `""`     | `""` ✓ |
-
-The `useLegacy=true` check causes early `return value` — the transformation code never runs.
-
-### GetDateObjectFromCalendar — Safe Alternative
-
-| Config | Empty GDOC Return | Type      |  Falsy?   |
-| ------ | ----------------- | --------- | :-------: |
-| D      | `undefined`       | Undefined | **Yes** ✓ |
-| C      | `undefined`       | Undefined | **Yes** ✓ |
-| A      | `undefined`       | Undefined | **Yes** ✓ |
-
-`GetDateObjectFromCalendar()` bypasses `getCalendarFieldValue()` entirely and returns `undefined` for empty fields — universally falsy and safe.
+| Field Configuration     | Empty Field Behavior              | Developer Impact                          |
+| ----------------------- | --------------------------------- | ----------------------------------------- |
+| Date-only (A, B)        | Returns `""` (falsy)              | Correct — block skipped                   |
+| Legacy date+time (G, H) | Returns `""` (falsy)              | Correct — block skipped                   |
+| **Config D**            | Returns `"Invalid Date"` (truthy) | **Wrong** — block entered for empty field |
+| **Config C**            | Throws `RangeError`               | **Crash** — script dies before the `if`   |
 
 ---
 
@@ -177,157 +145,76 @@ The `useLegacy=true` check causes early `return value` — the transformation co
 
 ### Config D — "Invalid Date" String
 
-1. Open a form with a Config D field (`Field5`: `enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`)
+1. Open a form with Field5 (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`)
 2. Leave the field empty (or clear it if it has a value)
 3. In DevTools console:
 
-    ```javascript
-    // Check raw value — should be empty
-    VV.Form.VV.FormPartition.getValueObjectValue('Field5');
-    // Returns: ""
-
-    // Check GetFieldValue — Bug #6
-    VV.Form.GetFieldValue('Field5');
-    // Returns: "Invalid Date"
-
-    // The broken conditional
-    if (VV.Form.GetFieldValue('Field5')) {
-        console.log('Field has a value!'); // ← THIS RUNS for an empty field
-    }
-    ```
-
-### Config C — RangeError Crash
-
-4. On the same form, check Config C field (`Field6`: `enableTime=true`, `ignoreTimezone=false`, `useLegacy=false`)
-5. Leave it empty, then:
-    ```javascript
-    VV.Form.GetFieldValue('Field6');
-    // THROWS: RangeError: Invalid time value
-    // Script execution stops here
-    ```
-
----
-
-## Test Evidence
-
-### Category 8 — GetFieldValue on Empty Fields
-
-| Test ID       | Config | TZ  | Expected | Actual              | Status   | Run File                         |
-| ------------- | ------ | --- | -------- | ------------------- | -------- | -------------------------------- |
-| 8-D-empty     | D      | BRT | `""`     | `"Invalid Date"`    | **FAIL** | `runs/tc-8-D-empty-run-1.md`     |
-| 8-D-empty-IST | D      | IST | `""`     | `"Invalid Date"`    | **FAIL** | `runs/tc-8-D-empty-IST-run-2.md` |
-| 8-C-empty     | C      | BRT | `""`     | throws `RangeError` | **FAIL** | `runs/tc-8-C-empty-run-2.md`     |
-| 8-A-empty     | A      | BRT | `""`     | `""`                | **PASS** | `runs/tc-8-A-empty-run-2.md`     |
-| 8-H-empty     | H      | BRT | `""`     | `""`                | **PASS** | `runs/tc-8-H-empty-run-1.md`     |
-
-### Category 8B — GetDateObjectFromCalendar on Empty Fields
-
-| Test ID    | Config | Expected    | Actual      | Status   |
-| ---------- | ------ | ----------- | ----------- | -------- |
-| 8B-D-empty | D      | `undefined` | `undefined` | **PASS** |
-| 8B-A-empty | A      | `undefined` | `undefined` | **PASS** |
-
-GDOC is immune — no Bug #6 equivalent.
-
-### Overall Category 8 Counts
-
-- **18/19 done** — **12 PASS, 6 FAIL**
-- 4 of 6 failures are Bug #5 (fake Z on populated Config D)
-- 2 of 6 failures are Bug #6 (empty Config C/D)
-
-### Audit Status `[PLAYWRIGHT AUDIT 2026-04-06]`
-
-**Multi-method verification achieved**: all 8 configs tested on empty fields, direct function invocation with empty and null inputs, developer pattern verification, and GDOC workaround confirmation.
-
-**All 8 Configs — Empty Field GFV**:
-
-| Config | Field      | enableTime | ignoreTZ  |  legacy   | GFV Return            |  Truthy  | Bug #6?          |
-| :----: | ---------- | :--------: | :-------: | :-------: | --------------------- | :------: | ---------------- |
-|   A    | Field7     |   false    |   false   |   false   | `""`                  |  false   | NO               |
-|   B    | Field10    |   false    |   true    |   false   | `""`                  |  false   | NO               |
-| **C**  | **Field6** |  **true**  | **false** | **false** | **THROWS RangeError** |    —     | **YES (crash)**  |
-| **D**  | **Field5** |  **true**  | **true**  | **false** | **`"Invalid Date"`**  | **TRUE** | **YES (truthy)** |
-|   E    | Field12    |   false    |   false   |   true    | `""`                  |  false   | NO               |
-|   F    | Field11    |   false    |   true    |   true    | `""`                  |  false   | NO               |
-|   G    | Field14    |    true    |   false   |   true    | `""`                  |  false   | NO               |
-|   H    | Field13    |    true    |   true    |   true    | `""`                  |  false   | NO               |
-
-**Direct getCalendarFieldValue() — Empty and Null Inputs**:
-
-| Config | Input      | Result                                  | Issue                                                 |
-| ------ | ---------- | --------------------------------------- | ----------------------------------------------------- |
-| C      | `""`       | THROWS `RangeError: Invalid time value` | `new Date("").toISOString()` crashes                  |
-| D      | `""`       | `"Invalid Date"` (truthy)               | `moment("").format(...)` returns literal string       |
-| G      | `""`       | `""`                                    | Safe (legacy passthrough)                             |
-| H      | `""`       | `""`                                    | Safe (legacy passthrough)                             |
-| A      | `""`       | `""`                                    | Safe (date-only passthrough)                          |
-| **D**  | **`null`** | **`"Invalid Date"`**                    | Same bug with null input                              |
-| **C**  | **`null`** | **`"1970-01-01T00:00:00.000Z"`**        | **Epoch return**: `new Date(null)` = epoch, NOT crash |
-
-**Developer Pattern Verification**: `if (VV.Form.GetFieldValue('field'))` — Config A returns `""` (falsy, correct), Config D returns `"Invalid Date"` (truthy, WRONG), Config C throws RangeError (CRASHES), Config H returns `""` (falsy, correct).
-
-**GDOC Workaround Confirmed Safe**: `GetDateObjectFromCalendar()` returns `undefined` (falsy) for all empty fields across all configs — universally safe.
-
-**Playwright Cat 8 Spec Regression**: 8-A-empty PASS, 8-C-empty FAIL (RangeError), 8-D-empty FAIL ("Invalid Date"), 8-H-empty PASS.
-
-**Artifacts created**: `testing/scripts/audit-bug6-empty-fields.js` (4 tests)
-
----
-
-## Impact Analysis
-
-### Developer Script Breakage
-
-The most common pattern for checking field emptiness in VV form scripts is:
-
 ```javascript
-const dateVal = VV.Form.GetFieldValue('dateField');
-if (dateVal) {
-    // Process the date
+// Raw stored value — should be empty
+VV.Form.VV.FormPartition.getValueObjectValue('Field5');
+// Returns: ""
+
+// GetFieldValue — Bug!
+VV.Form.GetFieldValue('Field5');
+// Returns: "Invalid Date"
+
+// The broken conditional
+if (VV.Form.GetFieldValue('Field5')) {
+    console.log('This runs for an empty field!'); // ← THIS RUNS
 }
 ```
 
-Bug #6 causes this pattern to **silently execute the processing block for empty Config D fields** (because `"Invalid Date"` is truthy) or **crash the script for empty Config C fields** (uncaught RangeError). Both outcomes are wrong.
+### Config C — RangeError Crash
 
-**Downstream consequences:**
+4. Check Config C field (`Field6`: `enableTime=true`, `ignoreTimezone=false`, `useLegacy=false`)
+5. Leave it empty, then:
 
-- Scripts may attempt to parse `"Invalid Date"` as a date → `new Date("Invalid Date")` → Invalid Date object → cascading errors
-- Scripts with Config C fields crash entirely on empty fields, potentially leaving forms in an inconsistent state
-- Error messages in production logs show `RangeError: Invalid time value` with no indication it comes from `GetFieldValue()`
-
-### Scope and Frequency
-
-- Bug #6 only triggers when a field is **empty** — a common state for optional date fields or newly created forms before the user fills in dates
-- Only `enableTime=true` + `useLegacy=false` configs (C, D) — date-only and legacy configs are safe
-- Every form load where a script reads an optional DateTime field is at risk
-
-### Interaction with Bug #5
-
-Bug #5 and Bug #6 share the same function (`getCalendarFieldValue`) and the same code path entry condition (`!useLegacy && enableTime`). They are:
-
-- **Bug #5**: Populated field → fake Z added to value → progressive drift on round-trip
-- **Bug #6**: Empty field → no value guard → `"Invalid Date"` or RangeError
-
-A single fix (adding an empty guard at the top of the function) resolves Bug #6 without affecting Bug #5. However, the recommended Bug #5 fix (Option A: return raw value) also resolves Bug #6 because the raw empty value `""` is returned before any transformation.
+```javascript
+VV.Form.GetFieldValue('Field6');
+// THROWS: RangeError: Invalid time value
+// Script execution stops here — no value returned
+```
 
 ---
 
 ## Workarounds
 
-### Workaround #1: Explicit "Invalid Date" Guard
+### Recommended: Use `GetDateObjectFromCalendar()`
 
-Add a check after every `GetFieldValue()` call on Config C/D fields:
+Replace `GetFieldValue()` with `VV.Form.GetDateObjectFromCalendar('fieldName')` for all date+time field reads. This function returns a native JavaScript `Date` object directly from the stored value, bypassing the defective transformation entirely. For empty fields, it returns `undefined` (falsy — safe for standard conditionals).
+
+```javascript
+// BROKEN — triggers FORM-BUG-6
+const val = VV.Form.GetFieldValue('Field5');
+if (val) {
+    /* enters block for empty field */
+}
+
+// SAFE — bypasses FORM-BUG-6
+const dateObj = VV.Form.GetDateObjectFromCalendar('Field5');
+if (dateObj) {
+    // dateObj is a valid Date object — field really has a value
+    const isoStr = dateObj.toISOString();
+}
+// dateObj is undefined — field is empty (falsy, safe)
+```
+
+Tested across all 8 field configurations — `GetDateObjectFromCalendar()` returns `undefined` for all empty fields, regardless of configuration. Also avoids [FORM-BUG-5](bug-5-fake-z-drift.md) (fake Z on populated fields).
+
+### Alternative: Explicit "Invalid Date" Guard
+
+Add a check after every `GetFieldValue()` call on Config D fields:
 
 ```javascript
 const val = VV.Form.GetFieldValue('Field5');
 if (val && val !== 'Invalid Date') {
-    // Field has a real value — safe to process
+    // Field has a real value
 }
 ```
 
-**Limitation**: Does not protect against Config C's RangeError. For Config C, you need try/catch.
+Does not protect against Config C's `RangeError`.
 
-### Workaround #2: Try/Catch Wrapper for Config C
+### Alternative: Try/Catch for Config C
 
 ```javascript
 let val;
@@ -337,73 +224,132 @@ try {
     val = ''; // Empty field — GetFieldValue threw RangeError
 }
 if (val) {
-    // Process date
+    /* process */
 }
 ```
 
-**Limitation**: Requires every GetFieldValue call on Config C to be wrapped. Verbose and error-prone.
+Verbose and error-prone — requires wrapping every Config C `GetFieldValue` call.
 
-### Workaround #3: Use GetDateObjectFromCalendar() (Recommended)
-
-Replace `GetFieldValue()` with `GetDateObjectFromCalendar()` for all Config C/D reads:
-
-```javascript
-const dateObj = VV.Form.GetDateObjectFromCalendar('Field5');
-if (dateObj) {
-    // dateObj is a valid Date object — field has a value
-    const isoStr = dateObj.toISOString();
-}
-// dateObj is undefined — field is empty (falsy, safe)
-```
-
-**Advantages**:
-
-- Returns `undefined` for empty fields (falsy — standard JS pattern)
-- No fake Z (also avoids Bug #5)
-- No crash (also avoids Config C's RangeError)
-- Works identically across all configs
-
-**Evidence**: Category 8B — 12 tests, 11 PASS, 1 FAIL (Bug #7 upstream, not GDOC). `[LIVE]`
-
-### Workaround #4: Check Raw Value First
+### Alternative: Check Raw Value First
 
 ```javascript
 const raw = VV.Form.VV.FormPartition.getValueObjectValue('Field5');
 if (raw && raw.length > 0) {
     const val = VV.Form.GetFieldValue('Field5');
-    // Safe — we know the field is populated
+    // Safe — field is populated
 }
 ```
 
-**Caveat**: Uses an internal API (`getValueObjectValue`) that may change across platform versions.
+Uses an internal API (`getValueObjectValue`) that may change across platform versions.
+
+---
+
+## Test Evidence
+
+### All 8 Configs — Empty Field GetFieldValue
+
+| Config | Field   | enableTime | ignoreTZ | legacy  | GFV Return            | Truthy? | Bug?             |
+| :----: | ------- | :--------: | :------: | :-----: | --------------------- | :-----: | ---------------- |
+|   A    | Field7  |    off     |   off    |   off   | `""`                  |   No    | No               |
+|   B    | Field10 |    off     |    on    |   off   | `""`                  |   No    | No               |
+| **C**  | Field6  |   **on**   | **off**  | **off** | **throws RangeError** |    —    | **Yes (crash)**  |
+| **D**  | Field5  |   **on**   |  **on**  | **off** | **`"Invalid Date"`**  | **Yes** | **Yes (truthy)** |
+|   E    | Field12 |    off     |   off    |   on    | `""`                  |   No    | No               |
+|   F    | Field11 |    off     |    on    |   on    | `""`                  |   No    | No               |
+|   G    | Field14 |     on     |   off    |   on    | `""`                  |   No    | No               |
+|   H    | Field13 |     on     |    on    |   on    | `""`                  |   No    | No               |
+
+### Direct getCalendarFieldValue() — Empty and Null Inputs
+
+| Config | Input  | Result                                  | Issue                                                  |
+| :----: | ------ | --------------------------------------- | ------------------------------------------------------ |
+|   C    | `""`   | THROWS `RangeError: Invalid time value` | `new Date("").toISOString()` crashes                   |
+|   D    | `""`   | `"Invalid Date"` (truthy)               | `moment("").format(...)` returns literal string        |
+|   G    | `""`   | `""`                                    | Safe — legacy passthrough                              |
+|   H    | `""`   | `""`                                    | Safe — legacy passthrough                              |
+|   A    | `""`   | `""`                                    | Safe — date-only passthrough                           |
+| **D**  | `null` | **`"Invalid Date"`**                    | Same bug with null input                               |
+| **C**  | `null` | **`"1970-01-01T00:00:00.000Z"`**        | Epoch return: `new Date(null)` = epoch, does NOT crash |
+
+### GetDateObjectFromCalendar — Safe Alternative
+
+| Field       | Config | Empty Result | Truthy? | Safe? |
+| ----------- | :----: | ------------ | :-----: | :---: |
+| Field5 (D)  |   D    | `undefined`  |   No    |  Yes  |
+| Field6 (C)  |   C    | `undefined`  |   No    |  Yes  |
+| Field7 (A)  |   A    | `undefined`  |   No    |  Yes  |
+| Field13 (H) |   H    | `undefined`  |   No    |  Yes  |
+
+Universally safe — returns `undefined` (falsy) for all empty fields regardless of configuration.
+
+### Playwright Regression
+
+| Test      | Expected | Received                      | Status   |
+| --------- | -------- | ----------------------------- | -------- |
+| 8-A-empty | `""`     | `""`                          | PASS     |
+| 8-C-empty | `""`     | `"ERROR: Invalid time value"` | **FAIL** |
+| 8-D-empty | `""`     | `"Invalid Date"`              | **FAIL** |
+| 8-H-empty | `""`     | `""`                          | PASS     |
+
+### Overall Category 8 Counts
+
+- 18 of 19 tests done — 12 PASS, 6 FAIL
+- 4 of 6 failures are [FORM-BUG-5](bug-5-fake-z-drift.md) (fake Z on populated Config D fields)
+- 2 of 6 failures are FORM-BUG-6 (empty Config C/D)
+
+---
+
+## Technical Root Cause
+
+### The Missing Empty Guard
+
+**File**: `main.js` (bundled FormViewer application)
+**Function**: `CalendarValueService.getCalendarFieldValue()` — line ~104114
+
+This is the same function that contains [FORM-BUG-5](bug-5-fake-z-drift.md) (fake Z on populated Config D fields). FORM-BUG-6 is the empty-field case of the same code:
+
+```javascript
+getCalendarFieldValue(fieldDef, value) {
+    if (this.useUpdatedCalendarValueLogic)
+        return value;  // V2: returns "" for empty — correct
+
+    // NO EMPTY GUARD — empty string falls through to transformations
+
+    if (!fieldDef.useLegacy && fieldDef.enableTime) {
+        if (fieldDef.ignoreTimezone) {
+            // Config D path:
+            const format = "YYYY-MM-DD[T]HH:mm:ss.SSS[Z]";
+            return moment(value).format(format);
+            // moment("") → invalid moment → .format() → "Invalid Date"
+        }
+        // Config C path:
+        return new Date(value).toISOString();
+        // new Date("") → Invalid Date → .toISOString() → throws RangeError
+        // new Date(null) → epoch → .toISOString() → "1970-01-01T00:00:00.000Z"
+    }
+
+    return value;  // Legacy or date-only: returns "" correctly
+}
+```
+
+The V2 path (`useUpdatedCalendarValueLogic = true`) returns the raw value immediately, which is `""` for empty fields — correct. Date-only and legacy paths also reach `return value` before the transformation code. Only the non-legacy date+time path reaches the defective `moment()` / `new Date()` calls without checking for empty input first.
+
+### Relationship to FORM-BUG-5
+
+FORM-BUG-5 and FORM-BUG-6 share the same function, the same code path, and the same entry condition (`!useLegacy && enableTime`). They represent different cases:
+
+- **FORM-BUG-5**: Populated field → fake Z added → progressive drift on round-trip
+- **FORM-BUG-6**: Empty field → no value guard → "Invalid Date" or RangeError or epoch
+
+The recommended FORM-BUG-5 fix (Option A: return raw value for Config D) also resolves FORM-BUG-6 for Config D because `return value` for empty input returns `""`. However, the Config C path (`new Date(value).toISOString()`) still needs the explicit empty guard regardless of how FORM-BUG-5 is resolved.
 
 ---
 
 ## Proposed Fix
 
-### Before (Current)
+### One-Line Empty Guard
 
-```javascript
-getCalendarFieldValue(fieldDef, value) {
-    if (this.useUpdatedCalendarValueLogic)
-        return value;
-
-    // NO EMPTY GUARD — empty string falls through
-
-    if (!fieldDef.useLegacy && fieldDef.enableTime) {
-        if (fieldDef.ignoreTimezone) {
-            return moment(value).format("YYYY-MM-DD[T]HH:mm:ss.SSS[Z]");
-            // moment("").format() → "Invalid Date"
-        }
-        return new Date(value).toISOString();
-        // new Date("").toISOString() → throws RangeError
-    }
-
-    return value;
-}
-```
-
-### After (Fixed)
+Add a single line before the transformation logic:
 
 ```javascript
 getCalendarFieldValue(fieldDef, value) {
@@ -417,7 +363,7 @@ getCalendarFieldValue(fieldDef, value) {
     if (!fieldDef.useLegacy && fieldDef.enableTime) {
         if (fieldDef.ignoreTimezone) {
             return moment(value).format("YYYY-MM-DD[T]HH:mm:ss.SSS[Z]");
-            // Still has Bug #5 (fake Z) for populated values — fix separately
+            // Still has FORM-BUG-5 (fake Z) for populated values — fix separately
         }
         return new Date(value).toISOString();
     }
@@ -426,21 +372,13 @@ getCalendarFieldValue(fieldDef, value) {
 }
 ```
 
-### Key Change
-
-**One line added**: `if (!value || value.length === 0) return "";`
-
 This single guard:
 
-- Returns `""` (empty string, falsy) for empty Config D fields instead of `"Invalid Date"`
+- Returns `""` (falsy) for empty Config D fields instead of `"Invalid Date"`
 - Prevents the `RangeError` crash for empty Config C fields
-- Matches V2 behavior (which returns raw `""`)
-- Matches date-only and legacy config behavior (which already return `""` via `return value`)
-- Has zero effect on populated fields (the guard only triggers when value is empty/null/undefined)
-
-### Relationship to Bug #5 Fix
-
-If Bug #5 is fixed with Option A (return raw value for Config D), the Config D path becomes `return value` — which already handles empty correctly (`""` → `""`). However, the Config C path (`new Date(value).toISOString()`) still needs the explicit guard. **The empty guard should be added regardless of how Bug #5 is resolved.**
+- Prevents the epoch return for Config C with null
+- Matches V2 behavior, date-only behavior, and legacy behavior (all return `""`)
+- Has zero effect on populated fields
 
 ---
 
@@ -450,28 +388,26 @@ If Bug #5 is fixed with Option A (return raw value for Config D), the Config D p
 
 - Empty Config D fields: `GetFieldValue()` returns `""` instead of `"Invalid Date"`
 - Empty Config C fields: `GetFieldValue()` returns `""` instead of throwing `RangeError`
+- Config C with null: `GetFieldValue()` returns `""` instead of epoch date
 - Developer conditionals `if (GetFieldValue('field'))` correctly evaluate to `false` for empty fields
 - Scripts no longer crash on empty Config C fields
 
-### Backwards Compatibility Risk
+### Backwards Compatibility Risk: LOW
 
-**LOW** — but not zero.
+| Script Pattern                                                    | Impact                                                                        |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `if (val === "Invalid Date")` — explicit Bug workaround           | Breaks — value is now `""`. But this was a workaround, not intended behavior. |
+| `try { GetFieldValue() } catch(e) {...}` — try/catch for Config C | Catch block no longer triggers. Script still works, but dead code remains.    |
+| `if (GetFieldValue('field'))` — standard emptiness check          | **Fixed** — now correctly returns falsy for empty fields.                     |
 
-| Pattern                                                                     | Impact                                                                                           |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `if (val === "Invalid Date")` — explicit check for Bug #6 output            | Breaks — value is now `""` instead. But this pattern was a workaround, not intentional behavior. |
-| `try { GetFieldValue('Field6') } catch(e) { ... }` — try/catch for Config C | The catch block no longer triggers. Script still works, but dead code remains.                   |
-| `if (GetFieldValue('field'))` — standard emptiness check                    | **Fixed** — now correctly returns falsy for empty fields.                                        |
+Scripts that relied on the buggy behavior (checking for `"Invalid Date"` explicitly) will need to update. But this is removing a workaround, not changing intended functionality.
 
-Scripts that relied on the buggy behavior (checking for `"Invalid Date"` explicitly) will need to update their checks. But this is a workaround being removed, not intended functionality being changed.
+### Regression Risk: VERY LOW
 
-### Regression Risk
+This is a single guard clause added before existing logic. It only activates when value is empty/null/undefined and has no effect on populated fields. It matches the behavior of every other configuration and the V2 code path.
 
-**Very Low** — this is a single guard clause added before existing logic. It:
+**Testing scope**: Empty field tests for Configs C and D, plus spot-check that populated Config C/D values are unaffected.
 
-- Only activates when value is empty/null/undefined
-- Has no effect on any populated field
-- Matches the behavior of every other config and the V2 path
-- Is the smallest possible change to fix both failure modes
+### Artifacts Created During Investigation
 
-**Testing scope**: Category 8 empty field tests for Configs C, D, plus spot-check that populated Config C/D values are unaffected.
+- `testing/scripts/audit-bug6-empty-fields.js` — comprehensive audit (4 tests across all configs)
