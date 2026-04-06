@@ -177,7 +177,7 @@ The dashboard and the Forms Angular SPA use different date format strings:
 | Dashboard | `M/d/yyyy`   | `3/15/2026`  |
 | Forms SPA | `MM/dd/yyyy` | `03/15/2026` |
 
-For DateTime fields with `ignoreTZ=false`, there is also a **time shift**: the dashboard renders UTC time directly (e.g., `2:30 PM` for `T14:30:00Z`), while Forms V1 converts UTC to local time (e.g., `11:30 AM` in BRT). Fields with `ignoreTZ=true` preserve the display time but still differ in leading-zero format.
+For DateTime fields with `ignoreTZ=false`, there is also a **time shift**: the dashboard renders the stored `datetime` value directly (e.g., `2:30 PM` for DB value `14:30:00.000`), while Forms V1 shifts the time because `FormInstance/Controls` serializes postForms-created records with a Z suffix that V1 interprets as UTC (e.g., `11:30 AM` in BRT = 14:30 − 3h). Fields with `ignoreTZ=true` preserve the display time but still differ in leading-zero format.
 
 ### Export Behavior
 
@@ -298,23 +298,31 @@ Named SQL queries defined on top of a connection. Used in dashboards, reports, a
 
 ### Form Database Schema
 
-Form field values are stored in SQL tables named after the form template. Each form template maps to one table.
+Form field values are stored in SQL Server tables named after the form template. Each form template maps to one table. Schema confirmed via SSMS inspection (2026-04-06):
 
-| Column                | Description                                                                                              |
-| --------------------- | -------------------------------------------------------------------------------------------------------- |
-| `DhDocID`             | Form instance identifier — e.g., `DateTest-000004`. Used in `WHERE` clauses to target a specific record. |
-| `Field1`, `Field2`, … | One column per VV field, named after the VV field name                                                   |
-| Other `Dh*` columns   | System columns (status, revision, timestamps, etc.)                                                      |
+| Column                             | SQL Type           | Nullable | Notes                                              |
+| ---------------------------------- | ------------------ | :------: | -------------------------------------------------- |
+| `DhDocID`                          | `nvarchar(255)`    |    PK    | Form instance identifier (e.g., `DateTest-001584`) |
+| `DhID`                             | `uniqueidentifier` |    No    | Internal GUID                                      |
+| `VVCreateDate`, `VVModifyDate`     | `datetime`         |    No    | System timestamps                                  |
+| `VVCreateBy`, `VVModifyBy`         | `nvarchar(256)`    |    No    | User email                                         |
+| `VVCreateByUsID`, `VVModifyByUsID` | `uniqueidentifier` |    No    | User GUID                                          |
+| `Field1` through `Field28`         | **`datetime`**     |   Yes    | All date fields — no `date`-only type exists       |
+| `WSAction`, `WSConfigs`, etc.      | `nvarchar(max)`    |   Yes    | Test harness metadata (string fields)              |
 
 Example query to inspect a saved record:
 
 ```sql
-SELECT DhDocID, Field1, Field2, Field5, Field6, Field7
+SELECT DhDocID, Field5, Field6, Field7
 FROM DateTest
-WHERE DhDocID = 'DateTest-000004'
+WHERE DhDocID = 'DateTest-001584'
 ```
 
-**Date storage format in the DB:** Values appear as `M/d/yyyy h:mm:ss tt` (e.g., `3/15/2026 12:00:00 AM`). There is no timezone suffix — the database does not record whether a value is UTC or local time. See [Calendar field mixed timezone storage](#calendar-field-mixed-timezone-storage) in `docs/reference/form-fields.md` for the implications.
+**Date storage in SQL Server:** All date fields are **`datetime`** (binary, format-agnostic). The raw value serializes as `YYYY-MM-DD HH:MM:SS.mmm` (e.g., `2026-03-15 14:30:00.000`). The `M/d/yyyy h:mm:ss tt` format seen in the VV Query Admin Preview (e.g., `3/15/2026 2:30:00 PM`) is **.NET display formatting**, not the stored value. There is no timezone information at the SQL level — the `datetime` type is timezone-unaware. Empty fields store `NULL`.
+
+**Critical implication:** Since there is no `date` column type, the `enableTime` flag is purely a client-side presentation control. Every "date-only" field can contain any time component depending on the write path. See [No Server-Side Date-Only Enforcement](#no-server-side-date-only-enforcement) below.
+
+**VV demo server timezone:** Confirmed as **BRT (UTC-3)** by comparing `VVCreateDate` (server local timestamp) with `Field1` (`new Date().toISOString()` = UTC). Consistent 3-hour offset across all records (e.g., `VVCreateDate=12:53`, `Field1=15:53`). The server stores `VVCreateDate`/`VVModifyDate` in its local timezone, while `toISOString()`-derived field values are stored in UTC. `getSaveValue()`-derived values are timezone-ambiguous (local midnight stored as `00:00:00.000` regardless of actual UTC offset).
 
 ---
 
@@ -372,33 +380,34 @@ The FormViewer SPA communicates with a **separate .NET service** (FormsAPI) for 
 
 ### FormsAPI Endpoints (discovered via network intercept)
 
-| Method | Endpoint                                                            | Purpose                                     |
-| ------ | ------------------------------------------------------------------- | ------------------------------------------- |
-| GET    | `/FormTemplate/<defId>?revisionType=2`                              | Template definition (by definition GUID)    |
-| GET    | `/FormTemplate/<revId>?revisionType=0`                              | Template by revision ID                     |
-| GET    | `/FormTemplate/Controls/<revId>?formInstanceId=<id>&revisionType=2` | Field definitions for a template            |
-| GET    | `/FormInstance/Controls/<dataId>?revisionType=1`                    | **Saved field values** (raw storage format) |
-| POST   | `/FormInstance`                                                     | Create a new form record                    |
-| PUT    | `/FormInstance`                                                     | Update existing record                      |
-| POST   | `/FormInstance/lock`                                                | Lock a record for editing                   |
-| GET    | `/FormTemplate/<defId>/NextInstance?revisionType=2`                 | Get next instance name                      |
-| GET    | `/Menu/Tab/<id>`                                                    | Tab configuration                           |
-| GET    | `/FormSettings`                                                     | Global form settings                        |
-| GET    | `/DefaultValues`                                                    | Default field values/settings               |
+| Method | Endpoint                                                            | Purpose                                                                      |
+| ------ | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| GET    | `/FormTemplate/<defId>?revisionType=2`                              | Template definition (by definition GUID)                                     |
+| GET    | `/FormTemplate/<revId>?revisionType=0`                              | Template by revision ID                                                      |
+| GET    | `/FormTemplate/Controls/<revId>?formInstanceId=<id>&revisionType=2` | Field definitions for a template                                             |
+| GET    | `/FormInstance/Controls/<dataId>?revisionType=1`                    | **Saved field values** (serialized — format varies by write path, see CB-29) |
+| POST   | `/FormInstance`                                                     | Create a new form record                                                     |
+| PUT    | `/FormInstance`                                                     | Update existing record                                                       |
+| POST   | `/FormInstance/lock`                                                | Lock a record for editing                                                    |
+| GET    | `/FormTemplate/<defId>/NextInstance?revisionType=2`                 | Get next instance name                                                       |
+| GET    | `/Menu/Tab/<id>`                                                    | Tab configuration                                                            |
+| GET    | `/FormSettings`                                                     | Global form settings                                                         |
+| GET    | `/DefaultValues`                                                    | Default field values/settings                                                |
 
-### Storage Format Difference (CB-29)
+### Serialization Format Difference (CB-29)
 
-The FormsAPI and core API store date values in **different formats** in the database:
+Both the core API (`postForms`) and FormsAPI (`forminstance/`) store **identical `datetime` values** in SQL Server. A DB dump (2026-04-06) confirmed records created by either endpoint contain the same binary value (e.g., `2026-03-15 14:30:00.000`).
 
-| Write Endpoint           | Storage Format         | Example                  |
-| ------------------------ | ---------------------- | ------------------------ |
-| Core API `postForms`     | ISO 8601 + Z           | `"2026-03-15T14:30:00Z"` |
-| FormsAPI `forminstance/` | US format, no timezone | `"03/15/2026 14:30:00"`  |
+The difference is in how `FormInstance/Controls` **serializes its HTTP response**:
 
-The core API's `getForms` read normalizes both to ISO+Z, masking the difference. But `FormInstance/Controls` returns the **raw storage format**, which is what the form viewer uses for `initCalendarValueV1`. This causes:
+| Write Endpoint           | DB Value (identical)      | `FormInstance/Controls` Response | Forms V1 Interpretation                |
+| ------------------------ | ------------------------- | -------------------------------- | -------------------------------------- |
+| Core API `postForms`     | `2026-03-15 14:30:00.000` | `"2026-03-15T14:30:00Z"` (ISO+Z) | UTC → converts to local (shifted)      |
+| FormsAPI `forminstance/` | `2026-03-15 14:30:00.000` | `"03/15/2026 14:30:00"` (US)     | Local time → no conversion (preserved) |
 
-- ISO+Z → Forms V1 interprets as UTC → converts to local time (CB-8 shift)
-- US format → Forms V1 interprets as local time → no conversion (preserved)
+The core API's `getForms` normalizes both to ISO+Z, masking the serialization difference. The divergence is only visible through `FormInstance/Controls` or by observing the Forms UI behavior.
+
+**Root cause**: The FormsAPI has two serialization paths that produce different string formats for the same `datetime` value. Forms V1 `initCalendarValueV1` parses the string format — ISO+Z triggers UTC→local conversion, US format does not.
 
 See `tasks/date-handling/web-services/analysis/overview.md` CB-29 for full evidence.
 

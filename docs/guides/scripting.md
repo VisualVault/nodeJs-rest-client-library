@@ -173,7 +173,7 @@ The VV server parses date strings before storing. It does **not** echo the input
 | ISO datetime+ms     | `"2026-03-15T14:30:00.000Z"`                           | `"2026-03-15T14:30:00Z"` (ms stripped)      |
 | YYYY/MM/DD          | `"2026/03/15"`                                         | `"2026-03-15T00:00:00Z"`                    |
 | English month       | `"March 15, 2026"`, `"15 March 2026"`, `"15-Mar-2026"` | `"2026-03-15T00:00:00Z"`                    |
-| DB storage format   | `"3/15/2026 12:00:00 AM"`                              | `"2026-03-15T00:00:00Z"`                    |
+| Query Admin display | `"3/15/2026 12:00:00 AM"`                              | `"2026-03-15T00:00:00Z"`                    |
 
 **Silently rejected formats** (accepted by API, stored as `null` — no error):
 
@@ -256,13 +256,13 @@ Since the Node.js library introduces **zero date transformations**:
 - Any date value passed to `postForms()` reaches the VV server exactly as sent
 - Any date value returned by `getForms()` is exactly what the VV server returned
 - Bugs #5, #6, #7 (discovered in Forms calendar testing) are **client-side only** — they live in the browser's `main.js`, not in the API layer
-- The open question is what the **VV server itself** does with date values (storage format, timezone handling, re-formatting)
+- **Answered (2026-04-06):** The VV server stores date values in SQL Server `datetime` columns (timezone-unaware). It stores the value as-received from the client — no UTC conversion or timezone normalization occurs server-side. `VVCreateDate`/`VVModifyDate` use server-local time (BRT on vvdemo); field values reflect whatever the client sent (`toISOString()` → UTC, `getSaveValue()` → local-time-no-TZ). See [Platform Architecture — Form Database Schema](../architecture/visualvault-platform.md#form-database-schema).
 
 ---
 
 ## FormsAPI Access (forminstance/ Endpoint)
 
-The VV Node.js client can create records through the **FormsAPI** (`/forminstance` endpoint) in addition to the standard `postForms`. The FormsAPI stores dates in a different format (US, no timezone) that avoids the CB-8 cross-layer shift. See [api-date-patterns.md](../reference/api-date-patterns.md#endpoint-storage-format-warning-cb-29) for details.
+The VV Node.js client can create records through the **FormsAPI** (`/forminstance` endpoint) in addition to the standard `postForms`. Both endpoints store identical SQL `datetime` values, but the FormsAPI's `FormInstance/Controls` serializes the response in US format (no timezone), which avoids the CB-8 cross-layer shift that occurs with postForms' ISO+Z serialization. See [api-date-patterns.md](../reference/api-date-patterns.md#endpoint-serialization-warning-cb-29) for details.
 
 ### Prerequisites
 

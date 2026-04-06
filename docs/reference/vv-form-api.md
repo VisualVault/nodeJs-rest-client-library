@@ -295,11 +295,11 @@ The core state manager for the form instance. Not part of the public API, but ac
 
 Controls the V1/V2 code path switch and provides shared date functions.
 
-| Property/Method                                             | Type       | Description                                                                                                                                      |
-| ----------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `useUpdatedCalendarValueLogic`                              | `boolean`  | `false` = V1 (default), `true` = V2. Set by server flag, `?ObjectID=` URL param, or non-empty `modelId`. Affects all calendar fields globally.   |
-| `getSaveValue(date, enableTime, ignoreTimezone, useLegacy)` | `function` | Converts a Date object to storage format string. Strips Z suffix. Produces `"yyyy-MM-dd"` for date-only or `"yyyy-MM-ddTHH:mm:ss"` for DateTime. |
-| `parseDateString(value, enableTime, ignoreTimezone)`        | `function` | Parses a date string during form load. In V1, strips Z and re-parses as local time (Bug #1).                                                     |
+| Property/Method                                             | Type       | Description                                                                                                                                                                                                                                                                                                                                 |
+| ----------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useUpdatedCalendarValueLogic`                              | `boolean`  | `false` = V1 (default), `true` = V2. Set by server flag, `?ObjectID=` URL param, or non-empty `modelId`. Affects all calendar fields globally.                                                                                                                                                                                              |
+| `getSaveValue(date, enableTime, ignoreTimezone, useLegacy)` | `function` | Converts a Date object to storage format string. Strips Z suffix. Produces `"yyyy-MM-dd"` for date-only or `"yyyy-MM-ddTHH:mm:ss"` for DateTime. **Empirically verified**: produces identical output for `ignoreTZ=true` and `ignoreTZ=false` given the same Date object — the flag affects display only, not storage (DB dump 2026-04-06). |
+| `parseDateString(value, enableTime, ignoreTimezone)`        | `function` | Parses a date string during form load. In V1, strips Z and re-parses as local time (Bug #1).                                                                                                                                                                                                                                                |
 
 ---
 
@@ -543,11 +543,19 @@ Authorization: <JWT token>
 → { data: { formId: "<DataID>", name: "TemplateName-001234", confirmationPage: null }, meta: { status: 201 } }
 ```
 
-**Important:** The FormsAPI stores field values in US format (`"03/15/2026 14:30:00"`, no timezone) — different from the core API's `postForms` which stores ISO+Z (`"2026-03-15T14:30:00Z"`). This affects how `initCalendarValueV1` parses the value on form load. See [CB-29](../../tasks/date-handling/web-services/analysis/overview.md) and [architecture](../architecture/visualvault-platform.md#storage-format-difference-cb-29).
+**Important:** The FormsAPI's `FormInstance/Controls` endpoint returns field values in US format (`"03/15/2026 14:30:00"`) for records created via `forminstance/`, vs ISO+Z (`"2026-03-15T14:30:00Z"`) for records created via `postForms`. The actual SQL `datetime` value is identical regardless of write endpoint — the format difference is in the API response serialization. This affects how `initCalendarValueV1` parses the value on form load. See [CB-29](../../tasks/date-handling/web-services/analysis/overview.md) and [architecture](../architecture/visualvault-platform.md#serialization-format-difference-cb-29).
 
 ### FormInstance Save API
 
 The FormViewer uses a separate API domain (FormsAPI) for form instance persistence. See [FormsAPI Service](../architecture/visualvault-platform.md#formsapi-service) for the full endpoint catalog.
+
+**Forms UI save payload** (captured via Playwright network intercept, 2026-04-06):
+
+- Uses **field GUIDs** as keys (not field names like `"Field5"`) — the same GUIDs from `VV.Form.VV.FormPartition.fieldMaster`
+- User-set DateTime fields (via `SetFieldValue` or picker) send values **without Z**: `"2026-03-15T14:30:00"`
+- Preset/initial-value fields send values **with Z**: `"2026-03-01T03:00:00.000Z"` (from `toISOString()`)
+- Date-only fields send date portion only: `"2026-03-15"`
+- All fields in the form are included in the POST body, not just modified ones
 
 ```
 POST https://preformsapi.visualvault.com/api/v1/FormInstance

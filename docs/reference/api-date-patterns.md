@@ -8,7 +8,7 @@ How to send date and datetime values through the VV REST API so they display cor
 
 ## The Problem
 
-When a web service creates or updates a form record with a datetime value, the time displayed in the browser depends on the user's local timezone. The VV server stores all datetimes in UTC. If the import sends a time without timezone context, the server assumes UTC — and every user sees a different local time.
+When a web service creates or updates a form record with a datetime value, the time displayed in the browser depends on the user's local timezone. The VV server stores datetime values in SQL Server `datetime` columns (timezone-unaware). **The server does not uniformly store UTC** — it stores whatever value the client sends. Different FormViewer code paths send different timezone representations: `toISOString()` sends UTC, `getSaveValue()` sends local-time-without-timezone-marker. For web service imports, values without timezone context are stored as-is — and every user sees a different local time.
 
 ```
 Import sends:   "2026-03-15T14:30:00"     (no timezone — server treats as UTC)
@@ -135,13 +135,14 @@ d.setDate(d.getDate() + 30); // Local arithmetic — may vary per TZ
 
 ## Quick Reference: What to Send
 
-| Field Type | Source Data                       | Send This                        | Example                       |
-| ---------- | --------------------------------- | -------------------------------- | ----------------------------- |
-| Date-only  | Any date string                   | ISO date                         | `"2026-03-15"`                |
-| DateTime   | UTC time                          | ISO + Z                          | `"2026-03-15T14:30:00Z"`      |
-| DateTime   | Local time (known TZ)             | ISO + offset                     | `"2026-03-15T14:30:00-05:00"` |
-| DateTime   | Computed                          | `toISOString()`                  | `"2026-03-15T14:30:00.000Z"`  |
-| DateTime   | Display-only (same for all users) | ISO + Z on `ignoreTZ=true` field | `"2026-03-15T14:30:00Z"`      |
+| Field Type                | Source Data     | Send This                      | Example                 | Endpoint            |
+| ------------------------- | --------------- | ------------------------------ | ----------------------- | ------------------- |
+| Date-only                 | Any date string | ISO date                       | `"2026-03-15"`          | Either              |
+| DateTime (any `ignoreTZ`) | Time value      | ISO datetime (no Z, no offset) | `"2026-03-15T14:30:00"` | **`forminstance/`** |
+
+**Why `forminstance/` for all DateTime fields**: The `postForms` endpoint appends Z to datetime values, which triggers a timezone shift when users open the record in Forms (WS-BUG-1). The `forminstance/` endpoint stores in US format without Z — no shift occurs. Empirically verified: `getSaveValue()` stores identical values for `ignoreTZ=true` and `ignoreTZ=false` — the flag affects display only, not DB storage. See [WS-BUG-1](../../tasks/date-handling/web-services/analysis/ws-bug-1-cross-layer-shift.md).
+
+**Cross-TZ note**: `forminstance/` stores local time without TZ context. This is consistent with how the Forms UI itself saves records. Two users in different timezones entering "2:30 PM" both store `T14:30:00` — the VV platform does not preserve timezone context through any `forminstance/` write path.
 
 ---
 
@@ -201,20 +202,20 @@ For batch corrections, you need to know the original source timezone to compute 
 
 ---
 
-## Endpoint Storage Format Warning (CB-29)
+## Endpoint Serialization Warning (CB-29)
 
-The `postForms` (core API) and `forminstance/` (FormsAPI) endpoints store dates in **different formats** in the database, even though the core API read normalizes both to ISO+Z:
+Both `postForms` (core API) and `forminstance/` (FormsAPI) store **identical SQL `datetime` values** in the database (confirmed via DB dump and SSMS schema inspection, 2026-04-06). However, the FormsAPI's `FormInstance/Controls` endpoint **serializes its HTTP response differently** depending on which write endpoint created the record:
 
-| Write Method                                 | DB Storage Format        | Forms V1 Interpretation                    |
-| -------------------------------------------- | ------------------------ | ------------------------------------------ |
-| `vvClient.forms.postForms()`                 | `"2026-03-15T14:30:00Z"` | UTC → converts to local (**shifted**)      |
-| `vvClient.formsApi.formInstances.postForm()` | `"03/15/2026 14:30:00"`  | Local time → no conversion (**preserved**) |
+| Write Method                                 | DB Value (identical)      | `FormInstance/Controls` Response    | Forms V1 Interpretation                    |
+| -------------------------------------------- | ------------------------- | ----------------------------------- | ------------------------------------------ |
+| `vvClient.forms.postForms()`                 | `2026-03-15 14:30:00.000` | `"2026-03-15T14:30:00Z"` (ISO+Z)    | UTC → converts to local (**shifted**)      |
+| `vvClient.formsApi.formInstances.postForm()` | `2026-03-15 14:30:00.000` | `"03/15/2026 14:30:00"` (US format) | Local time → no conversion (**preserved**) |
 
-**Impact:** Records created via `postForms` have their DateTime values shifted by the user's timezone offset on first form open (CB-8). Records created via `forminstance/` are immune to this shift.
+**Impact:** Records created via `postForms` have their DateTime values shifted by the user's timezone offset on first form open (CB-8) — not because the DB value differs, but because `FormInstance/Controls` serializes it as ISO+Z, which Forms V1 interprets as UTC. Records created via `forminstance/` are immune because the serialized US format is parsed as local time.
 
-**Workaround for migration/import scripts:** If dates must display the same time for all users regardless of timezone, use `forminstance/` instead of `postForms`. The `forminstance/` endpoint requires the template **revision ID** (not template ID), JWT auth, and a different payload format: `{ fields: [{ key: "FieldN", value: "..." }] }`. See [FormsAPI Service](../architecture/visualvault-platform.md#formsapi-service).
+**Workaround:** Use `forminstance/` for **all** DateTime fields that users will view in Forms. Empirically verified (2026-04-06): `getSaveValue()` stores identical values for `ignoreTZ=true` and `ignoreTZ=false` — the flag affects display only, not DB storage. The `forminstance/` endpoint requires the template **revision ID** (not template ID), JWT auth, and a different payload format: `{ fields: [{ key: "FieldN", value: "..." }] }`. See [FormsAPI Service](../architecture/visualvault-platform.md#formsapi-service).
 
-**Confirmed in:** Freshdesk #124697 (WADNR-10407), WS-10 test batch.
+**Confirmed in:** Freshdesk #124697 (WADNR-10407), WS-10 test batch, DB dump + SSMS schema (2026-04-06).
 
 ---
 
@@ -228,4 +229,4 @@ The `postForms` (core API) and `forminstance/` (FormsAPI) endpoints store dates 
 | WS-5   | DD/MM/YYYY silently stored as null — Bug #8             | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md)   |
 | WS-9   | TZ-safe vs unsafe Date patterns (CB-24–CB-28)           | [ws-9-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-9-batch-run-1.md)   |
 | Cat 10 | Epoch silent null, midnight-crossing                    | [cat10-gaps-run-1.md](../../tasks/date-handling/web-services/runs/cat10-gaps-run-1.md)   |
-| WS-10  | postForms vs forminstance/ storage format (CB-29)       | [ws-10-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-10-batch-run-1.md) |
+| WS-10  | postForms vs forminstance/ serialization format (CB-29) | [ws-10-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-10-batch-run-1.md) |
