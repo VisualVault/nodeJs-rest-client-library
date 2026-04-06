@@ -57,6 +57,7 @@ nodeV2/
   tasks/                             # Investigation and task workspace
     README.md                        # Task index and structure guide
     date-handling/                   # Active: cross-platform date bug investigation
+      analysis/                      # Cross-cutting root cause analysis (temporal models)
       forms-calendar/                # Forms calendar field testing (7 bugs, ~242 slots)
         analysis/                    # Analysis & conclusions (overview + 7 per-bug documents)
       web-services/                  # REST API date handling testing (148 slots, complete — WS-1 through WS-10)
