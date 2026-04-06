@@ -65,6 +65,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Legacy popup description in `docs/reference/form-fields.md` corrected: popup is Kendo calendar (not Angular UI Bootstrap as previously documented)
 - `docs/reference/api-date-patterns.md` corrected: server does not uniformly store UTC — stores whatever the client sends (mixed UTC/local in same column)
 - All 13 bug analysis documents (7 Forms, 6 Web Services) restructured for support/product readability: user-facing opening, progressive technical disclosure, concepts introduced before use. Bug IDs renamed: `Bug #X` → `FORM-BUG-X`, `WS-BUG-X` → `WEBSERVICE-BUG-X`. Audit findings merged into original documents (separate audit files removed). Classification tables replaced with narrative severity sections.
+- Dashboard analysis restructured: `analysis.md` → `analysis/overview.md` (matching forms-calendar and web-services pattern). Created `FORMDASHBOARD-BUG-1` (format inconsistency between dashboard .NET `M/d/yyyy` and Forms Angular `MM/dd/yyyy` — cosmetic, LOW severity)
 
 ### Fixed
 
