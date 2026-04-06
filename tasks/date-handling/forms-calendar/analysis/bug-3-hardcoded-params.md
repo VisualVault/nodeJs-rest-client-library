@@ -154,6 +154,17 @@ this.calendarValueService.parseDateString(
 - **No live test coverage**: V2 was never activated during testing (all tests used standard standalone form → V1)
 - The `useUpdatedCalendarValueLogic` flag was confirmed `false` via live CalendarValueService scan (2026-03-30)
 
+### Playwright Audit (2026-04-06)
+
+**Functional verification via parseDateString direct invocation.** See [bug-3-audit.md](bug-3-audit.md) for full report.
+
+- Source code verified at lines 102939 (`!0` = enableTime hardcoded true) and 102948 (`!1, !0` = enableTime false, ignoreTimezone true)
+- `parseDateString()` called directly in browser with hardcoded vs correct params → **different outputs confirmed**:
+    - Date-only `"2026-03-15"`: enableTime=true → `"2026-03-15T00:00:00.000Z"` vs enableTime=false → `"2026-03-14T03:00:00.000Z"`
+    - DateTime preset `"2026-03-15T00:00:00"`: hardcoded → `"2026-03-15T03:00:00.000Z"` vs correct → `"2026-03-15T00:00:00.000Z"` (3h shift)
+- V2 activation attempted via `?ObjectID=` — V2 could NOT be activated on vvdemo environment
+- Cat 3 V1 regression re-verified: 10P/8F (BRT + IST, Chromium)
+
 ---
 
 ## Impact Analysis
