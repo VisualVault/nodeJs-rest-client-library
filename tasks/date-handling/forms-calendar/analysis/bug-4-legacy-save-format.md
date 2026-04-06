@@ -70,7 +70,7 @@ The `moment().format('YYYY-MM-DD[T]HH:mm:ss')` call does two destructive things:
 
 2. **Converts to local time implicitly**: `moment(input)` parses the Z-suffixed input as UTC, then `.format()` outputs in the moment instance's local timezone. So `"2026-03-15T00:00:00.000Z"` in BRT becomes `"2026-03-14T21:00:00"` — the correct local time, but stored without any indication that it's BRT.
 
-The stored value is now **permanently ambiguous**. There is no metadata in the database to indicate which timezone the value represents. When this value is later loaded by `parseDateString()`, it is re-parsed as local time in the _loading_ user's timezone — which may be completely different from the saving user's timezone.
+The client sends this Z-less string to the VV server, which stores it as a SQL Server `datetime` value (e.g., `2026-03-14 21:00:00.000`). The `datetime` type is timezone-unaware — there is no metadata in the database to indicate which timezone the value represents. When this value is later loaded by `parseDateString()`, it is re-parsed as local time in the _loading_ user's timezone — which may be completely different from the saving user's timezone.
 
 ### What Should Happen
 
@@ -146,13 +146,25 @@ All DateTime stored values consistently lack the Z suffix — confirmed across c
 - **Code analysis**: `getSaveValue()` source confirmed at line ~104100. The `moment(input).format('YYYY-MM-DD[T]HH:mm:ss')` format string visibly lacks Z.
 - **Live observation**: All Category 7 test runs for DateTime configs show Z-less stored values (see table above)
 - **Cross-timezone evidence**: Category 3 tests (Server Reload) — `tc-3-C-BRT-IST` shows 8.5h shift when reloading a BRT-saved record from IST, consistent with the stored local time being reinterpreted in the new timezone
-- **Database evidence**: TC-2.10 (DB storage) confirmed that user-input DateTime fields store `"3/15/2026 12:00:00 AM"` — the DB representation also lacks timezone context
+- **Database evidence**: SQL Server dump (2026-04-06) confirmed all calendar fields are `datetime` type. User-input DateTime fields store values like `2026-03-15 00:00:00.000` — the `datetime` column is timezone-unaware, and no metadata indicates whether the value represents UTC or local time
 
 **Test counts** (Bug #4 is not the primary failure in most tests — it enables failures in combination with Bug #1):
 
 - Category 2 (Typed Input): 16/16 complete — 11P, 5F
-- Category 3 (Server Reload): 18/18 complete — 14P, 4F (4 failures involve cross-TZ or legacy format issues)
+- Category 3 (Server Reload): 18/18 complete — 10P, 8F (corrected 2026-04-06)
 - Category 7 (SetFieldValue): 38/39 done — 29P, 9F
+
+### Playwright Audit (2026-04-06)
+
+**Multi-method verification achieved.** See [bug-4-audit.md](bug-4-audit.md) for full report.
+
+- Source code verified: `getSaveValue()` at line 104106 strips Z via `moment().format("YYYY-MM-DD[T]HH:mm:ss")`; `getCalendarFieldValue()` at line 104122 reinterprets via `new Date(t).toISOString()`
+- Direct function invocation in BRT + IST confirms:
+    - `getSaveValue("2026-03-15T03:00:00.000Z", true, false)` → `"2026-03-15T00:00:00"` (Z stripped)
+    - `getCalendarFieldValue({C config}, "2026-03-15T00:00:00")` → `"2026-03-15T03:00:00.000Z"` in BRT, `"2026-03-14T18:30:00.000Z"` in IST
+- End-to-end: typed "03/15/2026 12:00 AM" in Config C → raw has no Z, GFV shifts by TZ offset
+- Cross-config: C affected (+3h in BRT), D affected (fake Z, Bug #5), G/H immune (legacy passthrough)
+- Playwright Cat 2 TC-2-C-BRT: FAIL at api assertion — confirms Bug #4 via automated test
 
 ---
 

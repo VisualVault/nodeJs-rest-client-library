@@ -2,16 +2,16 @@
 
 ## Classification
 
-| Field                  | Value                                                                                                                                                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Severity**           | **HIGH** — affects ALL UTC+ users on ALL date-only fields, on every input path                                                                                                             |
-| **Evidence**           | `[LIVE]` — Confirmed in IST (UTC+5:30) across Categories 1, 2, 5, 7, 9, 12. -1 day for all string inputs. Date object -2 day `[UNVERIFIED]`. BRT and UTC0 confirmed unaffected (controls). |
-| **Component**          | FormViewer → Calendar Component → `normalizeCalValue()`                                                                                                                                    |
-| **Code Path**          | V1 (default). V2 partially fixes for `ignoreTimezone=false` fields only.                                                                                                                   |
-| **Affected Configs**   | A, B, E, F (`enableTime=false` — all date-only configs)                                                                                                                                    |
-| **Affected TZs**       | UTC+ only (IST, JST, AEST, etc.). UTC- (BRT, EST, PST) and UTC+0 unaffected.                                                                                                               |
-| **Affected Scenarios** | 1 (Popup), 2 (Typed), 3 (Saved Data — load path), 5 (Preset), 7 (SetFieldValue), 9 (Round-Trip)                                                                                            |
-| **Related Bugs**       | Downstream of Bug #1 (Z stripping feeds ambiguous values into the same parsing). Independent of Bug #5 (different configs, different mechanism).                                           |
+| Field                  | Value                                                                                                                                                                                                       |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Severity**           | **HIGH** — affects ALL UTC+ users on ALL date-only fields, on every input path                                                                                                                              |
+| **Evidence**           | `[LIVE]` — Confirmed in IST (UTC+5:30) across Categories 1, 2, 5, 7, 9, 12. -1 day for all string inputs. Date object -2 day `[VERIFIED — audit 2026-04-06]`. BRT and UTC0 confirmed unaffected (controls). |
+| **Component**          | FormViewer → Calendar Component → `normalizeCalValue()`                                                                                                                                                     |
+| **Code Path**          | V1 (default). V2 partially fixes for `ignoreTimezone=false` fields only.                                                                                                                                    |
+| **Affected Configs**   | A, B, E, F (`enableTime=false` — all date-only configs)                                                                                                                                                     |
+| **Affected TZs**       | UTC+ only (IST, JST, AEST, etc.). UTC- (BRT, EST, PST) and UTC+0 unaffected.                                                                                                                                |
+| **Affected Scenarios** | 1 (Popup), 2 (Typed), 3 (Saved Data — load path), 5 (Preset), 7 (SetFieldValue), 9 (Round-Trip)                                                                                                             |
+| **Related Bugs**       | Downstream of Bug #1 (Z stripping feeds ambiguous values into the same parsing). Independent of Bug #5 (different configs, different mechanism).                                                            |
 
 ---
 
@@ -163,14 +163,14 @@ moment.utc('2026-03-15').toDate(); // IST: March 15 00:00 UTC
 // Then getSaveValue extracts "2026-03-15" from toISOString() → correct in every timezone
 ```
 
-### The Date Object Double-Shift (UNVERIFIED)
+### The Date Object Double-Shift (VERIFIED — audit 2026-04-06)
 
-Code analysis predicts that `Date` objects undergo **two** local-midnight conversions in the date-only branch:
+`Date` objects undergo **two** local-midnight conversions in the date-only branch:
 
 1. `Date` → `toISOString()` → `"2026-03-14T18:30:00.000Z"` (first shift: IST local midnight → UTC)
 2. Strip time → `"2026-03-14"` → `moment("2026-03-14").toDate()` (second shift: re-parsed as IST local midnight for March 14 → `"2026-03-13T18:30:00.000Z"`)
 
-This would produce **-2 days** in IST for `Date` object inputs. This path was **never triggered in live testing** — all tested input methods (popup, typed, SetFieldValue with strings) showed exactly -1 day. The -2 day path may only occur when a raw `Date` object is directly passed to `SetFieldValue()`, which was not tested in isolation.
+This produces **-2 days** in IST for `Date` object inputs. **Confirmed live** via Playwright audit (2026-04-06): `new Date(2026, 2, 15)` in IST stores `"2026-03-13"` — two full days before the intended March 15. This path triggers when a raw `Date` object is passed to `SetFieldValue()`, which is a valid developer pattern (e.g., `VV.Form.SetFieldValue('Field7', new Date())`).
 
 ---
 
@@ -178,13 +178,13 @@ This would produce **-2 days** in IST for `Date` object inputs. This path was **
 
 ### All Input Formats — IST (UTC+5:30) vs BRT (UTC-3)
 
-| Input Format  | Input Value                  | BRT Stored       | IST Stored               | IST Expected   | Shift   | Evidence       |
-| ------------- | ---------------------------- | ---------------- | ------------------------ | -------------- | ------- | -------------- |
-| ISO date      | `"2026-03-15"`               | `"2026-03-15"` ✓ | `"2026-03-14"` ✗         | `"2026-03-15"` | -1 day  | `[LIVE]`       |
-| US date       | `"03/15/2026"`               | `"2026-03-15"` ✓ | `"2026-03-14"` ✗         | `"2026-03-15"` | -1 day  | `[LIVE]`       |
-| ISO+time      | `"2026-03-15T00:00:00"`      | `"2026-03-15"` ✓ | `"2026-03-14"` ✗         | `"2026-03-15"` | -1 day  | `[LIVE]`       |
-| ISO+Z         | `"2026-03-15T00:00:00.000Z"` | `"2026-03-15"` ✓ | `"2026-03-14"` ✗         | `"2026-03-15"` | -1 day  | `[LIVE]`       |
-| `Date` object | `new Date(2026,2,15)`        | `"2026-03-15"` ✓ | predicted `"2026-03-13"` | `"2026-03-15"` | -2 day? | `[UNVERIFIED]` |
+| Input Format  | Input Value                  | BRT Stored       | IST Stored               | IST Expected   | Shift   | Evidence                        |
+| ------------- | ---------------------------- | ---------------- | ------------------------ | -------------- | ------- | ------------------------------- |
+| ISO date      | `"2026-03-15"`               | `"2026-03-15"` ✓ | `"2026-03-14"` ✗         | `"2026-03-15"` | -1 day  | `[LIVE]`                        |
+| US date       | `"03/15/2026"`               | `"2026-03-15"` ✓ | `"2026-03-14"` ✗         | `"2026-03-15"` | -1 day  | `[LIVE]`                        |
+| ISO+time      | `"2026-03-15T00:00:00"`      | `"2026-03-15"` ✓ | `"2026-03-14"` ✗         | `"2026-03-15"` | -1 day  | `[LIVE]`                        |
+| ISO+Z         | `"2026-03-15T00:00:00.000Z"` | `"2026-03-15"` ✓ | `"2026-03-14"` ✗         | `"2026-03-15"` | -1 day  | `[LIVE]`                        |
+| `Date` object | `new Date(2026,2,15)`        | `"2026-03-15"` ✓ | predicted `"2026-03-13"` | `"2026-03-15"` | -2 day? | `[VERIFIED — audit 2026-04-06]` |
 
 **All string-based formats produce identical -1 day shift** — the format is irrelevant because `normalizeCalValue()` strips the time and re-parses the date portion through `moment(dateStr).toDate()` regardless.
 
@@ -348,6 +348,20 @@ In IST, each `SetFieldValue(GetFieldValue())` cycle loses an additional day: ini
 | 12-year-boundary-IST   | A      | IST | `"2026-01-01"` | `"2025-12-31"` | **Year crossed** | **FAIL** |
 | 12-leap-day-IST        | A      | IST | `"2026-02-28"` | `"2026-02-27"` | Feb → Feb        | **FAIL** |
 | 12-near-midnight-1-IST | A      | IST | `"2026-03-15"` | `"2026-03-14"` | Standard         | **FAIL** |
+
+### Playwright Audit (2026-04-06)
+
+**Multi-method verification achieved.** See [bug-7-audit.md](bug-7-audit.md) for full report.
+
+- **IST date-only shift**: All 4 configs (A, B, E, F) store March 14 instead of March 15 — confirmed via SetFieldValue in Playwright IST context
+- **BRT control**: All 4 configs store March 15 correctly — confirms UTC- timezones unaffected
+- **DateTime unaffected**: All 4 DateTime configs (C, D, G, H) store correct value in IST
+- **useLegacy NO protection**: Configs E, F shift identically to A, B
+- **ignoreTimezone NO protection**: Configs B, F shift identically to A, E
+- **Date object double-shift**: `new Date(2026, 2, 15)` → stored `2026-03-13` (-2 days) in IST
+- **Round-trip compounding**: Mar 14 → Mar 13 → Mar 12 → Mar 11 (-1 day/trip, no limit)
+- **Year boundary**: Jan 1 2026 → Dec 31 2025 (year crossed); Apr 1 → Mar 31, Mar 1 → Feb 28 (months crossed)
+- **Playwright Cat 2 IST regression**: pending (background)
 
 ---
 

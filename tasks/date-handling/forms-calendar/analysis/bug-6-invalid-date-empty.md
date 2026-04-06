@@ -231,6 +231,17 @@ GDOC is immune — no Bug #6 equivalent.
 - 4 of 6 failures are Bug #5 (fake Z on populated Config D)
 - 2 of 6 failures are Bug #6 (empty Config C/D)
 
+### Playwright Audit (2026-04-06)
+
+**Multi-method verification achieved.** See [bug-6-audit.md](bug-6-audit.md) for full report.
+
+- All 8 configs tested on empty fields: only C and D affected, A/B/E/F/G/H return `""` correctly
+- Direct `getCalendarFieldValue()` invocation confirms: Config C throws `RangeError`, Config D returns `"Invalid Date"` (truthy)
+- **New finding**: Config C with `null` input returns `"1970-01-01T00:00:00.000Z"` (epoch) — third failure mode
+- Developer pattern `if(GFV)` verified broken: Config D enters block for empty field, Config C crashes
+- GDOC workaround confirmed safe: returns `undefined` (falsy) for all empty fields across all configs
+- Playwright Cat 8 empty tests: 8-C-empty FAIL (RangeError), 8-D-empty FAIL ("Invalid Date"), 8-A-empty PASS, 8-H-empty PASS
+
 ---
 
 ## Impact Analysis

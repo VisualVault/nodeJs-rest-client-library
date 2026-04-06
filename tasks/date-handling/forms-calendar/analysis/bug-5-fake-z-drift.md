@@ -243,6 +243,15 @@ The drift is **latent** — the display is correct, but the GFV return value is 
 
 The Freshdesk ticket (#124697 / WADNR-10407) reports time mutation when opening forms created via `postForms` API. The root cause chain is: `postForms` stores ISO+Z → Forms V1 loads → `parseDateString()` strips Z → reinterprets as local → display shifts by TZ offset. Bug #5 is part of this chain — GFV returns the shifted local time with fake Z, making the problem worse if scripts then write the value back.
 
+### Playwright Audit (2026-04-06)
+
+**Multi-method verification achieved.** See [bug-5-audit.md](bug-5-audit.md) for full report.
+
+- **TZ-invariance proof**: BRT and IST produce identical GFV output (`"...000Z"`) for same stored value → proves Z is literal, not real UTC. Config C contrast: BRT and IST produce DIFFERENT GFV output → proves Config C has real UTC conversion.
+- **Round-trip drift verified**: BRT -3h/trip (T00:00 → T21:00 → T18:00 → T15:00), IST +5:30h/trip (T00:00 → T05:30 → T11:00). Drift exactly proportional to TZ offset.
+- **Year boundary confirmed**: Jan 1 2026 midnight → 1 trip → Dec 31 2025 21:00. Year crossed in single round-trip.
+- **Cross-config**: D has fake Z, C has real UTC (Bug #4), G/H passthrough (legacy immune).
+
 ---
 
 ## Impact Analysis
