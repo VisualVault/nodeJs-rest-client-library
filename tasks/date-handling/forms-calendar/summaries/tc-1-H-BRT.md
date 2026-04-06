@@ -1,7 +1,7 @@
 # TC-1-H-BRT — Summary
 
 **Spec**: [tc-1-H-BRT.md](../test-cases/tc-1-H-BRT.md)
-**Current status**: FAIL-1 — last run 2026-03-31 (BRT)
+**Current status**: FAIL-1 — last run 2026-04-06 (BRT, Playwright audit)
 **Bug surface**: Legacy format — useLegacy=true popup stores UTC datetime; ignoreTZ=true + enableTime=true both inert on legacy path
 
 ## Run History
@@ -9,6 +9,7 @@
 | Run | Date       | TZ  | Outcome | File                                 |
 | --- | ---------- | --- | ------- | ------------------------------------ |
 | 1   | 2026-03-31 | BRT | FAIL-1  | [run-1](../runs/tc-1-H-BRT-run-1.md) |
+| 2   | 2026-04-06 | BRT | FAIL-1  | [run-2](../runs/tc-1-H-BRT-run-2.md) |
 
 ## Current Interpretation
 
@@ -16,4 +17,4 @@ Config H (DateTime, ignoreTZ=true, useLegacy=true) in BRT stores `"2026-03-15T03
 
 ## Next Action
 
-BRT legacy popup matrix is complete. All four configs (E/F/G/H) FAIL-1 with identical UTC datetime format. Legacy IST tests (E-IST confirmed, F/G/H-IST pending) expected to show same format with previous-day UTC date portion.
+Bug #2 audit complete. Run-2 (Playwright automated, 2026-04-06) confirms run-1 (manual, 2026-03-31). Dual-method verification achieved.

@@ -4,7 +4,7 @@
 
 | Field                  | Value                                                                                    |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
-| **Severity**           | Low                                                                                      |
+| **Severity**           | Medium (upgraded from Low — DB stores `datetime`, format difference = data difference)   |
 | **Evidence**           | `[LEGACY]` — NOT REPRODUCED for non-legacy configs. Confirmed only for `useLegacy=true`. |
 | **Component**          | FormViewer → Calendar Component → `calChangeSetValue()` vs `calChange()`                 |
 | **Code Path**          | V1 (default) — both handlers exist in V1                                                 |
@@ -114,6 +114,16 @@ Both display the same date to the user, but the stored representation differs. T
 - **Legacy CONFIRMED**: Tests 1-E-BRT vs 2-E-BRT show different stored formats for popup vs typed. `[LIVE]`
 - Category 1 (popup): 20/20 complete — 7P, 13F
 - Category 2 (typed): 16/16 complete — 11P, 5F
+
+### Playwright Audit (2026-04-06)
+
+**Dual-method verification achieved.** See [bug-2-audit.md](bug-2-audit.md) for full report.
+
+- Created `selectDateViaLegacyPopup()` helper in `testing/helpers/vv-calendar.js`
+- Created `testing/date-handling/cat-1-legacy-popup.spec.js` formal Playwright spec
+- All 4 BRT legacy configs (E/F/G/H) independently confirmed via automated Playwright — values match manual run-1 exactly
+- Cat 2 typed input re-verified via Playwright — all 4 legacy configs PASS
+- Config A control: popup = typed (no Bug #2)
 
 ---
 

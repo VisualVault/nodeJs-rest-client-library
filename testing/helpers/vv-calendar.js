@@ -307,7 +307,50 @@ async function typeDateInField(page, fieldName, dateStr) {
     );
 }
 
+/**
+ * Open the legacy calendar popup for a useLegacy=true field and select a specific day.
+ *
+ * Legacy fields render as `<div class="d-picker"><input><span class="cal-icon"></span></div>`.
+ * Clicking the cal-icon opens a Kendo calendar popup (same widget as non-legacy fields,
+ * just with a different toggle mechanism). Date-only and DateTime legacy fields both use
+ * this pattern — the popup closes immediately on day click without a Time tab.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} fieldName - e.g., "Field12" (Config E)
+ * @param {number} year - e.g., 2026
+ * @param {number} month - 1-indexed (1=Jan, 3=Mar, 12=Dec)
+ * @param {number} day - day of month (1-31)
+ */
+async function selectDateViaLegacyPopup(page, fieldName, year, month, day) {
+    // Legacy fields use a plain <input id="FieldN"> inside div.d-picker.
+    // The toggle is a <span class="k-icon k-i-calendar cal-icon"> sibling.
+    const clicked = await page.evaluate((name) => {
+        const input = document.querySelector(`#${name}`);
+        if (!input) return { error: `Input #${name} not found` };
+        const container = input.closest('.d-picker');
+        if (!container) return { error: `No .d-picker container for #${name}` };
+        const icon = container.querySelector('.cal-icon');
+        if (!icon) return { error: `No .cal-icon in .d-picker for #${name}` };
+        icon.click();
+        return { clicked: true };
+    }, fieldName);
+
+    if (clicked.error) {
+        throw new Error(`Legacy popup open failed for ${fieldName}: ${clicked.error}`);
+    }
+
+    // Wait for kendo-popup to appear
+    const popup = page.locator('kendo-popup');
+    await popup.waitFor({ state: 'visible', timeout: 5000 });
+
+    // Reuse the same date-only calendar selection logic as non-legacy.
+    // The Kendo calendar inside kendo-popup has the same structure:
+    // scrollable month list on the left + day grid tbodies on the right.
+    await selectDateInDatePicker(page, year, month, day);
+}
+
 module.exports = {
     selectDateViaPopup,
+    selectDateViaLegacyPopup,
     typeDateInField,
 };
