@@ -14,7 +14,7 @@ Last updated: 2026-04-06 | Status: **COMPLETE** (44/44 tests executed)
 
 - Dashboards are **100% server-rendered** (Telerik RadGrid / ASP.NET) — browser timezone has zero effect on displayed values
 - The dashboard is a **transparent read-only window** into database state — it introduces no bugs but also corrects none
-- All write-layer bugs (Bug #7 wrong day, Bug #5 drift, legacy UTC storage) **propagate faithfully** to the dashboard
+- All write-layer bugs (FORM-BUG-7 wrong day, FORM-BUG-5 drift, legacy UTC storage) **propagate faithfully** to the dashboard
 - Dashboard and Forms display **never match exactly** — two failure modes: format difference (leading zeros) and FormsAPI serialization-induced time shift
 - DateTime `=` filter only matches midnight records — range queries required for all-times-on-date lookups
 - Exports preserve date values; Excel/Word append `12:00:00 AM` to date-only fields
@@ -127,13 +127,13 @@ All confirmed behaviors (CBs) from 44 tests, reorganized by theme.
 
 ### Accuracy & Fidelity
 
-| #       | Behavior                                                                                                 | Evidence                                                                                      |
-| ------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| DB-CB-4 | Dashboard accurately represents stored SQL `datetime` values for all 8 configs                           | DB-2 all 8 configs PASS — grid values match DB dump (2026-04-06)                              |
-| DB-CB-5 | Server renders the stored `datetime` value as-is — no timezone conversion (SQL `datetime` is TZ-unaware) | DB dump: `14:30:00.000` → dashboard `2:30 PM`, `00:00:00.000` → `12:00 AM`                    |
-| DB-CB-6 | All upstream bugs propagate faithfully — dashboard introduces no distortion                              | DB-3 all 8 configs PASS — Bug #7, Bug #5 drift, legacy UTC all visible. Confirmed by DB dump. |
+| #       | Behavior                                                                                                 | Evidence                                                                                              |
+| ------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| DB-CB-4 | Dashboard accurately represents stored SQL `datetime` values for all 8 configs                           | DB-2 all 8 configs PASS — grid values match DB dump (2026-04-06)                                      |
+| DB-CB-5 | Server renders the stored `datetime` value as-is — no timezone conversion (SQL `datetime` is TZ-unaware) | DB dump: `14:30:00.000` → dashboard `2:30 PM`, `00:00:00.000` → `12:00 AM`                            |
+| DB-CB-6 | All upstream bugs propagate faithfully — dashboard introduces no distortion                              | DB-3 all 8 configs PASS — FORM-BUG-7, FORM-BUG-5 drift, legacy UTC all visible. Confirmed by DB dump. |
 
-**Upstream bug propagation:** Bug #7 wrong dates ([`forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md) § Bug #7), Bug #5 drift ([`forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md) § Bug #5), and mixed time components from different write paths ([`web-services/analysis/overview.md`](../web-services/analysis/overview.md) § "No Server-Side Date-Only Enforcement") are all visible in the dashboard grid. The dashboard is transparent — fixes must be applied at the write layer.
+**Upstream bug propagation:** FORM-BUG-7 wrong dates ([`forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md) § FORM-BUG-7), FORM-BUG-5 drift ([`forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md) § FORM-BUG-5), and mixed time components from different write paths ([`web-services/analysis/overview.md`](../web-services/analysis/overview.md) § "No Server-Side Date-Only Enforcement") are all visible in the dashboard grid. The dashboard is transparent — fixes must be applied at the write layer.
 
 ### TZ Independence
 
@@ -149,7 +149,7 @@ All confirmed behaviors (CBs) from 44 tests, reorganized by theme.
 | DB-CB-9  | Date columns sort as proper datetime (chronological), not text            | DB-4: 0 violations across all 4 sort tests                     |
 | DB-CB-10 | Empty cells sort to TOP (ascending) or BOTTOM (descending)                | DB-4-F7-ASC (empty→TOP), DB-4-F7-DESC (empty→BOTTOM)           |
 | DB-CB-11 | DateTime sort includes time component: `5:30 PM` > `2:30 PM` > `12:00 AM` | DB-4-F6-DESC: correct temporal ordering with time              |
-| DB-CB-12 | Bug #7 shifted dates sort correctly among non-shifted dates               | DB-4: `3/14/2026` (shifted) sorts before `3/15/2026` (correct) |
+| DB-CB-12 | FORM-BUG-7 shifted dates sort correctly among non-shifted dates           | DB-4: `3/14/2026` (shifted) sorts before `3/15/2026` (correct) |
 
 ### Filter
 
@@ -158,7 +158,7 @@ All confirmed behaviors (CBs) from 44 tests, reorganized by theme.
 | DB-CB-13 | Date-only `=` filter does exact date comparison — correct                   | DB-5-EXACT: 66 records for `Field7 = '3/15/2026'`                                  |
 | DB-CB-14 | DateTime `=` filter with date-only input matches ONLY midnight (`12:00 AM`) | DB-5-DT-EXACT: 25 records (midnight only) — see § 7 "SQL Filter DateTime Behavior" |
 | DB-CB-15 | Range queries work correctly for both date-only and DateTime columns        | DB-5-RANGE (85 records), DB-5-DT-RANGE (50 records)                                |
-| DB-CB-16 | Bug #7 shifted records correctly included/excluded by filter criteria       | DB-5-RANGE: 85 = 66 correct + 19 Bug #7 shifted to 3/14                            |
+| DB-CB-16 | FORM-BUG-7 shifted records correctly included/excluded by filter criteria   | DB-5-RANGE: 85 = 66 correct + 19 FORM-BUG-7 shifted to 3/14                        |
 | DB-CB-17 | Filter applied via hidden `txtSQLFilter` textarea — accepts raw SQL WHERE   | DB-5 all variants                                                                  |
 
 ### Export
@@ -178,8 +178,8 @@ All confirmed behaviors (CBs) from 44 tests, reorganized by theme.
 | DB-CB-23 | Date-only fields: format mismatch only — server `M/d` vs Angular `MM/dd` (leading zeros)                                                            | DB-6-A/B/E/F (FAIL-1)                                                                           |
 | DB-CB-24 | DateTime ignoreTZ=false: dashboard shows stored value (`2:30 PM`), form shows shifted value (`11:30 AM`) due to FormsAPI serialization + V1 parsing | DB-6-C/G (FAIL-2): DB value `14:30:00.000` → dashboard correct, form shifted −3h BRT            |
 | DB-CB-25 | DateTime ignoreTZ=true: display time matches but format differs; raw value diverged internally                                                      | DB-6-D/H (FAIL-1): `2:30 PM` ≡ `02:30 PM` display, but form raw=`T11:30:00` ≠ DB `14:30:00.000` |
-| DB-CB-26 | Bug #5 visible in Config D GFV during cross-layer: `"T11:30:00.000Z"` — fake Z on local time                                                        | DB-6-D run: GFV adds Z to BRT local value                                                       |
-| DB-CB-27 | Legacy Config H GFV has no fake Z — `useLegacy=true` bypasses Bug #5                                                                                | DB-6-H run: `"T11:30:00"` without Z suffix                                                      |
+| DB-CB-26 | FORM-BUG-5 visible in Config D GFV during cross-layer: `"T11:30:00.000Z"` — fake Z on local time                                                    | DB-6-D run: GFV adds Z to BRT local value                                                       |
+| DB-CB-27 | Legacy Config H GFV has no fake Z — `useLegacy=true` bypasses FORM-BUG-5                                                                            | DB-6-H run: `"T11:30:00"` without Z suffix                                                      |
 
 ---
 
@@ -210,18 +210,18 @@ If a date looks wrong in the dashboard grid:
 
 1. **The dashboard is correct** — it shows exactly what the database contains
 2. **The error occurred at write time** — check which path created the record:
-    - Forms popup from UTC+ timezone → Bug #7 (date-only fields store previous day)
-    - Script round-trip via `GetFieldValue`/`SetFieldValue` on Config D → Bug #5 drift
+    - Forms popup from UTC+ timezone → FORM-BUG-7 (date-only fields store previous day)
+    - Script round-trip via `GetFieldValue`/`SetFieldValue` on Config D → FORM-BUG-5 drift
     - Legacy popup (Configs G, H) → UTC conversion of local time (e.g., IST midnight → `6:30 PM` previous day UTC)
 3. **To verify**: Use the API to read the raw stored value — it will match what the dashboard shows
 
 ### Filtering DateTime Columns
 
-| Goal                                | Correct Filter                                             | Wrong Filter                                           |
-| ----------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------ |
-| All records on a specific date      | `Field6 >= '3/15/2026' AND Field6 <= '3/15/2026 11:59 PM'` | `Field6 = '3/15/2026'` (only returns midnight records) |
-| Exact datetime match                | `Field6 = '3/15/2026 2:30 PM'`                             | —                                                      |
-| Date range including Bug #7 shifted | `Field7 >= '3/14/2026' AND Field7 <= '3/15/2026'`          | `Field7 = '3/15/2026'` (misses shifted records)        |
+| Goal                                    | Correct Filter                                             | Wrong Filter                                           |
+| --------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------ |
+| All records on a specific date          | `Field6 >= '3/15/2026' AND Field6 <= '3/15/2026 11:59 PM'` | `Field6 = '3/15/2026'` (only returns midnight records) |
+| Exact datetime match                    | `Field6 = '3/15/2026 2:30 PM'`                             | —                                                      |
+| Date range including FORM-BUG-7 shifted | `Field7 >= '3/14/2026' AND Field7 <= '3/15/2026'`          | `Field7 = '3/15/2026'` (misses shifted records)        |
 
 **Rule of thumb**: For DateTime columns (`enableTime=true`), always use range queries. For date-only columns (`enableTime=false`), `=` works correctly.
 
@@ -287,13 +287,13 @@ Fully documented in [`web-services/analysis/overview.md`](../web-services/analys
 
 The VV server has no date-only storage type — every date field is SQL `datetime` regardless of the `enableTime` flag. Different write paths store different time components for the same intended date (confirmed via DB dump 2026-04-06):
 
-| Write Source                  | DB Value (`datetime`)     | Time Component                                              |
-| ----------------------------- | ------------------------- | ----------------------------------------------------------- |
-| Forms popup (BRT)             | `2026-03-15 00:00:00.000` | Midnight (DateTest-000889 Field7)                           |
-| Forms popup (IST)             | `2026-03-14 00:00:00.000` | Midnight of **wrong day** — Bug #7 (DateTest-001077 Field7) |
-| Forms preset `3/1/2026` (BRT) | `2026-03-01 03:00:00.000` | BRT midnight = 3am (DateTest-000080 Field2)                 |
-| Forms Current Date (BRT, 8pm) | `2026-03-31 23:01:57.000` | Actual timestamp (DateTest-000080 Field1)                   |
-| API string `"2026-03-15"`     | `2026-03-15 00:00:00.000` | Midnight (DateTest-000889 via postForms)                    |
+| Write Source                  | DB Value (`datetime`)     | Time Component                                                  |
+| ----------------------------- | ------------------------- | --------------------------------------------------------------- |
+| Forms popup (BRT)             | `2026-03-15 00:00:00.000` | Midnight (DateTest-000889 Field7)                               |
+| Forms popup (IST)             | `2026-03-14 00:00:00.000` | Midnight of **wrong day** — FORM-BUG-7 (DateTest-001077 Field7) |
+| Forms preset `3/1/2026` (BRT) | `2026-03-01 03:00:00.000` | BRT midnight = 3am (DateTest-000080 Field2)                     |
+| Forms Current Date (BRT, 8pm) | `2026-03-31 23:01:57.000` | Actual timestamp (DateTest-000080 Field1)                       |
+| API string `"2026-03-15"`     | `2026-03-15 00:00:00.000` | Midnight (DateTest-000889 via postForms)                        |
 
 Dashboard hides the time component for date-only fields, so this is invisible to users. But it affects SQL filter accuracy and export serialization (see below).
 
@@ -370,12 +370,12 @@ Both endpoints store **identical SQL `datetime` values** in the database (confir
 
 ## 9. Related
 
-| Reference                                             | Location                                                                                             |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Forms calendar analysis (Bugs #5, #6, #7 definitions) | [`../forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md)                   |
-| Web services analysis (CB-1 through CB-32, Bug #8)    | [`../web-services/analysis/overview.md`](../web-services/analysis/overview.md)                       |
-| Dashboard test matrix (44 slots, per-test status)     | [`matrix.md`](matrix.md)                                                                             |
-| Dashboard test evidence (session logs)                | [`results.md`](results.md)                                                                           |
-| Dashboard architecture & selectors                    | [`README.md`](README.md)                                                                             |
-| Freshdesk #124697 (postForms time mutation)           | [`../web-services/analysis/overview.md`](../web-services/analysis/overview.md) § CB-29               |
-| VV platform architecture                              | [`../../docs/architecture/visualvault-platform.md`](../../docs/architecture/visualvault-platform.md) |
+| Reference                                                    | Location                                                                                             |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Forms calendar analysis (Bugs #5, #6, #7 definitions)        | [`../forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md)                   |
+| Web services analysis (CB-1 through CB-32, WEBSERVICE-BUG-2) | [`../web-services/analysis/overview.md`](../web-services/analysis/overview.md)                       |
+| Dashboard test matrix (44 slots, per-test status)            | [`matrix.md`](matrix.md)                                                                             |
+| Dashboard test evidence (session logs)                       | [`results.md`](results.md)                                                                           |
+| Dashboard architecture & selectors                           | [`README.md`](README.md)                                                                             |
+| Freshdesk #124697 (postForms time mutation)                  | [`../web-services/analysis/overview.md`](../web-services/analysis/overview.md) § CB-29               |
+| VV platform architecture                                     | [`../../docs/architecture/visualvault-platform.md`](../../docs/architecture/visualvault-platform.md) |

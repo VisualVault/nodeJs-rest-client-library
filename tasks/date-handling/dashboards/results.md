@@ -25,9 +25,9 @@ Last updated: 2026-04-02
 **Field7 (Config A — date-only, enableTime=false, ignoreTZ=false):**
 
 - DateTest-001071: `3/15/2026` ✓
-- DateTest-001070: `4/14/2026` (expected 4/15 — Bug #7)
-- DateTest-001062: `4/14/2026` (Bug #7)
-- DateTest-001058: `3/14/2026` (expected 3/15 — Bug #7)
+- DateTest-001070: `4/14/2026` (expected 4/15 — FORM-BUG-7)
+- DateTest-001062: `4/14/2026` (FORM-BUG-7)
+- DateTest-001058: `3/14/2026` (expected 3/15 — FORM-BUG-7)
 
 **Field6 (Config C — DateTime, enableTime=true, ignoreTZ=false):**
 
@@ -100,18 +100,18 @@ Two records compared across BRT and IST browser timezones:
 
 **Environment**: WS-1 API record creation + Playwright headless Chrome verification
 **Method**: Create records with bug-simulated stored values, verify dashboard renders them faithfully
-**Records**: DateTest-001077 (A,B,E,F Bug #7), DateTest-001078 (C Bug #7v), DateTest-001079 (D Bug #5), DateTest-001081 (G,H legacy UTC)
+**Records**: DateTest-001077 (A,B,E,F FORM-BUG-7), DateTest-001078 (C FORM-BUG-7v), DateTest-001079 (D FORM-BUG-5), DateTest-001081 (G,H legacy UTC)
 
-- 2026-04-02 [TC-DB-3-A Run 1](runs/tc-db-3-A-run-1.md) — PASS — Field7 `3/14/2026` (Bug #7 -1 day, intended 3/15)
-- 2026-04-02 [TC-DB-3-B Run 1](runs/tc-db-3-B-run-1.md) — PASS — Field10 `3/14/2026` (Bug #7, ignoreTZ inert)
-- 2026-04-02 [TC-DB-3-C Run 1](runs/tc-db-3-C-run-1.md) — PASS — Field6 `3/14/2026 12:00 AM` (Bug #7 variant on DateTime)
-- 2026-04-02 [TC-DB-3-D Run 1](runs/tc-db-3-D-run-1.md) — PASS — Field5 `3/14/2026 9:00 PM` (Bug #5 drift -3h BRT)
-- 2026-04-02 [TC-DB-3-E Run 1](runs/tc-db-3-E-run-1.md) — PASS — Field12 `3/14/2026` (Bug #7, legacy flag inert)
-- 2026-04-02 [TC-DB-3-F Run 1](runs/tc-db-3-F-run-1.md) — PASS — Field11 `3/14/2026` (Bug #7, both flags inert)
+- 2026-04-02 [TC-DB-3-A Run 1](runs/tc-db-3-A-run-1.md) — PASS — Field7 `3/14/2026` (FORM-BUG-7 -1 day, intended 3/15)
+- 2026-04-02 [TC-DB-3-B Run 1](runs/tc-db-3-B-run-1.md) — PASS — Field10 `3/14/2026` (FORM-BUG-7, ignoreTZ inert)
+- 2026-04-02 [TC-DB-3-C Run 1](runs/tc-db-3-C-run-1.md) — PASS — Field6 `3/14/2026 12:00 AM` (FORM-BUG-7 variant on DateTime)
+- 2026-04-02 [TC-DB-3-D Run 1](runs/tc-db-3-D-run-1.md) — PASS — Field5 `3/14/2026 9:00 PM` (FORM-BUG-5 drift -3h BRT)
+- 2026-04-02 [TC-DB-3-E Run 1](runs/tc-db-3-E-run-1.md) — PASS — Field12 `3/14/2026` (FORM-BUG-7, legacy flag inert)
+- 2026-04-02 [TC-DB-3-F Run 1](runs/tc-db-3-F-run-1.md) — PASS — Field11 `3/14/2026` (FORM-BUG-7, both flags inert)
 - 2026-04-02 [TC-DB-3-G Run 1](runs/tc-db-3-G-run-1.md) — PASS — Field14 `3/14/2026 6:30 PM` (legacy popup UTC from IST)
 - 2026-04-02 [TC-DB-3-H Run 1](runs/tc-db-3-H-run-1.md) — PASS — Field13 `3/14/2026 6:30 PM` (legacy popup UTC, ignoreTZ inert)
 
-**Key finding**: All 8 configs confirm write-layer bugs propagate to the dashboard unchanged. The dashboard is a transparent read-only window into database state — it introduces no bugs but also corrects none. Wrong dates stored by Bug #7, Bug #5 drift, and legacy UTC storage are all faithfully displayed.
+**Key finding**: All 8 configs confirm write-layer bugs propagate to the dashboard unchanged. The dashboard is a transparent read-only window into database state — it introduces no bugs but also corrects none. Wrong dates stored by FORM-BUG-7, FORM-BUG-5 drift, and legacy UTC storage are all faithfully displayed.
 
 ---
 
@@ -131,7 +131,7 @@ Two records compared across BRT and IST browser timezones:
 - Server sorts date columns as proper datetime, not text — chronological order is correct
 - Empty cells sort to TOP (ascending) or BOTTOM (descending)
 - DateTime sort includes time component: `3/15 5:30 PM` > `3/15 2:30 PM` > `3/15 12:00 AM` (correct)
-- Bug #7 shifted dates sort correctly among non-shifted dates
+- FORM-BUG-7 shifted dates sort correctly among non-shifted dates
 
 ---
 
@@ -141,15 +141,15 @@ Two records compared across BRT and IST browser timezones:
 **Method**: Apply SQL WHERE clause via hidden `txtSQLFilter` textarea + `__doPostBack`, count and verify filtered results
 **Filter mechanism**: Hidden SQL filter panel in RadGrid dock — textarea accepts raw SQL WHERE expressions
 
-- 2026-04-02 [TC-DB-5-EXACT Run 1](runs/tc-db-5-exact-run-1.md) — PASS — `Field7 = '3/15/2026'` → 66 records, exact match excludes Bug #7
-- 2026-04-02 [TC-DB-5-RANGE Run 1](runs/tc-db-5-range-run-1.md) — PASS — `Field7 >= '3/14' AND <= '3/15'` → 85 records (66 + 19 Bug #7)
+- 2026-04-02 [TC-DB-5-EXACT Run 1](runs/tc-db-5-exact-run-1.md) — PASS — `Field7 = '3/15/2026'` → 66 records, exact match excludes FORM-BUG-7
+- 2026-04-02 [TC-DB-5-RANGE Run 1](runs/tc-db-5-range-run-1.md) — PASS — `Field7 >= '3/14' AND <= '3/15'` → 85 records (66 + 19 FORM-BUG-7)
 - 2026-04-02 [TC-DB-5-DT-EXACT Run 1](runs/tc-db-5-dt-exact-run-1.md) — PASS — `Field6 = '3/15/2026'` → 25 records, midnight only (time component matters)
 - 2026-04-02 [TC-DB-5-DT-RANGE Run 1](runs/tc-db-5-dt-range-run-1.md) — PASS — `Field5 >= '3/14' AND <= '3/15 11:59 PM'` → 50 records, all times in range
 
 **Key findings**:
 
 - SQL filter works correctly for both date-only and DateTime columns
-- Date-only `=` does exact date comparison — Bug #7 shifted dates correctly excluded/included by range
+- Date-only `=` does exact date comparison — FORM-BUG-7 shifted dates correctly excluded/included by range
 - DateTime `=` with date-only input matches ONLY midnight records (`12:00 AM`) — server treats `'3/15/2026'` as `'3/15/2026 12:00:00 AM'`
 - **To find all records on a date in a DateTime column, must use range, not `=`** — this is a critical usability finding
 - DateTime range with explicit time bounds (`11:59 PM`) correctly captures all time variants
@@ -180,7 +180,7 @@ Two records compared across BRT and IST browser timezones:
 - **Date-only (A,B,E,F)**: Format mismatch — server `M/d/yyyy` vs Angular `MM/dd/yyyy`. Date correct in both.
 - **DateTime ignoreTZ=false (C,G)**: Dashboard shows stored value (`2:30 PM` = DB `14:30:00.000`), form shows shifted value (`11:30 AM`) — `FormInstance/Controls` serializes as ISO+Z, V1 converts to local. 3h gap = BRT offset.
 - **DateTime ignoreTZ=true (D,H)**: Display time matches (`2:30 PM` ≡ `02:30 PM`) — format differs only. But raw value diverged: form stores BRT local `T11:30:00` internally despite displaying `02:30 PM`.
-- **Bug #5 visible in Config D GFV**: `"2026-03-15T11:30:00.000Z"` — fake Z on local time. Legacy Config H GFV has no fake Z (`"2026-03-15T11:30:00"`).
+- **FORM-BUG-5 visible in Config D GFV**: `"2026-03-15T11:30:00.000Z"` — fake Z on local time. Legacy Config H GFV has no fake Z (`"2026-03-15T11:30:00"`).
 
 ---
 

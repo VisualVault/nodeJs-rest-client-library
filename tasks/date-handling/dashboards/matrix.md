@@ -73,7 +73,7 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 |  1   | DB-8     | TZ independence — confirm BRT ≡ IST ≡ UTC0 (validates that all other tests need only 1 TZ) |
 |  2   | DB-1     | Display format baseline — verify each config shows expected format                         |
 |  3   | DB-2     | Date accuracy — compare dashboard values against known stored values (from WS results)     |
-|  4   | DB-3     | Wrong date detection — check Bug #7 / Bug #4 surface in dashboard                          |
+|  4   | DB-3     | Wrong date detection — check FORM-BUG-7 / FORM-BUG-4 surface in dashboard                  |
 |  5   | DB-4     | Sort — verify date columns sort chronologically                                            |
 |  6   | DB-5     | Filter — test SQL filter builder with date queries                                         |
 |  7   | DB-6     | Cross-layer — open record from dashboard, compare with form display                        |
@@ -121,7 +121,7 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 ## DB-3. Wrong Date Detection
 
-**Purpose**: Check if records affected by known bugs (Bug #7 wrong date in UTC+, Bug #4 DateTime UTC conversion) show the incorrect date in the dashboard. This tests whether bugs at the Forms/API write layer propagate to the read layer.
+**Purpose**: Check if records affected by known bugs (FORM-BUG-7 wrong date in UTC+, FORM-BUG-4 DateTime UTC conversion) show the incorrect date in the dashboard. This tests whether bugs at the Forms/API write layer propagate to the read layer.
 
 **Method**: Create records via WS-1 API with bug-simulated stored values, then verify the dashboard shows the shifted/drifted dates.
 

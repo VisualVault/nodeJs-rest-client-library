@@ -6,8 +6,8 @@ Generates a verified, deterministic test case file for a VisualVault Dashboard d
 
 Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser timezone has no effect on displayed values — the server formats dates from SQL and sends pre-rendered HTML. This means:
 
-- No client-side `moment.js` or `calendarValueService` bugs (Bug #5, #6 not applicable)
-- Bug #7 (wrong date stored) is visible — incorrect DB values surface directly in the grid
+- No client-side `moment.js` or `calendarValueService` bugs (FORM-BUG-5, #6 not applicable)
+- FORM-BUG-7 (wrong date stored) is visible — incorrect DB values surface directly in the grid
 - Mixed timezone storage is visible — same intended date may show different time components
 
 ## Usage
@@ -135,7 +135,7 @@ Read the following files before doing anything else:
 
 2. `tasks/date-handling/dashboards/matrix.md` — **Field Configurations table** (top of file). Map Config letter to: `enableTime`, `ignoreTZ`, `useLegacy`, Test Field name, and Dashboard Format.
 
-3. `tasks/date-handling/dashboards/analysis.md` — identify which bugs surface in the dashboard for this config. Note: only Bug #7 and mixed storage are relevant (Bug #5/#6 are client-side only).
+3. `tasks/date-handling/dashboards/analysis.md` — identify which bugs surface in the dashboard for this config. Note: only FORM-BUG-7 and mixed storage are relevant (FORM-BUG-5/#6 are client-side only).
 
 4. `tasks/date-handling/CLAUDE.md` — reference for field configuration details, known bugs, and form URLs (needed for DB-6 cross-layer tests).
 
@@ -210,11 +210,11 @@ const value = await page.evaluate(
 
 ### DB-3 — Wrong Date Detection
 
-**Goal**: Verify Bug #7 / Bug #4 surface in the dashboard.
+**Goal**: Verify FORM-BUG-7 / FORM-BUG-4 surface in the dashboard.
 
 **Steps**:
 
-1. Identify a record created from IST/UTC+ timezone with a known Bug #7 shifted date
+1. Identify a record created from IST/UTC+ timezone with a known FORM-BUG-7 shifted date
 2. Read the grid cell text
 3. Confirm the dashboard shows the shifted date (e.g., `3/14/2026` instead of `3/15/2026`)
 4. Record both the intended date and the displayed (shifted) date
@@ -357,7 +357,7 @@ node tasks/date-handling/dashboards/explore-dashboard.js --compare
 Examples:
 
 - `# TC-DB-1-A — Config A, Display Format: date-only shows M/D/YYYY without time`
-- `# TC-DB-3-A — Config A, Wrong Date Detection: Bug #7 shows 3/14 instead of 3/15`
+- `# TC-DB-3-A — Config A, Wrong Date Detection: FORM-BUG-7 shows 3/14 instead of 3/15`
 - `# TC-DB-4-F7-ASC — Field7, Column Sort Ascending: chronological order confirmed`
 - `# TC-DB-6-C — Config C, Cross-Layer: dashboard 12:00 AM vs form 3:00 AM (BRT)`
 
@@ -399,7 +399,7 @@ Table columns: `#` | `Action` | `Test Data` | `Expected Result` | `✓`
 Rules:
 
 - Row 1 is always: `| 1 | Complete setup | See Preconditions P1–P4 | Dashboard loaded, target record visible | ☐ |`
-- **Expected Results reflect correct/intended behavior** — not what a buggy system produces. If Bug #7 causes a wrong date, Expected shows the correct date; the FAIL condition documents the buggy value.
+- **Expected Results reflect correct/intended behavior** — not what a buggy system produces. If FORM-BUG-7 causes a wrong date, Expected shows the correct date; the FAIL condition documents the buggy value.
 - For DB-1/2/3: Action = "Read grid cell", Test Data = record + field, Expected = exact date string
 - For DB-4: Action = "Click column header", Expected = sort order description
 - For DB-5: Action = "Build filter", Expected = matching record set
@@ -417,7 +417,7 @@ One entry per failure mode:
 2. The observed symptom — exact value or pattern
 3. `- Interpretation:` root cause + what it means
 
-For DB-3 tests (wrong date detection), the FAIL condition describes what happens when the bug is **absent** (i.e., the system shows the correct date — meaning Bug #7 was fixed). For all other categories, FAIL conditions describe incorrect behavior.
+For DB-3 tests (wrong date detection), the FAIL condition describes what happens when the bug is **absent** (i.e., the system shows the correct date — meaning FORM-BUG-7 was fixed). For all other categories, FAIL conditions describe incorrect behavior.
 
 ---
 

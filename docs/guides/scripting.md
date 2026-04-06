@@ -143,7 +143,7 @@ This means **API return values do not match Forms `getValueObjectValue()` format
 
 ### Null and Empty Fields
 
-Unset or empty date fields return `null` in API responses (not `""` or `"Invalid Date"`). This differs from Forms `GetFieldValue()` which returns `"Invalid Date"` for empty Config D fields (Bug #6).
+Unset or empty date fields return `null` in API responses (not `""` or `"Invalid Date"`). This differs from Forms `GetFieldValue()` which returns `"Invalid Date"` for empty Config D fields (FORM-BUG-6).
 
 ### Expanded Record Metadata
 

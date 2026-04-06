@@ -140,7 +140,7 @@ d.setDate(d.getDate() + 30); // Local arithmetic — may vary per TZ
 | Date-only                 | Any date string | ISO date                       | `"2026-03-15"`          | Either              |
 | DateTime (any `ignoreTZ`) | Time value      | ISO datetime (no Z, no offset) | `"2026-03-15T14:30:00"` | **`forminstance/`** |
 
-**Why `forminstance/` for all DateTime fields**: The `postForms` endpoint appends Z to datetime values, which triggers a timezone shift when users open the record in Forms (WS-BUG-1). The `forminstance/` endpoint stores in US format without Z — no shift occurs. Empirically verified: `getSaveValue()` stores identical values for `ignoreTZ=true` and `ignoreTZ=false` — the flag affects display only, not DB storage. See [WS-BUG-1](../../tasks/date-handling/web-services/analysis/ws-bug-1-cross-layer-shift.md).
+**Why `forminstance/` for all DateTime fields**: The `postForms` endpoint appends Z to datetime values, which triggers a timezone shift when users open the record in Forms (WEBSERVICE-BUG-1). The `forminstance/` endpoint stores in US format without Z — no shift occurs. Empirically verified: `getSaveValue()` stores identical values for `ignoreTZ=true` and `ignoreTZ=false` — the flag affects display only, not DB storage. See [WEBSERVICE-BUG-1](../../tasks/date-handling/web-services/analysis/ws-bug-1-cross-layer-shift.md).
 
 **Cross-TZ note**: `forminstance/` stores local time without TZ context. This is consistent with how the Forms UI itself saves records. Two users in different timezones entering "2:30 PM" both store `T14:30:00` — the VV platform does not preserve timezone context through any `forminstance/` write path.
 
@@ -151,7 +151,7 @@ d.setDate(d.getDate() + 30); // Local arithmetic — may vary per TZ
 | Input                                                       | Problem                                                                                                                                              |
 | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `"2026-03-15T14:30:00"` (no offset, no Z) via **postForms** | Controls serializes with Z → V1 treats as UTC → wrong display. Use `forminstance/` instead, or add an offset (e.g., `"-03:00"`) for UTC-aware fields |
-| `"15/03/2026"` (DD/MM/YYYY)                                 | Silently stored as null — complete data loss (Bug #8)                                                                                                |
+| `"15/03/2026"` (DD/MM/YYYY)                                 | Silently stored as null — complete data loss (WEBSERVICE-BUG-2)                                                                                      |
 | `"05/03/2026"` (ambiguous)                                  | Interpreted as May 3 (MM/DD), not March 5 — wrong date silently                                                                                      |
 | `1773532800000` (epoch ms)                                  | Silently stored as null — numeric timestamps not supported                                                                                           |
 | `"1773532800000"` (epoch string)                            | Silently stored as null — numeric strings not parsed as dates                                                                                        |
@@ -175,7 +175,7 @@ const params = { q: "[Field7] ge '2026-03-15' AND [Field7] lt '2026-03-16'" };
 
 **Rule of thumb:** Always use range queries (`ge` + `lt`) instead of exact equality (`eq`) when filtering on date-only fields. This is necessary because the VV server does not enforce date-only semantics — it stores whatever datetime value was provided, and the "date-only" concept only exists in the Forms client-side JS.
 
-Empirically verified: [WS-BUG-6 audit](../../tasks/date-handling/web-services/analysis/ws-bug-6-no-date-only-enforcement.md) — exact equality returned 1 of 2 March 15 records; range query returned both.
+Empirically verified: [WEBSERVICE-BUG-6 audit](../../tasks/date-handling/web-services/analysis/ws-bug-6-no-date-only-enforcement.md) — exact equality returned 1 of 2 March 15 records; range query returned both.
 
 ---
 
@@ -226,7 +226,7 @@ Both `postForms` (core API) and `forminstance/` (FormsAPI) store **identical SQL
 | WS-1   | Server TZ irrelevant for API writes (H-4)               | [matrix.md WS-1](../../tasks/date-handling/web-services/matrix.md)                       |
 | WS-4   | API Z normalization → Forms TZ-dependent display (CB-8) | [ws-4-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-4-batch-run-1.md)   |
 | WS-5   | Server converts TZ offsets to UTC correctly (CB-12)     | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md)   |
-| WS-5   | DD/MM/YYYY silently stored as null — Bug #8             | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md)   |
+| WS-5   | DD/MM/YYYY silently stored as null — WEBSERVICE-BUG-2   | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md)   |
 | WS-9   | TZ-safe vs unsafe Date patterns (CB-24–CB-28)           | [ws-9-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-9-batch-run-1.md)   |
 | Cat 10 | Epoch silent null, midnight-crossing                    | [cat10-gaps-run-1.md](../../tasks/date-handling/web-services/runs/cat10-gaps-run-1.md)   |
 | WS-10  | postForms vs forminstance/ serialization format (CB-29) | [ws-10-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-10-batch-run-1.md) |

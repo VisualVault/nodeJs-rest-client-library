@@ -445,7 +445,7 @@ Five required elements — all must be present:
 - **Input Method** — the scenario type: `Calendar Popup`, `Typed Input`, `Round-Trip`, `SetFieldValue`, `Form Load`
 - **TZ** — timezone code: `BRT`, `IST`, `UTC`. Always required — behavior differs per timezone.
 - **Storage behavior** — what the test finds about the raw stored value. State the behavioral finding, not the measurement: `local midnight stored`, `same storage as popup`, `date shifts -3h per trip`. If storage is correct for this config, say so explicitly.
-- **API/developer behavior** — what GetFieldValue or SetFieldValue does. Include bug reference if applicable: `GetFieldValue appends fake Z (Bug #5)`, `no drift (Bug #2 absent)`.
+- **API/developer behavior** — what GetFieldValue or SetFieldValue does. Include bug reference if applicable: `GetFieldValue appends fake Z (FORM-BUG-5)`, `no drift (FORM-BUG-2 absent)`.
 
 Separate the storage and API claims with a semicolon. Keep the full title under ~100 characters.
 
@@ -572,7 +572,7 @@ Rules:
 - For calendar popup scenarios: include rows for opening popup, navigating to month, clicking day, verifying time header, clicking Set
 - Every Expected Result is an exact string — no ranges, no "approximately", no "contains"
 - Display assertions must include the time component when `enableTime=true` (e.g., `03/15/2026 12:00 AM`)
-- `GetFieldValue()` row: Expected Result is the raw stored value with no added transformation. If Bug #5 is active (enableTime=true, ignoreTimezone=true, useLegacy=false), the observed value will differ — document the buggy observed value as FAIL-N in the Fail Conditions section, not here.
+- `GetFieldValue()` row: Expected Result is the raw stored value with no added transformation. If FORM-BUG-5 is active (enableTime=true, ignoreTimezone=true, useLegacy=false), the observed value will differ — document the buggy observed value as FAIL-N in the Fail Conditions section, not here.
 - `toISOString()` row: append `— confirms <TZ> active` to the Expected Result cell
 - The `toISOString()` row is always the last row
 - The `✓` column uses `☐` in every row
@@ -594,7 +594,7 @@ Derive from:
 
 - Bugs identified in Phase 1 that affect this field config — each bug becomes one FAIL condition. For each bug, the FAIL condition must include: (a) the exact value the tester will observe when the bug is present, and (b) what the Expected Result shows (correct behavior). This gives the tester a complete picture: Expected tells them what should happen; the FAIL condition tells them what the buggy system produces instead.
 - The toISOString environment check (always → FAIL pattern: returns UTC midnight with no shift)
-- Any pre-existing state issues (round-trip drift → FAIL pattern if Bug #5 is relevant)
+- Any pre-existing state issues (round-trip drift → FAIL pattern if FORM-BUG-5 is relevant)
 - Any step-execution issues observed during Phase 2 (e.g., wrong time selected, wrong segment clicked)
 - For scenarios where no bugs apply, Fail Conditions cover only environmental/setup issues (wrong TZ, V2 active, wrong field) — not bug symptoms.
 
@@ -637,7 +637,7 @@ Read the file first, then append a new entry to the `TEST_DATA` array (before th
     inputDateStr: '{MM/dd/yyyy}',  // For typed input tests
     expectedRaw: '{raw value}',    // Expected getValueObjectValue() return
     expectedApi: '{api value}',    // Expected GetFieldValue() return
-    bugs: [{bug refs}],            // e.g., ['Bug #5', 'Bug #7'] or []
+    bugs: [{bug refs}],            // e.g., ['FORM-BUG-5', 'FORM-BUG-7'] or []
     notes: '{why this test exists and what it proves}',
     tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-{id}.md',
     savedRecord: '{record key}',   // (Cat 3 only) Key into SAVED_RECORDS in vv-config.js
@@ -747,11 +747,11 @@ If this is a **re-run** (file exists): open it and append a row to the Run Histo
 
 ## Current Interpretation
 
-{One paragraph: what the run history implies. Examples: "Bug #7 confirmed in IST. Awaiting fix verification." / "Passes consistently — no bug in UTC+0 control." / "Run 2 (PASS) confirms Bug #7 fix works for Config A IST."}
+{One paragraph: what the run history implies. Examples: "FORM-BUG-7 confirmed in IST. Awaiting fix verification." / "Passes consistently — no bug in UTC+0 control." / "Run 2 (PASS) confirms FORM-BUG-7 fix works for Config A IST."}
 
 ## Next Action
 
-{One line: what happens next. E.g., "Re-run after Bug #7 fix deployed." / "No further action — closed PASS." / "Run 1-F-IST (sibling) next."}
+{One line: what happens next. E.g., "Re-run after FORM-BUG-7 fix deployed." / "No further action — closed PASS." / "Run 1-F-IST (sibling) next."}
 ```
 
 ---

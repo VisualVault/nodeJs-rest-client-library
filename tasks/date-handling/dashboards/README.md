@@ -14,8 +14,8 @@ Dashboards use **Telerik RadGrid** (ASP.NET WebForms, server-rendered). Unlike F
 
 This means:
 
-- **No client-side calendar/moment.js bugs** (Bug #5, #6 are not applicable here)
-- **Bug #7 is visible** — wrong dates stored in the DB surface directly in the grid
+- **No client-side calendar/moment.js bugs** (FORM-BUG-5, #6 are not applicable here)
+- **FORM-BUG-7 is visible** — wrong dates stored in the DB surface directly in the grid
 - **Mixed timezone storage** is visible — same intended date shows different time components depending on write source
 
 ---

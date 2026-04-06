@@ -68,7 +68,7 @@ Shared config:
 | `../helpers/vv-calendar.js`       | Calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input    |
 | `../global-setup.js`              | Runs before all tests: auth + creates saved records via browser UI per timezone         |
 | `cat-1-calendar-popup.spec.js`    | Category 1 — calendar popup date selection tests (non-legacy Kendo fields)              |
-| `cat-1-legacy-popup.spec.js`      | Category 1 — legacy popup tests for Configs E-H (Bug #2 audit spec)                     |
+| `cat-1-legacy-popup.spec.js`      | Category 1 — legacy popup tests for Configs E-H (FORM-BUG-2 audit spec)                 |
 | `cat-2-typed-input.spec.js`       | Category 2 — keyboard segment-by-segment date entry tests                               |
 | `cat-3-server-reload.spec.js`     | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                   |
 | `cat-5-preset-date.spec.js`       | Category 5 — preset date default auto-population tests                                  |
@@ -79,7 +79,7 @@ Shared config:
 | `cat-9-gfv-roundtrip.spec.js`     | Category 9 — GFV round-trip drift tests (SetFieldValue → GetFieldValue → SetFieldValue) |
 | `cat-9-gdoc-roundtrip.spec.js`    | Category 9-GDOC — GDOC round-trip tests (SetFieldValue → GetDateObject → SetFieldValue) |
 | `cat-12-edge-cases.spec.js`       | Category 12 — edge case and boundary condition tests                                    |
-| `audit-bug1-tz-stripping.spec.js` | Bug #1 audit — independent Playwright verification of parseDateString() Z-stripping     |
+| `audit-bug1-tz-stripping.spec.js` | FORM-BUG-1 audit — independent Playwright verification of parseDateString() Z-stripping |
 
 ### External Config
 
@@ -96,21 +96,21 @@ Shared config:
 
 All tests target one of 8 field configurations defined by three boolean flags on VV calendar fields:
 
-| Config | enableTime | ignoreTimezone | useLegacy | Field Name | What It Tests                                    |
-| :----: | :--------: | :------------: | :-------: | ---------- | ------------------------------------------------ |
-|   A    |   false    |     false      |   false   | Field7     | Date-only baseline. Bug #7 surface in UTC+       |
-|   B    |   false    |      true      |   false   | Field10    | Date-only + ignoreTimezone. Same Bug #7 exposure |
-|   C    |    true    |     false      |   false   | Field6     | DateTime with timezone. UTC-aware storage        |
-|   D    |    true    |      true      |   false   | Field5     | **Primary bug surface**: Bug #5 (fake Z), Bug #6 |
-|   E    |   false    |     false      |   true    | Field12    | Legacy date-only. Bug #2, Bug #4                 |
-|   F    |   false    |      true      |   true    | Field11    | Legacy date-only + ignoreTimezone                |
-|   G    |    true    |     false      |   true    | Field14    | Legacy DateTime                                  |
-|   H    |    true    |      true      |   true    | Field13    | Legacy DateTime + ignoreTimezone                 |
+| Config | enableTime | ignoreTimezone | useLegacy | Field Name | What It Tests                                            |
+| :----: | :--------: | :------------: | :-------: | ---------- | -------------------------------------------------------- |
+|   A    |   false    |     false      |   false   | Field7     | Date-only baseline. FORM-BUG-7 surface in UTC+           |
+|   B    |   false    |      true      |   false   | Field10    | Date-only + ignoreTimezone. Same FORM-BUG-7 exposure     |
+|   C    |    true    |     false      |   false   | Field6     | DateTime with timezone. UTC-aware storage                |
+|   D    |    true    |      true      |   false   | Field5     | **Primary bug surface**: FORM-BUG-5 (fake Z), FORM-BUG-6 |
+|   E    |   false    |     false      |   true    | Field12    | Legacy date-only. FORM-BUG-2, FORM-BUG-4                 |
+|   F    |   false    |      true      |   true    | Field11    | Legacy date-only + ignoreTimezone                        |
+|   G    |    true    |     false      |   true    | Field14    | Legacy DateTime                                          |
+|   H    |    true    |      true      |   true    | Field13    | Legacy DateTime + ignoreTimezone                         |
 
 **Flag definitions:**
 
 - `enableTime` — field captures time in addition to date (shows time picker in popup, stores datetime vs date-only)
-- `ignoreTimezone` — VV's timezone handling flag. When true + enableTime, triggers Bug #5 (`GetFieldValue` appends fake `Z` to local-time strings)
+- `ignoreTimezone` — VV's timezone handling flag. When true + enableTime, triggers FORM-BUG-5 (`GetFieldValue` appends fake `Z` to local-time strings)
 - `useLegacy` — uses the V1 legacy code path for save/load. Legacy popup stores raw `toISOString()` (UTC datetime) while modern path stores local-time strings
 
 Each config also has a `enableInitialValue` variant (for Preset Date / Current Date tests), but the base tests use `enableInitialValue=false`.
@@ -121,12 +121,12 @@ Each config also has a `enableInitialValue` variant (for Preset Date / Current D
 
 Tests run across 4 timezone contexts to expose timezone-dependent bugs:
 
-| Project | IANA Name           | Offset   | Why                                                                                                                |
-| ------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
-| BRT     | America/Sao_Paulo   | UTC-3    | **UTC- control**: local midnight is same calendar day in UTC. Most bugs hidden.                                    |
-| IST     | Asia/Calcutta       | UTC+5:30 | **UTC+ exposure**: local midnight is previous day in UTC. Bug #7 visible. Non-integer offset stress-tests parsing. |
-| UTC0    | Etc/GMT             | UTC+0    | **Boundary control**: local = UTC. Verifies bugs are timezone-dependent, not universal.                            |
-| PST     | America/Los_Angeles | UTC-8/-7 | **DST exposure**: PDT (UTC-7) active March–November. Tests DST-sensitive edge cases.                               |
+| Project | IANA Name           | Offset   | Why                                                                                                                    |
+| ------- | ------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| BRT     | America/Sao_Paulo   | UTC-3    | **UTC- control**: local midnight is same calendar day in UTC. Most bugs hidden.                                        |
+| IST     | Asia/Calcutta       | UTC+5:30 | **UTC+ exposure**: local midnight is previous day in UTC. FORM-BUG-7 visible. Non-integer offset stress-tests parsing. |
+| UTC0    | Etc/GMT             | UTC+0    | **Boundary control**: local = UTC. Verifies bugs are timezone-dependent, not universal.                                |
+| PST     | America/Los_Angeles | UTC-8/-7 | **DST exposure**: PDT (UTC-7) active March–November. Tests DST-sensitive edge cases.                                   |
 
 Playwright's `timezoneId` context option simulates these timezones at the browser level — no system timezone changes or Chrome restarts needed. `new Date().toString()` inside the page returns the simulated timezone.
 
