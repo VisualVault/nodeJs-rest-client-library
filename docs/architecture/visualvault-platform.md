@@ -346,14 +346,71 @@ The Microservice registered in VV points to `{nodeV2 server URL}/scripts` or `/s
 
 ---
 
+## FormsAPI Service
+
+The FormViewer SPA communicates with a **separate .NET service** (FormsAPI) for form instance persistence. This is distinct from the core VV REST API.
+
+| Property       | Value                                                                           |
+| -------------- | ------------------------------------------------------------------------------- |
+| Base URL       | `https://preformsapi.visualvault.com/api/v1`                                    |
+| Authentication | JWT (not OAuth) — obtained via `GET /users/getjwt` on core API                  |
+| Discovery      | `GET /configuration/formsapi` on core API returns `formsApiUrl` and `isEnabled` |
+| Node.js client | `vvClient.formsApi.formInstances` (auto-initialized if enabled)                 |
+
+### FormsAPI Endpoints (discovered via network intercept)
+
+| Method | Endpoint                                                            | Purpose                                     |
+| ------ | ------------------------------------------------------------------- | ------------------------------------------- |
+| GET    | `/FormTemplate/<defId>?revisionType=2`                              | Template definition (by definition GUID)    |
+| GET    | `/FormTemplate/<revId>?revisionType=0`                              | Template by revision ID                     |
+| GET    | `/FormTemplate/Controls/<revId>?formInstanceId=<id>&revisionType=2` | Field definitions for a template            |
+| GET    | `/FormInstance/Controls/<dataId>?revisionType=1`                    | **Saved field values** (raw storage format) |
+| POST   | `/FormInstance`                                                     | Create a new form record                    |
+| PUT    | `/FormInstance`                                                     | Update existing record                      |
+| POST   | `/FormInstance/lock`                                                | Lock a record for editing                   |
+| GET    | `/FormTemplate/<defId>/NextInstance?revisionType=2`                 | Get next instance name                      |
+| GET    | `/Menu/Tab/<id>`                                                    | Tab configuration                           |
+| GET    | `/FormSettings`                                                     | Global form settings                        |
+| GET    | `/DefaultValues`                                                    | Default field values/settings               |
+
+### Storage Format Difference (CB-29)
+
+The FormsAPI and core API store date values in **different formats** in the database:
+
+| Write Endpoint           | Storage Format         | Example                  |
+| ------------------------ | ---------------------- | ------------------------ |
+| Core API `postForms`     | ISO 8601 + Z           | `"2026-03-15T14:30:00Z"` |
+| FormsAPI `forminstance/` | US format, no timezone | `"03/15/2026 14:30:00"`  |
+
+The core API's `getForms` read normalizes both to ISO+Z, masking the difference. But `FormInstance/Controls` returns the **raw storage format**, which is what the form viewer uses for `initCalendarValueV1`. This causes:
+
+- ISO+Z → Forms V1 interprets as UTC → converts to local time (CB-8 shift)
+- US format → Forms V1 interprets as local time → no conversion (preserved)
+
+See `tasks/date-handling/web-services/analysis.md` CB-29 for full evidence.
+
+---
+
 ## Key Concepts & GUIDs
 
-- **`formid`** — identifies a Form Template. Stable across versions.
+- **`formid`** — identifies a Form Template **definition**. Stable across versions. Used in form viewer URL and FormsAPI template lookup.
 - **`xcid`** — identifies the customer in the VV database.
 - **`xcdid`** — identifies the specific database within the customer.
 - **`CcID`** — Connection ID for a Data Connection; used in query URLs.
 - **Revision** — form templates are versioned. Scripts reference a specific revision or "Released" status.
 - **Status:** `Released` = live/published; `Release` = draft/in-progress (UI inconsistency — "Release" means it hasn't been released yet).
+
+### Form Template ID Hierarchy
+
+A form template has **three different GUIDs** used by different parts of the system:
+
+| ID Type              | Example (DateTest)                     | Where Used                                             | How to Get                                                             |
+| -------------------- | -------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------- |
+| Form Definition GUID | `6be0265c-152a-f111-ba23-0afff212cc87` | Form viewer URL `formid=`, FormsAPI template lookup    | URL bar, `vv-config.js`                                                |
+| Template ID          | `1c6e433e-f36b-1410-896b-005f6a77cdf8` | Core API `/formtemplates/{id}/forms`                   | `vvClient.forms.getFormTemplateIdByName()` → `.templateIdGuid`         |
+| Revision ID          | `ef82433e-f36b-1410-896b-005f6a77cdf8` | FormsAPI `POST /FormInstance` (`formTemplateId` field) | `vvClient.forms.getFormTemplateIdByName()` → `.templateRevisionIdGuid` |
+
+The core API `postForms()` takes a template name and resolves it automatically. The FormsAPI `postForm()` requires the **revision ID** explicitly.
 
 ---
 

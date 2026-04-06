@@ -181,13 +181,31 @@ For batch corrections, you need to know the original source timezone to compute 
 
 ---
 
+## Endpoint Storage Format Warning (CB-29)
+
+The `postForms` (core API) and `forminstance/` (FormsAPI) endpoints store dates in **different formats** in the database, even though the core API read normalizes both to ISO+Z:
+
+| Write Method                                 | DB Storage Format        | Forms V1 Interpretation                    |
+| -------------------------------------------- | ------------------------ | ------------------------------------------ |
+| `vvClient.forms.postForms()`                 | `"2026-03-15T14:30:00Z"` | UTC → converts to local (**shifted**)      |
+| `vvClient.formsApi.formInstances.postForm()` | `"03/15/2026 14:30:00"`  | Local time → no conversion (**preserved**) |
+
+**Impact:** Records created via `postForms` have their DateTime values shifted by the user's timezone offset on first form open (CB-8). Records created via `forminstance/` are immune to this shift.
+
+**Workaround for migration/import scripts:** If dates must display the same time for all users regardless of timezone, use `forminstance/` instead of `postForms`. The `forminstance/` endpoint requires the template **revision ID** (not template ID), JWT auth, and a different payload format: `{ fields: [{ key: "FieldN", value: "..." }] }`. See [FormsAPI Service](../architecture/visualvault-platform.md#formsapi-service).
+
+**Confirmed in:** Freshdesk #124697 (WADNR-10407), WS-10 test batch.
+
+---
+
 ## Evidence
 
-| Test   | Finding                                                 | Reference                                                                              |
-| ------ | ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| WS-1   | Server TZ irrelevant for API writes (H-4)               | [matrix.md WS-1](../../tasks/date-handling/web-services/matrix.md)                     |
-| WS-4   | API Z normalization → Forms TZ-dependent display (CB-8) | [ws-4-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-4-batch-run-1.md) |
-| WS-5   | Server converts TZ offsets to UTC correctly (CB-12)     | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md) |
-| WS-5   | DD/MM/YYYY silently stored as null — Bug #8             | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md) |
-| WS-9   | TZ-safe vs unsafe Date patterns (CB-24–CB-28)           | [ws-9-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-9-batch-run-1.md) |
-| Cat 10 | Epoch silent null, midnight-crossing                    | [cat10-gaps-run-1.md](../../tasks/date-handling/web-services/runs/cat10-gaps-run-1.md) |
+| Test   | Finding                                                 | Reference                                                                                |
+| ------ | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| WS-1   | Server TZ irrelevant for API writes (H-4)               | [matrix.md WS-1](../../tasks/date-handling/web-services/matrix.md)                       |
+| WS-4   | API Z normalization → Forms TZ-dependent display (CB-8) | [ws-4-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-4-batch-run-1.md)   |
+| WS-5   | Server converts TZ offsets to UTC correctly (CB-12)     | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md)   |
+| WS-5   | DD/MM/YYYY silently stored as null — Bug #8             | [ws-5-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-5-batch-run-1.md)   |
+| WS-9   | TZ-safe vs unsafe Date patterns (CB-24–CB-28)           | [ws-9-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-9-batch-run-1.md)   |
+| Cat 10 | Epoch silent null, midnight-crossing                    | [cat10-gaps-run-1.md](../../tasks/date-handling/web-services/runs/cat10-gaps-run-1.md)   |
+| WS-10  | postForms vs forminstance/ storage format (CB-29)       | [ws-10-batch-run-1.md](../../tasks/date-handling/web-services/runs/ws-10-batch-run-1.md) |

@@ -257,3 +257,59 @@ Since the Node.js library introduces **zero date transformations**:
 - Any date value returned by `getForms()` is exactly what the VV server returned
 - Bugs #5, #6, #7 (discovered in Forms calendar testing) are **client-side only** — they live in the browser's `main.js`, not in the API layer
 - The open question is what the **VV server itself** does with date values (storage format, timezone handling, re-formatting)
+
+---
+
+## FormsAPI Access (forminstance/ Endpoint)
+
+The VV Node.js client can create records through the **FormsAPI** (`/forminstance` endpoint) in addition to the standard `postForms`. The FormsAPI stores dates in a different format (US, no timezone) that avoids the CB-8 cross-layer shift. See [api-date-patterns.md](../reference/api-date-patterns.md#endpoint-storage-format-warning-cb-29) for details.
+
+### Prerequisites
+
+- FormsAPI must be enabled on the VV environment (checked via `/configuration/formsapi`)
+- JWT authentication (auto-negotiated by `getVaultApi()`)
+- Template **revision ID** (not the template ID or form definition GUID)
+
+### Usage
+
+```javascript
+// Resolve the template revision ID (one-time)
+const resp = await vvClient.forms.getFormTemplateIdByName('TemplateName');
+const revisionId = resp.templateRevisionIdGuid;
+
+// Create a record via FormsAPI
+// NOTE: payload format differs from postForms — uses { fields: [{key, value}] }
+const data = {
+    formName: '',
+    fields: [
+        { key: 'Field5', value: '2026-03-15T14:30:00' },
+        { key: 'Field7', value: '2026-03-15' },
+    ],
+};
+
+const result = await vvClient.formsApi.formInstances.postForm(null, data, revisionId);
+const parsed = JSON.parse(result);
+// parsed.data: { formId: "<DataID>", name: "TemplateName-001234", confirmationPage: null }
+```
+
+### Error handling
+
+```javascript
+try {
+    const formsApi = vvClient.formsApi; // throws ReferenceError if not enabled
+} catch (err) {
+    if (err instanceof ReferenceError) {
+        console.log('FormsAPI not enabled on this environment');
+    }
+}
+```
+
+### Key differences from postForms
+
+| Aspect              | `postForms` (core API)               | `formInstances.postForm` (FormsAPI) |
+| ------------------- | ------------------------------------ | ----------------------------------- |
+| Template identifier | Name or GUID (auto-resolves)         | Revision ID (must resolve manually) |
+| Payload format      | Flat `{ FieldN: value }`             | `{ fields: [{ key, value }] }`      |
+| Date storage        | ISO+Z (`"2026-03-15T14:30:00Z"`)     | US (`"03/15/2026 14:30:00"`)        |
+| Forms load behavior | UTC interpretation → TZ shift (CB-8) | Local interpretation → no shift     |
+| Auth requirement    | OAuth token                          | JWT token                           |

@@ -114,14 +114,14 @@ The primary developer interface. Contains both own properties (form state) and p
 
 #### Data Operations
 
-| Method                                      | Params | Description                                  |
-| ------------------------------------------- | ------ | -------------------------------------------- |
-| `CreateFormInstance(templateId, ?, ?)`      | 3      | Creates a new form instance from a template. |
-| `CreateFillInData(?, ?)`                    | 2      | Creates fill-in data for a form.             |
-| `UpdateFormDataInstanceJson(?, ?, ?, ?, ?)` | 5      | Updates form instance data via JSON.         |
-| `CustomQuery(name, ?, ?, ?)`                | 4      | Executes a custom query by name.             |
-| `TemplateQuery(name, ?)`                    | 2      | Executes a template query.                   |
-| `DataLookup(?, ?, ?)`                       | 3      | Performs a data lookup operation.            |
+| Method                                          | Params | Description                                                                                            |
+| ----------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
+| `CreateFormInstance(templateName, fieldValues)` | 2      | Creates a new form instance via FormsAPI. See [CreateFormInstance details](#createforminstance) below. |
+| `CreateFillInData(?, ?)`                        | 2      | Creates fill-in data for a form.                                                                       |
+| `UpdateFormDataInstanceJson(?, ?, ?, ?, ?)`     | 5      | Updates form instance data via JSON.                                                                   |
+| `CustomQuery(name, ?, ?, ?)`                    | 4      | Executes a custom query by name.                                                                       |
+| `TemplateQuery(name, ?)`                        | 2      | Executes a template query.                                                                             |
+| `DataLookup(?, ?, ?)`                           | 3      | Performs a data lookup operation.                                                                      |
 
 #### Control Refresh
 
@@ -511,16 +511,53 @@ VV.Form.DataID; // GUID of the current form record
 `${VV.BaseAppUrl}FormViewer/app?DataID=${VV.Form.DataID}&hidemenu=true&rOpener=1&xcid=${VV.Form.VV.currentUser.Xcid}&xcdid=${VV.Form.VV.currentUser.Xcdid}`;
 ```
 
-### FormInstance Save API
+### CreateFormInstance
 
-The FormViewer uses a separate API domain for form instance persistence:
+Creates a new form record via the FormsAPI (separate service from the core REST API).
+
+```javascript
+// Client-side (browser)
+const result = await VV.Form.CreateFormInstance('TemplateName', {
+    Field5: '2026-03-15T14:30:00',
+    Field7: '2026-03-15',
+});
+// result: { formId: "<DataID GUID>", name: "TemplateName-001234", confirmationPage: null }
+```
+
+**Actual FormsAPI request** (captured via network intercept):
 
 ```
 POST https://preformsapi.visualvault.com/api/v1/FormInstance
-→ {data: {formId: "<DataID>", revision: 2.0, confirmationPage: null}, meta: {status: 200}}
+Content-Type: application/json
+Authorization: <JWT token>
+
+{
+    "formTemplateId": "<revision ID — NOT template ID or definition GUID>",
+    "formName": "",
+    "fields": [
+        { "key": "Field5", "value": "2026-03-15T14:30:00" },
+        { "key": "Field7", "value": "2026-03-15" }
+    ]
+}
+
+→ { data: { formId: "<DataID>", name: "TemplateName-001234", confirmationPage: null }, meta: { status: 201 } }
+```
+
+**Important:** The FormsAPI stores field values in US format (`"03/15/2026 14:30:00"`, no timezone) — different from the core API's `postForms` which stores ISO+Z (`"2026-03-15T14:30:00Z"`). This affects how `initCalendarValueV1` parses the value on form load. See [CB-29](../../tasks/date-handling/web-services/analysis.md) and [architecture](../architecture/visualvault-platform.md#storage-format-difference-cb-29).
+
+### FormInstance Save API
+
+The FormViewer uses a separate API domain (FormsAPI) for form instance persistence. See [FormsAPI Service](../architecture/visualvault-platform.md#formsapi-service) for the full endpoint catalog.
+
+```
+POST https://preformsapi.visualvault.com/api/v1/FormInstance
+→ {data: {formId: "<DataID>", name: "...", confirmationPage: null}, meta: {status: 201}}
 
 POST https://preformsapi.visualvault.com/api/v1/FormInstance/lock
 → {data: {id: "<DataID>"}, meta: {status: 200}}
+
+GET https://preformsapi.visualvault.com/api/v1/FormInstance/Controls/<DataID>?revisionType=1
+→ Saved field values in raw storage format (key=field GUID, value=stored string)
 
 PUT https://vvdemo.visualvault.com/api/v1/{CustomerAlias}/{DatabaseAlias}/formentity/{formTemplateId}/evaluateGroupsAndConditions
 → Re-evaluates field visibility/readonly conditions after save

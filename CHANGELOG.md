@@ -34,7 +34,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `docs/guides/scripting.md` expanded: server-side date format acceptance table, OData query format tolerance, TZ-safe Date construction patterns for production scripts
 - `docs/reference/form-template-xml.md` — Form template XML export format reference: field types with XML element names, Groups/Conditions structure, script library/assignments, built-in form control GUIDs, what's included vs excluded in exports
 - `docs/reference/form-fields.md` expanded: field type enum table with 7 new types from production template analysis (Label, Dropdown, Checkbox, CellField, UploadButton, FormIDStamp), `mask`/`placeholder` calendar properties
-- `docs/reference/vv-form-api.md` expanded: script event type IDs (onChange/onBlur/onClick), `VV.Form.Template` namespace correction, `CentralDateValidation` operator details, `CloseAndUnlockForm` method
+- `docs/reference/vv-form-api.md` expanded: script event type IDs (onChange/onBlur/onClick), `VV.Form.Template` namespace correction, `CentralDateValidation` operator details, `CloseAndUnlockForm` method, `CreateFormInstance` full signature and FormsAPI payload format
+- WS-10 action handler in `webservice-test-harness.js`: compares `postForms` vs `forminstance/` (FormsAPI) endpoints. Includes `createFormRecordViaFormInstance()` helper and `verify-ws10-browser.js` browser verification script with compare + save-stabilize modes (Freshdesk #124697)
+- FormsAPI service architecture documented in `docs/architecture/visualvault-platform.md`: separate .NET service, endpoint catalog, JWT auth, form template ID hierarchy, storage format difference (CB-29)
+- `docs/reference/api-date-patterns.md` expanded: CB-29 endpoint storage format warning — `postForms` stores ISO+Z, `forminstance/` stores US format (no TZ); workaround for migration scripts
+- `docs/guides/scripting.md` expanded: FormsAPI access patterns via `vvClient.formsApi.formInstances.postForm()`, payload format, error handling, comparison table vs `postForms`
 - `[@]-cleanup` command: read-only 6-phase repository maintenance audit (staleness, orphans, bloat, doc consistency, config hygiene, git hygiene)
 - `testing/README.md` — entry-point documentation for testing infrastructure
 - PST timezone project (`America/Los_Angeles`, UTC-8/UTC-7) added to Playwright test matrix — 4 TZ × 3 browsers = 12 projects

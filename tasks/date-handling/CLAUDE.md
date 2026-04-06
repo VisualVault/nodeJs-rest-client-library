@@ -9,7 +9,7 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 | Component                                | Status                                                   | Folder                     |
 | ---------------------------------------- | -------------------------------------------------------- | -------------------------- |
 | **Forms — Calendar Fields**              | IN PROGRESS (~150/242 tests done, 191 test-data entries) | `forms-calendar/`          |
-| **Web Services (REST API)**              | IN PROGRESS (~118 slots, 0 done)                         | `web-services/`            |
+| **Web Services (REST API)**              | COMPLETE (162/162 — 116P/34F, 10 categories)             | `web-services/`            |
 | **Analytic Dashboards**                  | COMPLETE (44/44 tests done)                              | `dashboards/`              |
 | **VisualVault Reports**                  | NOT STARTED                                              | `reports/` (to create)     |
 | **Files (document dates)**               | NOT STARTED                                              | `files/` (to create)       |
@@ -27,7 +27,7 @@ tasks/date-handling/
   web-services/                      # REST API date handling investigation
     README.md                        # Test environment setup, harness usage, architecture
     analysis.md                      # API analysis, hypotheses, confirmed behaviors
-    matrix.md                        # Test matrix — WS-1 through WS-9 categories (~118 slots)
+    matrix.md                        # Test matrix — WS-1 through WS-10 categories (162 slots, complete)
     results.md                       # Live test evidence
     webservice-test-harness.js       # VV form button script — runs tests inside FormViewer
     ws-harness-button.js             # Form button event script — triggers harness
