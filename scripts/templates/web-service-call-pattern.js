@@ -1,4 +1,4 @@
-/* global VV, $ */
+/* global $ */
 // PROCESS NAME for TEMPLATE NAME
 
 const webServiceName = 'SCRIPTNAMEHERE';

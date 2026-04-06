@@ -83,7 +83,7 @@ async function main() {
     const args = parseArgs();
 
     // Load credentials
-    const configPath = path.join(__dirname, '..', '..', '..', 'testing', 'config', 'vv-config.json');
+    const configPath = path.join(__dirname, '..', 'config', 'vv-config.json');
     if (!fs.existsSync(configPath)) {
         console.error(`Config not found: ${configPath}`);
         console.error(
@@ -109,9 +109,7 @@ async function main() {
     }
 
     // Authenticate with VV
-    const clientLibrary = require(
-        path.join(__dirname, '..', '..', '..', 'lib', 'VVRestApi', 'VVRestApiNodeJs', 'VVRestApi')
-    );
+    const clientLibrary = require(path.join(__dirname, '..', '..', 'lib', 'VVRestApi', 'VVRestApiNodeJs', 'VVRestApi'));
     const vvAuthorize = new clientLibrary.authorize();
 
     console.log(`Authenticating with ${config.loginUrl} as ${config.customerAlias}/${config.databaseAlias}...`);
@@ -155,7 +153,7 @@ async function main() {
     };
 
     // Load and run harness
-    const harness = require(path.join(__dirname, 'webservice-test-harness'));
+    const harness = require(path.join(__dirname, '..', '..', 'scripts', 'server-scripts', 'webservice-test-harness'));
     await harness.main(ffCollection, vvClient, mockResponse);
 
     // Output results

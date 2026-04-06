@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-undef */
 
 /**
  * WS-4 Browser Verification — Playwright step for API→Forms cross-layer testing.
@@ -68,7 +67,7 @@ async function main() {
     const tz = args.tz || 'America/Sao_Paulo';
 
     // Load auth state
-    const authStatePath = path.join(__dirname, '..', '..', '..', 'testing', 'config', 'auth-state-pw.json');
+    const authStatePath = path.join(__dirname, '..', 'config', 'auth-state-pw.json');
     if (!fs.existsSync(authStatePath)) {
         console.error(`Auth state not found: ${authStatePath}`);
         console.error('Run a Playwright test first to generate auth state.');

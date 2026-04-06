@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-undef */
 
 /**
  * WS-10 Browser Verification — Freshdesk #124697 endpoint comparison & save-stabilize.
@@ -164,7 +163,7 @@ async function saveAndReload(page, timeout = 60000) {
 }
 
 async function launchBrowser(args) {
-    const authStatePath = path.join(__dirname, '..', '..', '..', 'testing', 'config', 'auth-state-pw.json');
+    const authStatePath = path.join(__dirname, '..', 'config', 'auth-state-pw.json');
     if (!fs.existsSync(authStatePath)) {
         console.error(`Auth state not found: ${authStatePath}`);
         console.error('Run a Playwright test first to generate auth state.');

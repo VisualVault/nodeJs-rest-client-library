@@ -20,7 +20,7 @@ const fs = require('fs');
 const path = require('path');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
-const RUNNER_PATH = path.join(REPO_ROOT, 'tasks', 'date-handling', 'web-services', 'run-ws-test.js');
+const RUNNER_PATH = path.join(REPO_ROOT, 'testing', 'scripts', 'run-ws-test.js');
 const RESULTS_DIR = path.join(REPO_ROOT, 'testing', 'tmp');
 const RESULTS_PATH = path.join(RESULTS_DIR, 'ws-regression-results-latest.json');
 const GENERATOR_PATH = path.join(REPO_ROOT, 'testing', 'scripts', 'generate-ws-artifacts.js');

@@ -1,4 +1,3 @@
-/* global document, VV */
 /**
  * Verification script: Dashboard vs Forms format comparison.
  *
@@ -7,12 +6,12 @@
  * Field7 (Config A), Field5 (Config D), Field6 (Config C), Field13 (Config H).
  *
  * Usage:
- *   node tasks/date-handling/dashboards/verify-format-mismatch.js
+ *   node testing/scripts/verify-format-mismatch.js
  */
 const { chromium } = require('@playwright/test');
 const path = require('path');
 
-const AUTH_STATE_PATH = path.join(__dirname, '..', '..', '..', 'testing', 'config', 'auth-state-pw.json');
+const AUTH_STATE_PATH = path.join(__dirname, '..', 'config', 'auth-state-pw.json');
 const DASHBOARD_URL =
     'https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25';
 const FORM_URL =

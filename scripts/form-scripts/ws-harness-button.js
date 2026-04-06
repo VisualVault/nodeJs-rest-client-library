@@ -1,4 +1,4 @@
-/* global VV, $ */
+/* global $ */
 // DateTest WS Harness — Form Button Script
 // Purpose: Calls the DateTestWSHarness web service with test parameters.
 // Setup:   Add this as a form button script on the DateTest form (or a dedicated WS test form).

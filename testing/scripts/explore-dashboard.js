@@ -1,4 +1,3 @@
-/* global document */
 /**
  * Dashboard exploration utility — Playwright-based.
  *
@@ -6,7 +5,7 @@
  * Captures grid structure, date values, and compares across timezones.
  *
  * Usage:
- *   node tasks/date-handling/dashboards/explore-dashboard.js [--tz BRT|IST|UTC0] [--record DateTest-NNNNNN] [--all]
+ *   node testing/scripts/explore-dashboard.js [--tz BRT|IST|UTC0] [--record DateTest-NNNNNN] [--all]
  *
  * Options:
  *   --tz       Browser timezone (default: BRT). Affects nothing for server-rendered grid,
@@ -18,7 +17,7 @@
 const { chromium } = require('@playwright/test');
 const path = require('path');
 
-const AUTH_STATE_PATH = path.join(__dirname, '..', '..', '..', 'testing', 'config', 'auth-state-pw.json');
+const AUTH_STATE_PATH = path.join(__dirname, '..', 'config', 'auth-state-pw.json');
 const DASHBOARD_URL =
     '/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25';
 const BASE = 'https://vvdemo.visualvault.com';
