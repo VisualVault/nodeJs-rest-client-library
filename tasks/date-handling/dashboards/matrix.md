@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the dashboard date display investigation.
 Analysis → `analysis.md` | Test evidence → `results.md` | Exploration → `explore-dashboard.js`
 
-Last updated: 2026-04-02 | Total slots: 44 | Done: 41 (33P/8F) | **IN PROGRESS**
+Last updated: 2026-04-06 | Total slots: 44 | Done: 44 (36P/8F) | **COMPLETE**
 
 ---
 
@@ -52,17 +52,17 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 `PASS` = ran, no issue. `FAIL` = ran, unexpected behavior. `PENDING` = not yet run. `BLOCKED` = requires setup.
 
-| Category                     | Total  | PASS | FAIL | PENDING | BLOCKED | Priority |
-| ---------------------------- | :----: | :--: | :--: | :-----: | :-----: | :------: |
-| DB-1. Display Format         |   8    |  8   |      |         |         |    P1    |
-| DB-2. Date Accuracy          |   8    |  8   |      |         |         |    P1    |
-| DB-3. Wrong Date Detection   |   8    |  8   |      |         |         |    P1    |
-| DB-4. Column Sort            |   4    |  4   |      |         |         |    P2    |
-| DB-5. Search / SQL Filter    |   4    |  4   |      |         |         |    P2    |
-| DB-6. Cross-Layer Comparison |   8    |      |  8   |         |         |    P2    |
-| DB-7. Export Verification    |   3    |  3   |      |         |         |    P3    |
-| DB-8. TZ Independence        |   1    |  1   |      |         |         |    P1    |
-| **TOTAL**                    | **44** |  33  |  8   |  **3**  |         |          |
+| Category                     | Total  |  PASS  | FAIL  | PENDING | BLOCKED | Priority |
+| ---------------------------- | :----: | :----: | :---: | :-----: | :-----: | :------: |
+| DB-1. Display Format         |   8    |   8    |       |         |         |    P1    |
+| DB-2. Date Accuracy          |   8    |   8    |       |         |         |    P1    |
+| DB-3. Wrong Date Detection   |   8    |   8    |       |         |         |    P1    |
+| DB-4. Column Sort            |   4    |   4    |       |         |         |    P2    |
+| DB-5. Search / SQL Filter    |   4    |   4    |       |         |         |    P2    |
+| DB-6. Cross-Layer Comparison |   8    |        |   8   |         |         |    P2    |
+| DB-7. Export Verification    |   3    |   3    |       |         |         |    P3    |
+| DB-8. TZ Independence        |   1    |   1    |       |         |         |    P1    |
+| **TOTAL**                    | **44** | **36** | **8** |         |         |          |
 
 ---
 
@@ -211,4 +211,4 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 | ------- | -------------------- | :--------: | :---------: | :----: | ---------- | ---------------------------------- |
 | db-8-tz | Full page comparison |     ✓      |      ✓      |  PASS  | 2026-04-02 | [summary](summaries/tc-db-8-tz.md) |
 
-**Preliminary result** (2026-04-02 exploratory): BRT and IST showed identical values for DateTest-000472 and DateTest-000471 across all 28 fields. Formal test pending with all three TZs and a larger record sample.
+**Result** (2026-04-02): 10 records × all fields compared across BRT, IST, and UTC0 — 0 mismatches. Full evidence in [tc-db-8-tz-run-1.md](runs/tc-db-8-tz-run-1.md).
