@@ -3,7 +3,7 @@
 Authoritative permutation tracker for the forms calendar date-handling investigation.
 Full test evidence → `results.md` | Bug analysis → `analysis.md`
 
-Last updated: 2026-04-03 | Total slots: ~242 | Done: ~120 | Blocked: 0
+Last updated: 2026-04-06 | Total slots: 242 | Executed: 202 (130P, 72F) | Pending: 37 | Blocked: 0
 
 ---
 
@@ -39,24 +39,24 @@ All tests target one of 8 field configurations defined by three boolean flags:
 
 `PASS` = ran, no bug triggered. `FAIL` = ran, bug confirmed. `PENDING` = not yet run, no blocker. `BLOCKED` = requires access/setup not currently available. `PARTIAL` = ran, partial result only (noted in Actual). `SKIP` = intentionally excluded with known reason.
 
-| Category                  |  Total  |  PASS  |  FAIL  | PENDING | BLOCKED | PARTIAL | SKIP  |
-| ------------------------- | :-----: | :----: | :----: | :-----: | :-----: | :-----: | :---: |
-| 1. Calendar Popup         |   20    |   7    |   13   |    0    |    0    |    0    |   0   |
-| 2. Typed Input            |   16    |   11   |   5    |    0    |    0    |    0    |   0   |
-| 3. Server Reload          |   18    |   14   |   4    |    0    |    0    |    0    |   0   |
-| 4. URL Parameters         |    5    |   0    |   0    |    5    |    0    |    0    |   0   |
-| 5. Preset Date            |   18    |   11   |   7    |    0    |    0    |    0    |   0   |
-| 6. Current Date           |   15    |   13   |   2    |    0    |    0    |    0    |   0   |
-| 7. SetFieldValue formats  |   39    |   29   |   9    |    1    |    0    |    0    |   0   |
-| 8. GetFieldValue return   |   19    |   12   |   6    |    1    |    0    |    0    |   0   |
-| 8B. GetDateObject return  |   12    |   11   |   1    |    0    |    0    |    0    |   0   |
-| 9. Round-Trip (GFV)       |   20    |   9    |   11   |    0    |    0    |    0    |   0   |
-| 9-GDOC. Round-Trip (GDOC) |    5    |   2    |   0    |    3    |    0    |    0    |   0   |
-| 10. Web Service           |   11    |   4    |   5    |    1    |    0    |    0    |   1   |
-| 11. Cross-Timezone        |   14    |   0    |   0    |   13    |    0    |    1    |   0   |
-| 12. Edge Cases            |   20    |   5    |   9    |    5    |    0    |    0    |   1   |
-| 13. Database              |   10    |   2    |   0    |    8    |    0    |    0    |   0   |
-| **TOTAL**                 | **242** | **72** | **46** | **123** |  **0**  |  **1**  | **1** |
+| Category                  |  Total  |  PASS   |  FAIL  | PENDING | BLOCKED | PARTIAL | SKIP  |
+| ------------------------- | :-----: | :-----: | :----: | :-----: | :-----: | :-----: | :---: |
+| 1. Calendar Popup         |   20    |    7    |   13   |    0    |    0    |    0    |   0   |
+| 2. Typed Input            |   16    |   11    |   5    |    0    |    0    |    0    |   0   |
+| 3. Server Reload          |   18    |   14    |   4    |    0    |    0    |    0    |   0   |
+| 4. URL Parameters         |    5    |    0    |   0    |    5    |    0    |    0    |   0   |
+| 5. Preset Date            |   18    |   11    |   7    |    0    |    0    |    0    |   0   |
+| 6. Current Date           |   15    |   13    |   2    |    0    |    0    |    0    |   0   |
+| 7. SetFieldValue formats  |   39    |   29    |   9    |    1    |    0    |    0    |   0   |
+| 8. GetFieldValue return   |   19    |   12    |   6    |    1    |    0    |    0    |   0   |
+| 8B. GetDateObject return  |   12    |   11    |   1    |    0    |    0    |    0    |   0   |
+| 9. Round-Trip (GFV)       |   20    |    9    |   11   |    0    |    0    |    0    |   0   |
+| 9-GDOC. Round-Trip (GDOC) |    5    |    2    |   0    |    3    |    0    |    0    |   0   |
+| 10. Web Service           |   11    |    4    |   5    |    1    |    0    |    0    |   1   |
+| 11. Cross-Timezone        |   14    |    0    |   0    |   13    |    0    |    1    |   0   |
+| 12. Edge Cases            |   20    |    5    |   9    |    5    |    0    |    0    |   1   |
+| 13. Database              |   10    |    2    |   0    |    8    |    0    |    0    |   0   |
+| **TOTAL**                 | **242** | **130** | **72** | **37**  |  **0**  |  **1**  | **2** |
 
 ---
 
