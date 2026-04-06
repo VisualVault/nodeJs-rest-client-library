@@ -1,9 +1,10 @@
-# WS-BUG-4: postForms vs forminstance/ Storage Format Mismatch
+# WS-4: postForms vs forminstance/ Storage Format Inconsistency (Design Flaw)
 
 ## Classification
 
 | Field                  | Value                                                                                                                                         |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type**               | Design Flaw                                                                                                                                   |
 | **Severity**           | HIGH                                                                                                                                          |
 | **Evidence**           | `[LIVE]` — Confirmed via WS-10 endpoint comparison + browser verification in BRT and IST                                                      |
 | **Component**          | VV Server — core API (`postForms` at `vvdemo.*`) vs FormsAPI (`forminstance/` at `preformsapi.*`)                                             |
@@ -18,14 +19,14 @@
 
 ## Summary
 
-The VisualVault platform has two independent endpoints for creating form records. Both accept the same datetime input, both return success, and both produce identical results when read back via `getForms()`. But they store the value in **different physical formats** in the database:
+The VisualVault platform has two independent endpoints for creating form records. Both accept the same datetime input, both return success, and both store **identical SQL `datetime` values** in the database (confirmed via DB dump and SSMS schema inspection, 2026-04-06). However, the FormsAPI's `FormInstance/Controls` endpoint **serializes its HTTP response differently** depending on which write endpoint created the record:
 
-| Endpoint                   | Server                        | Input                   | Stored Format                              |
-| -------------------------- | ----------------------------- | ----------------------- | ------------------------------------------ |
-| `postForms` (core API)     | `vvdemo.visualvault.com`      | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` (ISO 8601 + Z)    |
-| `forminstance/` (FormsAPI) | `preformsapi.visualvault.com` | `"2026-03-15T14:30:00"` | `"03/15/2026 14:30:00"` (US format, no TZ) |
+| Endpoint                   | Server                        | Input                   | DB Value (identical)      | `FormInstance/Controls` Response           |
+| -------------------------- | ----------------------------- | ----------------------- | ------------------------- | ------------------------------------------ |
+| `postForms` (core API)     | `vvdemo.visualvault.com`      | `"2026-03-15T14:30:00"` | `2026-03-15 14:30:00.000` | `"2026-03-15T14:30:00Z"` (ISO 8601 + Z)    |
+| `forminstance/` (FormsAPI) | `preformsapi.visualvault.com` | `"2026-03-15T14:30:00"` | `2026-03-15 14:30:00.000` | `"03/15/2026 14:30:00"` (US format, no TZ) |
 
-The core API read path (`getForms`) normalizes both formats to ISO+Z on read, completely masking the storage divergence from API consumers. The difference is only visible through the `FormInstance/Controls` endpoint or — critically — through the Forms UI, which parses the stored format directly.
+The core API read path (`getForms`) normalizes both to ISO+Z on read, masking the serialization divergence from API consumers. The difference is only visible through the `FormInstance/Controls` endpoint or — critically — through the Forms UI, which parses the serialized format directly.
 
 Forms V1 (`initCalendarValueV1`) is **format-sensitive**:
 
@@ -222,11 +223,11 @@ Both records had identical `getForms` output (`storedMatch=true`), confirming th
 
 ### Confirmed Behaviors
 
-| CB    | Description                                                                                                                    | Source |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------ | ------ |
-| CB-29 | `postForms` and `forminstance/` store dates in different physical formats. `FormInstance/Controls` reveals: ISO+Z vs US format | WS-10  |
-| CB-30 | Core API read (`getForms`) normalizes both formats to ISO+Z, masking the storage difference                                    | WS-10  |
-| CB-31 | `forminstance/` records are immune to CB-8 — Forms V1 parses US format as local time (no UTC conversion)                       | WS-10  |
+| CB    | Description                                                                                                                                                   | Source          |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| CB-29 | `FormInstance/Controls` returns different string formats for the same SQL `datetime` value: ISO+Z (postForms) vs US (forminstance/). DB values are identical. | WS-10 + DB dump |
+| CB-30 | Core API read (`getForms`) normalizes both serialization formats to ISO+Z, masking the difference                                                             | WS-10           |
+| CB-31 | `forminstance/` records are immune to CB-8 — Forms V1 parses US format as local time (no UTC conversion)                                                      | WS-10           |
 
 ---
 

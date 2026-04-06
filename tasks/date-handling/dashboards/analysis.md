@@ -15,7 +15,7 @@ Last updated: 2026-04-06 | Status: **COMPLETE** (44/44 tests executed)
 - Dashboards are **100% server-rendered** (Telerik RadGrid / ASP.NET) — browser timezone has zero effect on displayed values
 - The dashboard is a **transparent read-only window** into database state — it introduces no bugs but also corrects none
 - All write-layer bugs (Bug #7 wrong day, Bug #5 drift, legacy UTC storage) **propagate faithfully** to the dashboard
-- Dashboard and Forms display **never match exactly** — two failure modes: format difference (leading zeros) and UTC-vs-local time shift
+- Dashboard and Forms display **never match exactly** — two failure modes: format difference (leading zeros) and FormsAPI serialization-induced time shift
 - DateTime `=` filter only matches midnight records — range queries required for all-times-on-date lookups
 - Exports preserve date values; Excel/Word append `12:00:00 AM` to date-only fields
 
@@ -127,11 +127,11 @@ All confirmed behaviors (CBs) from 44 tests, reorganized by theme.
 
 ### Accuracy & Fidelity
 
-| #       | Behavior                                                                    | Evidence                                                               |
-| ------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| DB-CB-4 | Dashboard accurately represents stored database values for all 8 configs    | DB-2 all 8 configs PASS — grid values match known WS stored values     |
-| DB-CB-5 | Server renders UTC time directly — no timezone conversion at read layer     | DB-2: `T14:30:00Z` → `2:30 PM`, `T00:00:00Z` → `12:00 AM`              |
-| DB-CB-6 | All upstream bugs propagate faithfully — dashboard introduces no distortion | DB-3 all 8 configs PASS — Bug #7, Bug #5 drift, legacy UTC all visible |
+| #       | Behavior                                                                                                 | Evidence                                                                                      |
+| ------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| DB-CB-4 | Dashboard accurately represents stored SQL `datetime` values for all 8 configs                           | DB-2 all 8 configs PASS — grid values match DB dump (2026-04-06)                              |
+| DB-CB-5 | Server renders the stored `datetime` value as-is — no timezone conversion (SQL `datetime` is TZ-unaware) | DB dump: `14:30:00.000` → dashboard `2:30 PM`, `00:00:00.000` → `12:00 AM`                    |
+| DB-CB-6 | All upstream bugs propagate faithfully — dashboard introduces no distortion                              | DB-3 all 8 configs PASS — Bug #7, Bug #5 drift, legacy UTC all visible. Confirmed by DB dump. |
 
 **Upstream bug propagation:** Bug #7 wrong dates ([`forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md) § Bug #7), Bug #5 drift ([`forms-calendar/analysis/overview.md`](../forms-calendar/analysis/overview.md) § Bug #5), and mixed time components from different write paths ([`web-services/analysis/overview.md`](../web-services/analysis/overview.md) § "No Server-Side Date-Only Enforcement") are all visible in the dashboard grid. The dashboard is transparent — fixes must be applied at the write layer.
 
@@ -172,14 +172,14 @@ All confirmed behaviors (CBs) from 44 tests, reorganized by theme.
 
 ### Cross-Layer (Dashboard vs Forms)
 
-| #        | Behavior                                                                                       | Evidence                                                                                          |
-| -------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| DB-CB-22 | Dashboard and Forms display NEVER match exactly — all 8 configs fail                           | DB-6 all 8 configs FAIL                                                                           |
-| DB-CB-23 | Date-only fields: format mismatch only — server `M/d` vs Angular `MM/dd` (leading zeros)       | DB-6-A/B/E/F (FAIL-1)                                                                             |
-| DB-CB-24 | DateTime ignoreTZ=false: time shift — dashboard shows UTC, form shows local                    | DB-6-C/G (FAIL-2): `2:30 PM` vs `11:30 AM` (3h BRT gap)                                           |
-| DB-CB-25 | DateTime ignoreTZ=true: display time matches but format differs; raw value diverged internally | DB-6-D/H (FAIL-1): `2:30 PM` ≡ `02:30 PM` display, but form raw=`T11:30:00` ≠ stored `T14:30:00Z` |
-| DB-CB-26 | Bug #5 visible in Config D GFV during cross-layer: `"T11:30:00.000Z"` — fake Z on local time   | DB-6-D run: GFV adds Z to BRT local value                                                         |
-| DB-CB-27 | Legacy Config H GFV has no fake Z — `useLegacy=true` bypasses Bug #5                           | DB-6-H run: `"T11:30:00"` without Z suffix                                                        |
+| #        | Behavior                                                                                                                                            | Evidence                                                                                        |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| DB-CB-22 | Dashboard and Forms display NEVER match exactly — all 8 configs fail                                                                                | DB-6 all 8 configs FAIL                                                                         |
+| DB-CB-23 | Date-only fields: format mismatch only — server `M/d` vs Angular `MM/dd` (leading zeros)                                                            | DB-6-A/B/E/F (FAIL-1)                                                                           |
+| DB-CB-24 | DateTime ignoreTZ=false: dashboard shows stored value (`2:30 PM`), form shows shifted value (`11:30 AM`) due to FormsAPI serialization + V1 parsing | DB-6-C/G (FAIL-2): DB value `14:30:00.000` → dashboard correct, form shifted −3h BRT            |
+| DB-CB-25 | DateTime ignoreTZ=true: display time matches but format differs; raw value diverged internally                                                      | DB-6-D/H (FAIL-1): `2:30 PM` ≡ `02:30 PM` display, but form raw=`T11:30:00` ≠ DB `14:30:00.000` |
+| DB-CB-26 | Bug #5 visible in Config D GFV during cross-layer: `"T11:30:00.000Z"` — fake Z on local time                                                        | DB-6-D run: GFV adds Z to BRT local value                                                       |
+| DB-CB-27 | Legacy Config H GFV has no fake Z — `useLegacy=true` bypasses Bug #5                                                                                | DB-6-H run: `"T11:30:00"` without Z suffix                                                      |
 
 ---
 
@@ -187,16 +187,16 @@ All confirmed behaviors (CBs) from 44 tests, reorganized by theme.
 
 Hypotheses formalized from the initial exploratory analysis (2026-04-02) and validated by DB-1 through DB-8 test execution.
 
-| #    | Hypothesis                                                                                 | Result                    | Evidence                                                                                             |
-| ---- | ------------------------------------------------------------------------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------- |
-| DH-1 | Browser timezone affects dashboard date display                                            | **REFUTED**               | DB-8: BRT ≡ IST ≡ UTC0, 0 mismatches across 10 records × all fields                                  |
-| DH-2 | Dashboard format depends on all three field config flags (enableTime, ignoreTZ, useLegacy) | **PARTIAL**               | DB-1: Only `enableTime` affects format. `ignoreTZ` and `useLegacy` are invisible to server renderer  |
-| DH-3 | Dashboard accurately reflects stored database values                                       | **CONFIRMED**             | DB-2: All 8 configs PASS — grid values match known WS stored values exactly                          |
-| DH-4 | Write-layer bugs propagate to dashboard unchanged                                          | **CONFIRMED**             | DB-3: All 8 configs show expected shifted/drifted values faithfully                                  |
-| DH-5 | Date columns sort chronologically (not as text)                                            | **CONFIRMED**             | DB-4: 0 violations across 4 sort tests, time component included in sort order                        |
-| DH-6 | SQL filter handles mixed timezone storage correctly                                        | **CONFIRMED with caveat** | DB-5: Date-only filters work correctly. DateTime `=` only matches midnight — range required (§ 7)    |
-| DH-7 | Dashboard and Forms display match for the same record                                      | **REFUTED**               | DB-6: All 8 configs FAIL. Two failure modes: format (FAIL-1) and time shift (FAIL-2)                 |
-| DH-8 | Export preserves date values faithfully                                                    | **CONFIRMED with caveat** | DB-7: Values preserved. Excel/Word append `12:00:00 AM` to date-only fields (§ 7). XML uses ISO 8601 |
+| #    | Hypothesis                                                                                 | Result                    | Evidence                                                                                                                                                   |
+| ---- | ------------------------------------------------------------------------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DH-1 | Browser timezone affects dashboard date display                                            | **REFUTED**               | DB-8: BRT ≡ IST ≡ UTC0, 0 mismatches across 10 records × all fields                                                                                        |
+| DH-2 | Dashboard format depends on all three field config flags (enableTime, ignoreTZ, useLegacy) | **PARTIAL**               | DB-1: Only `enableTime` affects format. `ignoreTZ` and `useLegacy` are invisible to server renderer                                                        |
+| DH-3 | Dashboard accurately reflects stored database values                                       | **CONFIRMED**             | DB-2: All 8 configs PASS. DB dump (2026-04-06) confirms grid values match SQL `datetime` values exactly                                                    |
+| DH-4 | Write-layer bugs propagate to dashboard unchanged                                          | **CONFIRMED**             | DB-3: All 8 configs show expected shifted/drifted values faithfully                                                                                        |
+| DH-5 | Date columns sort chronologically (not as text)                                            | **CONFIRMED**             | DB-4: 0 violations across 4 sort tests, time component included in sort order                                                                              |
+| DH-6 | SQL filter handles mixed timezone storage correctly                                        | **CONFIRMED with caveat** | DB-5: Date-only filters work correctly. DateTime `=` only matches midnight — range required (§ 7)                                                          |
+| DH-7 | Dashboard and Forms display match for the same record                                      | **REFUTED**               | DB-6: All 8 configs FAIL. Two failure modes: format (FAIL-1) and FormsAPI serialization shift (FAIL-2). Dashboard shows correct DB value; form is shifted. |
+| DH-8 | Export preserves date values faithfully                                                    | **CONFIRMED with caveat** | DB-7: Values preserved. Excel/Word append `12:00:00 AM` to date-only fields (§ 7). XML uses ISO 8601                                                       |
 
 ---
 
@@ -227,13 +227,13 @@ If a date looks wrong in the dashboard grid:
 
 ### Dashboard vs Form Display Differences
 
-| Scenario                        | Dashboard Shows      | Form Shows             | Explanation                                        |
-| ------------------------------- | -------------------- | ---------------------- | -------------------------------------------------- |
-| Date-only, any config           | `3/15/2026`          | `03/15/2026`           | Format: server no-pad vs Angular zero-pad          |
-| DateTime, ignoreTZ=false (C, G) | `2:30 PM` (UTC time) | `11:30 AM` (local BRT) | Dashboard = UTC literal; Form = converted to local |
-| DateTime, ignoreTZ=true (D, H)  | `2:30 PM`            | `02:30 PM`             | Same time, different format (no-pad vs zero-pad)   |
+| Scenario                        | Dashboard Shows          | Form Shows           | Explanation                                                                   |
+| ------------------------------- | ------------------------ | -------------------- | ----------------------------------------------------------------------------- |
+| Date-only, any config           | `3/15/2026`              | `03/15/2026`         | Format: server no-pad vs Angular zero-pad                                     |
+| DateTime, ignoreTZ=false (C, G) | `2:30 PM` (stored value) | `11:30 AM` (shifted) | Dashboard shows DB value; Form shifted by FormsAPI serialization + V1 parsing |
+| DateTime, ignoreTZ=true (D, H)  | `2:30 PM`                | `02:30 PM`           | Same time, different format (no-pad vs zero-pad)                              |
 
-**If a user reports "the form shows a different time than the dashboard"**: this is expected behavior for `ignoreTZ=false` DateTime fields, not a bug. The dashboard shows UTC, the form shows the user's local time.
+**If a user reports "the form shows a different time than the dashboard"**: the dashboard is correct — it shows the actual stored `datetime` value. The form is shifted because `FormInstance/Controls` serializes postForms records with a Z suffix, and Forms V1 interprets Z as UTC and converts to local. This only affects `ignoreTZ=false` DateTime fields on postForms-created records.
 
 ### Export Best Practices
 
@@ -254,17 +254,19 @@ Platform characteristics that affect dashboard behavior. No fixable code exists 
 - **Platform defect** — cross-component inconsistency that should be reported to the VV platform team for correction
 - **Platform behavior** — standard behavior of the underlying technology (SQL, Telerik) that could be improved but isn't wrong
 
-### Dashboard Renders UTC, Forms Renders Local — PLATFORM DEFECT
+### Dashboard Shows Stored Value, Forms Shifts It — PLATFORM DEFECT
 
-The .NET server reads the datetime value from SQL and formats it **without timezone conversion**. A value stored as `T14:30:00Z` is displayed as `2:30 PM` regardless of the server's timezone or the user's location. The Forms Angular SPA, conversely, converts UTC to the user's local time via V1 `initCalendarValueV1`.
+The dashboard reads the SQL `datetime` value directly and formats it as-is. A value stored as `2026-03-15 14:30:00.000` is displayed as `3/15/2026 2:30 PM` — the `datetime` type is timezone-unaware, so no conversion is possible or attempted. **The dashboard shows the correct stored value.**
 
-**Result:** Users see different times for the same record — dashboard `2:30 PM` (UTC) vs form `11:30 AM` (BRT, −3h). The gap equals the user's UTC offset. Affects `ignoreTZ=false` DateTime configs (C, G). Evidence: [DB-6-C](runs/tc-db-6-C-run-1.md), [DB-6-G](runs/tc-db-6-G-run-1.md) (FAIL-2). Related: WS CB-8, WS CB-29.
+The Forms Angular SPA, however, receives the same value through `FormInstance/Controls`, which serializes postForms-created records as `"2026-03-15T14:30:00Z"` (with Z suffix). Forms V1 `initCalendarValueV1` interprets the Z as real UTC and converts to local time: `14:30Z − 3h BRT = 11:30 AM`. **The form shows a shifted value.**
 
-**Why this is a defect:** A platform should have a consistent TZ rendering policy. Users should not see different times for the same record depending on which view they use. The VV platform team needs to decide: should the dashboard convert to the user's local time (add server-side TZ logic), or should Forms stop converting (display UTC)? Either fix resolves the inconsistency — but the current state is a cross-component defect.
+**Result:** Users see different times for the same record — dashboard `2:30 PM` (correct, as stored) vs form `11:30 AM` (shifted by FormsAPI serialization + V1 parsing). The gap equals the user's UTC offset. Affects `ignoreTZ=false` DateTime configs (C, G). Evidence: [DB-6-C](runs/tc-db-6-C-run-1.md), [DB-6-G](runs/tc-db-6-G-run-1.md) (FAIL-2). DB dump (2026-04-06) confirms DB value is `14:30:00.000` — matching the dashboard, not the form.
 
-**Write-path dependency:** Records stored via `forminstance/` (US format, no Z) avoid this shift because Forms V1 parses US format as local time. Records stored via `postForms` (ISO+Z) trigger the UTC→local conversion. This explains Freshdesk #124697 (WS CB-31).
+**Why this is a defect:** Users should not see different times for the same record depending on which view they use. The root cause is the `FormInstance/Controls` serialization adding a Z suffix to a timezone-unaware `datetime` value (CB-29). The fix should be in the FormsAPI serialization layer — not the dashboard.
 
-**Recommendation:** Report to VV platform team. Include DB-6-C/G evidence showing the 3h BRT gap. Reference WS CB-8 and Freshdesk #124697 as supporting context.
+**Write-path dependency:** Records created via `forminstance/` avoid this shift because `FormInstance/Controls` serializes them in US format (no Z), and Forms V1 parses US format as local time. Same DB value, different serialization, different form behavior. This explains Freshdesk #124697 (WS CB-31).
+
+**Recommendation:** Report to VV platform team. The FormsAPI's `FormInstance/Controls` should not add Z suffix to timezone-unaware `datetime` values. Include DB-6-C/G evidence + DB dump confirmation.
 
 ### Format Inconsistency: .NET vs Angular — PLATFORM DEFECT
 
@@ -283,15 +285,15 @@ Both layers display correct values — they just format them differently. All 8 
 
 Fully documented in [`web-services/analysis/overview.md`](../web-services/analysis/overview.md) § "Cross-Layer Design Inconsistency: No Server-Side Date-Only Enforcement".
 
-The VV server has no date-only storage type — every date field is stored as datetime regardless of the `enableTime` flag. Different write paths store different time components for the same intended date:
+The VV server has no date-only storage type — every date field is SQL `datetime` regardless of the `enableTime` flag. Different write paths store different time components for the same intended date (confirmed via DB dump 2026-04-06):
 
-| Write Source                  | Stored Value           | Time Component                         |
-| ----------------------------- | ---------------------- | -------------------------------------- |
-| Forms popup (BRT)             | `2026-03-15T00:00:00Z` | UTC midnight                           |
-| Forms popup (IST)             | `2026-03-14T00:00:00Z` | UTC midnight of **wrong day** (Bug #7) |
-| Forms preset `3/1/2026` (BRT) | `2026-03-01T03:00:00Z` | BRT midnight = 3am UTC                 |
-| Forms Current Date (BRT, 8pm) | `2026-03-31T23:01:57Z` | Actual timestamp                       |
-| API string `"2026-03-15"`     | `2026-03-15T00:00:00Z` | UTC midnight                           |
+| Write Source                  | DB Value (`datetime`)     | Time Component                                              |
+| ----------------------------- | ------------------------- | ----------------------------------------------------------- |
+| Forms popup (BRT)             | `2026-03-15 00:00:00.000` | Midnight (DateTest-000889 Field7)                           |
+| Forms popup (IST)             | `2026-03-14 00:00:00.000` | Midnight of **wrong day** — Bug #7 (DateTest-001077 Field7) |
+| Forms preset `3/1/2026` (BRT) | `2026-03-01 03:00:00.000` | BRT midnight = 3am (DateTest-000080 Field2)                 |
+| Forms Current Date (BRT, 8pm) | `2026-03-31 23:01:57.000` | Actual timestamp (DateTest-000080 Field1)                   |
+| API string `"2026-03-15"`     | `2026-03-15 00:00:00.000` | Midnight (DateTest-000889 via postForms)                    |
 
 Dashboard hides the time component for date-only fields, so this is invisible to users. But it affects SQL filter accuracy and export serialization (see below).
 
@@ -313,27 +315,29 @@ Telerik RadGrid export serializes all date columns as datetime. Date-only values
 
 **Possible improvement:** Configure Telerik RadGrid export column format strings per field type — use date-only format for `enableTime=false` fields. Low priority.
 
-### `postForms` vs `forminstance/` Storage Format Difference — PLATFORM DEFECT
+### `postForms` vs `forminstance/` Serialization Difference — PLATFORM DEFECT
 
 Fully documented in [`web-services/analysis/overview.md`](../web-services/analysis/overview.md) § CB-29.
 
-| Endpoint                   | Storage Format                    | Forms V1 Interpretation                          |
-| -------------------------- | --------------------------------- | ------------------------------------------------ |
-| `postForms` (core API)     | `2026-03-15T14:30:00Z` (ISO+Z)    | Parses Z as UTC → converts to local → time shift |
-| `forminstance/` (FormsAPI) | `03/15/2026 14:30:00` (US format) | Parses as local time → no conversion → preserved |
+Both endpoints store **identical SQL `datetime` values** in the database (confirmed via DB dump 2026-04-06). The difference is in the FormsAPI's `FormInstance/Controls` HTTP response serialization:
 
-**Dashboard impact:** Both formats display identically in the dashboard grid (server normalizes on read). The difference only manifests when a user clicks through from dashboard to form — `postForms` records show the time shift, `forminstance/` records do not.
+| Endpoint                   | DB Value (identical)      | `FormInstance/Controls` Response    | Forms V1 Interpretation                          |
+| -------------------------- | ------------------------- | ----------------------------------- | ------------------------------------------------ |
+| `postForms` (core API)     | `2026-03-15 14:30:00.000` | `"2026-03-15T14:30:00Z"` (ISO+Z)    | Parses Z as UTC → converts to local → time shift |
+| `forminstance/` (FormsAPI) | `2026-03-15 14:30:00.000` | `"03/15/2026 14:30:00"` (US format) | Parses as local time → no conversion → preserved |
+
+**Dashboard impact:** Both display identically in the dashboard grid (server reads `datetime` directly from SQL). The difference only manifests when a user clicks through from dashboard to form — the FormsAPI serializes the response differently, and Forms V1 parses each format differently.
 
 ### Summary
 
-| Finding                                | Classification        | Action                                                         |
-| -------------------------------------- | --------------------- | -------------------------------------------------------------- |
-| UTC vs local time rendering            | **Platform defect**   | Report to VV team — needs consistent TZ policy                 |
-| Format inconsistency (.NET vs Angular) | **Platform defect**   | Report to VV team — trivial fix, low priority                  |
-| No date-only enforcement               | **Platform defect**   | Report to VV team — server should normalize on write           |
-| `postForms` vs `forminstance/` storage | **Platform defect**   | Report to VV team — two endpoints should produce same format   |
-| SQL filter midnight-only               | **Platform behavior** | Document workaround (range queries); optional UX enhancement   |
-| Export midnight append                 | **Platform behavior** | Document workaround (XML or post-process); optional config fix |
+| Finding                                      | Classification        | Action                                                                              |
+| -------------------------------------------- | --------------------- | ----------------------------------------------------------------------------------- |
+| Dashboard correct, Forms shifted             | **Platform defect**   | Report to VV team — FormsAPI serialization adds false Z to TZ-unaware values        |
+| Format inconsistency (.NET vs Angular)       | **Platform defect**   | Report to VV team — trivial fix, low priority                                       |
+| No date-only enforcement                     | **Platform defect**   | Report to VV team — server should normalize on write                                |
+| `postForms` vs `forminstance/` serialization | **Platform defect**   | Report to VV team — FormsAPI should serialize consistently regardless of write path |
+| SQL filter midnight-only                     | **Platform behavior** | Document workaround (range queries); optional UX enhancement                        |
+| Export midnight append                       | **Platform behavior** | Document workaround (XML or post-process); optional config fix                      |
 
 ---
 

@@ -176,6 +176,15 @@ Run: [`ws-5-batch-run-1.md`](../runs/ws-5-batch-run-1.md) — 2026-04-02, BRT
 
 All 5 tests: HTTP 200 returned, record created, date field stored as `null`.
 
+### DB Dump Verification (2026-04-06)
+
+| Record          | Input                  |         Field7 in DB          |        Status        |
+| --------------- | ---------------------- | :---------------------------: | :------------------: |
+| DateTest-001656 | `"15/03/2026"` (DD/MM) | NULL (all date columns empty) | Data loss confirmed  |
+| DateTest-001661 | `"2026-03-15"` (ISO)   |   `2026-03-15 00:00:00.000`   | Contrast — ISO works |
+
+The record exists in `dbo.DateTest` (has DhDocID), but all `datetime` columns are NULL. The DB column type is SQL Server `datetime` — the server parser failed to produce a value, stored NULL silently.
+
 ### Confirmed Behaviors
 
 | CB    | Description                                                                                       | Source     |

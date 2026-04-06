@@ -138,6 +138,16 @@ Run: [`cat10-gaps-run-1.md`](../runs/cat10-gaps-run-1.md) — 2026-04-02, BRT
 
 Epoch tests (numeric and string) independently confirmed as silent null. Both variants accepted (record created), both stored null.
 
+### DB Dump Verification (2026-04-06)
+
+| Record          | Input                            | Date columns in DB |
+| --------------- | -------------------------------- | :----------------: |
+| DateTest-001704 | `"20260315"` (compact)           |      All NULL      |
+| DateTest-001706 | `1773532800000` (epoch number)   |      All NULL      |
+| DateTest-001708 | `"20260315"` (compact, via WS-1) |      All NULL      |
+
+All three records exist in `dbo.DateTest` (have DhDocID) but all `datetime` columns are NULL. The DB column type is SQL Server `datetime` — the server parser failed to convert these formats to a `datetime` value.
+
 ### Confirmed Behaviors
 
 | CB    | Description                                                                                    | Source |

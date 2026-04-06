@@ -1,21 +1,33 @@
-# Web Services — Bug Analysis
+# Web Services — Date Handling Findings
 
-Individual root-cause analysis documents for each confirmed issue in the VisualVault REST API date handling layer. Each document is structured for direct conversion into a product bug ticket.
+Root-cause analysis documents for each confirmed finding in the VisualVault REST API date handling layer. Organized by type: bugs (software defects), design flaws (architectural gaps), and undocumented behaviors.
 
 ## Overview
 
 See [`overview.md`](overview.md) for the comprehensive analysis including executive summary, all confirmed behaviors (CB-1 through CB-32), hypothesis resolution, developer guidance, and design observations.
 
-## Bug Documents
+## Findings by Type
 
-| Bug #    | Document                                                                       | Severity | Title                                              | Evidence   |
-| -------- | ------------------------------------------------------------------------------ | -------- | -------------------------------------------------- | ---------- |
-| WS-BUG-1 | [`ws-bug-1-cross-layer-shift.md`](ws-bug-1-cross-layer-shift.md)               | **HIGH** | postForms Z suffix causes datetime shift in Forms  | `[LIVE]`   |
-| WS-BUG-2 | [`ws-bug-2-latam-data-loss.md`](ws-bug-2-latam-data-loss.md)                   | **HIGH** | DD/MM/YYYY formats silently stored as null         | `[LIVE]`   |
-| WS-BUG-3 | [`ws-bug-3-ambiguous-dates.md`](ws-bug-3-ambiguous-dates.md)                   | MEDIUM   | Ambiguous dates interpreted as MM/DD (US bias)     | `[LIVE]`   |
-| WS-BUG-4 | [`ws-bug-4-endpoint-format-mismatch.md`](ws-bug-4-endpoint-format-mismatch.md) | **HIGH** | postForms vs forminstance/ store different formats | `[LIVE]`   |
-| WS-BUG-5 | [`ws-bug-5-silent-null-formats.md`](ws-bug-5-silent-null-formats.md)           | LOW      | Compact/epoch formats silently stored as null      | `[LIVE]`   |
-| WS-BUG-6 | [`ws-bug-6-no-date-only-enforcement.md`](ws-bug-6-no-date-only-enforcement.md) | MEDIUM   | No server-side date-only type enforcement          | `[DESIGN]` |
+### Bugs (defects — software produces incorrect/unexpected results)
+
+| ID       | Document                                                             | Severity | Title                                             | Evidence |
+| -------- | -------------------------------------------------------------------- | -------- | ------------------------------------------------- | -------- |
+| WS-BUG-1 | [`ws-bug-1-cross-layer-shift.md`](ws-bug-1-cross-layer-shift.md)     | **HIGH** | postForms Z suffix causes datetime shift in Forms | `[LIVE]` |
+| WS-BUG-2 | [`ws-bug-2-latam-data-loss.md`](ws-bug-2-latam-data-loss.md)         | **HIGH** | DD/MM/YYYY formats silently stored as null        | `[LIVE]` |
+| WS-BUG-5 | [`ws-bug-5-silent-null-formats.md`](ws-bug-5-silent-null-formats.md) | LOW      | Compact/epoch formats silently stored as null     | `[LIVE]` |
+
+### Design Flaws (architectural gaps — systemic inconsistencies, not single-point failures)
+
+| ID   | Document                                                                       | Severity | Title                                                   | Evidence   |
+| ---- | ------------------------------------------------------------------------------ | -------- | ------------------------------------------------------- | ---------- |
+| WS-4 | [`ws-bug-4-endpoint-format-mismatch.md`](ws-bug-4-endpoint-format-mismatch.md) | **HIGH** | postForms vs forminstance/ storage format inconsistency | `[LIVE]`   |
+| WS-6 | [`ws-bug-6-no-date-only-enforcement.md`](ws-bug-6-no-date-only-enforcement.md) | MEDIUM   | No server-side date-only type enforcement               | `[DESIGN]` |
+
+### Undocumented Behaviors (valid design decisions that need documentation)
+
+| ID   | Document                                                     | Severity | Title                                       | Evidence |
+| ---- | ------------------------------------------------------------ | -------- | ------------------------------------------- | -------- |
+| WS-3 | [`ws-bug-3-ambiguous-dates.md`](ws-bug-3-ambiguous-dates.md) | MEDIUM   | US-biased date parsing for ambiguous inputs | `[LIVE]` |
 
 ## Additional Findings
 

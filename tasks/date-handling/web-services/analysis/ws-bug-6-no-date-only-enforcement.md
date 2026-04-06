@@ -1,9 +1,10 @@
-# WS-BUG-6: No Server-Side Date-Only Type Enforcement
+# WS-6: No Server-Side Date-Only Type Enforcement (Design Flaw)
 
 ## Classification
 
 | Field                  | Value                                                                                                                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type**               | Design Flaw                                                                                                                                                       |
 | **Severity**           | MEDIUM                                                                                                                                                            |
 | **Evidence**           | `[DESIGN]` — Confirmed via WS-1, WS-2, WS-8, and cross-reference with Forms calendar testing                                                                      |
 | **Component**          | VV Server — field type enforcement (absent) + database schema (no date-only column type)                                                                          |
@@ -85,16 +86,22 @@ If a field is configured as `enableTime=false`, all stored values should normali
 
 ### Actual: time components vary by write path
 
-Evidence from WS-2 debug output for DateTest-000080 (BRT-saved record):
+Evidence from DB dump (`DataTest.xlsx`, 2026-04-06) for DateTest-000080 (BRT-saved record):
 
-| Field       | Config | Write Source            | Stored Value             | Time Component              |
-| ----------- | :----: | ----------------------- | ------------------------ | --------------------------- |
-| dataField7  |   A    | Forms popup (BRT)       | `"2026-03-15T00:00:00Z"` | UTC midnight                |
-| dataField1  |   A    | Current Date (BRT, 8pm) | `"2026-03-31T23:01:57Z"` | 23:01:57 UTC                |
-| dataField2  |   A    | Preset "3/1/2026" (BRT) | `"2026-03-01T03:00:00Z"` | 03:00:00 UTC (BRT midnight) |
-| dataField19 |   E    | Legacy preset (BRT)     | `"2026-03-01T03:00:00Z"` | 03:00:00 UTC (BRT midnight) |
+| Field  | Config | Write Source            | DB Value (`datetime`)     | Time Component              |
+| ------ | :----: | ----------------------- | ------------------------- | --------------------------- |
+| Field7 |   A    | Forms popup (BRT)       | `2026-03-15 00:00:00.000` | midnight                    |
+| Field1 |   A    | Current Date (BRT, 8pm) | `2026-03-31 23:01:57.000` | 23:01:57                    |
+| Field2 |   A    | Preset "3/1/2026" (BRT) | `2026-03-01 03:00:00.000` | 03:00 (BRT midnight as UTC) |
 
-All four fields have `enableTime=false` (date-only), yet the database stores four different time components.
+And from DateTest-001711 / DateTest-001712 (API-created):
+
+| Field  | Config | Input                              | DB Value (`datetime`)     | Time Component             |
+| ------ | :----: | ---------------------------------- | ------------------------- | -------------------------- |
+| Field7 |   A    | `"2026-03-15"` (date-only)         | `2026-03-15 00:00:00.000` | midnight                   |
+| Field7 |   A    | `"2026-03-15T14:30:00"` (datetime) | `2026-03-15 14:30:00.000` | **14:30 — no enforcement** |
+
+All fields have `enableTime=false` (date-only). The DB column is SQL Server `datetime` — it stores whatever value the server parsed, with no date-only normalization. The time component varies by write path.
 
 ### API write path — no enforcement
 

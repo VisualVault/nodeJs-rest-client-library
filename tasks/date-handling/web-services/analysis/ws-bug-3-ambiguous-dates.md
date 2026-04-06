@@ -1,9 +1,10 @@
-# WS-BUG-3: Ambiguous Dates Interpreted as MM/DD (US Bias)
+# WS-3: US-Biased Date Parsing for Ambiguous Inputs (Undocumented Behavior)
 
 ## Classification
 
 | Field                  | Value                                                                            |
 | ---------------------- | -------------------------------------------------------------------------------- |
+| **Type**               | Undocumented Behavior                                                            |
 | **Severity**           | MEDIUM                                                                           |
 | **Evidence**           | `[LIVE]` — Confirmed via WS-5 ambiguous date test (1 slot)                       |
 | **Component**          | VV Server — date parser                                                          |
@@ -143,6 +144,14 @@ Run: [`ws-5-batch-run-1.md`](../runs/ws-5-batch-run-1.md) — 2026-04-02, BRT
 | ws-5-A-AMBIG |   A    | `"05/03/2026"` | `"2026-05-03T00:00:00Z"` | March 5 or May 3? | PASS\* | Interpreted as MM/DD (May 3) |
 
 \*Marked PASS in the matrix because the API correctly stored what the parser parsed. The FAIL is in the **ambiguity** — the parser has a US bias that is undocumented and produces wrong results for DD/MM-convention users.
+
+### DB Dump Verification (2026-04-06)
+
+| Record          | Input (intended March 5) |             Field7 in DB              |
+| --------------- | ------------------------ | :-----------------------------------: |
+| DateTest-001660 | `"05/03/2026"`           | `2026-05-03 00:00:00.000` — **May 3** |
+
+The DB column is SQL Server `datetime`. The wrong date is permanently stored — May 3 instead of March 5.
 
 ### Confirmed Behaviors
 

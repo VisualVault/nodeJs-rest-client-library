@@ -4,7 +4,7 @@
 
 148 tests across 10 categories (WS-1 through WS-10) exhaustively characterize how the VisualVault REST API handles dates when creating, reading, updating, and querying form records via web services. Testing covered 8 field configurations, 3 server timezones (BRT/IST/UTC), 20+ input formats, and cross-layer verification against the Forms UI.
 
-**Key findings**: The API write/read/round-trip path is reliable and timezone-independent when using string inputs. However, **6 distinct issues** were identified — 2 cause silent data loss, 2 cause datetime corruption when records cross from API to Forms, 1 is an ambiguous-format trap, and 1 is a systemic design flaw. The most critical production issue (Freshdesk #124697) was root-caused to a storage format mismatch between the `postForms` and `forminstance/` endpoints (CB-29).
+**Key findings**: The API write/read/round-trip path is reliable and timezone-independent when using string inputs. However, **6 distinct issues** were identified — 2 cause silent data loss, 2 cause datetime corruption when records cross from API to Forms, 1 is an ambiguous-format trap, and 1 is a systemic design flaw. The most critical production issue (Freshdesk #124697) was root-caused to a serialization format mismatch in the FormsAPI's `FormInstance/Controls` response between records created via `postForms` vs `forminstance/` (CB-29).
 
 **Results**: 116 PASS / 32 FAIL across 148 formal test slots. All 32 failures map to one of the 6 catalogued issues below. (WS-10A additionally includes 7 forminstance/ comparison rows — all PASS — documented in the matrix but not counted as separate test slots.)
 
@@ -42,11 +42,31 @@ Confirmed 2026-04-02 via upstream `VisualVault/nodeJs-rest-client-library` analy
 
 Full documentation: [`docs/guides/scripting.md`](../../../../docs/guides/scripting.md)
 
+### Database Schema: SQL Server `datetime` Columns
+
+Confirmed 2026-04-06 via SSMS schema inspection and DB dump (`dbo.DateTest` table):
+
+- **All date fields** (Field1 through Field28) are SQL Server **`datetime`** columns — a binary numeric type, not a string
+- The DB stores no Z suffix, no ISO format, no US format — just a naive datetime value (year/month/day/hour/minute/second)
+- The Z suffix visible in `getForms` API responses is added by the **API serialization layer**, not stored in the DB
+- The US format visible in `FormInstance/Controls` responses is also a serialization artifact
+- Both `postForms` and `forminstance/` write **identical `datetime` values** to the same column (confirmed: DateTest-001679 vs DateTest-001680)
+
+**Implication**: The "storage format mismatch" (WS-4/CB-29) is not in the database — it's in the `FormInstance/Controls` serialization layer. Both endpoints write the same binary datetime; the behavioral difference comes from how the Controls endpoint serializes it for the Forms V1 client (ISO+Z for postForms-created records, US format for forminstance/-created records).
+
+**DB evidence** (from `DataTest.xlsx` dump):
+
+| Record          | Endpoint               |       Field5 (D) DB       |       Field6 (C) DB       |
+| --------------- | ---------------------- | :-----------------------: | :-----------------------: |
+| DateTest-001679 | postForms              | `2026-03-15 14:30:00.000` | `2026-03-15 14:30:00.000` |
+| DateTest-001680 | forminstance/          | `2026-03-15 14:30:00.000` | `2026-03-15 14:30:00.000` |
+| DateTest-001737 | postForms → Forms save | `2026-03-15 11:30:00.000` | `2026-03-15 11:30:00.000` |
+
 ---
 
 ## 4. Issues Registry
 
-Six distinct issues identified. Ordered by production impact.
+Six distinct findings identified — 3 bugs (software defects), 2 design flaws (architectural gaps), 1 undocumented behavior. Ordered by production impact.
 
 ### WS-BUG-1 — Cross-Layer Datetime Shift (postForms Z Suffix)
 
@@ -70,7 +90,7 @@ Six distinct issues identified. Ordered by production impact.
 - After the user saves the form, the shifted value is committed to the DB. Subsequent open/save cycles are stable (no further drift)
 - Config D/H (`ignoreTZ=true`): display appears correct on first open, but rawValue is already shifted. After save+reopen, display changes to shifted time. **This is exactly Freshdesk #124697.**
 
-**Workaround**: Use the `forminstance/` endpoint (FormsAPI) instead of `postForms`. The FormsAPI stores dates in US format (`"03/15/2026 14:30:00"`) without Z suffix, which Forms V1 parses as local time — no conversion occurs. See WS-BUG-4 for the underlying format mismatch.
+**Workaround**: Use the `forminstance/` endpoint instead of `postForms` for all DateTime fields. Empirically verified: `getSaveValue()` stores identical values for `ignoreTZ=true` and `ignoreTZ=false` — the flag affects display only, not DB storage. `forminstance/` avoids the V1 Z-interpretation shift for all DateTime configs. See [`ws-bug-1-cross-layer-shift.md`](ws-bug-1-cross-layer-shift.md) for details and limitations.
 
 **Who is affected**: Every VV customer using `postForms` to write datetime fields, where any user outside UTC+0 opens the record in Forms.
 
@@ -102,7 +122,7 @@ Six distinct issues identified. Ordered by production impact.
 
 ---
 
-### WS-BUG-3 — Ambiguous Dates Interpreted as MM/DD (US Bias)
+### WS-3 — US-Biased Date Parsing for Ambiguous Inputs (Undocumented Behavior)
 
 | Field        | Value                                                 |
 | ------------ | ----------------------------------------------------- |
@@ -122,26 +142,26 @@ Six distinct issues identified. Ordered by production impact.
 
 ---
 
-### WS-BUG-4 — postForms vs forminstance/ Storage Format Mismatch
+### WS-4 — postForms vs forminstance/ Serialization Inconsistency (Design Flaw)
 
-| Field        | Value                                                                                                                     |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| **Severity** | **HIGH** — root cause of Freshdesk #124697; two endpoints store identical logical values in incompatible physical formats |
-| **Status**   | Confirmed, architectural inconsistency                                                                                    |
-| **Evidence** | CB-29, CB-30, CB-31 (WS-10)                                                                                               |
+| Field        | Value                                                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| **Severity** | **HIGH** — root cause of Freshdesk #124697; FormsAPI serializes the same `datetime` value in incompatible string formats |
+| **Status**   | Confirmed, architectural inconsistency                                                                                   |
+| **Evidence** | CB-29, CB-30, CB-31 (WS-10); DB dump (2026-04-06) confirmed identical SQL `datetime` values for both endpoints           |
 
-**Description**: The `postForms` endpoint (core API at `vvdemo.visualvault.com`) and the `forminstance/` endpoint (FormsAPI at `preformsapi.visualvault.com`) write the same logical date value in **different storage formats**:
+**Description**: The `postForms` endpoint (core API) and the `forminstance/` endpoint (FormsAPI) both store the **same SQL `datetime` value** in the database (confirmed via DB dump: both produce `2026-03-15 14:30:00.000`). However, the FormsAPI's `FormInstance/Controls` endpoint **serializes its HTTP response differently** depending on which write endpoint created the record:
 
-| Endpoint        | Input                   | Stored Format                       | Forms V1 Interpretation                |
-| --------------- | ----------------------- | ----------------------------------- | -------------------------------------- |
-| `postForms`     | `"2026-03-15T14:30:00"` | `"2026-03-15T14:30:00Z"` (ISO+Z)    | UTC → converts to local (shifted)      |
-| `forminstance/` | `"2026-03-15T14:30:00"` | `"03/15/2026 14:30:00"` (US, no TZ) | Local time → no conversion (preserved) |
+| Endpoint        | Input                   | DB Value (identical)      | `FormInstance/Controls` Response    | Forms V1 Interpretation                |
+| --------------- | ----------------------- | ------------------------- | ----------------------------------- | -------------------------------------- |
+| `postForms`     | `"2026-03-15T14:30:00"` | `2026-03-15 14:30:00.000` | `"2026-03-15T14:30:00Z"` (ISO+Z)    | UTC → converts to local (shifted)      |
+| `forminstance/` | `"2026-03-15T14:30:00"` | `2026-03-15 14:30:00.000` | `"03/15/2026 14:30:00"` (US, no TZ) | Local time → no conversion (preserved) |
 
-The core API read (`getForms`) normalizes both to `"2026-03-15T14:30:00Z"` — masking the storage difference. The divergence is only visible through `FormInstance/Controls` or by observing the Forms UI behavior.
+The core API read (`getForms`) normalizes both to `"2026-03-15T14:30:00Z"` — masking the serialization difference. The divergence is only visible through `FormInstance/Controls` or by observing the Forms UI behavior.
 
-**Root Cause**: Two independent write paths exist in the VV platform with no shared date normalization layer. The core API normalizes to ISO+Z, the FormsAPI preserves US format.
+**Root Cause**: The FormsAPI has two independent serialization paths that produce different string formats for the same `datetime` value. Forms V1 `initCalendarValueV1` parses the string — ISO+Z triggers UTC→local conversion, US format does not.
 
-**Impact**: This is the root cause of WS-BUG-1. Scripts that switch from `postForms` to `forminstance/` see the datetime shift disappear — not because of a client fix, but because the storage format changes.
+**Impact**: This is the root cause of WS-BUG-1. Scripts that switch from `postForms` to `forminstance/` see the datetime shift disappear — not because the DB value changes, but because the FormsAPI serialization format changes, which Forms V1 parses differently.
 
 **Workaround**: Use `forminstance/` for datetime fields. Note: `forminstance/` requires a different payload format (`{ formTemplateId, formName, fields: [{ key, value }] }`) and targets a different server (`preformsapi.*`). There is no SDK method — direct HTTP required.
 
@@ -174,7 +194,7 @@ The core API read (`getForms`) normalizes both to `"2026-03-15T14:30:00Z"` — m
 
 ---
 
-### WS-BUG-6 — No Server-Side Date-Only Enforcement
+### WS-6 — No Server-Side Date-Only Type Enforcement (Design Flaw)
 
 | Field        | Value                                                         |
 | ------------ | ------------------------------------------------------------- |
@@ -237,15 +257,15 @@ This means the same "date-only" field can contain different time components depe
 
 ### 5.4 Cross-Layer: API → Forms (WS-4, WS-10)
 
-| #     | Behavior                                                                                                                                                                             | Evidence                                                                                                                                                                    |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CB-8  | API Z normalization causes cross-layer datetime shift when opened in Forms. `"T14:30:00"` → stored `"T14:30:00Z"` → Forms displays 11:30 AM (BRT) / 8:00 PM (IST). See WS-BUG-1      | [ws-4-batch-run-1](runs/ws-4-batch-run-1.md)                                                                                                                                |
-| CB-10 | Bug #7 does NOT manifest on Forms load/display path for **date-only** fields loaded from API. Config A IST displays `03/15/2026` (correct) — Kendo shows local date from Date object | Same run                                                                                                                                                                    |
-| CB-11 | `ignoreTZ=true` preserves display but not rawValue when loading API-stored datetimes. Config D/H display 2:30 PM but rawValue shifted to 11:30/20:00                                 | Same run                                                                                                                                                                    |
-| CB-29 | `postForms` and `forminstance/` store dates in **different formats** in the database. `FormInstance/Controls` reveals: postForms → ISO+Z, forminstance/ → US format. See WS-BUG-4    | [ws-10-batch-run-1](runs/ws-10-batch-run-1.md) + browser verification (WS-10B was BLOCKED in batch run; forminstance/ data collected via `verify-ws10-browser.js` post-run) |
-| CB-30 | Core API read (`getForms`) normalizes both storage formats to ISO+Z, masking the storage difference. `storedMatch=true` for both records                                             | Same run                                                                                                                                                                    |
-| CB-31 | `forminstance/` records are immune to CB-8. Forms V1 parses US format as local time (no UTC conversion). rawValue=`T14:30:00` in both BRT and IST                                    | Same run                                                                                                                                                                    |
-| CB-32 | `postForms` Config D first-open display mutation exactly matches Freshdesk #124697 report: display `02:30 PM` → `11:30 AM` after save+reopen, stable after first mutation            | Same run                                                                                                                                                                    |
+| #     | Behavior                                                                                                                                                                                                                                                      | Evidence                                                                        |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| CB-8  | API Z normalization causes cross-layer datetime shift when opened in Forms. `"T14:30:00"` → stored `"T14:30:00Z"` → Forms displays 11:30 AM (BRT) / 8:00 PM (IST). See WS-BUG-1                                                                               | [ws-4-batch-run-1](runs/ws-4-batch-run-1.md)                                    |
+| CB-10 | Bug #7 does NOT manifest on Forms load/display path for **date-only** fields loaded from API. Config A IST displays `03/15/2026` (correct) — Kendo shows local date from Date object                                                                          | Same run                                                                        |
+| CB-11 | `ignoreTZ=true` preserves display but not rawValue when loading API-stored datetimes. Config D/H display 2:30 PM but rawValue shifted to 11:30/20:00                                                                                                          | Same run                                                                        |
+| CB-29 | `FormInstance/Controls` returns dates in **different string formats** depending on which endpoint created the record: postForms → ISO+Z, forminstance/ → US format. DB values are identical (`datetime` type, confirmed via DB dump 2026-04-06). See WS-BUG-4 | [ws-10-batch-run-1](runs/ws-10-batch-run-1.md) + browser verification + DB dump |
+| CB-30 | Core API read (`getForms`) normalizes both serialization formats to ISO+Z, masking the difference. `storedMatch=true` for both records                                                                                                                        | Same run                                                                        |
+| CB-31 | `forminstance/` records are immune to CB-8. Forms V1 parses US format as local time (no UTC conversion). rawValue=`T14:30:00` in both BRT and IST                                                                                                             | Same run                                                                        |
+| CB-32 | `postForms` Config D first-open display mutation exactly matches Freshdesk #124697 report: display `02:30 PM` → `11:30 AM` after save+reopen, stable after first mutation                                                                                     | Same run                                                                        |
 
 ### 5.5 Input Format Handling (WS-5)
 
@@ -378,12 +398,16 @@ const result = base.toLocaleDateString('en-US'); // "4/14/2026" in UTC, "4/13/20
 
 ### 7.4 Choosing an Endpoint
 
-| Use Case                                      | Recommended Endpoint                  | Why                                              |
-| --------------------------------------------- | ------------------------------------- | ------------------------------------------------ |
-| Date-only fields                              | Either `postForms` or `forminstance/` | No cross-layer issue for date-only (CB-10)       |
-| DateTime fields that users will view in Forms | **`forminstance/`**                   | Avoids WS-BUG-1 cross-layer shift                |
-| DateTime fields consumed only by API/scripts  | Either                                | No cross-layer issue if Forms UI is not involved |
-| Updating existing records                     | `postFormRevision`                    | `forminstance/` has no revision equivalent       |
+| Use Case                                      | Recommended Approach | Why                                                                                                                                     |
+| --------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Date-only fields                              | Either endpoint      | Immune to shift (CB-10)                                                                                                                 |
+| DateTime fields that users will view in Forms | **`forminstance/`**  | Avoids WS-BUG-1 shift for all DateTime configs. DB stores identical values for `ignoreTZ=true` and `false` — flag affects display only. |
+| DateTime fields consumed only by API/scripts  | Either endpoint      | No cross-layer issue if Forms UI is not involved                                                                                        |
+| Updating existing records                     | `postFormRevision`   | `forminstance/` has no revision equivalent                                                                                              |
+
+**Empirical finding (2026-04-06)**: `getSaveValue()` produces identical DB values for Config C and Config D given the same input. The `ignoreTZ` flag does not affect what's stored — it only affects how Forms V1 displays the value on load. Therefore `forminstance/` is the correct workaround for **all** DateTime configs, not just `ignoreTZ=true`.
+
+**Cross-TZ note**: `forminstance/` stores local time without TZ context. This is consistent with how the Forms UI itself saves records — the VV platform does not store timezone context for any write path through `forminstance/`. Two users in different timezones saving "2:30 PM" both store `T14:30:00`.
 
 ---
 
