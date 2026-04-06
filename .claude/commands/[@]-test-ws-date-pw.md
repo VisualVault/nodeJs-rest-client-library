@@ -48,7 +48,7 @@ Read the following files before doing anything else:
 
 2. `tasks/date-handling/web-services/matrix.md` — **Field Configurations table** (top of file). Map the Config letter to: `enableTime`, `ignoreTimezone`, `useLegacy`, and the Test Field name.
 
-3. `tasks/date-handling/web-services/analysis.md` — identify which hypotheses (H-1 through H-12) apply to this test category. Note the hypothesis, its rationale, and what the expected outcome would be if confirmed or refuted.
+3. `tasks/date-handling/web-services/analysis/overview.md` — identify which hypotheses (H-1 through H-12) apply to this test category. Note the hypothesis, its rationale, and what the expected outcome would be if confirmed or refuted.
 
 4. `tasks/date-handling/web-services/README.md` — reference for runner usage, credential setup, and TZ simulation.
 

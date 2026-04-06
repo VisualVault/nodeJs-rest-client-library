@@ -543,7 +543,7 @@ Authorization: <JWT token>
 → { data: { formId: "<DataID>", name: "TemplateName-001234", confirmationPage: null }, meta: { status: 201 } }
 ```
 
-**Important:** The FormsAPI stores field values in US format (`"03/15/2026 14:30:00"`, no timezone) — different from the core API's `postForms` which stores ISO+Z (`"2026-03-15T14:30:00Z"`). This affects how `initCalendarValueV1` parses the value on form load. See [CB-29](../../tasks/date-handling/web-services/analysis.md) and [architecture](../architecture/visualvault-platform.md#storage-format-difference-cb-29).
+**Important:** The FormsAPI stores field values in US format (`"03/15/2026 14:30:00"`, no timezone) — different from the core API's `postForms` which stores ISO+Z (`"2026-03-15T14:30:00Z"`). This affects how `initCalendarValueV1` parses the value on form load. See [CB-29](../../tasks/date-handling/web-services/analysis/overview.md) and [architecture](../architecture/visualvault-platform.md#storage-format-difference-cb-29).
 
 ### FormInstance Save API
 

@@ -227,7 +227,7 @@ Read the following files before doing anything else:
 
 2. `tasks/date-handling/forms-calendar/matrix.md` — **Field Configurations table** (top of file). Map the Config letter from step 1 to its flag values: `enableTime`, `ignoreTimezone`, `useLegacy`. Also note the Test Field name (e.g., Field5 for Config D) as a cross-check — but the field will be located dynamically in Phase 2 via P6.
 
-3. `tasks/date-handling/forms-calendar/analysis.md` — identify every bug whose trigger conditions match the field config extracted above. For each matching bug, note: its number, name, the exact function where it lives, and what the observable symptom is.
+3. `tasks/date-handling/forms-calendar/analysis/overview.md` — identify every bug whose trigger conditions match the field config extracted above. For each matching bug, note: its number, name, the exact function where it lives, and what the observable symptom is.
 
 4. `tasks/date-handling/forms-calendar/matrix.md` — check the CLAUDE.md section for:
     - The DateTest form template URL

@@ -57,18 +57,19 @@ nodeV2/
   tasks/                             # Investigation and task workspace
     README.md                        # Task index and structure guide
     date-handling/                   # Active: cross-platform date bug investigation
-      forms-calendar/                # Forms calendar field testing (8 bugs, ~242 slots)
-      web-services/                  # REST API date handling testing (162 slots, complete — WS-1 through WS-10)
-      dashboards/                    # Dashboard date display testing (44/44 complete — DB-1 thru DB-8 all done)
-    form-templates/                  # XML template analysis, generator, redesigned DateTest v2
-        README.md                    # Environment setup, runner usage, execution modes
-        matrix.md                    # Test matrix — 10 categories (WS-1 through WS-10)
-        analysis.md                  # Hypotheses (H-1 to H-12), confirmed behaviors (CB-1 through CB-32)
+      forms-calendar/                # Forms calendar field testing (7 bugs, ~242 slots)
+        analysis/                    # Analysis & conclusions (overview + 7 per-bug documents)
+      web-services/                  # REST API date handling testing (148 slots, complete — WS-1 through WS-10)
+        analysis/                    # Analysis & conclusions (overview + 6 per-bug documents)
         webservice-test-harness.js   # Server-side harness (all 10 categories via Action param)
         run-ws-test.js               # Direct Node.js CLI runner (auth + harness invocation)
-        ws-harness-button.js         # Client-side form button script for browser path
         verify-ws4-browser.js        # Playwright browser verification for WS-4 cross-layer
-        verify-ws10-browser.js       # Playwright browser verification for WS-10 (postForms vs forminstance comparison)
+        verify-ws10-browser.js       # Playwright browser verification for WS-10 (postForms vs forminstance)
+      dashboards/                    # Dashboard date display testing (44/44 complete — DB-1 thru DB-8 all done)
+    form-templates/                  # XML template analysis, generator, redesigned DateTest v2
+        README.md                    # Template format docs and generator usage
+        datetest-v2.xml              # Redesigned DateTest form template
+        generate-datetest-v2.js      # Template generator script
 ```
 
 ## How the Server Works

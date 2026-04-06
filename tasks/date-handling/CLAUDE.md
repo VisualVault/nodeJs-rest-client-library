@@ -9,7 +9,7 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 | Component                                | Status                                                   | Folder                     |
 | ---------------------------------------- | -------------------------------------------------------- | -------------------------- |
 | **Forms — Calendar Fields**              | IN PROGRESS (~150/242 tests done, 191 test-data entries) | `forms-calendar/`          |
-| **Web Services (REST API)**              | COMPLETE (162/162 — 116P/34F, 10 categories)             | `web-services/`            |
+| **Web Services (REST API)**              | COMPLETE (148/148 — 116P/32F, 10 categories)             | `web-services/`            |
 | **Analytic Dashboards**                  | COMPLETE (44/44 tests done)                              | `dashboards/`              |
 | **VisualVault Reports**                  | NOT STARTED                                              | `reports/` (to create)     |
 | **Files (document dates)**               | NOT STARTED                                              | `files/` (to create)       |
@@ -22,12 +22,16 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 tasks/date-handling/
   CLAUDE.md                          # This file — overall context
   forms-calendar/                    # Forms calendar field investigation
-    analysis.md                # Code review + confirmed bug analysis
-    test/results.md                  # Live browser test evidence (source of truth)
+    analysis/                        # Analysis & conclusions
+      overview.md                    # Executive summary, confirmed bugs, code paths, V1/V2 comparison
+      bug-{1-7}.md                   # Individual bug documents (1 per bug)
+    results.md                       # Live browser test evidence (source of truth)
   web-services/                      # REST API date handling investigation
     README.md                        # Test environment setup, harness usage, architecture
-    analysis.md                      # API analysis, hypotheses, confirmed behaviors
-    matrix.md                        # Test matrix — WS-1 through WS-10 categories (162 slots, complete)
+    analysis/                        # Analysis & conclusions
+      overview.md                    # Executive summary, issues registry, confirmed behaviors, developer guidance
+      ws-bug-{1-6}.md               # Individual bug documents (1 per issue)
+    matrix.md                        # Test matrix — WS-1 through WS-10 categories (148 slots, complete)
     results.md                       # Live test evidence
     webservice-test-harness.js       # VV form button script — runs tests inside FormViewer
     ws-harness-button.js             # Form button event script — triggers harness
@@ -35,7 +39,19 @@ tasks/date-handling/
     test-cases/                      # Individual TC spec files
     runs/                            # Immutable execution records
     summaries/                       # Per-TC status files
-  dashboards/                        # (future) Analytic Dashboard dates
+  dashboards/                        # Dashboard date display investigation (COMPLETE — 44/44)
+    analysis.md                      # Architecture, confirmed behaviors, design observations, test coverage
+    matrix.md                        # Test matrix — DB-1 through DB-8 (44 slots, complete)
+    results.md                       # Live test evidence
+    test-cases/                      # Individual TC spec files
+    runs/                            # Immutable execution records
+    summaries/                       # Per-TC status files
+    explore-dashboard.js             # Playwright grid capture + TZ comparison
+    test-cross-layer.js              # DB-6: dashboard vs form comparison
+    test-export-v1.js                # DB-7: export format verification
+    test-filter-v3.js                # DB-5: SQL filter tests
+    test-sort-v4.js                  # DB-4: column sort tests
+    verify-format-mismatch.js        # Independent verification: format + time shift
   reports/                           # (future) VV Reports date filtering/display
   files/                             # (future) Document date metadata
   workflows/                         # (future) Workflow date triggers
@@ -61,14 +77,14 @@ tasks/date-handling/
 
 ### Files
 
-| File                         | Purpose                                                                                        |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- |
-| `forms-calendar/analysis.md` | Code review — 5 original bugs + 2 confirmed new bugs. Appendix has extracted source functions. |
-| `forms-calendar/results.md`  | Live browser test evidence — source of truth for confirmed behavior.                           |
-| `forms-calendar/matrix.md`   | Full test matrix (~242 slots) — authoritative permutation tracker, coverage summary.           |
-| `forms-calendar/test-cases/` | Individual TC spec files — one per test scenario, browser-verified before writing.             |
-| `forms-calendar/runs/`       | Immutable run files — one per test execution.                                                  |
-| `forms-calendar/summaries/`  | Per-TC summary files — current status, run history, interpretation.                            |
+| File                         | Purpose                                                                               |
+| ---------------------------- | ------------------------------------------------------------------------------------- |
+| `forms-calendar/analysis/`   | Analysis & conclusions — overview + 7 individual bug documents (bug-1 through bug-7). |
+| `forms-calendar/results.md`  | Live browser test evidence — source of truth for confirmed behavior.                  |
+| `forms-calendar/matrix.md`   | Full test matrix (~242 slots) — authoritative permutation tracker, coverage summary.  |
+| `forms-calendar/test-cases/` | Individual TC spec files — one per test scenario, browser-verified before writing.    |
+| `forms-calendar/runs/`       | Immutable run files — one per test execution.                                         |
+| `forms-calendar/summaries/`  | Per-TC summary files — current status, run history, interpretation.                   |
 
 ### V1 vs V2 Code Path — Critical Note
 

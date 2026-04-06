@@ -2,7 +2,7 @@
 
 How to send date and datetime values through the VV REST API so they display correctly in Forms for users in any timezone.
 
-> Based on confirmed test results from the [WS date-handling investigation](../../tasks/date-handling/web-services/analysis.md) (150 tests, WS-1 through WS-9).
+> Based on confirmed test results from the [WS date-handling investigation](../../tasks/date-handling/web-services/analysis/overview.md) (148 tests, WS-1 through WS-10).
 
 ---
 
@@ -155,6 +155,26 @@ d.setDate(d.getDate() + 30); // Local arithmetic — may vary per TZ
 | `1773532800000` (epoch ms)                | Silently stored as null — numeric timestamps not supported       |
 | `"1773532800000"` (epoch string)          | Silently stored as null — numeric strings not parsed as dates    |
 | `new Date("03/15/2026")` (Date object)    | Serialized as local midnight → different UTC per server TZ       |
+
+---
+
+## Query Patterns for Date-Only Fields
+
+Date-only fields (`enableTime=false`) are stored as full datetime values in the database. The time component varies depending on the write path (Forms popup → UTC midnight, Forms preset → BRT midnight = `T03:00:00Z`, Current Date → actual timestamp, API → whatever was sent). This causes **exact-equality queries to miss records** with non-midnight time components.
+
+```javascript
+// UNRELIABLE — misses records with non-midnight time components
+const params = { q: "[Field7] eq '2026-03-15'" };
+// Only matches records stored as "2026-03-15T00:00:00Z"
+// Misses "2026-03-15T03:00:00Z" (preset), "2026-03-15T14:30:00Z" (API datetime), etc.
+
+// RELIABLE — catches all March 15 records regardless of time component
+const params = { q: "[Field7] ge '2026-03-15' AND [Field7] lt '2026-03-16'" };
+```
+
+**Rule of thumb:** Always use range queries (`ge` + `lt`) instead of exact equality (`eq`) when filtering on date-only fields. This is necessary because the VV server does not enforce date-only semantics — it stores whatever datetime value was provided, and the "date-only" concept only exists in the Forms client-side JS.
+
+Empirically verified: [WS-BUG-6 audit](../../tasks/date-handling/web-services/analysis/ws-bug-6-no-date-only-enforcement.md) — exact equality returned 1 of 2 March 15 records; range query returned both.
 
 ---
 

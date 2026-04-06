@@ -11,7 +11,7 @@ The VisualVault platform has **7 confirmed date-handling bugs** affecting how ca
 - Produces both human-readable test documentation (in `tasks/date-handling/`) and reusable Playwright specs (here)
 
 Full investigation context: `tasks/date-handling/CLAUDE.md`
-Bug analysis: `tasks/date-handling/forms-calendar/analysis.md`
+Bug analysis: `tasks/date-handling/forms-calendar/analysis/overview.md`
 Test matrix: `tasks/date-handling/forms-calendar/matrix.md`
 
 ---
@@ -60,24 +60,25 @@ Shared config:
 
 ## File Reference
 
-| File                           | Purpose                                                                                 |
-| ------------------------------ | --------------------------------------------------------------------------------------- |
-| `../fixtures/vv-config.js`     | Shared constants: form URL, field map (A-H), record definitions, saved record URLs      |
-| `../fixtures/test-data.js`     | All test case definitions as structured data (data-driven parameterization)             |
-| `../helpers/vv-form.js`        | Generic VV form helpers: navigation, field verification, value capture, save            |
-| `../helpers/vv-calendar.js`    | Calendar helpers: popup selection (date-only + DateTime), typed input                   |
-| `../global-setup.js`           | Runs before all tests: auth + creates saved records via browser UI per timezone         |
-| `cat-1-calendar-popup.spec.js` | Category 1 — calendar popup date selection tests                                        |
-| `cat-2-typed-input.spec.js`    | Category 2 — keyboard segment-by-segment date entry tests                               |
-| `cat-3-server-reload.spec.js`  | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                   |
-| `cat-5-preset-date.spec.js`    | Category 5 — preset date default auto-population tests                                  |
-| `cat-6-current-date.spec.js`   | Category 6 — current date default auto-population tests                                 |
-| `cat-7-setfieldvalue.spec.js`  | Category 7 — SetFieldValue input format tests (Date obj, ISO±Z, US, epoch)              |
-| `cat-8-getfieldvalue.spec.js`  | Category 8 — GetFieldValue return value tests                                           |
-| `cat-8b-getdateobject.spec.js` | Category 8B — GetDateObjectFromCalendar return tests                                    |
-| `cat-9-gfv-roundtrip.spec.js`  | Category 9 — GFV round-trip drift tests (SetFieldValue → GetFieldValue → SetFieldValue) |
-| `cat-9-gdoc-roundtrip.spec.js` | Category 9-GDOC — GDOC round-trip tests (SetFieldValue → GetDateObject → SetFieldValue) |
-| `cat-12-edge-cases.spec.js`    | Category 12 — edge case and boundary condition tests                                    |
+| File                              | Purpose                                                                                 |
+| --------------------------------- | --------------------------------------------------------------------------------------- |
+| `../fixtures/vv-config.js`        | Shared constants: form URL, field map (A-H), record definitions, saved record URLs      |
+| `../fixtures/test-data.js`        | All test case definitions as structured data (data-driven parameterization)             |
+| `../helpers/vv-form.js`           | Generic VV form helpers: navigation, field verification, value capture, save            |
+| `../helpers/vv-calendar.js`       | Calendar helpers: popup selection (date-only + DateTime), typed input                   |
+| `../global-setup.js`              | Runs before all tests: auth + creates saved records via browser UI per timezone         |
+| `cat-1-calendar-popup.spec.js`    | Category 1 — calendar popup date selection tests                                        |
+| `cat-2-typed-input.spec.js`       | Category 2 — keyboard segment-by-segment date entry tests                               |
+| `cat-3-server-reload.spec.js`     | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                   |
+| `cat-5-preset-date.spec.js`       | Category 5 — preset date default auto-population tests                                  |
+| `cat-6-current-date.spec.js`      | Category 6 — current date default auto-population tests                                 |
+| `cat-7-setfieldvalue.spec.js`     | Category 7 — SetFieldValue input format tests (Date obj, ISO±Z, US, epoch)              |
+| `cat-8-getfieldvalue.spec.js`     | Category 8 — GetFieldValue return value tests                                           |
+| `cat-8b-getdateobject.spec.js`    | Category 8B — GetDateObjectFromCalendar return tests                                    |
+| `cat-9-gfv-roundtrip.spec.js`     | Category 9 — GFV round-trip drift tests (SetFieldValue → GetFieldValue → SetFieldValue) |
+| `cat-9-gdoc-roundtrip.spec.js`    | Category 9-GDOC — GDOC round-trip tests (SetFieldValue → GetDateObject → SetFieldValue) |
+| `cat-12-edge-cases.spec.js`       | Category 12 — edge case and boundary condition tests                                    |
+| `audit-bug1-tz-stripping.spec.js` | Bug #1 audit — independent Playwright verification of parseDateString() Z-stripping     |
 
 ### External Config
 
@@ -117,13 +118,14 @@ Each config also has a `enableInitialValue` variant (for Preset Date / Current D
 
 ## Timezone Projects
 
-Tests run across 3 timezone contexts to expose timezone-dependent bugs:
+Tests run across 4 timezone contexts to expose timezone-dependent bugs:
 
-| Project | IANA Name         | Offset   | Why                                                                                                                |
-| ------- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
-| BRT     | America/Sao_Paulo | UTC-3    | **UTC- control**: local midnight is same calendar day in UTC. Most bugs hidden.                                    |
-| IST     | Asia/Calcutta     | UTC+5:30 | **UTC+ exposure**: local midnight is previous day in UTC. Bug #7 visible. Non-integer offset stress-tests parsing. |
-| UTC0    | Etc/GMT           | UTC+0    | **Boundary control**: local = UTC. Verifies bugs are timezone-dependent, not universal.                            |
+| Project | IANA Name           | Offset   | Why                                                                                                                |
+| ------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
+| BRT     | America/Sao_Paulo   | UTC-3    | **UTC- control**: local midnight is same calendar day in UTC. Most bugs hidden.                                    |
+| IST     | Asia/Calcutta       | UTC+5:30 | **UTC+ exposure**: local midnight is previous day in UTC. Bug #7 visible. Non-integer offset stress-tests parsing. |
+| UTC0    | Etc/GMT             | UTC+0    | **Boundary control**: local = UTC. Verifies bugs are timezone-dependent, not universal.                            |
+| PST     | America/Los_Angeles | UTC-8/-7 | **DST exposure**: PDT (UTC-7) active March–November. Tests DST-sensitive edge cases.                               |
 
 Playwright's `timezoneId` context option simulates these timezones at the browser level — no system timezone changes or Chrome restarts needed. `new Date().toString()` inside the page returns the simulated timezone.
 

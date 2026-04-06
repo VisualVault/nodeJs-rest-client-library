@@ -51,6 +51,14 @@ https://{env}.visualvault.com/FormViewer/app?DataID={recordGUID}&hidemenu=true&r
 
 The FormViewer is a completely separate SPA from the main VV shell. It runs independently with its own URL structure.
 
+### Form Details (opens a saved record within the VV app shell)
+
+```
+https://{env}.visualvault.com/app/{customer}/{database}/FormDetails?DataID={recordGUID}&Mode=ReadOnly&hidemenu=true
+```
+
+This is the route used by dashboards and the VV app to open form records. Unlike `FormViewer/app`, this loads VV.Form on the main page (no iframe, no standalone SPA). The dashboard's record-click link generates this URL via `VV.OpenWindow()` in a popup window.
+
 ### Dashboard Detail (shows a grid of form records)
 
 ```
@@ -110,6 +118,11 @@ Dashboards use **Telerik RadGrid** (ASP.NET WebForms) — a **server-side render
 | Pager          | `.rgPagerCell` — configurable page size (10/15/20/25/50/100/200/500) |
 | Default sort   | By Form ID descending (most recent first)                            |
 
+**Row data attributes** (useful for Playwright automation):
+
+- Checkbox `dhid` attribute = DataID (revisionId GUID)
+- Checkbox `dhdocid` attribute = instance name (e.g., `DateTest-001584`)
+
 **Column layout:** Columns are sorted **alphabetically** by field name (Field1, Field10, Field11, ..., Field2, Field20, ..., Field7), not numerically. The first column is always Form ID.
 
 ### Date Display Format
@@ -131,7 +144,7 @@ The `ignoreTimezone` and `useLegacy` flags do **not** affect the server-side dis
 | **Search**       | SQL filter builder (`a[title="Toggle search toolbar display"]`) — see [SQL Filter](#sql-filter-behavior) below                                                                       |
 | **Export**       | Excel (`.xls`), Word (`.doc`), XML (`.xml`) — inside a collapsible dock panel (hidden by default, toggle via toolbar "Export" button). See [Export Behavior](#export-behavior) below |
 | **Print**        | Print dialog with page range selection                                                                                                                                               |
-| **Record click** | `__doPostBack` opens the form record in FormViewer (server postback, same window)                                                                                                    |
+| **Record click** | `VV.OpenWindow()` opens `FormDetails?DataID=...&Mode=ReadOnly&hidemenu=true` in a popup (loads VV.Form on main page, no iframe)                                                      |
 | **Pagination**   | Server-side paging with configurable page size                                                                                                                                       |
 
 ### Sort Behavior
@@ -387,7 +400,7 @@ The core API's `getForms` read normalizes both to ISO+Z, masking the difference.
 - ISO+Z → Forms V1 interprets as UTC → converts to local time (CB-8 shift)
 - US format → Forms V1 interprets as local time → no conversion (preserved)
 
-See `tasks/date-handling/web-services/analysis.md` CB-29 for full evidence.
+See `tasks/date-handling/web-services/analysis/overview.md` CB-29 for full evidence.
 
 ---
 
@@ -437,7 +450,7 @@ The core API `postForms()` takes a template name and resolves it automatically. 
 | Form                          | Template GUID                                    | Template URL                                                                                                                                                                                             | Notes                                                                     |
 | ----------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | DateTest                      | `6be0265c-152a-f111-ba23-0afff212cc87`           | `https://vvdemo.visualvault.com/FormViewer/app?hidemenu=true&formid=6be0265c-152a-f111-ba23-0afff212cc87&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939`           | 8 date fields across all calendar configs; creates new instance each load |
-| DateTest Dashboard            | ReportID: `e522c887-e72e-f111-ba23-0e3ceb11fc25` | `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25`                                                                       | 272 records (as of 2026-04-02); Telerik RadGrid, server-rendered          |
+| DateTest Dashboard            | ReportID: `e522c887-e72e-f111-ba23-0e3ceb11fc25` | `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25`                                                                       | 467 records (as of 2026-04-06); Telerik RadGrid, server-rendered          |
 | DateTest-000004 Rev 1 (saved) | —                                                | `https://vvdemo.visualvault.com/FormViewer/app?DataID=2ae985b5-1892-4d26-94da-388121b0907e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939` | Saved record from BRT session; use for reload/cross-TZ tests              |
 
 ---
@@ -487,7 +500,7 @@ The VV REST API normalizes all date values in responses to ISO 8601 datetime wit
 
 ### No Server-Side Date-Only Enforcement
 
-The VV server has no date-only storage type. All date fields are stored as datetime, regardless of the `enableTime` flag. The "date-only" semantic is enforced only by the Forms client-side JS — the API and database treat all date fields identically. This means a "date-only" field can contain UTC midnight, local midnight as UTC, actual timestamps, or arbitrary times depending on the write source (Forms popup, preset, Current Date, or API). See `tasks/date-handling/web-services/analysis.md` for full evidence and impact analysis.
+The VV server has no date-only storage type. All date fields are stored as datetime, regardless of the `enableTime` flag. The "date-only" semantic is enforced only by the Forms client-side JS — the API and database treat all date fields identically. This means a "date-only" field can contain UTC midnight, local midnight as UTC, actual timestamps, or arbitrary times depending on the write source (Forms popup, preset, Current Date, or API). See `tasks/date-handling/web-services/analysis/overview.md` for full evidence and impact analysis.
 
 ### Data Passthrough
 
