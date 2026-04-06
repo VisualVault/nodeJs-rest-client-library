@@ -64,7 +64,7 @@ tasks/date-handling/
 
 **VV server timezone**: BRT (UTC-3) — confirmed by 3-hour offset between `VVCreateDate` (server local) and Field1 `toISOString()` (UTC).
 
-**Mixed timezone storage**: The same `datetime` column contains BOTH UTC values (from `toISOString()`) and timezone-ambiguous local values (from `getSaveValue()`). SQL queries cannot reliably filter by date without knowing which code path stored the value. See `analysis/bug-2-audit.md` and `analysis/bug-3-audit.md` for DB evidence tables.
+**Mixed timezone storage**: The same `datetime` column contains BOTH UTC values (from `toISOString()`) and timezone-ambiguous local values (from `getSaveValue()`). SQL queries cannot reliably filter by date without knowing which code path stored the value. See DB Evidence sections in `analysis/bug-2-inconsistent-handlers.md` and `analysis/bug-3-hardcoded-params.md`.
 
 ## Cross-Cutting Questions
 

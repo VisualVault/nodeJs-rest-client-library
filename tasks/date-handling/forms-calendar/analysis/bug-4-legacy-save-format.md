@@ -2,16 +2,16 @@
 
 ## Classification
 
-| Field                  | Value                                                                                                                                                                                           |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Severity**           | Medium                                                                                                                                                                                          |
-| **Evidence**           | `[CODE]` — Confirmed in source code. Observable in live test stored values (Z absence in raw partition values).                                                                                 |
-| **Component**          | FormViewer → CalendarValueService → `getSaveValue()`                                                                                                                                            |
-| **Code Path**          | V1 (default) — the `else if` branch of `getSaveValue()` when `useUpdatedCalendarValueLogic=false`                                                                                               |
-| **Affected Configs**   | All configs with `enableTime=true` (C, D, G, H). Date-only configs (A, B, E, F) are unaffected because they extract only the date portion.                                                      |
-| **Affected TZs**       | All — the stripped value is ambiguous in every timezone                                                                                                                                         |
-| **Affected Scenarios** | 2 (Typed Input), 3 (Saved Data reload), 4 (URL Parameters), 5 (Preset Date)                                                                                                                     |
-| **Related Bugs**       | Complements Bug #1 — Bug #4 strips Z on save, Bug #1 strips Z on parse/load. Together they create a double-ambiguity pattern where neither side knows the timezone context of the stored value. |
+| Field                  | Value                                                                                                                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Severity**           | Medium                                                                                                                                                                                                              |
+| **Evidence**           | `[CODE]` + `[PLAYWRIGHT AUDIT 2026-04-06]` — Confirmed in source code + direct function invocation in BRT/IST + end-to-end verification. Observable in live test stored values (Z absence in raw partition values). |
+| **Component**          | FormViewer → CalendarValueService → `getSaveValue()`                                                                                                                                                                |
+| **Code Path**          | V1 (default) — the `else if` branch of `getSaveValue()` when `useUpdatedCalendarValueLogic=false`                                                                                                                   |
+| **Affected Configs**   | All configs with `enableTime=true` (C, D, G, H). Date-only configs (A, B, E, F) are unaffected because they extract only the date portion.                                                                          |
+| **Affected TZs**       | All — the stripped value is ambiguous in every timezone                                                                                                                                                             |
+| **Affected Scenarios** | 2 (Typed Input), 3 (Saved Data reload), 4 (URL Parameters), 5 (Preset Date)                                                                                                                                         |
+| **Related Bugs**       | Complements Bug #1 — Bug #4 strips Z on save, Bug #1 strips Z on parse/load. Together they create a double-ambiguity pattern where neither side knows the timezone context of the stored value.                     |
 
 ---
 
@@ -154,17 +154,70 @@ All DateTime stored values consistently lack the Z suffix — confirmed across c
 - Category 3 (Server Reload): 18/18 complete — 10P, 8F (corrected 2026-04-06)
 - Category 7 (SetFieldValue): 38/39 done — 29P, 9F
 
-### Playwright Audit (2026-04-06)
+### Audit Status `[PLAYWRIGHT AUDIT 2026-04-06]`
 
-**Multi-method verification achieved.** See [bug-4-audit.md](bug-4-audit.md) for full report.
+**Multi-method verification achieved**: source code, direct function invocation (BRT + IST), end-to-end testing, cross-config comparison, and Playwright spec regression.
 
-- Source code verified: `getSaveValue()` at line 104106 strips Z via `moment().format("YYYY-MM-DD[T]HH:mm:ss")`; `getCalendarFieldValue()` at line 104122 reinterprets via `new Date(t).toISOString()`
-- Direct function invocation in BRT + IST confirms:
-    - `getSaveValue("2026-03-15T03:00:00.000Z", true, false)` → `"2026-03-15T00:00:00"` (Z stripped)
-    - `getCalendarFieldValue({C config}, "2026-03-15T00:00:00")` → `"2026-03-15T03:00:00.000Z"` in BRT, `"2026-03-14T18:30:00.000Z"` in IST
-- End-to-end: typed "03/15/2026 12:00 AM" in Config C → raw has no Z, GFV shifts by TZ offset
-- Cross-config: C affected (+3h in BRT), D affected (fake Z, Bug #5), G/H immune (legacy passthrough)
+**Source Code Verification — CONFIRMED**:
+
+- `getSaveValue()` at line 104106: `moment(input).format('YYYY-MM-DD[T]HH:mm:ss')` — strips Z and milliseconds
+- `getCalendarFieldValue()` at line 104122: `new Date(t).toISOString()` — reinterprets Z-less value as local → UTC
+- V2 path correctly preserves Z in both functions
+
+**Direct Function Invocation — getSaveValue() Z-stripping**:
+
+BRT (UTC-3):
+
+| Input                                       | Output                  | Z Present |
+| ------------------------------------------- | ----------------------- | :-------: |
+| `"2026-03-15T00:00:00.000Z"` (UTC midnight) | `"2026-03-14T21:00:00"` |  **NO**   |
+| `"2026-03-15T03:00:00.000Z"` (BRT midnight) | `"2026-03-15T00:00:00"` |  **NO**   |
+| `"2026-03-15T00:00:00"` (no Z)              | `"2026-03-15T00:00:00"` |  **NO**   |
+
+IST (UTC+5:30):
+
+| Input                                       | Output                  | Z Present |
+| ------------------------------------------- | ----------------------- | :-------: |
+| `"2026-03-15T00:00:00.000Z"` (UTC midnight) | `"2026-03-15T05:30:00"` |  **NO**   |
+
+**Direct Function Invocation — getCalendarFieldValue() reinterpretation** (stored `"2026-03-15T00:00:00"`):
+
+| Config                            | Output                       | Changed | Bug                 |
+| --------------------------------- | ---------------------------- | :-----: | ------------------- |
+| C (DateTime, !ignoreTZ, !legacy)  | `"2026-03-15T03:00:00.000Z"` | **YES** | Bug #4 (+3h in BRT) |
+| D (DateTime, ignoreTZ, !legacy)   | `"2026-03-15T00:00:00.000Z"` | **YES** | Bug #5 (fake [Z])   |
+| G (DateTime, !ignoreTZ, legacy)   | `"2026-03-15T00:00:00"`      |   NO    | Passthrough         |
+| A (date-only, !ignoreTZ, !legacy) | `"2026-03-15T00:00:00"`      |   NO    | Passthrough         |
+
+**End-to-End Verification**:
+
+- BRT Config C, typed "03/15/2026 12:00 AM": raw stored `"2026-03-15T00:00:00"` (Z stripped), GFV returns `"2026-03-15T03:00:00.000Z"` (+3h)
+- IST Config C, typed "03/15/2026 12:00 AM": raw stored `"2026-03-15T00:00:00"` (Z stripped), GFV returns `"2026-03-14T18:30:00.000Z"` (-5.5h, crosses day boundary)
+- Cross-config: C affected (+3h BRT), D affected (fake Z/Bug #5), G/H immune (legacy passthrough)
 - Playwright Cat 2 TC-2-C-BRT: FAIL at api assertion — confirms Bug #4 via automated test
+
+**The Bug #4 Chain**:
+
+```
+User types "03/15/2026 12:00 AM" in Config C field
+    ↓
+calChange() → toISOString() → "2026-03-15T03:00:00.000Z" (correct UTC)
+    ↓
+getSaveValue("...Z", enableTime=true, ignoreTZ=false)
+    → moment("...Z").format("YYYY-MM-DD[T]HH:mm:ss")
+    → "2026-03-15T00:00:00" (Z STRIPPED — Bug #4)
+    ↓
+Stored in partition: "2026-03-15T00:00:00" (timezone-ambiguous)
+    ↓
+GetFieldValue() → getCalendarFieldValue({!ignoreTZ, !legacy, enableTime}, "2026-03-15T00:00:00")
+    → new Date("2026-03-15T00:00:00").toISOString()
+    → "2026-03-15T03:00:00.000Z" in BRT (reinterprets as local midnight → UTC)
+    → "2026-03-14T18:30:00.000Z" in IST (reinterprets as IST midnight → UTC)
+```
+
+**DB Context**: All fields are SQL `datetime` — the Z-less value is stored as `2026-03-15 00:00:00.000` in the DB. This is timezone-ambiguous. Cross-TZ queries comparing DateTime values from different-TZ users will produce incorrect results.
+
+**Artifacts created**: `testing/scripts/audit-bug4-save-format.js` (5 tests, BRT + IST)
 
 ---
 

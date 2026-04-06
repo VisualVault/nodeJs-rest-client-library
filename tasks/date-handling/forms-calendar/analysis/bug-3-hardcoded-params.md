@@ -2,16 +2,16 @@
 
 ## Classification
 
-| Field                  | Value                                                                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **Severity**           | Medium                                                                                                                                 |
-| **Evidence**           | `[CODE]` — Confirmed in source code. V2 code path only; V1 has equivalent hardcoding. Not live-tested (V2 never activated in testing). |
-| **Component**          | FormViewer → Calendar Component → `initCalendarValueV2()`                                                                              |
-| **Code Path**          | V2 only (`useUpdatedCalendarValueLogic=true`) — but V1 has analogous issues                                                            |
-| **Affected Configs**   | All configs — any field where the hardcoded value differs from the actual setting                                                      |
-| **Affected TZs**       | All                                                                                                                                    |
-| **Affected Scenarios** | 3 (Saved Data — hardcodes `enableTime=true`), 5 (Preset Date — hardcodes both params)                                                  |
-| **Related Bugs**       | Amplifies Bug #1 by feeding wrong parameters to `parseDateString()`                                                                    |
+| Field                  | Value                                                                                                                                                                                                                                               |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Severity**           | Medium                                                                                                                                                                                                                                              |
+| **Evidence**           | `[CODE]` + `[PLAYWRIGHT AUDIT 2026-04-06]` — Confirmed in source code + functional verification via parseDateString direct invocation. V2 code path only; V1 has equivalent hardcoding. Not end-to-end tested (V2 cannot be activated on test env). |
+| **Component**          | FormViewer → Calendar Component → `initCalendarValueV2()`                                                                                                                                                                                           |
+| **Code Path**          | V2 only (`useUpdatedCalendarValueLogic=true`) — but V1 has analogous issues                                                                                                                                                                         |
+| **Affected Configs**   | All configs — any field where the hardcoded value differs from the actual setting                                                                                                                                                                   |
+| **Affected TZs**       | All                                                                                                                                                                                                                                                 |
+| **Affected Scenarios** | 3 (Saved Data — hardcodes `enableTime=true`), 5 (Preset Date — hardcodes both params)                                                                                                                                                               |
+| **Related Bugs**       | Amplifies Bug #1 by feeding wrong parameters to `parseDateString()`                                                                                                                                                                                 |
 
 ---
 
@@ -154,16 +154,99 @@ this.calendarValueService.parseDateString(
 - **No live test coverage**: V2 was never activated during testing (all tests used standard standalone form → V1)
 - The `useUpdatedCalendarValueLogic` flag was confirmed `false` via live CalendarValueService scan (2026-03-30)
 
-### Playwright Audit (2026-04-06)
+### Audit Status `[PLAYWRIGHT AUDIT 2026-04-06]`
 
-**Functional verification via parseDateString direct invocation.** See [bug-3-audit.md](bug-3-audit.md) for full report.
+**Three-pronged verification**: source code reading, parseDateString functional testing, and V2 activation probe.
 
-- Source code verified at lines 102939 (`!0` = enableTime hardcoded true) and 102948 (`!1, !0` = enableTime false, ignoreTimezone true)
-- `parseDateString()` called directly in browser with hardcoded vs correct params → **different outputs confirmed**:
-    - Date-only `"2026-03-15"`: enableTime=true → `"2026-03-15T00:00:00.000Z"` vs enableTime=false → `"2026-03-14T03:00:00.000Z"`
-    - DateTime preset `"2026-03-15T00:00:00"`: hardcoded → `"2026-03-15T03:00:00.000Z"` vs correct → `"2026-03-15T00:00:00.000Z"` (3h shift)
-- V2 activation attempted via `?ObjectID=` — V2 could NOT be activated on vvdemo environment
-- Cat 3 V1 regression re-verified: 10P/8F (BRT + IST, Chromium)
+**1. Source Code Verification — CONFIRMED**
+
+Hardcoded parameters verified at exact line numbers in main.js:
+
+- Line 102939: `!0` (true) hardcoded for `enableTime` in saved data path
+- Lines 102947-102949: `!1` (false) hardcoded for `enableTime`, `!0` (true) hardcoded for `ignoreTimezone` in preset path
+- Contrast: URL query string path (lines 102934-102935) **correctly** uses actual settings `this.data.enableTime` / `this.data.ignoreTimezone`
+
+**2. parseDateString Functional Test — BUG CONFIRMED**
+
+Direct invocation in browser with hardcoded vs correct parameters:
+
+| Input                        | Scenario                   | V2 Hardcoded Params                 | Correct Params                   | V2 Result                          | Correct Result               | Match  |
+| ---------------------------- | -------------------------- | ----------------------------------- | -------------------------------- | ---------------------------------- | ---------------------------- | ------ |
+| `"2026-03-15"`               | Date-only saved (Config A) | enableTime=true, ignoreTZ=false     | enableTime=false, ignoreTZ=false | `"2026-03-15T00:00:00.000Z"`       | `"2026-03-14T03:00:00.000Z"` | **NO** |
+| `"2026-03-15T00:00:00"`      | DateTime preset (Config C) | enableTime=false, ignoreTZ=true     | enableTime=true, ignoreTZ=false  | `"2026-03-15T03:00:00.000Z"`       | `"2026-03-15T00:00:00.000Z"` | **NO** |
+| `"2026-03-15T03:00:00.000Z"` | Legacy-stored UTC          | enableTime=true                     | enableTime=false                 | `"2026-03-15T03:00:00.000Z"`       | `"2026-03-15T03:00:00.000Z"` | YES    |
+| `"2026-03-15T00:00:00"`      | Config D saved vs preset   | enableTime=true/false,ignoreTZ=true | —                                | Both: `"2026-03-15T03:00:00.000Z"` | —                            | YES    |
+
+Key finding: hardcoded parameters produce materially different results for date-only fields loading saved data and DateTime presets with ignoreTZ=false.
+
+**3. V2 Activation Probe — V2 COULD NOT BE ACTIVATED**
+
+| Method                                                                     | Result                           |
+| -------------------------------------------------------------------------- | -------------------------------- |
+| `?ObjectID={fakeGUID}` appended to URL                                     | V2 flag remains `false`          |
+| `?ObjectID=` as first URL param                                            | V2 flag remains `false`          |
+| Manual `calendarValueService.useUpdatedCalendarValueLogic = true` + reload | Flag resets to `false` on reload |
+
+Conclusion: V2 cannot be activated on vvdemo test environment. Bug #3 is **code-confirmed + functionally verified, NOT end-to-end tested**.
+
+**4. Category 3 V1 Regression — 10P/8F (matches matrix)**
+
+BRT-chromium (12 tests: 6P/6F):
+
+| Test        | Status | Bug                                        |
+| ----------- | ------ | ------------------------------------------ |
+| 3-A-BRT-BRT | PASS   | —                                          |
+| 3-B-BRT-BRT | PASS   | —                                          |
+| 3-E-BRT-BRT | PASS   | —                                          |
+| 3-F-BRT-BRT | PASS   | —                                          |
+| 3-G-BRT-BRT | PASS   | —                                          |
+| 3-H-BRT-BRT | PASS   | —                                          |
+| 3-A-IST-BRT | FAIL   | Bug #7                                     |
+| 3-B-IST-BRT | FAIL   | Bug #7                                     |
+| 3-C-BRT-BRT | FAIL   | Bug #4                                     |
+| 3-C-IST-BRT | FAIL   | Bug #1+#4 (RangeError: Invalid time value) |
+| 3-D-BRT-BRT | FAIL   | Bug #5                                     |
+| 3-D-IST-BRT | FAIL   | Bug #5                                     |
+
+IST-chromium (6 tests: 4P/2F):
+
+| Test        | Status | Bug       |
+| ----------- | ------ | --------- |
+| 3-A-BRT-IST | PASS   | —         |
+| 3-B-BRT-IST | PASS   | —         |
+| 3-E-BRT-IST | PASS   | —         |
+| 3-H-BRT-IST | PASS   | —         |
+| 3-C-BRT-IST | FAIL   | Bug #1+#4 |
+| 3-D-BRT-IST | FAIL   | Bug #5    |
+
+**Note**: date-handling CLAUDE.md claims "Cat 3 fully complete 18/18 (14P, 4F)" — this is incorrect. The correct count is **10P/8F**.
+
+### DB Context `[PLAYWRIGHT AUDIT 2026-04-06]`
+
+**Schema**: All fields are SQL Server `datetime` — no `date` column type. `parseDateString()` output passes through `getSaveValue()` to become a `datetime` value in the DB.
+
+**V2 Bug #3 / Bug #7 Interaction — Critical Irony**: The hardcoded `enableTime=true` on V2 saved data path **accidentally prevents Bug #7** for date-only fields in UTC+:
+
+| parseDateString("2026-03-15", ...) | enableTime         | Result                       | Bug #7?                             |
+| ---------------------------------- | ------------------ | ---------------------------- | ----------------------------------- |
+| V2 hardcoded                       | `true` (hardcoded) | `"2026-03-15T00:00:00.000Z"` | **No** — preserves correct date     |
+| V2 "fixed"                         | `false` (actual)   | `"2026-03-14T03:00:00.000Z"` | **Yes** — shifts to March 14 in BRT |
+
+**Fixing Bug #3 without fixing Bug #7 first would INTRODUCE Bug #7 on the V2 load path.**
+
+**Cat 3 DB Evidence** — Cross-referencing saved records with actual DB values:
+
+| Record               | Field   | DB Value                  | Expected                  | Bug                              |
+| -------------------- | ------- | ------------------------- | ------------------------- | -------------------------------- |
+| cat3-A-BRT (000080)  | Field7  | `2026-03-15 00:00:00.000` | `2026-03-15 00:00:00.000` | None (BRT same-TZ)               |
+| cat3-AD-IST (000084) | Field7  | `2026-03-14 00:00:00.000` | `2026-03-15 00:00:00.000` | **#7: -1 day permanently in DB** |
+| cat3-B-IST (000485)  | Field10 | `2026-03-14 00:00:00.000` | `2026-03-15 00:00:00.000` | **#7: -1 day permanently in DB** |
+| cat3-EF-BRT (000471) | Field12 | `2026-03-15 00:00:00.000` | `2026-03-15 00:00:00.000` | None (legacy typed)              |
+| cat3-C-BRT (000106)  | Field6  | `2026-03-15 00:00:00.000` | `2026-03-15 00:00:00.000` | None (DateTime same-TZ)          |
+
+**Mixed Timezone Storage**: DB contains a mix of UTC and timezone-ambiguous values in the same `datetime` columns. VV server confirmed running in **BRT (UTC-3)** — VVCreateDate is 3 hours behind Field1 `toISOString()` values.
+
+**Artifacts created**: `testing/scripts/audit-bug3-v2-probe.js` (V2 probe + parseDateString functional test), `testing/scripts/audit-bug2-db-evidence.js`
 
 ---
 

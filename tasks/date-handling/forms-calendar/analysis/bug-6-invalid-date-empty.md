@@ -2,22 +2,22 @@
 
 ## Classification
 
-| Field                  | Value                                                                                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Severity**           | Medium (Config D: truthy garbage). **High for Config C** (uncaught RangeError — crash).                                                                            |
-| **Evidence**           | `[LIVE]` — Confirmed for Config D (returns `"Invalid Date"`) and Config C (throws `RangeError`). Tested in BRT, IST.                                               |
-| **Component**          | FormViewer → CalendarValueService → `getCalendarFieldValue()`                                                                                                      |
-| **Code Path**          | V1 (default) — V2 bypasses this entirely (returns raw value `""`)                                                                                                  |
-| **Affected Configs**   | C (`enableTime=true`, `ignoreTimezone=false`, `useLegacy=false`) and D (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) — two different failure modes |
-| **Affected TZs**       | All — timezone-independent (empty is empty everywhere)                                                                                                             |
-| **Affected Scenarios** | 8 (GetFieldValue on empty/cleared fields)                                                                                                                          |
-| **Related Bugs**       | Same function as Bug #5. Both are fixed by the same empty-guard addition.                                                                                          |
+| Field                  | Value                                                                                                                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Severity**           | Medium (Config D: truthy garbage). **High for Config C** (uncaught RangeError — crash). Three failure modes confirmed.                                                                                                 |
+| **Evidence**           | `[LIVE]` + `[PLAYWRIGHT AUDIT 2026-04-06]` — Confirmed for Config D (returns `"Invalid Date"`) and Config C (throws `RangeError`). Tested in BRT, IST. Audit discovered third failure mode: Config C + `null` → epoch. |
+| **Component**          | FormViewer → CalendarValueService → `getCalendarFieldValue()`                                                                                                                                                          |
+| **Code Path**          | V1 (default) — V2 bypasses this entirely (returns raw value `""`)                                                                                                                                                      |
+| **Affected Configs**   | C (`enableTime=true`, `ignoreTimezone=false`, `useLegacy=false`) and D (`enableTime=true`, `ignoreTimezone=true`, `useLegacy=false`) — two different failure modes                                                     |
+| **Affected TZs**       | All — timezone-independent (empty is empty everywhere)                                                                                                                                                                 |
+| **Affected Scenarios** | 8 (GetFieldValue on empty/cleared fields)                                                                                                                                                                              |
+| **Related Bugs**       | Same function as Bug #5. Both are fixed by the same empty-guard addition.                                                                                                                                              |
 
 ---
 
 ## Summary
 
-When a Config C or D calendar field is empty (value is `""`), `getCalendarFieldValue()` does not guard against empty input before applying its transformation. This produces **two different failure modes** depending on the `ignoreTimezone` flag: Config D (`ignoreTimezone=true`) calls `moment("").format(...)` which returns the literal string `"Invalid Date"` — a truthy value that breaks developer conditionals. Config C (`ignoreTimezone=false`) calls `new Date("").toISOString()` which throws an uncaught `RangeError` — crashing any script that doesn't wrap the call in try/catch. Both failures are absent in date-only configs, legacy configs, and the V2 code path.
+When a Config C or D calendar field is empty (value is `""` or `null`), `getCalendarFieldValue()` does not guard against empty input before applying its transformation. This produces **three different failure modes**: Config D (`ignoreTimezone=true`) with `""` or `null` calls `moment("").format(...)` which returns the literal string `"Invalid Date"` — a truthy value that breaks developer conditionals. Config C (`ignoreTimezone=false`) with `""` calls `new Date("").toISOString()` which throws an uncaught `RangeError` — crashing any script that doesn't wrap the call in try/catch. Config C with `null` calls `new Date(null).toISOString()` which silently returns `"1970-01-01T00:00:00.000Z"` (Unix epoch) — a valid-looking but completely wrong date. All three failures are absent in date-only configs, legacy configs, and the V2 code path.
 
 ---
 
@@ -30,18 +30,22 @@ When a Config C or D calendar field is empty (value is `""`), `getCalendarFieldV
 
 ### Failure Mode Summary
 
-| Config | `ignoreTimezone` | Empty GFV Return        | Type      | Truthy? | Crashes? |
-| ------ | :--------------: | ----------------------- | --------- | :-----: | :------: |
-| A      |      false       | `""`                    | String    |   No    |    No    |
-| B      |       true       | `""`                    | String    |   No    |    No    |
-| **C**  |      false       | **throws `RangeError`** | Exception |   N/A   | **YES**  |
-| **D**  |       true       | **`"Invalid Date"`**    | String    | **YES** |    No    |
-| E      |      false       | `""`                    | String    |   No    |    No    |
-| F      |       true       | `""`                    | String    |   No    |    No    |
-| G      |      false       | `""`                    | String    |   No    |    No    |
-| H      |       true       | `""`                    | String    |   No    |    No    |
+| Config | `ignoreTimezone` | Input  | GFV Return                       | Type      | Truthy? | Crashes? |
+| ------ | :--------------: | ------ | -------------------------------- | --------- | :-----: | :------: |
+| A      |      false       | `""`   | `""`                             | String    |   No    |    No    |
+| B      |       true       | `""`   | `""`                             | String    |   No    |    No    |
+| **C**  |      false       | `""`   | **throws `RangeError`**          | Exception |   N/A   | **YES**  |
+| **C**  |      false       | `null` | **`"1970-01-01T00:00:00.000Z"`** | String    | **YES** |    No    |
+| **D**  |       true       | `""`   | **`"Invalid Date"`**             | String    | **YES** |    No    |
+| **D**  |       true       | `null` | **`"Invalid Date"`**             | String    | **YES** |    No    |
+| E      |      false       | `""`   | `""`                             | String    |   No    |    No    |
+| F      |       true       | `""`   | `""`                             | String    |   No    |    No    |
+| G      |      false       | `""`   | `""`                             | String    |   No    |    No    |
+| H      |       true       | `""`   | `""`                             | String    |   No    |    No    |
 
 Only configs where `enableTime=true` AND `useLegacy=false` are affected. The `useLegacy` guard causes the function to `return value` early (the raw `""` string), which is correct.
+
+**Third failure mode** `[PLAYWRIGHT AUDIT 2026-04-06]`: Config C with `null` input does NOT throw — instead `new Date(null)` creates the Unix epoch (`1970-01-01T00:00:00.000Z`), which is a valid ISO string. This means Config C with null silently returns a wrong date instead of crashing. This is arguably worse than the crash because it's undetectable at runtime.
 
 ---
 
@@ -231,16 +235,42 @@ GDOC is immune — no Bug #6 equivalent.
 - 4 of 6 failures are Bug #5 (fake Z on populated Config D)
 - 2 of 6 failures are Bug #6 (empty Config C/D)
 
-### Playwright Audit (2026-04-06)
+### Audit Status `[PLAYWRIGHT AUDIT 2026-04-06]`
 
-**Multi-method verification achieved.** See [bug-6-audit.md](bug-6-audit.md) for full report.
+**Multi-method verification achieved**: all 8 configs tested on empty fields, direct function invocation with empty and null inputs, developer pattern verification, and GDOC workaround confirmation.
 
-- All 8 configs tested on empty fields: only C and D affected, A/B/E/F/G/H return `""` correctly
-- Direct `getCalendarFieldValue()` invocation confirms: Config C throws `RangeError`, Config D returns `"Invalid Date"` (truthy)
-- **New finding**: Config C with `null` input returns `"1970-01-01T00:00:00.000Z"` (epoch) — third failure mode
-- Developer pattern `if(GFV)` verified broken: Config D enters block for empty field, Config C crashes
-- GDOC workaround confirmed safe: returns `undefined` (falsy) for all empty fields across all configs
-- Playwright Cat 8 empty tests: 8-C-empty FAIL (RangeError), 8-D-empty FAIL ("Invalid Date"), 8-A-empty PASS, 8-H-empty PASS
+**All 8 Configs — Empty Field GFV**:
+
+| Config | Field      | enableTime | ignoreTZ  |  legacy   | GFV Return            |  Truthy  | Bug #6?          |
+| :----: | ---------- | :--------: | :-------: | :-------: | --------------------- | :------: | ---------------- |
+|   A    | Field7     |   false    |   false   |   false   | `""`                  |  false   | NO               |
+|   B    | Field10    |   false    |   true    |   false   | `""`                  |  false   | NO               |
+| **C**  | **Field6** |  **true**  | **false** | **false** | **THROWS RangeError** |    —     | **YES (crash)**  |
+| **D**  | **Field5** |  **true**  | **true**  | **false** | **`"Invalid Date"`**  | **TRUE** | **YES (truthy)** |
+|   E    | Field12    |   false    |   false   |   true    | `""`                  |  false   | NO               |
+|   F    | Field11    |   false    |   true    |   true    | `""`                  |  false   | NO               |
+|   G    | Field14    |    true    |   false   |   true    | `""`                  |  false   | NO               |
+|   H    | Field13    |    true    |   true    |   true    | `""`                  |  false   | NO               |
+
+**Direct getCalendarFieldValue() — Empty and Null Inputs**:
+
+| Config | Input      | Result                                  | Issue                                                 |
+| ------ | ---------- | --------------------------------------- | ----------------------------------------------------- |
+| C      | `""`       | THROWS `RangeError: Invalid time value` | `new Date("").toISOString()` crashes                  |
+| D      | `""`       | `"Invalid Date"` (truthy)               | `moment("").format(...)` returns literal string       |
+| G      | `""`       | `""`                                    | Safe (legacy passthrough)                             |
+| H      | `""`       | `""`                                    | Safe (legacy passthrough)                             |
+| A      | `""`       | `""`                                    | Safe (date-only passthrough)                          |
+| **D**  | **`null`** | **`"Invalid Date"`**                    | Same bug with null input                              |
+| **C**  | **`null`** | **`"1970-01-01T00:00:00.000Z"`**        | **Epoch return**: `new Date(null)` = epoch, NOT crash |
+
+**Developer Pattern Verification**: `if (VV.Form.GetFieldValue('field'))` — Config A returns `""` (falsy, correct), Config D returns `"Invalid Date"` (truthy, WRONG), Config C throws RangeError (CRASHES), Config H returns `""` (falsy, correct).
+
+**GDOC Workaround Confirmed Safe**: `GetDateObjectFromCalendar()` returns `undefined` (falsy) for all empty fields across all configs — universally safe.
+
+**Playwright Cat 8 Spec Regression**: 8-A-empty PASS, 8-C-empty FAIL (RangeError), 8-D-empty FAIL ("Invalid Date"), 8-H-empty PASS.
+
+**Artifacts created**: `testing/scripts/audit-bug6-empty-fields.js` (4 tests)
 
 ---
 

@@ -2,16 +2,16 @@
 
 ## Classification
 
-| Field                  | Value                                                                                                                                                                                                       |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Severity**           | **HIGH** — affects ALL UTC+ users on ALL date-only fields, on every input path                                                                                                                              |
-| **Evidence**           | `[LIVE]` — Confirmed in IST (UTC+5:30) across Categories 1, 2, 5, 7, 9, 12. -1 day for all string inputs. Date object -2 day `[VERIFIED — audit 2026-04-06]`. BRT and UTC0 confirmed unaffected (controls). |
-| **Component**          | FormViewer → Calendar Component → `normalizeCalValue()`                                                                                                                                                     |
-| **Code Path**          | V1 (default). V2 partially fixes for `ignoreTimezone=false` fields only.                                                                                                                                    |
-| **Affected Configs**   | A, B, E, F (`enableTime=false` — all date-only configs)                                                                                                                                                     |
-| **Affected TZs**       | UTC+ only (IST, JST, AEST, etc.). UTC- (BRT, EST, PST) and UTC+0 unaffected.                                                                                                                                |
-| **Affected Scenarios** | 1 (Popup), 2 (Typed), 3 (Saved Data — load path), 5 (Preset), 7 (SetFieldValue), 9 (Round-Trip)                                                                                                             |
-| **Related Bugs**       | Downstream of Bug #1 (Z stripping feeds ambiguous values into the same parsing). Independent of Bug #5 (different configs, different mechanism).                                                            |
+| Field                  | Value                                                                                                                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Severity**           | **HIGH** — affects ALL UTC+ users on ALL date-only fields, on every input path                                                                                                                                         |
+| **Evidence**           | `[LIVE]` + `[PLAYWRIGHT AUDIT 2026-04-06]` — Confirmed in IST (UTC+5:30) across Categories 1, 2, 5, 7, 9, 12. -1 day for all string inputs. Date object -2 day verified. BRT and UTC0 confirmed unaffected (controls). |
+| **Component**          | FormViewer → Calendar Component → `normalizeCalValue()`                                                                                                                                                                |
+| **Code Path**          | V1 (default). V2 partially fixes for `ignoreTimezone=false` fields only.                                                                                                                                               |
+| **Affected Configs**   | A, B, E, F (`enableTime=false` — all date-only configs)                                                                                                                                                                |
+| **Affected TZs**       | UTC+ only (IST, JST, AEST, etc.). UTC- (BRT, EST, PST) and UTC+0 unaffected.                                                                                                                                           |
+| **Affected Scenarios** | 1 (Popup), 2 (Typed), 3 (Saved Data — load path), 5 (Preset), 7 (SetFieldValue), 9 (Round-Trip)                                                                                                                        |
+| **Related Bugs**       | Downstream of Bug #1 (Z stripping feeds ambiguous values into the same parsing). Independent of Bug #5 (different configs, different mechanism).                                                                       |
 
 ---
 
@@ -349,19 +349,40 @@ In IST, each `SetFieldValue(GetFieldValue())` cycle loses an additional day: ini
 | 12-leap-day-IST        | A      | IST | `"2026-02-28"` | `"2026-02-27"` | Feb → Feb        | **FAIL** |
 | 12-near-midnight-1-IST | A      | IST | `"2026-03-15"` | `"2026-03-14"` | Standard         | **FAIL** |
 
-### Playwright Audit (2026-04-06)
+### Audit Status `[PLAYWRIGHT AUDIT 2026-04-06]`
 
-**Multi-method verification achieved.** See [bug-7-audit.md](bug-7-audit.md) for full report.
+**Multi-method verification achieved**: cross-TZ testing (IST + BRT), cross-config comparison (all 8 configs), Date object double-shift verification, round-trip compounding, and boundary crossing tests.
 
-- **IST date-only shift**: All 4 configs (A, B, E, F) store March 14 instead of March 15 — confirmed via SetFieldValue in Playwright IST context
-- **BRT control**: All 4 configs store March 15 correctly — confirms UTC- timezones unaffected
-- **DateTime unaffected**: All 4 DateTime configs (C, D, G, H) store correct value in IST
-- **useLegacy NO protection**: Configs E, F shift identically to A, B
-- **ignoreTimezone NO protection**: Configs B, F shift identically to A, E
-- **Date object double-shift**: `new Date(2026, 2, 15)` → stored `2026-03-13` (-2 days) in IST
-- **Round-trip compounding**: Mar 14 → Mar 13 → Mar 12 → Mar 11 (-1 day/trip, no limit)
-- **Year boundary**: Jan 1 2026 → Dec 31 2025 (year crossed); Apr 1 → Mar 31, Mar 1 → Feb 28 (months crossed)
-- **Playwright Cat 2 IST regression**: pending (background)
+**IST (UTC+5:30) — All Date-Only Configs Store Wrong Day**:
+
+| Config | Field   | Type                      | Input      | Stored       | Expected     | Bug #7?          |
+| :----: | ------- | ------------------------- | ---------- | ------------ | ------------ | ---------------- |
+| **A**  | Field7  | date-only                 | 03/15/2026 | `2026-03-14` | `2026-03-15` | **YES (-1 day)** |
+| **B**  | Field10 | date-only+ignoreTZ        | 03/15/2026 | `2026-03-14` | `2026-03-15` | **YES (-1 day)** |
+|   C    | Field6  | DateTime                  | 03/15/2026 | correct      | —            | NO               |
+|   D    | Field5  | DateTime+ignoreTZ         | 03/15/2026 | correct      | —            | NO               |
+| **E**  | Field12 | legacy date-only          | 03/15/2026 | `2026-03-14` | `2026-03-15` | **YES (-1 day)** |
+| **F**  | Field11 | legacy date-only+ignoreTZ | 03/15/2026 | `2026-03-14` | `2026-03-15` | **YES (-1 day)** |
+|   G    | Field14 | legacy DateTime           | 03/15/2026 | correct      | —            | NO               |
+|   H    | Field13 | legacy DateTime+ignoreTZ  | 03/15/2026 | correct      | —            | NO               |
+
+**BRT (UTC-3) Control**: All 4 date-only configs (A, B, E, F) store correctly. Confirms Bug #7 is UTC+ only.
+
+**Date Object Double-Shift (-2 days) — CONFIRMED**: `new Date(2026, 2, 15)` in IST stores `"2026-03-13"` (two full days early). Two local-midnight conversions: (1) `Date.toISOString()` → UTC string shifts -1 day, (2) `normalizeCalValue()` strips time → re-parses as local midnight shifts -1 day again.
+
+**Round-Trip Compounding — CONFIRMED**: Each `GetFieldValue→SetFieldValue` cycle loses -1 day. Mar 14 → Mar 13 → Mar 12 → Mar 11. No limit, accumulates indefinitely.
+
+**Calendar Boundary Crossing — CONFIRMED**:
+
+| Input       | Stored (IST) | Boundary Crossed   |
+| ----------- | ------------ | ------------------ |
+| Jan 1, 2026 | `2025-12-31` | **YEAR boundary**  |
+| Apr 1, 2026 | `2026-03-31` | **MONTH boundary** |
+| Mar 1, 2026 | `2026-02-28` | **MONTH boundary** |
+
+**Key confirmations**: `useLegacy=true` provides NO protection (E, F shift identically). `ignoreTimezone=true` provides NO protection (B, F shift identically).
+
+**Artifacts created**: `testing/scripts/audit-bug7-wrong-day.js` (5-test comprehensive audit, IST + BRT)
 
 ---
 

@@ -2,16 +2,16 @@
 
 ## Classification
 
-| Field                  | Value                                                                                    |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| **Severity**           | Medium (upgraded from Low — DB stores `datetime`, format difference = data difference)   |
-| **Evidence**           | `[LEGACY]` — NOT REPRODUCED for non-legacy configs. Confirmed only for `useLegacy=true`. |
-| **Component**          | FormViewer → Calendar Component → `calChangeSetValue()` vs `calChange()`                 |
-| **Code Path**          | V1 (default) — both handlers exist in V1                                                 |
-| **Affected Configs**   | E, F, G, H (`useLegacy=true` only)                                                       |
-| **Affected TZs**       | All                                                                                      |
-| **Affected Scenarios** | 1 (Calendar Popup), 2 (Typed Input)                                                      |
-| **Related Bugs**       | Format difference is distinct from Bug #7 (wrong day) which also affects these scenarios |
+| Field                  | Value                                                                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Severity**           | Medium (upgraded from Low — DB stores `datetime`, format difference = data difference)                                     |
+| **Evidence**           | `[LEGACY]` + `[PLAYWRIGHT AUDIT 2026-04-06]` — NOT REPRODUCED for non-legacy configs. Confirmed only for `useLegacy=true`. |
+| **Component**          | FormViewer → Calendar Component → `calChangeSetValue()` vs `calChange()`                                                   |
+| **Code Path**          | V1 (default) — both handlers exist in V1                                                                                   |
+| **Affected Configs**   | E, F, G, H (`useLegacy=true` only)                                                                                         |
+| **Affected TZs**       | All                                                                                                                        |
+| **Affected Scenarios** | 1 (Calendar Popup), 2 (Typed Input)                                                                                        |
+| **Related Bugs**       | Format difference is distinct from Bug #7 (wrong day) which also affects these scenarios                                   |
 
 ---
 
@@ -115,15 +115,76 @@ Both display the same date to the user, but the stored representation differs. T
 - Category 1 (popup): 20/20 complete — 7P, 13F
 - Category 2 (typed): 16/16 complete — 11P, 5F
 
-### Playwright Audit (2026-04-06)
+### Audit Status `[PLAYWRIGHT AUDIT 2026-04-06]`
 
-**Dual-method verification achieved.** See [bug-2-audit.md](bug-2-audit.md) for full report.
+**Dual-method verification achieved** across standalone audit script and formal Playwright spec.
 
-- Created `selectDateViaLegacyPopup()` helper in `testing/helpers/vv-calendar.js`
-- Created `testing/date-handling/cat-1-legacy-popup.spec.js` formal Playwright spec
-- All 4 BRT legacy configs (E/F/G/H) independently confirmed via automated Playwright — values match manual run-1 exactly
-- Cat 2 typed input re-verified via Playwright — all 4 legacy configs PASS
-- Config A control: popup = typed (no Bug #2)
+**Methodology**: Three verification methods run independently:
+
+1. **Standalone audit script** (`testing/scripts/explore-legacy-popup.js`) — Playwright headless Chromium, BRT timezone, programmatic popup interaction + typed input + value capture for all 4 legacy configs plus Config A control
+2. **Formal Playwright spec** (`testing/date-handling/cat-1-legacy-popup.spec.js`) — `--project BRT-chromium`, same test data and assertion framework as all other specs
+3. **Cat 2 re-verification** — `cat-2-typed-input.spec.js` re-run via `--project BRT-chromium` to confirm the typed input side independently
+
+**DOM Discovery**: Legacy fields use the **same Kendo calendar popup widget** as non-legacy fields. The only difference is the toggle mechanism:
+
+- **Non-legacy**: `<kendo-datepicker>` wrapper with `<span role="button" aria-label="Toggle calendar">`
+- **Legacy**: `<div class="d-picker"><input><span class="k-icon k-i-calendar cal-icon"></span></div>`
+
+Both open the same `<kendo-popup>` → `<kendo-calendar>` structure. This enabled reuse of `selectDateInDatePicker()` for the legacy popup spec.
+
+**Audit Script Results**:
+
+| Config      | Field   | Popup Raw                    | Typed Raw               | Raw Match | Bug #2  |
+| ----------- | ------- | ---------------------------- | ----------------------- | --------- | ------- |
+| A (control) | Field7  | `"2026-03-15"`               | `"2026-03-15"`          | YES       | NO      |
+| E           | Field12 | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15"`          | NO        | **YES** |
+| F           | Field11 | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15"`          | NO        | **YES** |
+| G           | Field14 | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15T00:00:00"` | NO        | **YES** |
+| H           | Field13 | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15T00:00:00"` | NO        | **YES** |
+
+**Playwright Spec Results**:
+
+Cat 1 Legacy Popup (`cat-1-legacy-popup.spec.js --project BRT-chromium`):
+
+| TC      | Expected                | Received                     | Result |
+| ------- | ----------------------- | ---------------------------- | ------ |
+| 1-E-BRT | `"2026-03-15"`          | `"2026-03-15T03:00:00.000Z"` | FAIL   |
+| 1-F-BRT | `"2026-03-15"`          | `"2026-03-15T03:00:00.000Z"` | FAIL   |
+| 1-G-BRT | `"2026-03-15T00:00:00"` | `"2026-03-15T03:00:00.000Z"` | FAIL   |
+| 1-H-BRT | `"2026-03-15T00:00:00"` | `"2026-03-15T03:00:00.000Z"` | FAIL   |
+
+Cat 2 Typed Input (`cat-2-typed-input.spec.js --project BRT-chromium`):
+
+| TC      | Expected                | Received                | Result |
+| ------- | ----------------------- | ----------------------- | ------ |
+| 2-E-BRT | `"2026-03-15"`          | `"2026-03-15"`          | PASS   |
+| 2-F-BRT | `"2026-03-15"`          | `"2026-03-15"`          | PASS   |
+| 2-G-BRT | `"2026-03-15T00:00:00"` | `"2026-03-15T00:00:00"` | PASS   |
+| 2-H-BRT | `"2026-03-15T00:00:00"` | `"2026-03-15T00:00:00"` | PASS   |
+
+**Run-1 vs Run-2 Comparison**:
+
+| TC      | Run-1 (Manual, 2026-03-31)   | Run-2 (PW, 2026-04-06)       | Match |
+| ------- | ---------------------------- | ---------------------------- | ----- |
+| 1-E-BRT | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15T03:00:00.000Z"` | YES   |
+| 1-F-BRT | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15T03:00:00.000Z"` | YES   |
+| 1-G-BRT | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15T03:00:00.000Z"` | YES   |
+| 1-H-BRT | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15T03:00:00.000Z"` | YES   |
+
+All run-2 values match run-1 exactly.
+
+**Evidence Quality**:
+
+| Criterion                 | Status                                         |
+| ------------------------- | ---------------------------------------------- |
+| Automated Playwright spec | Created and run (`cat-1-legacy-popup.spec.js`) |
+| Standalone audit script   | Run (`explore-legacy-popup.js`)                |
+| Non-legacy control        | Config A tested — no Bug #2                    |
+| Cross-category comparison | Cat 1 popup vs Cat 2 typed for all 4 configs   |
+| Run-1 vs Run-2 match      | All values identical across methods            |
+| Dual-method confirmation  | Manual (2026-03-31) + Playwright (2026-04-06)  |
+
+**Artifacts created**: `testing/helpers/vv-calendar.js` (added `selectDateViaLegacyPopup()`), `testing/date-handling/cat-1-legacy-popup.spec.js`, `testing/scripts/audit-bug2-db-evidence.js`, run files `tc-1-{E,F,G,H}-BRT-run-2.md`
 
 ---
 
@@ -143,7 +204,29 @@ Both display the same date to the user, but the stored representation differs. T
 
 - Only affects legacy configs (`useLegacy=true`)
 - Non-legacy configs are unaffected because `normalizeCalValue()` in the popup path normalizes the Date object before it reaches the divergent handlers
-- Medium severity — while legacy configs are the older code path, the DB stores `datetime` (not strings), so the format difference translates to actual data differences (3h offset in BRT, 5.5h in IST). See [bug-2-audit.md](bug-2-audit.md) DB Evidence section.
+- Medium severity — while legacy configs are the older code path, the DB stores `datetime` (not strings), so the format difference translates to actual data differences (3h offset in BRT, 5.5h in IST). See DB Evidence below.
+
+### DB Evidence `[PLAYWRIGHT AUDIT 2026-04-06]`
+
+The `dbo.DateTest` table schema reveals **all calendar fields are SQL Server `datetime` type** — there is no `date` column type. This means the JavaScript format difference translates to an **actual data difference in the database**.
+
+Two records created via Playwright, same date (March 15, 2026), different input methods:
+
+| Record | DataID                                 | Method       | Field12 (E, date-only) pre-save | Field14 (G, DateTime) pre-save |
+| ------ | -------------------------------------- | ------------ | ------------------------------- | ------------------------------ |
+| Popup  | `6b6d73a9-1b1d-4283-8816-834e25ab8258` | Legacy popup | `"2026-03-15T03:00:00.000Z"`    | `"2026-03-15T03:00:00.000Z"`   |
+| Typed  | `9c82f195-15cd-4309-9dec-e876994fcf2e` | Typed input  | `"2026-03-15"`                  | `"2026-03-15T00:00:00"`        |
+
+**Expected DB values**:
+
+| Field               | Popup record DB           | Typed record DB           | Difference  |
+| ------------------- | ------------------------- | ------------------------- | ----------- |
+| Field12 (date-only) | `2026-03-15 03:00:00.000` | `2026-03-15 00:00:00.000` | **3 hours** |
+| Field14 (DateTime)  | `2026-03-15 03:00:00.000` | `2026-03-15 00:00:00.000` | **3 hours** |
+
+SQL queries like `WHERE Field12 = '2026-03-15'` would match typed but NOT popup values. Reports, dashboards, and SQL filters become unreliable for legacy popup-entered dates. The 3-hour difference equals the BRT offset (UTC-3) — different offsets in other timezones.
+
+**Post-Save Normalization**: After saving, VV re-reads the record and the V1 init path normalizes the in-memory value. Popup Field12 post-save: `"2026-03-15"` (normalized from `"2026-03-15T03:00:00.000Z"`). The **display normalizes on next load**, but the **DB retains the UTC time**.
 
 ---
 

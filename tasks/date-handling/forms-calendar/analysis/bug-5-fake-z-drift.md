@@ -243,14 +243,48 @@ The drift is **latent** — the display is correct, but the GFV return value is 
 
 The Freshdesk ticket (#124697 / WADNR-10407) reports time mutation when opening forms created via `postForms` API. The root cause chain is: `postForms` stores ISO+Z → Forms V1 loads → `parseDateString()` strips Z → reinterprets as local → display shifts by TZ offset. Bug #5 is part of this chain — GFV returns the shifted local time with fake Z, making the problem worse if scripts then write the value back.
 
-### Playwright Audit (2026-04-06)
+### Audit Status `[PLAYWRIGHT AUDIT 2026-04-06]`
 
-**Multi-method verification achieved.** See [bug-5-audit.md](bug-5-audit.md) for full report.
+**Multi-method verification achieved**: TZ-invariance proof, direct function invocation, round-trip drift measurement, cross-config comparison, and edge case testing.
 
-- **TZ-invariance proof**: BRT and IST produce identical GFV output (`"...000Z"`) for same stored value → proves Z is literal, not real UTC. Config C contrast: BRT and IST produce DIFFERENT GFV output → proves Config C has real UTC conversion.
-- **Round-trip drift verified**: BRT -3h/trip (T00:00 → T21:00 → T18:00 → T15:00), IST +5:30h/trip (T00:00 → T05:30 → T11:00). Drift exactly proportional to TZ offset.
-- **Year boundary confirmed**: Jan 1 2026 midnight → 1 trip → Dec 31 2025 21:00. Year crossed in single round-trip.
-- **Cross-config**: D has fake Z, C has real UTC (Bug #4), G/H passthrough (legacy immune).
+**1. TZ-Invariance Proof — FAKE Z CONFIRMED**
+
+If Z were real UTC, BRT and IST would produce DIFFERENT values. If Z is fake (literal character), both produce IDENTICAL output:
+
+| Stored Value            | BRT GFV (Config D)           | IST GFV (Config D)           | Identical? |
+| ----------------------- | ---------------------------- | ---------------------------- | :--------: |
+| `"2026-03-15T00:00:00"` | `"2026-03-15T00:00:00.000Z"` | `"2026-03-15T00:00:00.000Z"` |  **YES**   |
+
+Config C contrast (real UTC via `new Date().toISOString()`):
+
+| Stored Value            | BRT GFV (Config C)           | IST GFV (Config C)           | Identical? |
+| ----------------------- | ---------------------------- | ---------------------------- | :--------: |
+| `"2026-03-15T00:00:00"` | `"2026-03-15T03:00:00.000Z"` | `"2026-03-14T18:30:00.000Z"` |   **NO**   |
+
+Config C produces different values per timezone = real UTC. Config D produces identical values = fake literal Z.
+
+**2. Round-Trip Drift — CONFIRMED**
+
+BRT (UTC-3): -3h per trip (T00:00 → T21:00 → T18:00 → T15:00). Exactly -3h = BRT offset. After 8 trips: -24h = full day lost.
+
+IST (UTC+5:30): +5:30h per trip (T00:00 → T05:30 → T11:00). Opposite direction from BRT — drift is proportional to TZ offset.
+
+**3. Year Boundary — CONFIRMED**
+
+Jan 1, 2026 midnight → 1 round-trip in BRT: `2026-01-01T00:00:00` → `2025-12-31T21:00:00`. **Year boundary crossed in a single round-trip.**
+
+**4. Cross-Config Comparison (BRT)**
+
+| Config                              | Raw         | GFV              | Z?  | Match  | Bug           |
+| ----------------------------------- | ----------- | ---------------- | --- | :----: | ------------- |
+| **D** (DateTime, ignoreTZ, !legacy) | `T00:00:00` | `T00:00:00.000Z` | YES | **NO** | **#5 fake Z** |
+| C (DateTime, !ignoreTZ, !legacy)    | `T00:00:00` | `T03:00:00.000Z` | YES | **NO** | #4 real UTC   |
+| G (DateTime, !ignoreTZ, legacy)     | `T00:00:00` | `T00:00:00`      | NO  |  YES   | —             |
+| H (DateTime, ignoreTZ, legacy)      | `T00:00:00` | `T00:00:00`      | NO  |  YES   | —             |
+
+**Source Code Verified**: `getCalendarFieldValue()` at line 104119 — format string `"YYYY-MM-DD[T]HH:mm:ss.SSS[Z]"` uses moment's literal `[Z]` escape, confirmed at documented line number.
+
+**Artifacts created**: `testing/scripts/audit-bug5-fake-z.js` (5-test comprehensive audit)
 
 ---
 
