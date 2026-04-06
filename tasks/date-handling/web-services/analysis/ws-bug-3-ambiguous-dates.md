@@ -113,11 +113,11 @@ console.log(result.data.datafield7);
 
 ```bash
 # Create a record with an ambiguous DD/MM date
-node tasks/date-handling/web-services/run-ws-test.js \
+node testing/scripts/run-ws-test.js \
   --action WS-1 --configs A --input-date "05/03/2026"
 
 # Read back the stored value
-node tasks/date-handling/web-services/run-ws-test.js \
+node testing/scripts/run-ws-test.js \
   --action WS-2 --configs A --record-id <record-name>
 # → datafield7 = "2026-05-03T00:00:00Z"  (May 3, not March 5)
 ```

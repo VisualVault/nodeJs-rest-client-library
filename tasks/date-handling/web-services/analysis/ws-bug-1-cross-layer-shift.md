@@ -170,7 +170,7 @@ Once a user opens and saves a `postForms`-created record, the shifted value beco
 Using the test harness:
 
 ```bash
-node tasks/date-handling/web-services/run-ws-test.js \
+node testing/scripts/run-ws-test.js \
   --action WS-1 --configs D --input-date "2026-03-15T14:30:00"
 ```
 
@@ -181,7 +181,7 @@ Note the record name from the output (e.g., DateTest-001566).
 ### 2. Read Back via API — Confirm Z Was Added
 
 ```bash
-node tasks/date-handling/web-services/run-ws-test.js \
+node testing/scripts/run-ws-test.js \
   --action WS-2 --configs D --record-id DateTest-001566
 ```
 

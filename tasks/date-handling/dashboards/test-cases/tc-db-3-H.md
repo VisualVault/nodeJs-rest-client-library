@@ -16,7 +16,7 @@
 P1 — Create a test record via WS-1 API with legacy IST popup simulated value:
 
 ```bash
-node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs H --input-date "2026-03-14T18:30:00"
+node testing/scripts/run-ws-test.js --action WS-1 --configs H --input-date "2026-03-14T18:30:00"
 ```
 
 P2 — Open the DateTest Dashboard and verify the record appears.

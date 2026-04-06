@@ -35,9 +35,6 @@ tasks/date-handling/
       ws-bug-{1-6}.md               # Individual bug documents (WEBSERVICE-BUG-1 through WEBSERVICE-BUG-6)
     matrix.md                        # Test matrix — WS-1 through WS-10 categories (148 slots, complete)
     results.md                       # Live test evidence
-    webservice-test-harness.js       # VV form button script — runs tests inside FormViewer
-    ws-harness-button.js             # Form button event script — triggers harness
-    run-ws-test.js                   # Direct Node.js test runner (via microservices server)
     test-cases/                      # Individual TC spec files
     runs/                            # Immutable execution records
     summaries/                       # Per-TC status files
@@ -50,12 +47,6 @@ tasks/date-handling/
     test-cases/                      # Individual TC spec files
     runs/                            # Immutable execution records
     summaries/                       # Per-TC status files
-    explore-dashboard.js             # Playwright grid capture + TZ comparison
-    test-cross-layer.js              # DB-6: dashboard vs form comparison
-    test-export-v1.js                # DB-7: export format verification
-    test-filter-v3.js                # DB-5: SQL filter tests
-    test-sort-v4.js                  # DB-4: column sort tests
-    verify-format-mismatch.js        # Independent verification: format + time shift
   reports/                           # (future) VV Reports date filtering/display
   files/                             # (future) Document date metadata
   workflows/                         # (future) Workflow date triggers

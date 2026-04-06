@@ -16,7 +16,7 @@
 P1 — Create a test record via WS-1 API with legacy IST popup simulated value:
 
 ```bash
-node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs G --input-date "2026-03-14T18:30:00"
+node testing/scripts/run-ws-test.js --action WS-1 --configs G --input-date "2026-03-14T18:30:00"
 ```
 
 This simulates: IST (UTC+5:30) user selects March 15 via legacy popup. Popup stores full UTC datetime: `new Date(2026,2,15,0,0,0)` at IST midnight = `2026-03-14T18:30:00Z`. The entire datetime shifts to the previous UTC day.

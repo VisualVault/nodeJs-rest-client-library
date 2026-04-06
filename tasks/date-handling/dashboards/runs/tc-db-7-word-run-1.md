@@ -29,4 +29,4 @@
 
 - Word export is HTML table with `.doc` extension — not native Word format. Opens in Word via HTML import.
 - File size nearly identical to Excel (261,089 vs 261,146 bytes) — confirms same underlying HTML.
-- Reproducible via: `node tasks/date-handling/dashboards/test-export-v1.js --format word`
+- Reproducible via: `npx playwright test testing/date-handling/dash-export.spec.js --grep "word export"`

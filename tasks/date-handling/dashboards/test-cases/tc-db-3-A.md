@@ -16,7 +16,7 @@
 P1 — Create a test record via WS-1 API with Bug #7 simulated value:
 
 ```bash
-node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date "2026-03-14"
+node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date "2026-03-14"
 ```
 
 The value `"2026-03-14"` represents what Bug #7 stores when a UTC+5:30 (IST) user intends `"2026-03-15"`. Bug #7 mechanism: `moment("2026-03-15").toDate()` at IST midnight = `2026-03-14T18:30:00Z` → `getSaveValue()` extracts UTC date → `"2026-03-14"`.

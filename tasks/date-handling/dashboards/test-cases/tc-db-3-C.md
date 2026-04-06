@@ -16,7 +16,7 @@
 P1 — Create a test record via WS-1 API with Bug #7 variant simulated value:
 
 ```bash
-node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs C --input-date "2026-03-14T00:00:00"
+node testing/scripts/run-ws-test.js --action WS-1 --configs C --input-date "2026-03-14T00:00:00"
 ```
 
 This simulates: a script calls `SetFieldValue('Field6', '2026-03-15')` from IST. `normalizeCalValue()` parses as IST midnight → `2026-03-14T18:30:00Z` → stored as `2026-03-14T00:00:00` after format processing. The intended date was 3/15 but midnight UTC of 3/14 was stored.

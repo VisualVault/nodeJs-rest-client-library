@@ -57,8 +57,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - VV demo server timezone confirmed as BRT (UTC-3) via VVCreateDate vs `toISOString()` offset analysis
 - Bug #4 through Bug #7 audit scripts and reports: `audit-bug4-save-format.js`, `audit-bug5-fake-z.js`, `audit-bug6-empty-fields.js`, `audit-bug7-wrong-day.js` with corresponding `bug-{4-7}-audit.md` reports. All 4 bugs independently confirmed via Playwright direct invocation + spec regression
 
+- Dashboard test specs (`dash-filter.spec.js`, `dash-sort.spec.js`, `dash-export.spec.js`, `dash-cross-layer.spec.js`) — converted from standalone scripts to Playwright specs in `testing/date-handling/`
+- `scripts/templates/` folder with boilerplate script patterns (`webservice-pattern.js`, `web-service-call-pattern.js`)
+- `scripts/log.js` — log shim so `scripts/server-scripts/` harness works locally via runner
+
 ### Changed
 
+- File reorganization: all JS files moved out of `tasks/date-handling/` (analysis-only folder). Server harness → `scripts/server-scripts/`, form button script → `scripts/form-scripts/`, test runner + verification scripts → `testing/scripts/`, templates → `scripts/templates/`, log shim → `testing/helpers/ws-log.js`. Deleted `forms-calendar/main.js` (webpack bundle)
 - Bug #2 severity upgraded from Low to **Medium** — DB schema shows all fields are `datetime` (no `date` type), making format inconsistency an actual data difference. SQL queries and reports affected
 - Matrix summary counts corrected across 6 categories to match actual row data: Cat 1 (7P/13F→4P/16F), Cat 2 (11P/5F→8P/8F), Cat 3 (14P/4F→10P/8F), Cat 7 (29P/9F→23P/16F), Cat 8 (12P/6F/1P→13P/6F/0P), Cat 12 (5P/9F→1P/13F). Total 130P/72F→111P/93F
 - DB wording audit across all 7 bug analysis docs: clarified SQL Server `datetime` storage semantics, replaced VV Query Admin display format with actual SSMS datetime values, updated Bug #7 double-shift from UNVERIFIED to VERIFIED (confirmed -2 days for Date objects in IST)

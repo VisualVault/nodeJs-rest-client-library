@@ -16,7 +16,7 @@
 P1 — Create a test record via WS-1 API with Bug #7 simulated value:
 
 ```bash
-node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs F --input-date "2026-03-14"
+node testing/scripts/run-ws-test.js --action WS-1 --configs F --input-date "2026-03-14"
 ```
 
 P2 — Open the DateTest Dashboard and verify the record appears.

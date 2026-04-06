@@ -117,12 +117,12 @@ For users in timezones east of London, [FORM-BUG-7](../../forms-calendar/analysi
 
 ```bash
 # 1. Create record with date-only string
-node tasks/date-handling/web-services/run-ws-test.js \
+node testing/scripts/run-ws-test.js \
   --action WS-1 --configs A --input-date "2026-03-15"
 # → DB stores: 2026-03-15 00:00:00.000 (midnight)
 
 # 2. Create another record with datetime string (same field type, same date)
-node tasks/date-handling/web-services/run-ws-test.js \
+node testing/scripts/run-ws-test.js \
   --action WS-1 --configs A --input-date "2026-03-15T14:30:00"
 # → DB stores: 2026-03-15 14:30:00.000 (2:30 PM — no enforcement!)
 
@@ -135,7 +135,7 @@ node tasks/date-handling/web-services/run-ws-test.js \
 
 ```bash
 # Exact equality — only matches midnight records
-node tasks/date-handling/web-services/run-ws-test.js \
+node testing/scripts/run-ws-test.js \
   --action WS-8 --configs A
 # OData: [Field7] eq '2026-03-15'
 # → Matches record 1 (midnight), MISSES record 2 (14:30)

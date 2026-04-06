@@ -334,7 +334,7 @@ const formValues = await page.evaluate(
 Use the `--compare` flag in `explore-dashboard.js` as a reference:
 
 ```bash
-node tasks/date-handling/dashboards/explore-dashboard.js --compare
+node testing/scripts/explore-dashboard.js --compare
 ```
 
 ---

@@ -16,7 +16,7 @@
 P1 — Create a test record via WS-1 API with Bug #5 drift simulated value:
 
 ```bash
-node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs D --input-date "2026-03-14T21:00:00"
+node testing/scripts/run-ws-test.js --action WS-1 --configs D --input-date "2026-03-14T21:00:00"
 ```
 
 This simulates: a BRT script does `SetFieldValue('Field5', GetFieldValue('Field5'))` once. Original value was `"2026-03-15T00:00:00"` (midnight). Bug #5 adds fake Z → `"2026-03-15T00:00:00.000Z"` → parsed as UTC midnight → BRT is UTC-3 → stored as `"2026-03-14T21:00:00"`. The date shifts from 3/15 to 3/14 after one round-trip.

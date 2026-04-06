@@ -26,7 +26,12 @@ nodeV2/
       testScheduledScripts.js        # GET /testscripts/scheduled/:name — local dev testing
   scripts/                           # Script examples
     form-scripts/                    # Form button event scripts
+      ws-harness-button.js           # DateTest WS Harness form button trigger
     server-scripts/                  # Scheduled/server-side scripts
+      webservice-test-harness.js     # DateTest WS Harness (all 10 categories via Action param)
+    templates/                       # Boilerplate script patterns
+      webservice-pattern.js          # Server-side web service template
+      web-service-call-pattern.js    # Form button AJAX call template
     test-scripts/                    # Local test scripts
   testing/                           # Playwright testing infrastructure
     README.md                        # Testing infrastructure entry point
@@ -36,6 +41,7 @@ nodeV2/
     helpers/                         # Reusable page helpers
       vv-form.js                     # Generic VV form automation (11 functions)
       vv-calendar.js                 # Calendar popup + typed input helpers
+      ws-log.js                      # Log shim for WS harness scripts (proxies to server lib)
     fixtures/                        # Shared test data and config
       vv-config.js                   # FIELD_MAP, form URLs, saved records
       test-data.js                   # All test case definitions (data-driven)
@@ -44,11 +50,16 @@ nodeV2/
     scripts/                         # Regression pipeline orchestrators + generators
       run-regression.js              # Forms pipeline: Playwright → artifacts
       run-ws-regression.js           # WS pipeline: run-ws-test.js → artifacts
+      run-ws-test.js                 # Direct Node.js CLI runner (auth + harness invocation)
       run-dash-regression.js         # Dashboard pipeline: grid capture → artifacts
       generate-artifacts.js          # Forms artifact generator
       generate-ws-artifacts.js       # WS artifact generator (matrix-based PASS/FAIL)
       generate-dash-artifacts.js     # Dashboard artifact generator (format-pattern validation)
-    date-handling/                   # Date-handling test specs (1 per category)
+      verify-ws4-browser.js          # Playwright verification for WS-4 cross-layer
+      verify-ws10-browser.js         # Playwright verification for WS-10 (postForms vs forminstance)
+      verify-format-mismatch.js      # Dashboard vs Forms format comparison
+      explore-dashboard.js           # Dashboard grid capture + TZ comparison
+    date-handling/                   # Date-handling test specs (1 per category + dashboard specs)
   docs/                              # Shared documentation
     architecture/                    # Platform architecture, component diagrams, data flow
     standards/                       # Coding standards, patterns, conventions
@@ -62,10 +73,6 @@ nodeV2/
         analysis/                    # Analysis & conclusions (overview + 7 per-bug documents)
       web-services/                  # REST API date handling testing (148 slots, complete — WS-1 through WS-10)
         analysis/                    # Analysis & conclusions (overview + 6 finding documents)
-        webservice-test-harness.js   # Server-side harness (all 10 categories via Action param)
-        run-ws-test.js               # Direct Node.js CLI runner (auth + harness invocation)
-        verify-ws4-browser.js        # Playwright browser verification for WS-4 cross-layer
-        verify-ws10-browser.js       # Playwright browser verification for WS-10 (postForms vs forminstance)
       dashboards/                    # Dashboard date display testing (44/44 complete — DB-1 thru DB-8 all done)
         analysis/                    # Analysis & conclusions (overview + 1 bug document)
     form-templates/                  # XML template analysis, generator, redesigned DateTest v2
@@ -177,6 +184,7 @@ npm run test:dash:regression                        # Dashboard: grid capture + 
 - `helpers/vv-calendar.js` — calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input, legacy fields
 - `global-setup.js` — auto-login + create saved records via browser UI (per-TZ, cached 1h)
 - `date-handling/cat-*.spec.js` — 12 parameterized spec files (cat-1, cat-1-legacy-popup, 2, 3, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 12)
+- `date-handling/dash-*.spec.js` — 4 dashboard specs (filter, sort, export, cross-layer)
 
 Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
 
@@ -189,10 +197,10 @@ REST API date handling tests via the `DateTestWSHarness`. Two execution paths:
 
 ```bash
 # Run a WS test directly
-node tasks/date-handling/web-services/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
+node testing/scripts/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
 
 # Simulate cloud TZ
-TZ=UTC node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+TZ=UTC node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 ```
 
 **Command:** `/@-test-ws-date-pw <test-id>` — executes test, generates artifacts (TC spec, run file, summary), updates matrix.

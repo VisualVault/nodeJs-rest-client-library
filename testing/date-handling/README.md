@@ -80,6 +80,10 @@ Shared config:
 | `cat-9-gdoc-roundtrip.spec.js`    | Category 9-GDOC — GDOC round-trip tests (SetFieldValue → GetDateObject → SetFieldValue) |
 | `cat-12-edge-cases.spec.js`       | Category 12 — edge case and boundary condition tests                                    |
 | `audit-bug1-tz-stripping.spec.js` | FORM-BUG-1 audit — independent Playwright verification of parseDateString() Z-stripping |
+| `dash-filter.spec.js`             | DB-5 — dashboard SQL filter tests (WHERE clause on date fields)                         |
+| `dash-sort.spec.js`               | DB-4 — dashboard column sort order verification (ascending/descending)                  |
+| `dash-export.spec.js`             | DB-7 — dashboard export verification (Excel, Word, XML vs grid values)                  |
+| `dash-cross-layer.spec.js`        | DB-6 — dashboard vs Forms SPA cross-layer value comparison                              |
 
 ### External Config
 

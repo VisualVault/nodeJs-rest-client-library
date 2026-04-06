@@ -210,19 +210,19 @@ The direct runner (`run-ws-test.js`) uses `testing/config/vv-config.json` instea
 
 ```bash
 # Smoke test — read an existing record
-node tasks/date-handling/web-services/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
+node testing/scripts/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
 
 # Create a record via API
-node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 
 # Debug mode (includes raw API response)
-node tasks/date-handling/web-services/run-ws-test.js --action WS-2 --configs ALL --record-id DateTest-000080 --debug
+node testing/scripts/run-ws-test.js --action WS-2 --configs ALL --record-id DateTest-000080 --debug
 
 # Simulate cloud/AWS timezone
-TZ=UTC node tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+TZ=UTC node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 
 # Attach debugger (VS Code)
-node --inspect-brk tasks/date-handling/web-services/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+node --inspect-brk testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 ```
 
 The runner authenticates with VV, builds the ffCollection, calls the harness, and prints the JSON result. No local server needed.

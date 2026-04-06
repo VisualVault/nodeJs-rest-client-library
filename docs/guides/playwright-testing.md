@@ -46,6 +46,7 @@ This command:
 | `testing/fixtures/test-data.js`  | All test case definitions (data-driven parameterization)                   |
 | `testing/helpers/vv-form.js`     | Generic VV form helpers: navigation, field ops, value capture, save        |
 | `testing/helpers/vv-calendar.js` | Calendar helpers: popup (date-only + DateTime + legacy popup), typed input |
+| `testing/helpers/ws-log.js`      | Log shim for WS harness scripts (proxies to server lib logger)             |
 | `testing/global-setup.js`        | Auto-login + create saved records via browser UI (per-TZ, cached 1h)       |
 | `testing/config/vv-config.json`  | VV credentials (gitignored)                                                |
 

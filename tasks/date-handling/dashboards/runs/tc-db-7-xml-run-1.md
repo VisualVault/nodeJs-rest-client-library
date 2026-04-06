@@ -32,4 +32,4 @@
 - Field names use `_x0020_` encoding for spaces: `Form_x0020_ID`, but date field names (`Field7`, etc.) are unaffected (no spaces).
 - Smaller file size than HTML exports (203KB vs 261KB) — XML is more compact than HTML table markup.
 - Calendar date comparison correctly handles grid `M/D/YYYY` vs XML `YYYY-MM-DDTHH:MM:SS+00:00`.
-- Reproducible via: `node tasks/date-handling/dashboards/test-export-v1.js --format xml`
+- Reproducible via: `npx playwright test testing/date-handling/dash-export.spec.js --grep "xml export"`

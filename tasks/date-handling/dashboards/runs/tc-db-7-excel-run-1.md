@@ -31,4 +31,4 @@
 - Export format is HTML table with `.xls` extension (not native Excel format) — standard Telerik RadGrid behavior. Opens in Excel via HTML import.
 - Date-only fields (Config A/B/E/F) get `12:00:00 AM` appended in export — cosmetic difference, date is preserved.
 - Export includes ALL records across all pages (432), not just the current page (200).
-- Reproducible via: `node tasks/date-handling/dashboards/test-export-v1.js --format excel`
+- Reproducible via: `npx playwright test testing/date-handling/dash-export.spec.js --grep "excel export"`

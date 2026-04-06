@@ -141,11 +141,11 @@ console.log(result.data.datafield7); // → null (date silently lost)
 
 ```bash
 # Create a record with DD/MM format
-node tasks/date-handling/web-services/run-ws-test.js \
+node testing/scripts/run-ws-test.js \
   --action WS-1 --configs A --input-date "15/03/2026"
 
 # Read back — date is null
-node tasks/date-handling/web-services/run-ws-test.js \
+node testing/scripts/run-ws-test.js \
   --action WS-2 --configs A --record-id <record-name>
 # → datafield7 = null
 ```

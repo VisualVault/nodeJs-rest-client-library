@@ -206,7 +206,7 @@ The export dock panel (`dockExport`) starts **hidden** (`display: none`). The "E
 | Word   | `ctl00_ContentBody_ctrlPanelHolder_ctl0_dockExport_C_btnWordExport2`  |
 | XML    | `ctl00_ContentBody_ctrlPanelHolder_ctl0_dockExport_C_btnXMLExport2`   |
 
-**Reproducible test:** `node tasks/date-handling/dashboards/test-export-v1.js [--format excel|word|xml|all]`
+**Reproducible test:** `npx playwright test testing/date-handling/dash-export.spec.js` (or individual format: `--grep "excel export"`)
 
 ### DataID = revisionId
 
