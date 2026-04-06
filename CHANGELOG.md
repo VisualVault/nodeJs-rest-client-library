@@ -55,11 +55,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Bug #2 and Bug #3 audit reports with Playwright verification (`analysis/bug-2-audit.md`, `analysis/bug-3-audit.md`). Bug #2 independently confirmed via automated Playwright. Bug #3 verified via source code + `parseDateString()` direct invocation (V2 could not be activated on test env)
 - DB evidence script (`testing/scripts/audit-bug2-db-evidence.js`): saves popup vs typed records for DB comparison. Confirms Bug #2 causes different `datetime` values in SQL Server (3-hour offset in BRT)
 - VV demo server timezone confirmed as BRT (UTC-3) via VVCreateDate vs `toISOString()` offset analysis
+- Bug #4 through Bug #7 audit scripts and reports: `audit-bug4-save-format.js`, `audit-bug5-fake-z.js`, `audit-bug6-empty-fields.js`, `audit-bug7-wrong-day.js` with corresponding `bug-{4-7}-audit.md` reports. All 4 bugs independently confirmed via Playwright direct invocation + spec regression
 
 ### Changed
 
 - Bug #2 severity upgraded from Low to **Medium** — DB schema shows all fields are `datetime` (no `date` type), making format inconsistency an actual data difference. SQL queries and reports affected
-- Cat 3 count corrected from 14P/4F to **10P/8F** in `tasks/date-handling/CLAUDE.md`
+- Matrix summary counts corrected across 6 categories to match actual row data: Cat 1 (7P/13F→4P/16F), Cat 2 (11P/5F→8P/8F), Cat 3 (14P/4F→10P/8F), Cat 7 (29P/9F→23P/16F), Cat 8 (12P/6F/1P→13P/6F/0P), Cat 12 (5P/9F→1P/13F). Total 130P/72F→111P/93F
+- DB wording audit across all 7 bug analysis docs: clarified SQL Server `datetime` storage semantics, replaced VV Query Admin display format with actual SSMS datetime values, updated Bug #7 double-shift from UNVERIFIED to VERIFIED (confirmed -2 days for Date objects in IST)
 - Legacy popup description in `docs/reference/form-fields.md` corrected: popup is Kendo calendar (not Angular UI Bootstrap as previously documented)
 - `docs/reference/api-date-patterns.md` corrected: server does not uniformly store UTC — stores whatever the client sends (mixed UTC/local in same column)
 
