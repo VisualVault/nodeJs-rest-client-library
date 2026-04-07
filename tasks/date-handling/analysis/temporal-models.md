@@ -4,7 +4,31 @@
 
 The VisualVault platform has a systemic problem with how it handles dates and times. Multiple customer projects have reported date-related defects in production, QA teams routinely flag date issues during UAT, and support tickets about incorrect dates have been a recurring pattern for an extended period. This investigation determined that these are not isolated bugs — they are symptoms of an architectural limitation that affects every component that stores, reads, or displays dates.
 
-**Intended audience**: Product and engineering leadership. §1–3 define the framework. §4–5 map every confirmed bug. §6–9 cover propagation, limitations, fix strategy, and anti-patterns.
+---
+
+## Executive Summary
+
+### What we found
+
+- **14 confirmed bugs so far** across Forms (7), Web Services (6), Dashboards (1)
+- **All 14 trace to one root cause**: date/time values serve different purposes — a due date, a UTC timestamp, and a local clock reading each require different storage, display, and comparison rules. The platform treats them all identically
+
+### Why it happens
+
+- Once a date value is stored, **no component can determine what type it is**. The same SQL `datetime` column holds date-only values, UTC timestamps, and local times — all as bare numbers with no discriminator. Every downstream operation must guess the type, and each component guesses differently
+- The 3 field config flags (`enableTime`, `ignoreTimezone`, `useLegacy`) are the only signal about date type, but they exist only in the form template — the database, API serialization, and query engine do not consult them. **No configuration correctly implements its intended behavior across all code paths**
+
+### Why it matters
+
+- The highest-severity pattern causes **permanent data corruption**: local times incorrectly labeled as UTC, shifting values when a user opens a record in Forms
+- The problem is architectural — patching individual bugs without making the date type identifiable will leave systemic issues. Any new platform feature, endpoint, or integration will reintroduce the same defects, and any date handling or computation in customer project code will face the same ambiguity
+- **Developer experience is directly affected**: no format guidance, no validation errors, timezone-dependent correctness that fails silently. Date handling is a recurring source of project delays and support escalations (see § 6.5)
+
+### What needs to happen
+
+- For date handling to be correct, every layer — from database storage through API serialization to each user-facing component — must be able to identify which date type a value represents and handle it according to that type's rules. Today, no layer can make that identification
+- The fix is not 14 isolated patches — it is **4 categories of change** (one per date/time category, § 1), each requiring coordinated fixes across all of these layers
+- **Key design decision**: does VV need to distinguish "same clock for everyone" from "local clock for each viewer"? These share a single config flag today. See § 7
 
 ---
 
@@ -27,31 +51,6 @@ The Node.js client library (`lib/VVRestApi/`) was confirmed as a transparent pas
 
 ---
 
-## Executive Summary
-
-### What we found
-
-- **14 confirmed bugs so far** across Forms (7), Web Services (6), Dashboards (1)
-- **All 14 trace to one root cause**: date/time values serve different purposes — a due date, a UTC timestamp, and a local clock reading each require different storage, display, and comparison rules. The platform treats them all identically
-
-### Why it happens
-
-- Once a date value is stored, **no component can determine what type it is**. The same SQL `datetime` column holds date-only values, UTC timestamps, and local times — all as bare numbers with no discriminator. Every downstream operation must guess the type, and each component guesses differently
-- The 3 field config flags (`enableTime`, `ignoreTimezone`, `useLegacy`) are the only signal about date type, but they exist only in the form template — the database, API serialization, and query engine do not consult them. **No configuration correctly implements its intended behavior across all code paths**
-
-### Why it matters
-
-- The highest-severity pattern causes **permanent data corruption**: local times incorrectly labeled as UTC, shifting values when a user opens a record in Forms
-- The problem is architectural — patching individual bugs without making the date type identifiable will leave systemic issues. Any new feature, endpoint, or integration will reintroduce the same defects
-- **Developer experience is directly affected**: no format guidance, no validation errors, timezone-dependent correctness that fails silently. Date handling is a recurring source of project delays and support escalations (see § 7.6)
-
-### What needs to happen
-
-- The fix is not 14 isolated patches — it is **4 categories of change** (one per date/time category, § 1), each requiring coordinated fixes across multiple layers (database, API, Forms, query engine)
-- **Key design decision**: does VV need to distinguish "same clock for everyone" from "local clock for each viewer"? These share a single config flag today. See § 8
-
----
-
 ## 1. The Four Models
 
 The column stores a number — it carries no information about what that number _means_. Is `2026-03-15 14:30:00` a UTC instant? A local time pinned to São Paulo? A floating time that means "2:30 PM wherever you are"?
@@ -65,58 +64,24 @@ These four models are exhaustive — every real-world date/time use case maps to
 | **Correct storage** | `YYYY-MM-DD` — no time      | UTC with explicit Z or offset       | Naive datetime + anchor timezone        | Naive datetime — no TZ            |
 | **Correct display** | Show as-is — no conversion  | Convert to viewer's local timezone  | Show as-is — do not convert             | Show as-is — do not convert       |
 | **Comparison**      | String or date-only         | Compare UTC values directly         | Convert to UTC via anchor, then compare | Undefined across timezones        |
-| **Anti-pattern**    | Attaching a midnight time   | Stripping the Z suffix              | Storing without anchor TZ               | Appending Z or any TZ marker      |
 
-**Model 1 — Calendar Date**: Attaching midnight makes it timezone-dependent — "midnight" is a different instant in each zone.
-
-**Model 2 — Instant**: Stripping the Z and re-parsing as local shifts the value by the viewer's offset.
-
-**Model 3 — Pinned DateTime**: Storing without the anchor timezone makes it indistinguishable from Floating.
-
-**Model 4 — Floating DateTime**: Appending Z forces the value into Instant semantics.
+> **Models 3 vs 4 — why this matters**: The platform uses a single setting for both Pinned and Floating, with no way to distinguish them. Without knowing which timezone the value belongs to, the system cannot determine whether `"15:30"` means "15:30 at the data-entry location" (Pinned — convertible to UTC) or "15:30 wherever you are" (Floating — no single UTC equivalent, cross-timezone comparison is meaningless). This ambiguity becomes a bug whenever the system needs to compare, filter, or round-trip these values.
 
 ---
 
-## 2. Models 3 vs 4 — The Critical Distinction
+## 2. How VV Configurations Map to Models
 
-`ignoreTZ=true` conflates Pinned and Floating. It stores a naive datetime without an anchor timezone, making it impossible to know whether `"15:30"` means "15:30 at the data-entry location" or "15:30 wherever you are." This ambiguity becomes a bug when the system needs to compare, filter, or round-trip these values.
+The three boolean flags (`enableTime`, `ignoreTimezone`, `useLegacy`) create 8 combinations, but they map to only 2–3 intended models:
 
-| Operation                                   | Model 3 (Pinned)                                                | Model 4 (Floating)                                                                        |
-| ------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **"What UTC instant does this represent?"** | Answerable — use the anchor TZ to convert                       | **Unanswerable** — no single UTC equivalent exists                                        |
-| **Cross-timezone comparison**               | Convert both to UTC via their anchors, then compare             | Meaningless — "8 AM local" in São Paulo and "8 AM local" in Mumbai are different instants |
-| **Filtering by date range**                 | Convert the filter bounds to the anchor TZ, apply to UTC values | Apply the filter as-is to the naive values (no conversion)                                |
+1. **8 configs, 3 intended models.** 4 date-only configs → Model 1 (Calendar Date). 2 DateTime+TZ configs → Model 2 (Instant). 2 DateTime+ignoreTZ configs → Model 3 or 4 (Pinned/Floating). `ignoreTZ` adds no value for date-only fields; `useLegacy` is an implementation toggle, not a semantic one.
 
----
+2. **The ignoreTZ configs cannot distinguish Pinned from Floating** — no anchor timezone is stored (see § 1).
 
-## 3. Mapping VV Configurations to Models
-
-The three boolean flags create 8 combinations, but they map to only 2–3 intended models:
-
-| Config | enableTime | ignoreTZ | useLegacy |      Intended Model      | Why                                                         |
-| :----: | :--------: | :------: | :-------: | :----------------------: | ----------------------------------------------------------- |
-| **A**  |   false    |  false   |   false   |    1 — Calendar Date     | Date-only field, no time, no TZ handling needed             |
-| **B**  |   false    |   true   |   false   |    1 — Calendar Date     | Same intent as A (`ignoreTZ` is meaningless without time)   |
-| **C**  |    true    |  false   |   false   |       2 — Instant        | DateTime with timezone awareness → store UTC, display local |
-| **D**  |    true    |   true   |   false   | 3 or 4 — Pinned/Floating | DateTime ignoring timezone → store local, display as-is     |
-| **E**  |   false    |  false   |   true    |    1 — Calendar Date     | Legacy date-only                                            |
-| **F**  |   false    |   true   |   true    |    1 — Calendar Date     | Legacy date-only (`ignoreTZ` meaningless)                   |
-| **G**  |    true    |  false   |   true    |       2 — Instant        | Legacy DateTime with TZ                                     |
-| **H**  |    true    |   true   |   true    | 3 or 4 — Pinned/Floating | Legacy DateTime ignoring TZ                                 |
-
-1. **8 configs, 3 intended models.** A/B/E/F → Model 1. C/G → Model 2. D/H → Model 3 or 4. `ignoreTZ` adds no value for date-only fields; `useLegacy` is an implementation toggle, not a semantic one.
-
-2. **D/H cannot distinguish Pinned from Floating** — no anchor timezone is stored (see § 2).
-
-3. **No config correctly implements its intended model.** Every configuration has at least one code path that breaks the model's semantics (see § 4).
+3. **No config correctly implements its intended model.** Every configuration has at least one code path that breaks the model's semantics (see § 3).
 
 ---
 
-## 4. Current State Per Model
-
-In the tables below, **SFV** = `SetFieldValue()` (write path), **GFV** = `GetFieldValue()` (read path).
-
-### Status at a Glance
+## 3. Current State Per Model
 
 | Model             | VV Configs | Works? | Key Issue                              | Confirmed Bugs |
 | ----------------- | ---------- | :----: | -------------------------------------- | :------------: |
@@ -125,94 +90,11 @@ In the tables below, **SFV** = `SetFieldValue()` (write path), **GFV** = `GetFie
 | 3 — Pinned        | D, H       |   ❌   | Literal Z + no anchor TZ               |       3        |
 | 4 — Floating      | (none)     |   ⚠️   | No dedicated config; shares D/H        |   Same as 3    |
 
-_The subsections below detail each model's behavior at every platform layer — intended for developers investigating or fixing specific code paths._
+Per-model layer-by-layer behavior is documented in the individual bug reports under [Forms Calendar Analysis](../forms-calendar/analysis/overview.md) and [Web Services Analysis](../web-services/analysis/overview.md).
 
 ---
 
-### Model 1: Calendar Date — `enableTime=false` (Configs A, B, E, F)
-
-**Can VV represent this correctly today?** No. Broken for UTC+ timezones.
-
-JavaScript's `Date` object is always an Instant (Model 2). The code stores Calendar Dates via local midnight, which for UTC+ users is the previous UTC day — off by one day.
-
-| Layer              | Behavior                                                                                                      | OK? | Notes                                                         |
-| ------------------ | ------------------------------------------------------------------------------------------------------------- | :-: | ------------------------------------------------------------- |
-| **SFV (write)**    | `normalizeCalValue()` → `moment("2026-03-15").toDate()` → local midnight → `getSaveValue()` extracts UTC date | ⚠️  | BRT: correct. IST: **-1 day** (FORM-BUG-7)                    |
-| **Form load (V1)** | `initCalendarValueV1()` → `moment(e).toDate()` → same local-midnight conversion                               | ⚠️  | BRT: correct. IST: **-1 day** (FORM-BUG-7)                    |
-| **GFV (read)**     | Returns raw stored value (no transformation)                                                                  | ✅  | Reads what was stored                                         |
-| **DB storage**     | SQL `datetime` with `00:00:00.000` time component                                                             | ❌  | Wrong type — should be `date` or string                       |
-| **API write**      | `postForms` stores string as-is                                                                               | ✅  | No conversion                                                 |
-| **API read**       | `getForms` returns ISO with Z (`"2026-03-15T00:00:00Z"`)                                                      | ⚠️  | Z implies UTC midnight, but the value might be local midnight |
-| **Dashboard**      | Shows stored value, no conversion                                                                             | ✅  | Transparent read                                              |
-| **Round-trip**     | GFV→SFV: raw date string → `moment().toDate()` → local midnight → extract UTC date                            | ⚠️  | BRT: stable. IST: **-1 day per trip** (FORM-BUG-7 compounds)  |
-
-**Root cause**: Model 1 → Model 2 conversion at the JavaScript layer. Timezone-dependent — works in UTC-, fails in UTC+.
-
----
-
-### Model 2: Instant — `enableTime=true, ignoreTZ=false` (Configs C, G)
-
-**Can VV represent this correctly today?** Approximately — Config C is the safest configuration, but has edge cases.
-
-| Layer                               | Behavior                                                                             | OK? | Notes                                                            |
-| ----------------------------------- | ------------------------------------------------------------------------------------ | :-: | ---------------------------------------------------------------- |
-| **SFV (write)**                     | `calChange()` → `toISOString()` (UTC) → `getSaveValue()` strips Z → stores naive UTC | ⚠️  | Loses the Z marker, but value IS UTC                             |
-| **Form load (V1)**                  | `parseDateString()` → strips Z → `new Date(local)` → reconverts                      | ✅  | Net effect: correct display in user's TZ                         |
-| **GFV (read)**                      | `new Date(value).toISOString()` → real UTC conversion                                | ✅  |                                                                  |
-| **GFV empty field**                 | Returns `"Invalid Date"` string (truthy)                                             | ❌  | FORM-BUG-6                                                       |
-| **DB storage**                      | SQL `datetime` — UTC value without marker                                            | ⚠️  | Correct value, missing marker                                    |
-| **API write**                       | `postForms` stores input as-is                                                       | ✅  |                                                                  |
-| **API read (postForms record)**     | `FormInstance/Controls` serializes with Z suffix                                     | ✅  | Z is correct here (value IS UTC)                                 |
-| **API read (forminstance/ record)** | `FormInstance/Controls` serializes as US format (no Z)                               | ❌  | WEBSERVICE-BUG-1 — same DB value, different serialization        |
-| **Dashboard**                       | Shows stored UTC value without conversion                                            | ⚠️  | Shows UTC time, not local — consistent but potentially confusing |
-| **Round-trip**                      | GFV returns real UTC → SFV stores real UTC                                           | ✅  | Stable across all timezones                                      |
-
-**Root cause**: DB stores UTC without a marker. The assumption breaks when values from Model 3/4 code paths land in the same column.
-
-**Legacy (Config G)**: `useLegacy=true` bypasses GFV transformation → returns raw value instead of `toISOString()`. Return format differs from Config C, breaking consumer code that expects ISO.
-
----
-
-### Model 3: Pinned DateTime — `enableTime=true, ignoreTZ=true` (Configs D, H)
-
-**Can VV represent this correctly today?** No. Config D is affected by the most confirmed bugs of any configuration.
-
-| Layer                               | Behavior                                                                                                          | OK? | Notes                                                           |
-| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------- | :-: | --------------------------------------------------------------- |
-| **SFV (write)**                     | `calChange()` → `toISOString()` (UTC) → `getSaveValue()` strips Z → stores local time                             | ✅  | Stores local time correctly (for Pinned: this is what you want) |
-| **Form load (V1)**                  | `parseDateString()` → strips Z → local parse                                                                      | ✅  | Preserves the stored wall-clock time                            |
-| **GFV (read)**                      | `moment(value).format("....[Z]")` → appends **literal** character Z                                               | ❌  | FORM-BUG-5 — consumers treat local time as UTC                  |
-| **GFV empty field**                 | Returns `"Invalid Date"` string (truthy)                                                                          | ❌  | FORM-BUG-6                                                      |
-| **DB storage**                      | SQL `datetime` — local value without TZ marker or anchor                                                          | ⚠️  | Missing anchor TZ — can't distinguish from Floating             |
-| **API write**                       | `postForms` stores input as-is                                                                                    | ✅  |                                                                 |
-| **API read (postForms record)**     | Serialized with Z suffix → Forms treats as UTC                                                                    | ❌  | WEBSERVICE-BUG-1 — local value incorrectly marked UTC           |
-| **API read (forminstance/ record)** | Serialized as US format (no Z) → Forms preserves                                                                  | ✅  | No incorrect Z                                                  |
-| **Dashboard**                       | Shows stored value, no conversion                                                                                 | ✅  | Pinned: show as-is                                              |
-| **Round-trip**                      | GFV returns literal-Z local time → SFV interprets as UTC → converts to local → **shifts by TZ offset each cycle** | ❌  | FORM-BUG-5 drift: BRT -3h/trip, IST +5:30h/trip, UTC0 0h/trip   |
-
-**Root cause**: The `[Z]` in the moment.js format string is a literal escape (brackets emit the character verbatim), not a timezone directive like `Z` (UTC offset). A correct Model 3 value is presented with a literal `Z` suffix, causing every downstream consumer to misidentify it as Model 2 and apply timezone conversion.
-
-**Legacy (Config H)**: Bypasses the literal-Z path → GFV returns raw value. **Config H is the only DateTime+ignoreTZ configuration that survives round-trips** — as a side effect of bypassing the GFV transformation, not by design.
-
----
-
-### Model 4: Floating DateTime — No dedicated config
-
-**Can VV represent this correctly today?** Partially. Config D/H display path is correct (show as-is). The problems arise at the boundaries:
-
-| Layer                   | Behavior                                                   | OK? | Notes                                |
-| ----------------------- | ---------------------------------------------------------- | :-: | ------------------------------------ |
-| **Display**             | Shows stored value as-is (when not corrupted by literal Z) | ✅  |                                      |
-| **Filtering**           | SQL queries compare naive datetime values directly         | ✅  | No TZ conversion needed for Floating |
-| **Cross-TZ comparison** | No mechanism to recognize that comparison is meaningless   | ⚠️  | Should warn or prevent               |
-| **API serialization**   | Some paths add Z, some don't                               | ❌  | Z implies UTC (Model 2)              |
-| **Round-trip**          | Same FORM-BUG-5 issue as Pinned (Config D)                 | ❌  |                                      |
-
-Any code path that touches GFV (Config D) or any API response that adds Z will corrupt the value by forcing it into Model 2 semantics.
-
----
-
-## 5. Bug-to-Model-Confusion Map
+## 4. Bug-to-Model-Confusion Map
 
 ### Pattern Summary
 
@@ -252,61 +134,29 @@ Three additional bugs are format parsing failures (not model confusion): silent 
 
 ---
 
-## 6. Cross-Layer Propagation
+## 5. Cross-Layer Propagation
 
-**The bug is in the serialization layer, not the storage layer.** The database stores correct values regardless of endpoint. The `FormInstance/Controls` endpoint adds an incorrect UTC marker to `postForms` records only, causing the Forms frontend to shift the time. The dashboard reads the DB directly and is always correct.
+**The bug is in the serialization layer, not the storage layer.** The database stores correct values regardless of which endpoint wrote them. The `FormInstance/Controls` serialization endpoint adds an incorrect UTC marker (`Z`) to `postForms` records only — causing the Forms frontend to interpret local times as UTC and shift them. Records written via `forminstance/` serialize without the `Z` and load correctly. The dashboard reads the DB directly and is always correct.
 
-```
-                                  Model 3/4 value: "14:30 local"
-                                           │
-                     ┌─────────────────────┤
-                     │                     │
-              postForms write         forminstance/ write
-                     │                     │
-                     ▼                     ▼
-              DB: 2026-03-15          DB: 2026-03-15
-                  14:30:00.000            14:30:00.000
-              (identical)             (identical)
-                     │                     │
-                     ▼                     ▼
-         FormInstance/Controls    FormInstance/Controls
-         serializes as:          serializes as:
-         "2026-03-15T14:30:00Z"  "3/15/2026 2:30:00 PM"
-         (Model 2 — WRONG)      (Model 3/4 — correct)
-                     │                     │
-                     ▼                     ▼
-              Forms V1 load:         Forms V1 load:
-              Z → UTC → local        local parse → local
-              14:30 - 3h = 11:30     14:30 preserved
-              (SHIFTED)              (CORRECT)
-                     │
-                     ▼
-              Dashboard (both):
-              Shows DB value: 2:30 PM
-              (CORRECT — dashboard ignores Forms serialization)
-```
+The same DB value (`2026-03-15 14:30:00.000`) becomes `"2026-03-15T14:30:00Z"` (wrong — treated as UTC, shifted on load) or `"3/15/2026 2:30:00 PM"` (correct — preserved as local) depending solely on which endpoint originally created the record.
 
 ---
 
-## 7. Architectural Limitations
+## 6. Architectural Limitations
 
-### 7.1 No Model 1 storage type
+### 6.1 No Model 1 storage type
 
 `enableTime=false` is the closest to Model 1, but the backend stores it in SQL `datetime` with a time component, and JavaScript processes it via `moment()` / `new Date()` (Instant-native). **There is no code path that treats a date-only value as a pure calendar date from input to storage to output.**
 
-### 7.2 No anchor timezone for Model 3
+### 6.2 No anchor timezone for Model 3
 
 `ignoreTimezone=true` says "don't convert" — but doesn't store _which_ timezone the value belongs to. Without an anchor, SQL queries across timezones produce undefined results, stored values cannot be converted to UTC, and API consumers cannot know whether to convert or display as-is.
 
-### 7.3 Model 3 and Model 4 share a single flag value
+### 6.3 Model 3 and Model 4 share a single flag value
 
 `ignoreTimezone=true` handles both "show everyone the same clock" (Pinned) and "show everyone their own clock" (Floating). These require different comparison/query behavior, but the flag cannot distinguish them.
 
-### 7.4 The `useLegacy` side effect
-
-`useLegacy=true` bypasses the GFV literal-Z transformation (FORM-BUG-5), making Config H more correct than Config D — as a side effect of skipping code, not by design. Legacy configs have their own format inconsistencies (FORM-BUG-2).
-
-### 7.5 No model identification at any layer
+### 6.4 No model identification at any layer
 
 The config flags exist only in the form template and are read only by the Forms frontend. No other layer has access:
 
@@ -322,7 +172,7 @@ The config flags exist only in the form template and are read only by the Forms 
 
 Each layer encounters the same bare value, guesses independently, and guesses differently. Fixing one layer does not prevent the next from guessing wrong.
 
-### 7.6 Developer experience
+### 6.5 Developer experience
 
 Developers implementing customer projects face the same identification gap:
 
@@ -335,7 +185,7 @@ Date handling is a recurring source of project delays, QA cycles, and support es
 
 ---
 
-## 8. Fix Strategy
+## 7. Fix Strategy
 
 **Categories of change:**
 
@@ -352,21 +202,7 @@ Date handling is a recurring source of project delays, QA cycles, and support es
 
 ---
 
-## 9. Anti-Patterns and Traps
-
-### Observed in the current platform
-
-| Anti-pattern                                                                      | Why it is wrong                                                                                            | Models affected |
-| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------- |
-| Using `moment(dateString).toDate()` or `new Date(dateString)` on date-only values | Forces a calendar date into a JS `Date` (always a UTC instant). Local midnight in UTC+ = previous UTC day. | Model 1         |
-| Storing all date fields as SQL `datetime` with no `date` type                     | Date-only values gain a spurious time component, making equality queries unreliable                        | Model 1         |
-| Stripping the `Z` suffix from UTC values before parsing                           | UTC instant loses its anchor, re-parsed as local time, shifted by viewer's offset                          | Model 2         |
-| Appending a literal `Z` via `moment.format("...[Z]")`                             | Local time misidentified as UTC. Progressive drift on round-trips                                          | Model 3/4       |
-| Serializing same DB value differently by creation endpoint                        | Consumers cannot predict the format. Same value treated as UTC or local depending on path                  | All             |
-| Accepting any date format silently, storing null on failure                       | No feedback on wrong format. Data loss discovered only when record is opened                               | All             |
-| No model discriminator in storage or transport                                    | Every layer guesses the date type independently                                                            | All             |
-
-### Traps to avoid when fixing
+## 8. Traps to Avoid When Fixing
 
 | Approach                                            | Why it fails                                                                                             |
 | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
