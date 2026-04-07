@@ -16,7 +16,7 @@ docs/
 
 ### Architecture
 
-- [visualvault-platform.md](architecture/visualvault-platform.md) — URL structure, navigation map, Enterprise Tools (Microservices, Scheduled Services, Queries), how nodeV2 integrates, demo environment reference
+- [visualvault-platform.md](architecture/visualvault-platform.md) — URL structure, navigation map, Dashboard/FormTemplateAdmin grid details, Enterprise Tools, FormsAPI, authentication patterns, demo + WADNR environment references
 
 ### Standards
 

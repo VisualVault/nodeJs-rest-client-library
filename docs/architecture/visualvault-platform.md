@@ -153,7 +153,7 @@ Dates sort **chronologically** (as proper datetime values), not alphabetically a
 
 **Empty cell positioning:** Empty cells sort to **TOP** in ascending order and **BOTTOM** in descending order.
 
-**Playwright note:** `__doPostBack` in Playwright's `page.evaluate()` fails because ASP.NET's `PageRequestManager._doPostBack` accesses `arguments.callee`, forbidden in strict mode. Workaround: use `page.goto('javascript:void(__doPostBack(...))')` — the navigation may reject but the postback still fires. Alternative: `page.addScriptTag({ content: '...__doPostBack(...)...' })`.
+**Playwright note:** `__doPostBack` in Playwright's `page.evaluate()` fails because ASP.NET's `PageRequestManager._doPostBack` accesses `arguments.callee`, forbidden in strict mode. **Preferred workaround:** `page.addScriptTag({ content: "__doPostBack('target', '')" })` — injects a `<script>` tag that runs in the page's own non-strict context. Alternative: `page.goto('javascript:void(__doPostBack(...))')` — the navigation may reject but the postback still fires. After triggering, use `page.waitForResponse(resp => resp.request().method() === 'POST')` to detect the AJAX partial postback completion (not `waitForNavigation`, which times out for UpdatePanel postbacks).
 
 ### SQL Filter Behavior
 
@@ -211,6 +211,70 @@ The export dock panel (`dockExport`) starts **hidden** (`display: none`). The "E
 ### DataID = revisionId
 
 The `DataID` parameter in the FormViewer URL corresponds to the `revisionId` returned by the VV REST API (also available as the last path segment of the `href` field in form query results). There is no separate `dataId` field in API responses.
+
+---
+
+## FormTemplateAdmin Details
+
+The **Form Templates** page (`/FormTemplateAdmin`) uses Telerik RadGrid — the same framework as dashboards — but with a different column layout and row-level actions for template management.
+
+### Grid Structure
+
+| Property          | Value                                                                     |
+| ----------------- | ------------------------------------------------------------------------- |
+| Table ID          | `ctl00_ContentBody_DG1_ctl00`                                             |
+| CSS class         | `rgMasterTable rgClipCells`                                               |
+| Row classes       | `.rgRow` (even), `.rgAltRow` (odd) — same as Dashboard                    |
+| Pager style       | `NextPrevAndNumeric` — numbered page links + First/Prev/Next/Last buttons |
+| Default page size | 15 rows (configurable via `rcbInput radPreventDecorate` combo)            |
+
+### Column Layout (12 columns)
+
+| Index | Column            | Content / Element                                                                |
+| :---: | ----------------- | -------------------------------------------------------------------------------- |
+|   0   | (Select)          | Empty/checkbox                                                                   |
+|   1   | Category          | e.g., "None"                                                                     |
+|   2   | **Template Name** | Key identifier (used for lookups)                                                |
+|   3   | Form Design       | "View" link (`lnkView`)                                                          |
+|   4   | Description       | Template description text                                                        |
+|   5   | Status            | "Released" (live) or "Release" (draft)                                           |
+|   6   | New Rev           | Link to create new revision (`lnkNewRevision`)                                   |
+|   7   | Revision          | Version number (e.g., "2.3")                                                     |
+|   8   | Import            | `<a onclick="DisplayFileUploadForImport(this)">` — can be `aspNetDisabled`       |
+|   9   | **Export**        | `<a title="Export Form Template" href="javascript:__doPostBack(...)">Export</a>` |
+|  10   | Copy              | `<a>` link (`lnkCopyTemplate`)                                                   |
+|  11   | Modified Date     | e.g., "5/22/2025 12:21 PM"                                                       |
+
+### Export Mechanism
+
+The Export link triggers `__doPostBack(eventTarget, '')` which sends a server-side request to generate the template XML. The server responds with a file download (Content-Disposition attachment). This is an **AJAX partial postback** (UpdatePanel) — the grid refreshes after the download starts.
+
+The downloaded XML is a `<FormEntity>` document containing the full template definition: metadata, pages, fields, scripts, groups/conditions, and PDF settings. See `docs/reference/form-template-xml.md` for the XML format reference.
+
+### Pagination
+
+Pager buttons use ASP.NET `__doPostBack` for page changes:
+
+- **Numbered page links** (`.rgNumPart a`): `href="javascript:__doPostBack('ctl00$ContentBody$DG1$ctl00$ctl03$ctl01$ctlNN', '')"` — link text is the page number
+- **Current page**: marked with `class="rgCurrentPage"` and `onclick="return false;"` (no-op click)
+- **Arrow buttons** (`.rgPageFirst`, `.rgPagePrev`, `.rgPageNext`, `.rgPageLast`): `<input type="button">` with `onclick="return false;__doPostBack(...)"`
+
+**Automation note:** Page size combo box supports values like 15 (default). To show all rows, change via the RadComboBox client API or iterate pages.
+
+---
+
+## Authentication & Login
+
+### Post-Login Redirect
+
+Different VV environments redirect to different pages after successful login:
+
+| Environment | Redirect Target                              | Notes                               |
+| ----------- | -------------------------------------------- | ----------------------------------- |
+| `vvdemo`    | `/app/{customer}/{db}/FormDataAdmin`         | Standard VV shell with Form Library |
+| `vv5dev`    | `/VVPortalUI/home?access_token=<long token>` | Portal UI with access token in URL  |
+
+**Playwright implication:** Cannot use a fixed `waitForURL('**/FormDataAdmin**')` pattern for all environments. Use a generic post-login detection like checking that the URL path is no longer `/` or a login path.
 
 ---
 
@@ -463,6 +527,33 @@ The core API `postForms()` takes a template name and resolves it automatically. 
 | DateTest                      | `6be0265c-152a-f111-ba23-0afff212cc87`           | `https://vvdemo.visualvault.com/FormViewer/app?hidemenu=true&formid=6be0265c-152a-f111-ba23-0afff212cc87&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939`           | 8 date fields across all calendar configs; creates new instance each load |
 | DateTest Dashboard            | ReportID: `e522c887-e72e-f111-ba23-0e3ceb11fc25` | `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25`                                                                       | 467 records (as of 2026-04-06); Telerik RadGrid, server-rendered          |
 | DateTest-000004 Rev 1 (saved) | —                                                | `https://vvdemo.visualvault.com/FormViewer/app?DataID=2ae985b5-1892-4d26-94da-388121b0907e&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939` | Saved record from BRT session; use for reload/cross-TZ tests              |
+
+---
+
+## WADNR Environment Reference
+
+| Item                           | Value                                                  |
+| ------------------------------ | ------------------------------------------------------ |
+| Environment                    | `vv5dev`                                               |
+| Customer                       | `WADNR`                                                |
+| Database                       | `fpOnline`                                             |
+| Base URL                       | `https://vv5dev.visualvault.com/app/WADNR/fpOnline/`   |
+| Form templates                 | 228 total (89 active, 139 z-prefixed) as of 2026-04-07 |
+| Templates with calendar fields | 35 of 77 exported (some exports failed server-side)    |
+
+**Top calendar field counts** (FieldCalendar3 per template):
+
+| Template                   | Calendar Fields |
+| -------------------------- | :-------------: |
+| Application Review Page    |       35        |
+| Notification Communication |       13        |
+| Notice to Comply           |        9        |
+| Multi-purpose              |        6        |
+| WTM Review Page            |        5        |
+| FPAN Notice of Decision    |        5        |
+| Forest Practices App/Notif |        5        |
+
+**Exported templates:** 77 of 89 active templates exported to `tasks/date-handling/wadnr-impact/form-templates/` via `testing/scripts/export-wadnr-templates.js`. 12 templates consistently failed (server-side export timeout).
 
 ---
 
