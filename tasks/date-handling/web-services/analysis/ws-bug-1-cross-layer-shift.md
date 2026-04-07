@@ -2,26 +2,42 @@
 
 ## What Happens
 
-A developer script creates a form record through the VisualVault REST API, writing a date/time value like `"2026-03-15T14:30:00"` (2:30 PM, March 15). The database stores **the correct value**: `2026-03-15 14:30:00.000`. So far, everything is fine.
+A developer script creates a form record through the VisualVault REST API, writing a date/time value like `"2026-03-15T14:30:00"` (2:30 PM, March 15). The database stores the correct value: `2026-03-15 14:30:00.000`. So far, everything is fine.
 
-The problem occurs when a user opens this record in the VisualVault Forms UI. The form displays **11:30 AM** instead of 2:30 PM (in São Paulo, UTC-3) — a 3-hour backward shift. If the user saves the form — even without touching the date field — the shifted value **permanently overwrites the original** in the database. The correct 2:30 PM is gone, replaced by 11:30 AM.
+The problem occurs when a user opens this record in the VisualVault Forms UI. The form displays **11:30 AM** instead of 2:30 PM (in São Paulo, UTC-3) — a 3-hour backward shift. If the user saves the form — even without touching the date field — the shifted value permanently overwrites the original in the database. The correct 2:30 PM is gone, replaced by 11:30 AM.
 
-The most common date/time field configuration ("ignore timezone" enabled) makes this worse: the first open looks deceptively correct — the display shows 2:30 PM. But internally, the value has already been shifted to 11:30 AM. The user trusts the display, saves, and only discovers the mutation when they reopen the record and see 11:30 AM. **This is exactly the behavior reported in Freshdesk #124697** (WADNR-10407), where hundreds of thousands of records migrated via the API had their times corrupted after users opened them in Forms.
-
-**This is the most impactful web services date handling defect.** It affects every production script that writes date/time values via the `postForms` API endpoint where any user outside UTC+0 subsequently opens the record in Forms. Date-only fields (fields that store a date without a time component) are immune.
+In the most common field configuration, the first open appears correct — the display shows 2:30 PM. But internally, the value has already been shifted to 11:30 AM. The user trusts the display, saves, and only discovers the corruption when they reopen the record and see 11:30 AM. This is the behavior reported in Freshdesk #124697 (WADNR-10407), where hundreds of thousands of records migrated via the API had their times corrupted after users opened them in Forms.
 
 ---
 
-## Severity: HIGH
+## When This Applies
 
-Permanent data corruption on first save. Affects every API-created record with date/time fields when opened by a non-UTC+0 user. Confirmed root cause of Freshdesk #124697.
+Four conditions must all be true for this bug to produce a visible effect:
 
----
+### 1. The record was created through the standard REST API endpoint
 
-## Who Is Affected
+VisualVault has two REST API endpoints that developer scripts can use to create form records:
 
-- **Every VV customer** using the `postForms` (or `postFormRevision`) API endpoint to write date/time fields that are later viewed in the Forms UI
-- **Users outside UTC+0** see the shift. The magnitude equals their timezone offset:
+- **`postForms`** — The standard endpoint available through the VV Node.js SDK (`vvClient.forms.postForms()`). This is what most developer scripts use. It is part of the main VV REST API.
+- **`forminstance/`** — An alternative endpoint that creates records through a different server path (the FormsAPI server). It requires separate registration and direct HTTP calls — there is no SDK wrapper for it.
+
+Both endpoints write identical values to the database. This was confirmed by creating records through each endpoint with the same input and comparing the database rows column by column — the stored `datetime` values are byte-for-byte identical.
+
+Only records created through `postForms` are affected. Records created through `forminstance/` or the Forms UI display correctly in all timezones. The difference is in how the server serializes the value when the Forms UI requests it — see [The Problem in Detail](#the-problem-in-detail).
+
+### 2. The field stores a time component (date+time, not date-only)
+
+Date-only fields (`enableTime=false`) are immune. The Forms frontend's date-only parsing path extracts just the date portion and discards any timezone information. The incorrect serialization from the server is ignored along with the time component, so it never causes a shift.
+
+Only fields configured to store both date and time (`enableTime=true`) are affected, regardless of the `ignoreTimezone` setting.
+
+### 3. A user opens the record in the Forms UI
+
+The shift occurs when the Forms frontend (FormViewer) requests the field value from the server and parses it in the browser. If the record is only read by scripts via the `getForms` API (never opened in the Forms UI), no corruption occurs. The `getForms` API normalizes all serialization formats consistently, and the API round-trip is drift-free.
+
+### 4. The user's timezone is not UTC+0
+
+At UTC+0, local time equals UTC — the incorrect serialization produces no numeric shift. The bug is invisible. For all other timezones, the magnitude of the shift equals the user's UTC offset:
 
 | Timezone                 | Shift When Opening an API-Created Record |
 | ------------------------ | ---------------------------------------- |
@@ -32,24 +48,65 @@ Permanent data corruption on first save. Affects every API-created record with d
 | Tokyo (JST, UTC+9)       | +9 hours                                 |
 | London (UTC+0)           | No shift (coincidental correctness)      |
 
-- **Freshdesk #124697** (WA DNR, John Sevilla) independently confirmed this defect in production
-- **Date-only fields are immune** — fields configured to store only a date (no time component) display correctly in all timezones regardless of which endpoint created the record
+**Freshdesk #124697** (WA DNR, John Sevilla) independently confirmed this defect in production. Hundreds of thousands of records migrated via `postForms` had their date/time values corrupted when users subsequently opened them in the Forms UI.
+
+---
+
+## Severity: HIGH
+
+Permanent data corruption on first save. Affects every API-created record with date/time fields when opened by a non-UTC+0 user in the Forms UI. The `forminstance/` endpoint provides a workaround, but it requires non-obvious changes to existing developer scripts and only supports new record creation. Confirmed root cause of Freshdesk #124697.
+
+---
+
+## How to Reproduce
+
+### 1. Create a Record via the API
+
+Using the test harness:
+
+```bash
+node testing/scripts/run-ws-test.js \
+  --action WS-1 --configs D --input-date "2026-03-15T14:30:00"
+```
+
+Or via any script that calls `vvClient.forms.postForms()` with a date/time field value.
+
+Note the record name from the output (e.g., DateTest-001566).
+
+### 2. Read Back via API — Confirm the Value Was Stored Correctly
+
+```bash
+node testing/scripts/run-ws-test.js \
+  --action WS-2 --configs D --record-id DateTest-001566
+```
+
+The API response shows the value with Z appended: `"2026-03-15T14:30:00Z"`.
+
+### 3. Open in Browser — Observe the Shift
+
+Open the record in Chrome (with system timezone set to São Paulo). In DevTools console:
+
+```javascript
+// Check the stored value held by the FormViewer
+VV.Form.VV.FormPartition.getValueObjectValue('Field5');
+```
+
+- **Expected**: `"2026-03-15T14:30:00"` (2:30 PM, unchanged)
+- **Actual**: `"2026-03-15T11:30:00"` (11:30 AM — shifted -3 hours)
+
+For a field with the "ignore timezone" setting enabled: the display shows 2:30 PM (appears correct), but the stored value above is already 11:30 AM.
+
+### 4. Save and Reopen — Corruption Is Permanent
+
+Save the form without editing the date field. Reopen. For "ignore timezone" fields, the display now shows **11:30 AM** instead of the original 2:30 PM. The database has been permanently overwritten.
+
+### Automated
+
+This bug report is backed by a supporting test repository containing automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ---
 
 ## Background
-
-### Two Ways to Create Form Records via API
-
-VisualVault has two REST API endpoints that developer scripts can use to create form records:
-
-1. **`postForms`** — The standard endpoint available through the VV Node.js SDK (`vvClient.forms.postForms()`). This is what most developer scripts use. It's part of the main VV REST API.
-
-2. **`forminstance/`** — An alternative endpoint that creates records through a different server path (the FormsAPI server). It requires separate registration and direct HTTP calls — there's no SDK wrapper for it.
-
-Both endpoints write **identical values** to the database. This was confirmed by creating records through each endpoint with the same input and comparing the database rows column by column — the stored `datetime` values are byte-for-byte identical.
-
-The critical difference is not in how the data is _written_, but in how it is _read back_ when a user opens the record in the Forms UI. More on this below.
 
 ### How Forms Reads Field Values When a User Opens a Record
 
@@ -84,7 +141,7 @@ This bug affects **all date+time fields** (`enableTime=true`), regardless of the
 
 ## The Problem in Detail
 
-### The Core Issue: The Server Adds a Fake UTC Marker
+### The Core Issue: The Server Adds an Incorrect UTC Marker
 
 The `FormInstance/Controls` server endpoint serializes the **same database value** differently depending on which API endpoint created the record:
 
@@ -96,7 +153,7 @@ The `FormInstance/Controls` server endpoint serializes the **same database value
 
 The database values are identical in all three cases. The difference is only in how Controls formats the string.
 
-The `Z` suffix on `postForms` records is **incorrect**. The SQL Server `datetime` column is timezone-unaware — it stores a number, not a timezone. No value in it is "UTC" or "local" — it's just a timestamp without context. But Controls adds the `Z` anyway, and the Forms frontend takes it at face value.
+The `Z` suffix on `postForms` records is incorrect. The SQL Server `datetime` column is timezone-unaware — it stores a number, not a timezone. No value in it is "UTC" or "local" — it is a timestamp without context. But Controls adds the `Z` anyway, and the Forms frontend takes it at face value.
 
 ### What Happens in the Browser
 
@@ -104,7 +161,7 @@ When the FormViewer receives `"2026-03-15T14:30:00Z"`, it interprets the Z as a 
 
 **For fields with `ignoreTimezone=false`** (standard timezone handling):
 
-- The FormViewer converts 14:30 UTC → 11:30 São Paulo local time
+- The FormViewer converts 14:30 UTC to 11:30 São Paulo local time
 - The display immediately shows **11:30 AM** (wrong)
 - The stored value is updated to `"2026-03-15T11:30:00"` (shifted)
 
@@ -116,7 +173,7 @@ When the FormViewer receives `"2026-03-15T14:30:00Z"`, it interprets the Z as a 
 - When they save, the shifted stored value (11:30 AM) overwrites the original in the database
 - On reopen, the display now shows **11:30 AM** — the time has "changed" without the user editing it
 
-This second scenario — where the display looks correct but the underlying data is silently corrupted — is exactly what Freshdesk #124697 describes.
+This second scenario — where the display appears correct but the underlying data is silently corrupted — is the most difficult to detect, and is exactly what Freshdesk #124697 describes.
 
 ### Step by Step — São Paulo (UTC-3)
 
@@ -138,10 +195,6 @@ This second scenario — where the display looks correct but the underlying data
 8. Database permanently stores:            2026-03-15 11:30:00.000 (original 2:30 PM lost forever)
 ```
 
-### Why Records Created by `forminstance/` and the Forms UI Are Safe
-
-Records created through `forminstance/` or the Forms UI are serialized by Controls as `"03/15/2026 2:30:00 PM"` (US date format, no Z suffix). The FormViewer parses this as local time — no UTC conversion, no shift. The stored value matches what the user sees.
-
 ### When the Date Itself Changes (Midnight-Crossing)
 
 For early-morning times, the shift can cross the date boundary — the stored **date** changes, not just the time:
@@ -151,7 +204,7 @@ For early-morning times, the shift can cross the date boundary — the stored **
 | `"2026-03-15T02:00:00"` | São Paulo | 02:00 AM (correct)    | `"2026-03-14T23:00:00"` | **Yes — stored as March 14** |
 | `"2026-03-15T02:00:00"` | Mumbai    | 02:00 AM (correct)    | `"2026-03-15T07:30:00"` | No — same day                |
 
-In São Paulo, any time between `T00:00:00` and `T02:59:59` will have the stored date shift to the **previous calendar day**. For larger timezone offsets (e.g., Los Angeles at UTC-8), the window is wider. For bulk data imports, the records look correct in Forms on first open but store the wrong calendar day.
+In São Paulo, any time between `T00:00:00` and `T02:59:59` will have the stored date shift to the previous calendar day. For larger timezone offsets (e.g., Los Angeles at UTC-8), the window is wider.
 
 ### Date-Only Fields Are Immune
 
@@ -161,137 +214,39 @@ Date-only fields (`enableTime=false`) display correctly in all timezones, even f
 
 Once a user opens and saves a `postForms`-created record, the shifted value becomes the new database value. Subsequent opens and saves do not shift it further — the corruption is a one-time event on first save, then stable. This was confirmed by testing multiple open/save cycles on the same record.
 
----
+### Why Records Created by `forminstance/` and the Forms UI Are Safe
 
-## Steps to Reproduce
-
-### 1. Create a Record via the API
-
-Using the test harness:
-
-```bash
-node testing/scripts/run-ws-test.js \
-  --action WS-1 --configs D --input-date "2026-03-15T14:30:00"
-```
-
-Or via any script that calls `vvClient.forms.postForms()` with a date/time field value.
-
-Note the record name from the output (e.g., DateTest-001566).
-
-### 2. Read Back via API — Confirm Z Was Added
-
-```bash
-node testing/scripts/run-ws-test.js \
-  --action WS-2 --configs D --record-id DateTest-001566
-```
-
-The API response shows the value with Z appended: `"2026-03-15T14:30:00Z"`.
-
-### 3. Open in Browser — Observe the Shift
-
-Open the record in Chrome (with system timezone set to São Paulo). In DevTools console:
-
-```javascript
-// Check the stored value held by the FormViewer
-VV.Form.VV.FormPartition.getValueObjectValue('Field5');
-// Expected: "2026-03-15T14:30:00"
-// Actual:   "2026-03-15T11:30:00"  ← shifted -3 hours
-```
-
-For a field with `ignoreTimezone=true`: the display shows 2:30 PM (looks correct), but the stored value above is already 11:30 AM.
-
-### 4. Save and Reopen — Corruption Is Permanent
-
-Save the form without editing the date field. Reopen. For `ignoreTimezone=true` fields, the display now shows **11:30 AM** instead of the original 2:30 PM. The database has been permanently overwritten.
-
----
-
-## Workarounds
-
-### Recommended: Use the `forminstance/` Endpoint Instead of `postForms`
-
-The `forminstance/` endpoint stores datetime values in a format that the Forms frontend parses without timezone conversion. Records created through `forminstance/` display correctly in all timezones — zero shift, zero corruption.
-
-```javascript
-// forminstance/ payload (direct HTTP to the FormsAPI server):
-const payload = {
-    formTemplateId: '<revision-id>', // The template's revision ID, not the template GUID
-    formName: '',
-    fields: [{ key: 'Field5', value: '2026-03-15T14:30:00' }],
-};
-// POST to https://preformsapi.visualvault.com/forminstance/
-```
-
-**Limitations**:
-
-- No SDK wrapper — requires direct HTTP calls to a different server than the main VV API
-- Only supports new record creation — there is no `forminstance/` equivalent for updating existing records
-- Requires FormsAPI registration for the form template on the target environment
-
-**Important finding**: The `ignoreTimezone` field setting does not affect what gets stored in the database. Both `ignoreTimezone=true` and `ignoreTimezone=false` fields store identical database values for the same input. This was verified by comparing records created through all write paths (`postForms`, `forminstance/`, Forms UI). This means the `forminstance/` workaround works for all date/time field configurations.
-
-### Use Date-Only Fields When Time Is Not Needed
-
-Fields configured to store only a date (no time component) display correctly in all timezones regardless of which endpoint created the record. If the use case only requires a date, switching to a date-only field eliminates this bug entirely.
-
-### Keep Records API-Only (No Human Opens Them in Forms)
-
-If the date/time field is only read by scripts via the `getForms` API (never opened in the Forms UI by a human), no corruption occurs. The `getForms` API normalizes all serialization formats consistently, and the API round-trip is drift-free. The shift only manifests when the value crosses from the API layer to the Forms UI.
-
----
-
-## Test Evidence
-
-### API-to-Forms Cross-Layer Tests (8 tests — 2 PASS, 6 FAIL)
-
-Records created via `postForms`, then opened in the Forms UI in two timezones. Each row tests a different field configuration:
-
-| Field Configuration                             | Timezone  | Status | What Happened                                                      |
-| ----------------------------------------------- | --------- | :----: | ------------------------------------------------------------------ |
-| Date-only (`enableTime=false`)                  | São Paulo |  PASS  | Immune — date displays correctly                                   |
-| Date-only (`enableTime=false`)                  | Mumbai    |  PASS  | Immune — date displays correctly                                   |
-| Date+time, standard TZ (`ignoreTimezone=false`) | São Paulo |  FAIL  | Display: 11:30 AM instead of 2:30 PM (-3h shift)                   |
-| Date+time, standard TZ (`ignoreTimezone=false`) | Mumbai    |  FAIL  | Display: 8:00 PM instead of 2:30 PM (+5:30h shift)                 |
-| Date+time, ignore TZ (`ignoreTimezone=true`)    | São Paulo |  FAIL  | Display: 2:30 PM (looks correct), stored value: 11:30 AM (shifted) |
-| Date+time, ignore TZ (`ignoreTimezone=true`)    | Mumbai    |  FAIL  | Display: 2:30 PM (looks correct), stored value: 8:00 PM (shifted)  |
-| Date+time, legacy + standard TZ                 | São Paulo |  FAIL  | Same as standard TZ above                                          |
-| Date+time, legacy + ignore TZ                   | Mumbai    |  FAIL  | Same as ignore TZ above                                            |
-
-### `postForms` vs `forminstance/` Comparison (15 comparison rows)
-
-Both endpoints write identical database values. The difference is only in how the Controls endpoint serializes them:
-
-- **`postForms` records**: 2 PASS (date-only), 6 FAIL (date+time) — same results as above
-- **`forminstance/` records**: 7 PASS, 0 FAIL — **zero shift** for any configuration or timezone
-
-This confirms the root cause: the Controls endpoint serializes `postForms` records with a Z suffix (triggering the shift), while `forminstance/` records get a US date format (no Z, no shift). The database values are identical.
-
-### Save-and-Stabilize Test (Freshdesk #124697 Reproduction)
-
-Verifying the exact behavior reported in the support ticket — open a `postForms`-created record, save it, reopen:
-
-| Field Configuration    | 1st Open Display | After Save+Reopen Display | Matches Freshdesk #124697?                 |
-| ---------------------- | :--------------: | :-----------------------: | ------------------------------------------ |
-| Date+time, standard TZ |     11:30 AM     |         11:30 AM          | No — shift is visible immediately          |
-| Date+time, ignore TZ   |   **02:30 PM**   |       **11:30 AM**        | **Yes — exact match of reported behavior** |
-
-The "ignore timezone" configuration is the most dangerous: the display looks correct on first open, the user saves trusting it, and the time changes on reopen.
-
-### Database Dump Evidence
-
-Direct database inspection confirmed:
-
-- Record created by `postForms` (never opened in Forms): database = `14:30:00.000` — **correct**
-- Same record after being opened and saved in Forms (São Paulo): database = `11:30:00.000` — **shifted, original permanently lost**
-- Column-by-column comparison of `postForms` vs `forminstance/` records: **identical database values**, only the Controls serialization differs
+Records created through `forminstance/` or the Forms UI are serialized by Controls as `"03/15/2026 2:30:00 PM"` (US date format, no Z suffix). The FormViewer parses this as local time — no UTC conversion, no shift. The stored value matches what the user sees.
 
 ### How Does Controls Know Which Endpoint Created the Record?
 
-The form data table (`dbo.DateTest`) contains no flag or column that distinguishes records by creation endpoint. A column-by-column comparison shows identical metadata (same user, same field values — only internal IDs and timestamps differ). The serialization decision must be based on **hidden metadata in VV's internal system tables** (revision history, form instance tracking, or similar). The specific table or flag has not been identified — this is an open question for the product team.
+The form data table (`dbo.DateTest`) contains no flag or column that distinguishes records by creation endpoint. A column-by-column comparison shows identical metadata (same user, same field values — only internal IDs and timestamps differ). The serialization decision must be based on hidden metadata in VV's internal system tables (revision history, form instance tracking, or similar). The specific table or flag has not been identified — this is an open question for the product team.
+
+### Relationship to Forms Calendar Bugs
+
+This bug connects to three bugs documented in the Forms calendar investigation:
+
+- **[FORM-BUG-5](../../forms-calendar/analysis/bug-5-fake-z-drift.md)** (incorrect Z on GetFieldValue): After the shift, if a developer script reads the field with `GetFieldValue()`, it gets the already-shifted value with an additional incorrect Z appended. Round-tripping via `SetFieldValue(GetFieldValue())` would drift the value further. WEBSERVICE-BUG-1 feeds into FORM-BUG-5 — the shifted value from WEBSERVICE-BUG-1 becomes the input that FORM-BUG-5 further corrupts.
+
+- **[FORM-BUG-4](../../forms-calendar/analysis/bug-4-legacy-save-format.md)** (Z stripped on save): When the user saves the form, the save function strips the Z from the shifted value before storing it — making the corruption permanent and timezone-ambiguous. WEBSERVICE-BUG-1 produces the shifted value; FORM-BUG-4 bakes it into the database.
+
+- **[FORM-BUG-1](../../forms-calendar/analysis/bug-1-timezone-stripping.md)** (Z stripped on load): The Z-stripping in the load path is the same class of defect — both the V1 inline code and this serialization bug treat Z as something to reinterpret rather than preserve. WEBSERVICE-BUG-1 and FORM-BUG-1 are independent mechanisms (different code paths, different layers) that produce the same category of error.
+
+---
+
+## Verification
+
+Verified via automated test harness and manual browser inspection on the demo environment at `vvdemo.visualvault.com`, across two timezones (São Paulo/BRT UTC-3, Mumbai/IST UTC+5:30). Testing covered three areas: API-to-Forms cross-layer behavior (8 tests — 2 PASS, 6 FAIL across field configurations and timezones), `postForms` vs `forminstance/` comparison (15 comparison rows — `postForms` 6 FAIL on date+time, `forminstance/` 0 FAIL across all configurations), and save-and-stabilize reproduction matching Freshdesk #124697 (confirmed: "ignore timezone" fields display correctly on first open but store shifted values that appear on reopen). Direct database inspection confirmed that `postForms` records store the correct value until opened in Forms, and that `postForms` and `forminstance/` records have identical database values — only the Controls serialization differs.
+
+**Limitations**: The metadata or code path that Controls uses to decide serialization format has not been identified. The form data table shows no distinguishing columns between `postForms` and `forminstance/` records. Testing was performed on the demo environment only — other environments have not been verified.
+
+This bug report is backed by a supporting test repository containing automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ---
 
 ## Technical Root Cause
+
+The defective behavior involves two components interacting. The server-side serialization code and the client-side form data are shown in [The Core Issue](#the-core-issue-the-server-adds-an-incorrect-utc-marker) above. This section adds architectural context.
 
 ### Component 1: Server-Side Serialization Inconsistency
 
@@ -305,83 +260,37 @@ Controls output for forminstance: "03/15/2026 2:30:00 PM"      ← no Z (correct
 Controls output for Forms UI:     "03/15/2026 2:30:00 PM"      ← no Z (correct)
 ```
 
-The Z is incorrect because the SQL Server `datetime` column is timezone-unaware — it stores a numeric timestamp with no timezone concept. Adding Z claims the value is UTC, but it could be any timezone (or no timezone at all).
+The Z is incorrect because the SQL Server `datetime` column is timezone-unaware — it stores a numeric timestamp with no timezone concept. Adding Z claims the value is UTC, but the column has no timezone context.
+
+**File locations**: The Controls endpoint is server-side .NET code, not available in this repository. The branching logic that determines serialization format has not been located — it is likely in VV's internal revision or form instance tracking tables.
 
 ### Component 2: The Forms Frontend Trusts the Z
 
-The FormViewer JavaScript code that runs in the browser has a function called `initCalendarValueV1()` that processes field values when a form is loaded. This is part of the current production code path (called "V1" — the FormViewer has two code path versions, and V1 is the default for all standard forms).
+The FormViewer JavaScript code has a function called `initCalendarValueV1()` (line ~102886 in `main.js`) that processes field values when a form is loaded. When it receives a string ending in `Z`, it treats the Z as a genuine UTC marker. For fields with standard timezone handling (`ignoreTimezone=false`), it converts the UTC time to the user's local time — shifting the value. For fields with `ignoreTimezone=true`, the display is preserved but the internal stored value is still shifted.
 
-When `initCalendarValueV1` receives a string ending in `Z`, it treats the Z as a real UTC marker. For fields with standard timezone handling (`ignoreTimezone=false`), it converts the UTC time to the user's local time — shifting the value. For fields with `ignoreTimezone=true`, the display is preserved but the internal stored value is still shifted.
-
-Neither component is independently wrong in all cases — the defect emerges from their interaction. The Controls endpoint shouldn't add Z to a timezone-unaware value, and the FormViewer shouldn't blindly trust Z from a source that doesn't guarantee UTC.
-
-### Interaction with Forms Calendar Bugs
-
-This bug connects to three bugs documented in the Forms calendar investigation:
-
-- **[FORM-BUG-5](../../forms-calendar/analysis/bug-5-fake-z-drift.md)** (fake Z on GetFieldValue): After the shift, if a developer script reads the field with `GetFieldValue()`, it gets the already-shifted value with an additional fake Z appended. Round-tripping via `SetFieldValue(GetFieldValue())` would drift the value further.
-
-- **[FORM-BUG-4](../../forms-calendar/analysis/bug-4-legacy-save-format.md)** (Z stripped on save): When the user saves the form, the save function strips the Z from the shifted value before storing it — making the corruption permanent and timezone-ambiguous.
-
-- **[FORM-BUG-1](../../forms-calendar/analysis/bug-1-timezone-stripping.md)** (Z stripped on load): The Z-stripping in the load path is conceptually the same operation — both the V1 inline code and this serialization bug treat Z as something to reinterpret rather than preserve.
+Neither component is independently wrong in all cases — the defect emerges from their interaction. The Controls endpoint should not add Z to a timezone-unaware value, and the FormViewer should not unconditionally trust Z from a source that does not guarantee UTC.
 
 ---
 
-## Proposed Fix
+## Appendix: Field Configuration Reference
 
-### Recommended: Fix the Controls Serialization (Server-Side)
+The test form fields referenced in this document use the following configurations:
 
-Remove the creation-path-dependent serialization logic in the `FormInstance/Controls` endpoint. All records should be serialized the same way, regardless of which endpoint created them:
+| Config | Field   | enableTime | ignoreTimezone | Description                 | Affected? |
+| ------ | ------- | ---------- | -------------- | --------------------------- | --------- |
+| A      | Field7  | —          | —              | Date-only baseline          | No        |
+| B      | Field10 | —          | ✅             | Date-only + ignoreTZ        | No        |
+| C      | Field6  | ✅         | —              | DateTime UTC (control)      | **Yes**   |
+| D      | Field5  | ✅         | ✅             | DateTime + ignoreTZ         | **Yes**   |
+| E      | Field12 | —          | —              | Legacy date-only            | No        |
+| F      | Field11 | —          | ✅             | Legacy date-only + ignoreTZ | No        |
+| G      | Field14 | ✅         | —              | Legacy DateTime             | **Yes**   |
+| H      | Field13 | ✅         | ✅             | Legacy DateTime + ignoreTZ  | **Yes**   |
 
-```
-Current (broken):
-  postForms record:     Controls returns "2026-03-15T14:30:00Z"     (Z added — incorrect)
-  forminstance/ record: Controls returns "03/15/2026 2:30:00 PM"    (no Z — correct)
-  Forms UI record:      Controls returns "03/15/2026 2:30:00 PM"    (no Z — correct)
-
-Fixed:
-  ALL records:          Controls returns "03/15/2026 2:30:00 PM"    (no Z — consistent)
-```
-
-**Why this is the right fix:**
-
-- The Z is a lie — the `datetime` column has no timezone context
-- The `forminstance/` and Forms UI serialization (US format, no Z) is already correct and consistent
-- One change in one server code path fixes all existing and future records
-- No client-side changes needed — the FormViewer already handles the US format correctly
-- No developer-side changes needed — existing scripts work as-is
-
-**What needs to happen:**
-
-1. Identify the metadata or code path that Controls uses to decide the serialization format (it's not in the form data table — likely in VV's internal revision/instance tracking tables)
-2. Remove or bypass that branching logic
-3. Apply consistent serialization (US format, no Z) for all records
-
-### Alternative: Fix the Forms Frontend (Defensive)
-
-If the Controls serialization cannot be changed, the FormViewer could be modified to strip the Z before parsing, treating all values as local time regardless of the Z suffix. This works but papers over the inconsistent serialization rather than fixing it, and requires regression testing across all form load scenarios.
-
-### Not Recommended: Require Developers to Send Timezone Offsets
-
-Requiring scripts to include offsets (e.g., `"T14:30:00-03:00"`) places the burden on developers and doesn't help with existing records already stored without offsets.
+All date+time configurations (C, D, G, H) are affected. All date-only configurations (A, B, E, F) are immune. The `ignoreTimezone` and `useLegacy` settings do not change whether the bug occurs — they only change whether the shifted value is visible on first open or hidden until reopen.
 
 ---
 
-## Fix Impact Assessment
+## Workarounds and Fix Recommendations
 
-### What Changes If Fixed (Controls Serialization Fix)
-
-- All records display consistently in Forms regardless of which endpoint created them
-- Freshdesk #124697 behavior eliminated for all future form opens
-- The `forminstance/` workaround becomes unnecessary
-- No developer-side changes needed — existing scripts work as-is
-
-### Backwards Compatibility Risk: LOW
-
-The database values are correct — only the serialization was wrong. After the fix, existing `postForms` records that were **never opened in Forms** will now display correctly. Records that **were already opened and saved** have the shifted value permanently in the database (e.g., `11:30:00` instead of `14:30:00`). These cannot be automatically fixed because the system cannot distinguish "shifted by this bug" from "intentionally entered as 11:30."
-
-**Risk area**: Applications that read `FormInstance/Controls` directly (not through the Forms UI) and parse the ISO+Z format would need to handle the US format instead. This is an uncommon pattern but should be checked.
-
-### No Data Migration Needed
-
-The fix is in the serialization layer, not in the database. Existing database values are correct (for records never opened in Forms) or already permanently shifted (for records that were opened and saved). No data changes are required.
+See [ws-bug-1-fix-recommendations.md](ws-bug-1-fix-recommendations.md) for workarounds, proposed fix, and impact assessment.

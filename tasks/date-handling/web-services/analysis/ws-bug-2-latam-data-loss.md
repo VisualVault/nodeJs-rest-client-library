@@ -2,61 +2,102 @@
 
 ## What Happens
 
-When a developer script sends a date in day-first format (DD/MM/YYYY) to the VisualVault REST API — for example `"15/03/2026"` for March 15, 2026 — the API:
+When a developer script sends a date in day-first format (DD/MM/YYYY) to the VisualVault REST API — for example `"15/03/2026"` for March 15, 2026 — the API accepts the request (returns HTTP 200), creates the record, but silently discards the date value. The database stores `null` instead of the date. No error or warning is returned.
 
-1. **Accepts the request** — returns HTTP 200, creates the record successfully
-2. **Silently discards the date** — stores `null` instead of the date value
-3. **Returns no error** — no validation message, no warning in the response body
+The record is created, all non-date fields are saved correctly, but the date field is empty. The data loss is only discovered when someone opens the record and finds the date missing. The original value cannot be recovered — it was discarded during parsing before anything was stored.
 
-The record is created, all non-date fields are saved correctly, but the date field is **empty**. The data loss is only discovered when someone opens the record and finds the date missing. There is no way to recover the intended value — it was discarded during parsing before anything was stored.
+This affects all three common DD/MM separator variants: slashes (`"15/03/2026"`), dashes (`"15-03-2026"`), and dots (`"15.03.2026"`) — all result in null.
 
-This affects all three common DD/MM separator variants:
+When the day value is 12 or lower (e.g., `"05/03/2026"` for March 5), the API does not fail — it silently misinterprets the date as May 3 by reading the day as the month. This related problem is documented in [WEBSERVICE-BUG-3](ws-bug-3-ambiguous-dates.md).
 
-- Slashes: `"15/03/2026"` → null
-- Dashes: `"15-03-2026"` → null
-- Dots: `"15.03.2026"` → null
+---
 
-The VV server's date parser is US-centric — it expects the month to come first (MM/DD/YYYY). When it encounters `"15/03/2026"`, it tries to read `15` as the month, fails (months only go up to 12), and gives up silently.
+## When This Applies
 
-**When the day is 12 or lower** (e.g., `"05/03/2026"` for March 5), the parser doesn't fail — it **misinterprets** the date as May 3 (reading it as MM/DD). This is a different but related problem documented in [WEBSERVICE-BUG-3](ws-bug-3-ambiguous-dates.md). Together, these two bugs mean that a script sending DD/MM dates will silently lose data for days 13–31 and silently store wrong dates for days 1–12.
+Three conditions must all be true for this bug to cause data loss:
+
+### 1. The date is in a day-first numeric format
+
+The input must be an all-numeric date string with the day component first, using any common separator:
+
+| Format     | Example        | Result |
+| ---------- | -------------- | ------ |
+| DD/MM/YYYY | `"15/03/2026"` | null   |
+| DD-MM-YYYY | `"15-03-2026"` | null   |
+| DD.MM.YYYY | `"15.03.2026"` | null   |
+
+Day-first dates with a spelled-out month name (e.g., `"15 March 2026"`, `"15-Mar-2026"`) are **not affected** — the server parser recognizes the month name and handles these correctly.
+
+This is the default date format in Latin America (Argentina, Brazil, Chile, Colombia, Peru, Mexico), Europe (UK, Germany, France, Spain, Italy), Australia, India, and most of Africa and Asia.
+
+### 2. The day value is greater than 12
+
+When the day is between 1 and 12, the input is numerically ambiguous — `"05/03/2026"` could be May 3 (MM/DD) or March 5 (DD/MM). The server always interprets it as MM/DD, storing the wrong date without error. This is a distinct defect documented in [WEBSERVICE-BUG-3](ws-bug-3-ambiguous-dates.md).
+
+When the day is 13 or higher, the server attempts to read it as a month number, fails (months only go to 12), and discards the value. This is the data loss described in this document.
+
+Together, a script processing a full month of DD/MM dates will silently lose roughly 60% of records (days 13–31) and silently store incorrect dates for the remaining 40% (days 1–12).
+
+### 3. The date is sent through the REST API
+
+The server's date parser runs on all dates submitted through `postForms()` or `postFormRevision()` in the VV REST API. The field's calendar configuration (`enableTime`, `ignoreTimezone`, `useLegacy`) has no effect on the parser — all field types are affected equally.
+
+Dates entered through the Forms UI are not affected — the UI uses its own date picker and formatting.
 
 ---
 
 ## Severity: HIGH
 
-Complete, irrecoverable data loss with no error or warning. Affects any script sending dates in the format used by most of the non-US world.
+Complete, irrecoverable data loss with no error or warning. The API returns HTTP 200 and the record is created with all non-date fields intact, making the null date field indistinguishable from an intentionally empty field. Discovery only happens when someone opens the record and notices the missing date. For bulk imports, this could affect thousands of records before detection.
+
+Affects any developer script sending dates in the format used by most of the non-US world. The risk is highest for data migration scripts importing CSV data from external systems, automated workflows using locale-dependent JavaScript APIs like `toLocaleDateString()`, and integration scripts receiving dates from Latin American or European source systems.
 
 ---
 
-## Who Is Affected
+## How to Reproduce
 
-### Any developer using day-first date formats
+### Via the Test Harness
 
-This is the default date format in:
+```bash
+# Create a record with DD/MM format
+node testing/scripts/run-ws-test.js \
+  --action WS-1 --configs A --input-date "15/03/2026"
 
-- **Latin America**: Argentina (`dd/mm/yyyy`), Brazil (`dd/mm/yyyy`), Chile, Colombia, Peru, Mexico, etc.
-- **Europe**: UK (`dd/mm/yyyy`), Germany (`dd.mm.yyyy`), France (`dd/mm/yyyy`), Spain, Italy, etc.
-- **Other**: Australia, India (mixed), most of Africa and Asia
-
-### Common code patterns that trigger this bug
-
-```javascript
-// DANGEROUS: locale-formatted dates in non-US locales
-new Date().toLocaleDateString('es-AR'); // → "15/3/2026"  → null (data lost)
-new Date().toLocaleDateString('pt-BR'); // → "15/03/2026" → null (data lost)
-new Date().toLocaleDateString('en-GB'); // → "15/03/2026" → null (data lost)
-new Date().toLocaleDateString('de-DE'); // → "15.3.2026"  → null (data lost)
-
-// DANGEROUS: dates from external data sources
-const importedDate = csvRow.date; // "15/03/2026" from EU source → null
-const userInput = formField.value; // "15-03-2026" typed by BR user → null
+# Read back — date is null
+node testing/scripts/run-ws-test.js \
+  --action WS-2 --configs A --record-id <record-name>
+# → datafield7 = null
 ```
 
-### Who is not affected
+### Via the VV Node.js SDK
 
-- Developers using US format (MM/DD/YYYY) — this is what the parser expects
-- Developers using ISO 8601 (`YYYY-MM-DD`) — always safe
-- Dates where the day value is ≤ 12 — these are parsed (incorrectly) as MM/DD instead of failing (see [WEBSERVICE-BUG-3](ws-bug-3-ambiguous-dates.md))
+```javascript
+// Create a record with a DD/MM date
+const data = { Field7: '15/03/2026' };
+const resp = await vvClient.forms.postForms({}, data, TEMPLATE_ID);
+const result = JSON.parse(resp);
+
+console.log(result.meta.status); // → 200 (success)
+console.log(result.data.datafield7); // → null (date silently discarded)
+```
+
+### Contrast with ISO Format (Same Date, Same Field)
+
+```javascript
+// ISO format — works correctly
+const data = { Field7: '2026-03-15' };
+const resp = await vvClient.forms.postForms({}, data, TEMPLATE_ID);
+const result = JSON.parse(resp);
+
+console.log(result.data.datafield7); // → "2026-03-15T00:00:00Z" (stored correctly)
+```
+
+- **Expected**: Both formats store March 15, 2026
+- **Actual**: DD/MM format stores null; ISO format stores the correct date
+
+### Automated
+
+This bug report is backed by a supporting test repository containing automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ---
 
@@ -66,11 +107,9 @@ const userInput = formField.value; // "15-03-2026" typed by BR user → null
 
 When a developer script creates or updates a form record through the VV REST API (using `postForms()` or `postFormRevision()` in the Node.js SDK), the server receives the field values as strings and parses them into SQL Server `datetime` values for storage.
 
-The server's date parser is surprisingly flexible — it successfully handles over 20 different date formats, including ISO 8601, US format, year-first with various separators, English month names, abbreviated months, and the VV internal database format. The parser's vocabulary is broad. DD/MM is a specific blind spot, not a general parsing limitation.
+The server's date parser handles over 20 different date formats, including ISO 8601, US format, year-first with various separators, English month names, abbreviated months, and the VV internal database format. DD/MM is a specific gap in the parser, not a general parsing limitation.
 
-The field's calendar configuration (whether it includes time, whether timezone is ignored, whether legacy mode is on) has **no effect** on the server parser. The parser operates the same way for all calendar field types.
-
-### What the Parser Accepts and What It Doesn't
+### What the Parser Accepts and What It Does Not
 
 | Format             | Example                   |   Accepted?   | Notes                           |
 | ------------------ | ------------------------- | :-----------: | ------------------------------- |
@@ -87,13 +126,13 @@ The field's calendar configuration (whether it includes time, whether timezone i
 | **DD/MM dashes**   | **`"15-03-2026"`**        | **No → null** | **Silent data loss**            |
 | **DD/MM dots**     | **`"15.03.2026"`**        | **No → null** | **Silent data loss**            |
 
-Note: `"15 March 2026"` (European word format with spelled-out month) **is accepted** — the parser can handle day-first when the month is a word. The failure is specific to all-numeric DD/MM formats where the parser assumes month-first.
+`"15 March 2026"` (European word format with spelled-out month) **is accepted** — the parser handles day-first when the month is a word. The failure is specific to all-numeric DD/MM formats where the parser assumes month-first.
 
 ---
 
 ## The Problem in Detail
 
-### Why the Parser Fails
+### Why the Parser Discards the Value
 
 The parser attempts to interpret the first numeric component as the month:
 
@@ -106,233 +145,54 @@ Parser:   Reads first component: 15
 Result:   null stored in database, HTTP 200 returned to caller
 ```
 
-### Why It's Silent
+### Why the Failure Is Silent
 
-The API response for a record created with a null date field is **indistinguishable** from a response where the date was intentionally left empty. The response status is 200 (success), the data object contains the created record, and the null date field looks like any other unset field. There is no validation error, no warning, no indication that anything went wrong.
+The API response for a record created with a null date field is indistinguishable from a response where the date was intentionally left empty. The response status is 200 (success), the data object contains the created record, and the null date field looks like any other unset field. There is no validation error, no warning, no indication that the input was rejected.
 
 ### The Two Failure Modes for DD/MM Dates
 
-A script processing a full month of dates in DD/MM format experiences two different silent failures:
+A script processing a full month of dates in DD/MM format experiences two different silent failures depending on the day value:
 
 | Day Range | Input Example (March) | What the Parser Does            | Result                              |
 | --------- | --------------------- | ------------------------------- | ----------------------------------- |
 | 13–31     | `"15/03/2026"`        | Tries month=15, fails           | **null** — data lost entirely       |
 | 1–12      | `"05/03/2026"`        | Reads as month=5, day=3 (May 3) | **Wrong date** — May 3, not March 5 |
 
-Neither case produces an error. A bulk import of DD/MM dates would silently lose roughly 60% of records (days 13–31) and silently corrupt the remaining 40% (days 1–12).
+Neither case produces an error. The day 1–12 misinterpretation is documented separately in [WEBSERVICE-BUG-3](ws-bug-3-ambiguous-dates.md) because its root cause is different (ambiguous input interpreted with a US-centric assumption, not a parse failure).
+
+### Relationship to WEBSERVICE-BUG-3
+
+WEBSERVICE-BUG-2 and WEBSERVICE-BUG-3 are **two manifestations of the same parser limitation** — the assumption that the first numeric component is the month:
+
+- WEBSERVICE-BUG-2: When the day is > 12, the assumption fails and the value is discarded (data loss)
+- WEBSERVICE-BUG-3: When the day is ≤ 12, the assumption succeeds with the wrong interpretation (data corruption)
+
+They are documented separately because their symptoms, detection methods, and fix strategies differ. WEBSERVICE-BUG-2 (null) is detectable by checking for empty fields; WEBSERVICE-BUG-3 (wrong date) can only be detected by comparing against the intended input.
 
 ---
 
-## Steps to Reproduce
+## Verification
 
-### Via the VV Node.js SDK
+Verified via the test harness (`run-ws-test.js`) on the demo environment at `vvdemo.visualvault.com`. 5 format tolerance tests confirmed that all three DD/MM separator variants (slashes, dashes, dots) result in null for both date-only and date+time field types — HTTP 200 returned in all cases with the date field stored as null. Direct database inspection of DateTest-001656 confirmed NULL across all datetime columns, while a control record (DateTest-001661) created with the same date in ISO format stored `2026-03-15 00:00:00.000` correctly.
 
-```javascript
-// Create a record with a DD/MM date
-const data = { Field7: '15/03/2026' };
-const resp = await vvClient.forms.postForms({}, data, TEMPLATE_ID);
-const result = JSON.parse(resp);
+Additionally, testing of common JavaScript date formatting patterns confirmed that locale-dependent APIs (`toLocaleDateString()` with non-US locales) naturally produce the DD/MM formats that trigger this bug, meaning developers in non-US locales using standard JavaScript APIs without explicit format control are especially likely to encounter it.
 
-console.log(result.meta.status); // → 200 (success!)
-console.log(result.data.datafield7); // → null (date silently lost)
-```
+**Limitations**: Testing was performed on the demo environment only. The server-side parser code is .NET and not available in this repository — the parser behavior was characterized through input/output testing, not code inspection. Other environments have not been verified.
 
-### Via the Test Harness
-
-```bash
-# Create a record with DD/MM format
-node testing/scripts/run-ws-test.js \
-  --action WS-1 --configs A --input-date "15/03/2026"
-
-# Read back — date is null
-node testing/scripts/run-ws-test.js \
-  --action WS-2 --configs A --record-id <record-name>
-# → datafield7 = null
-```
-
-### Contrast with ISO Format (Same Date, Same Field)
-
-```javascript
-// ISO format — works correctly
-const data = { Field7: '2026-03-15' };
-const resp = await vvClient.forms.postForms({}, data, TEMPLATE_ID);
-const result = JSON.parse(resp);
-
-console.log(result.data.datafield7); // → "2026-03-15T00:00:00Z" (stored correctly)
-```
+This bug report is backed by a supporting test repository containing automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ---
 
-## Workarounds
+## Technical Root Cause
 
-### Always Use ISO 8601 Format for API Input
+The server-side date parser in the VV REST API assumes the first numeric component of a date string is the month. When a DD/MM date is submitted with a day value > 12, the parser cannot interpret the first component as a valid month and discards the entire value, storing null. No validation error is returned to the caller.
 
-The only reliable workaround is to format all dates as `YYYY-MM-DD` before sending to the API. This format is unambiguous and always accepted.
+**File locations**: The parser is server-side .NET code, not available in this repository. The parser's behavior was characterized entirely through input/output testing — submitting various date formats via `postForms()` and inspecting the database values. The specific .NET method or class that performs the parsing has not been identified.
 
-```javascript
-// SAFE: ISO 8601 — always works
-const date = new Date(2026, 2, 15); // March 15, 2026
-const isoDate = date.toISOString().split('T')[0]; // "2026-03-15"
-const data = { Field7: isoDate };
-
-// SAFE: explicit UTC construction (avoids timezone edge cases)
-const utcDate = new Date(Date.UTC(2026, 2, 15));
-const safe = utcDate.toISOString().split('T')[0]; // "2026-03-15"
-
-// SAFE: manual formatting
-const y = date.getFullYear();
-const m = String(date.getMonth() + 1).padStart(2, '0');
-const d = String(date.getDate()).padStart(2, '0');
-const manual = `${y}-${m}-${d}`; // "2026-03-15"
-```
-
-### Convert External DD/MM Data Before Sending
-
-```javascript
-// Convert DD/MM/YYYY to ISO before API call
-function ddmmToIso(ddmm) {
-    const parts = ddmm.split(/[\/\-\.]/);
-    if (parts.length !== 3) return null;
-    const [day, month, year] = parts;
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-}
-
-ddmmToIso('15/03/2026'); // → "2026-03-15"
-ddmmToIso('15-03-2026'); // → "2026-03-15"
-ddmmToIso('15.03.2026'); // → "2026-03-15"
-```
-
-### Never Use `toLocaleDateString()` for API Input
-
-```javascript
-// DANGEROUS — output format depends on the user's locale
-date.toLocaleDateString('es-AR'); // "15/3/2026" → null (WEBSERVICE-BUG-2)
-date.toLocaleDateString('pt-BR'); // "15/03/2026" → null (WEBSERVICE-BUG-2)
-date.toLocaleDateString('en-US'); // "3/15/2026" → works (US format)
-
-// SAFE — always use toISOString() for API input
-date.toISOString().split('T')[0]; // "2026-03-15" → always works
-```
+The parser correctly handles day-first formats when the month is spelled out (e.g., `"15 March 2026"`, `"15-Mar-2026"`), confirming the limitation is specific to all-numeric date strings where the position of day and month is ambiguous without locale context.
 
 ---
 
-## Test Evidence
+## Workarounds and Fix Recommendations
 
-### Format Tolerance Tests (5 FAIL Slots)
-
-Records created through the API with DD/MM dates, then read back to verify what was stored:
-
-| Input Format | Input Value    | Field Type | HTTP Response | Stored Value | Status |
-| ------------ | -------------- | ---------- | :-----------: | :----------: | :----: |
-| DD/MM/YYYY   | `"15/03/2026"` | Date-only  |      200      |   **null**   |  FAIL  |
-| DD-MM-YYYY   | `"15-03-2026"` | Date-only  |      200      |   **null**   |  FAIL  |
-| DD.MM.YYYY   | `"15.03.2026"` | Date-only  |      200      |   **null**   |  FAIL  |
-| DD/MM/YYYY   | `"15/03/2026"` | Date+time  |      200      |   **null**   |  FAIL  |
-| DD-MM-YYYY   | `"15-03-2026"` | Date+time  |      200      |   **null**   |  FAIL  |
-
-All 5 tests: HTTP 200 returned, record created, date field stored as null. Both date-only and date+time fields produce the same result — the field configuration has no effect on the server parser.
-
-### Database Verification
-
-Direct database inspection confirmed the data loss:
-
-| Record          | Input                  |        Database Value         |        Status        |
-| --------------- | ---------------------- | :---------------------------: | :------------------: |
-| DateTest-001656 | `"15/03/2026"` (DD/MM) | NULL (all date columns empty) | Data loss confirmed  |
-| DateTest-001661 | `"2026-03-15"` (ISO)   |   `2026-03-15 00:00:00.000`   | Contrast — ISO works |
-
-The record exists in the database (has a document ID and all non-date fields), but every `datetime` column is NULL. The parser failed to produce a value and stored nothing.
-
-### Related Finding: Locale-Dependent JavaScript Patterns
-
-Testing of common JavaScript date formatting patterns confirmed that locale-dependent APIs naturally produce the formats that trigger this bug:
-
-- `new Date("03/15/2026")` parses correctly in US locale but is timezone-dependent
-- `toLocaleDateString('en-US')` in São Paulo returns the wrong day for UTC-midnight dates
-- A developer using `toLocaleDateString('es-AR')` would get `"15/3/2026"` — which hits this exact bug
-
-This means the bug is especially likely to be triggered by developers in non-US locales who use standard JavaScript date APIs without explicit format control.
-
----
-
-## Impact Analysis
-
-### Data Integrity: Complete, Irrecoverable Loss
-
-The date value is not stored anywhere. The API response does not echo back the input value. There is no audit trail of what was sent. The original value is lost at the server parsing step — before any storage occurs. There is no recovery path.
-
-### Detection Difficulty: Very Hard
-
-- The API returns HTTP 200 (success)
-- The record is created with all non-date fields intact
-- The null date field is indistinguishable from an intentionally empty field
-- Discovery only happens when someone opens the record and notices the missing date
-- For bulk imports, this could affect thousands of records before detection
-
-### Scale: Proportional to Non-US Developer Base
-
-Every VV customer with Latin American or European developers writing scripts is potentially affected. The risk is highest for:
-
-1. **Data migration scripts** importing CSV data with DD/MM dates from external systems
-2. **Automated workflows** that compute dates using locale-dependent JavaScript APIs like `toLocaleDateString()`
-3. **Integration scripts** receiving dates from European/Latin American source systems
-
----
-
-## Proposed Fix
-
-### Option A: Return a Validation Error for Unparseable Dates (Minimum Fix)
-
-The server should return an error when a date string cannot be parsed, instead of silently storing null:
-
-```
-Current:  POST { Field7: "15/03/2026" } → 200 OK, Field7 = null
-Fixed:    POST { Field7: "15/03/2026" } → 400 Bad Request
-          { "error": "Invalid date format for Field7: '15/03/2026'.
-            Use ISO 8601 (YYYY-MM-DD) or MM/DD/YYYY." }
-```
-
-Prevents silent data loss. Scripts fail immediately — developers discover the issue during development, not after deployment.
-
-### Option B: Add DD/MM/YYYY Support to the Parser
-
-Extend the server's date parser to recognize day-first formats:
-
-- If first component > 12: must be DD/MM (unambiguous) — parse as day-first
-- If first component ≤ 12: ambiguous — requires a tiebreaker policy (see [WEBSERVICE-BUG-3](ws-bug-3-ambiguous-dates.md))
-
-Enables natural date formats for non-US developers, but ambiguous cases (day 1–12) still need a policy decision.
-
-### Option C: Both — Validation + Extended Support (Recommended)
-
-1. Add DD/MM support for unambiguous cases (day > 12)
-2. Return a validation error for ambiguous all-numeric dates where the intent cannot be determined
-3. Always accept ISO 8601 and US format without restriction
-4. Optionally support a locale hint header for ambiguous cases
-
-```
-"15/03/2026" → parsed as March 15 (day > 12, unambiguous DD/MM)
-"05/03/2026" → 400 error: "Ambiguous date format. Use ISO 8601 (YYYY-MM-DD)."
-"2026-03-15" → parsed as March 15 (ISO 8601, always unambiguous)
-"03/15/2026" → parsed as March 15 (MM/DD, current behavior preserved)
-```
-
----
-
-## Fix Impact Assessment
-
-### What Changes If Fixed
-
-- Scripts sending DD/MM dates with day > 12 either work correctly (Option B/C) or fail immediately with a clear error (Option A/C) — no more silent data loss
-- Existing records are unaffected — null values already stored cannot be recovered
-- API documentation should be updated to list supported date formats and recommended practices
-
-### Backwards Compatibility Risk: LOW
-
-There is no existing correct data to break. DD/MM dates are currently silently stored as null. Any fix either makes them work or makes them fail explicitly — both are improvements over silent data loss.
-
-The only risk is scripts that have inadvertently adapted to the null behavior (e.g., checking for null dates and having a fallback). These scripts would see different behavior after the fix, but the original intent was clearly to store a date, not null.
-
-### Regression Risk: LOW
-
-The date parser change is isolated to the server's input normalization. The 20+ currently-accepted formats should be regression-tested to verify they still work identically. No other date processing is affected.
+See [ws-bug-2-fix-recommendations.md](ws-bug-2-fix-recommendations.md) for workarounds, proposed fix options, and impact assessment.

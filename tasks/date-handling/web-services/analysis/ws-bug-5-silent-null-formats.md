@@ -2,90 +2,44 @@
 
 ## What Happens
 
-Several technically valid or widely used date representations are silently accepted by the VisualVault REST API (HTTP 200, record created) but stored as `null` for the date field. The pattern is identical to [WEBSERVICE-BUG-2](ws-bug-2-latam-data-loss.md): the server's date parser does not recognize the format, fails without generating an error, and stores nothing.
+Several technically valid or widely used date representations are silently accepted by the VisualVault REST API (HTTP 200, record created) but stored as `null` for the date field. The API returns success, the record is created with all non-date fields intact, and the date field is empty. No error, no warning. The data loss is only discovered when someone opens the record and finds the date missing.
 
 The affected formats:
 
-| Format                      | Example           | Where It's Used                                                       |
+| Format                      | Example           | Where It Is Used                                                      |
 | --------------------------- | ----------------- | --------------------------------------------------------------------- |
 | Compact ISO 8601            | `"20260315"`      | Machine-generated IDs, log timestamps, healthcare (HL7), banking APIs |
 | Inverted ISO                | `"2026-15-03"`    | Malformed input, copy-paste errors                                    |
 | Epoch milliseconds (number) | `1773532800000`   | JavaScript `Date.getTime()`, Unix systems, message queues             |
 | Epoch milliseconds (string) | `"1773532800000"` | JSON serialization of epoch values                                    |
 
-In every case: the API returns success (HTTP 200), the record is created with all non-date fields intact, and the date field is silently empty. No error, no warning. The data loss is only discovered when someone opens the record and finds the date missing.
+---
+
+## When This Applies
+
+Two conditions must be true for this bug to cause data loss:
+
+### 1. The date value is in one of the four affected formats
+
+The VV REST API's date parser handles over 20 date formats (see the full accepted-format table in [WEBSERVICE-BUG-2 — Background](ws-bug-2-latam-data-loss.md#background)). The four formats listed above fall outside that vocabulary. Adding separators to compact ISO (`"2026-03-15"` instead of `"20260315"`) or converting epoch to an ISO string before sending resolves the issue.
+
+### 2. The date is sent through the REST API
+
+The server's date parser runs on all dates submitted through `postForms()` or `postFormRevision()` in the VV REST API. The field's calendar configuration (`enableTime`, `ignoreTimezone`, `useLegacy`) has no effect on the parser — all field types produce the same result for these formats.
+
+Dates entered through the Forms UI are not affected — the UI uses its own date picker and formatting.
 
 ---
 
 ## Severity: LOW
 
-These formats are uncommon in typical VV production scripts. Most VV scripts use ISO 8601 strings (`"YYYY-MM-DD"`) or US format (`"MM/DD/YYYY"`), both of which work correctly. This bug primarily affects integrations with external systems that use epoch timestamps or compact date formats.
+These formats are uncommon in typical VV production scripts. Most VV scripts use ISO 8601 strings (`"YYYY-MM-DD"`) or US format (`"MM/DD/YYYY"`), both of which work correctly. The risk is highest for integration scripts bridging between VV and timestamp-based systems (databases, message queues, IoT platforms) where epoch is the natural format, and for data migration from systems that use compact ISO (`YYYYMMDD`) as a date identifier (HL7 healthcare messages, some European banking APIs).
+
+The failure pattern is the same silent null as [WEBSERVICE-BUG-2](ws-bug-2-latam-data-loss.md) — complete data loss with no error indication — but the affected population is much smaller.
 
 ---
 
-## Who Is Affected
-
-### Epoch timestamp users (the most likely production scenario)
-
-Scripts that receive timestamps from external databases, message queues (Kafka, RabbitMQ), IoT platforms, or REST APIs that return dates as milliseconds. A script naturally passing the numeric value to the VV API silently loses the date:
-
-```javascript
-// DANGEROUS: epoch timestamp from external system
-const epochMs = 1773532800000; // = 2026-03-15T00:00:00.000Z
-const data = { Field7: epochMs }; // number → null (data lost)
-
-// Also fails as a string:
-const data2 = { Field7: String(epochMs) }; // "1773532800000" → null
-```
-
-### Compact ISO users (less common)
-
-Possible in systems that use `YYYYMMDD` as a compact date identifier — log files, some European banking APIs, HL7 healthcare messages:
-
-```javascript
-const compact = '20260315';
-const data = { Field7: compact }; // → null
-// Adding dashes fixes it:
-const data2 = { Field7: '2026-03-15' }; // → works
-```
-
-### Not significantly affected
-
-Typical VV developers — standard scripting patterns use ISO 8601 with separators or US format, both of which are correctly handled. The affected formats are edge cases.
-
----
-
-## The Problem in Detail
-
-### Why Each Format Fails
-
-The VV server's date parser has a broad format vocabulary — it successfully handles over 20 formats including ISO 8601, US format, year-first with various separators, English month names, and the VV internal database format (see [WEBSERVICE-BUG-2](ws-bug-2-latam-data-loss.md) for the full accepted-format table). These four formats fall outside that vocabulary:
-
-| Format                     | Why the Parser Fails                                                 |
-| -------------------------- | -------------------------------------------------------------------- |
-| `"20260315"` (compact ISO) | No separators — parser doesn't recognize an 8-digit string as a date |
-| `"2026-15-03"` (inverted)  | Month position has value 15 — invalid month, fails silently          |
-| `1773532800000` (number)   | Not a string — the parser expects string input                       |
-| `"1773532800000"` (string) | 13-digit numeric string — parser doesn't recognize epoch format      |
-
-### The Common Thread
-
-All four cases share the same failure pattern as WEBSERVICE-BUG-2: the parser receives a value it cannot match to any known format, stores `null`, returns HTTP 200. The difference is only which formats trigger it — WEBSERVICE-BUG-2 covers DD/MM dates (high impact, large affected population), this bug covers less common formats (lower impact).
-
-### Contrast: Similar Formats That Work
-
-| Format              | Example                 | Status | Notes                                      |
-| ------------------- | ----------------------- | :----: | ------------------------------------------ |
-| ISO with separators | `"2026-03-15"`          | Works  | Adding dashes to compact ISO makes it work |
-| ISO datetime        | `"2026-03-15T14:30:00"` | Works  | Full ISO always works                      |
-| US format           | `"03/15/2026"`          | Works  | Parser's native format                     |
-| English month       | `"March 15, 2026"`      | Works  | Word-based dates work                      |
-
-The parser is flexible for well-known formats — compact ISO and epoch are specific blind spots.
-
----
-
-## Steps to Reproduce
+## How to Reproduce
 
 ### Compact ISO
 
@@ -94,7 +48,7 @@ const data = { Field7: '20260315' };
 const resp = await vvClient.forms.postForms({}, data, TEMPLATE_ID);
 const result = JSON.parse(resp);
 
-console.log(result.meta.status); // → 200 (success!)
+console.log(result.meta.status); // → 200 (success)
 console.log(result.data.datafield7); // → null (date lost)
 ```
 
@@ -108,133 +62,77 @@ const result = JSON.parse(resp);
 console.log(result.data.datafield5); // → null (date lost)
 ```
 
----
-
-## Workarounds
-
-### Convert to ISO 8601 Before Sending
+### Contrast: Adding Separators Fixes Compact ISO
 
 ```javascript
-// Compact ISO → ISO with separators
-const compact = '20260315';
-const iso = `${compact.slice(0, 4)}-${compact.slice(4, 6)}-${compact.slice(6, 8)}`;
-// → "2026-03-15" (now accepted)
+const data = { Field7: '2026-03-15' }; // ISO with separators
+const resp = await vvClient.forms.postForms({}, data, TEMPLATE_ID);
+const result = JSON.parse(resp);
 
-// Epoch → ISO date string
-const epoch = 1773532800000;
-const isoFromEpoch = new Date(epoch).toISOString().split('T')[0];
-// → "2026-03-15" (now accepted)
-
-// Epoch → full ISO datetime
-const isoFull = new Date(epoch).toISOString();
-// → "2026-03-15T00:00:00.000Z" (also accepted)
-
-// Always send as a string, never as a number
-const data = { Field7: isoFromEpoch };
+console.log(result.data.datafield7); // → "2026-03-15T00:00:00Z" (stored correctly)
 ```
 
-### Validate Format Before Sending
+- **Expected**: All four formats store March 15, 2026
+- **Actual**: All four formats store null; only ISO with separators works
 
-```javascript
-function isVvAcceptedFormat(value) {
-    if (typeof value !== 'string') return false; // numbers not accepted
-    if (/^\d{8}$/.test(value)) return false; // compact ISO
-    if (/^\d{10,13}$/.test(value)) return false; // epoch
-    if (/^\d{4}-\d{2}-\d{2}/.test(value)) return true; // ISO date
-    if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(value)) return true; // US format
-    return true; // let other formats through — server is flexible
-}
-```
+### Automated
+
+This bug report is backed by a supporting test repository containing automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ---
 
-## Test Evidence
+## The Problem in Detail
 
-### Format Tolerance Tests (4 FAIL Slots)
+### Why Each Format Fails
 
-Records created through the API with each format, then read back to verify what was stored:
+The VV server's date parser does not recognize these four representations:
 
-| Format         | Input             | Field Type | HTTP Response | Stored Value | Status |
-| -------------- | ----------------- | ---------- | :-----------: | :----------: | :----: |
-| Compact ISO    | `"20260315"`      | Date-only  |      200      |   **null**   |  FAIL  |
-| Inverted ISO   | `"2026-15-03"`    | Date-only  |      200      |   **null**   |  FAIL  |
-| Epoch (number) | `1773532800000`   | Date+time  |      200      |   **null**   |  FAIL  |
-| Epoch (string) | `"1773532800000"` | Date+time  |      200      |   **null**   |  FAIL  |
+| Format                     | Why the Parser Fails                                                  |
+| -------------------------- | --------------------------------------------------------------------- |
+| `"20260315"` (compact ISO) | No separators — parser does not recognize an 8-digit string as a date |
+| `"2026-15-03"` (inverted)  | Month position has value 15 — invalid month, fails silently           |
+| `1773532800000` (number)   | Not a string — the parser expects string input                        |
+| `"1773532800000"` (string) | 13-digit numeric string — parser does not recognize epoch format      |
 
-All 4 tests: HTTP 200 returned, record created, date field stored as null. The field's calendar configuration has no effect on the server parser — both date-only and date+time fields produce the same result.
+### The Common Thread With WEBSERVICE-BUG-2
 
-Epoch tests independently confirmed in a separate test run — both numeric and string variants accepted (record created), both stored null.
+All four cases share the same failure pattern as [WEBSERVICE-BUG-2](ws-bug-2-latam-data-loss.md): the parser receives a value it cannot match to any known format, stores null, and returns HTTP 200. The difference is only which formats trigger it — WEBSERVICE-BUG-2 covers DD/MM dates (high impact, large affected population), this bug covers less common formats (lower impact).
 
-### Database Verification
+### Formats That Work for Comparison
 
-Direct database inspection confirmed the data loss:
+| Format              | Example                 | Status | Notes                                    |
+| ------------------- | ----------------------- | :----: | ---------------------------------------- |
+| ISO with separators | `"2026-03-15"`          | Works  | Adding dashes to compact ISO resolves it |
+| ISO datetime        | `"2026-03-15T14:30:00"` | Works  | Full ISO always works                    |
+| US format           | `"03/15/2026"`          | Works  | Parser's native format                   |
+| English month       | `"March 15, 2026"`      | Works  | Word-based dates work                    |
 
-| Record          | Input                           |    Database Value     |
-| --------------- | ------------------------------- | :-------------------: |
-| DateTest-001704 | `"20260315"` (compact)          | All date columns NULL |
-| DateTest-001706 | `1773532800000` (epoch number)  | All date columns NULL |
-| DateTest-001708 | `"20260315"` (compact, re-test) | All date columns NULL |
-
-Records exist in the database (have document IDs and all non-date fields), but every `datetime` column is NULL. The parser failed to convert these formats.
-
----
-
-## Impact Analysis
-
-### Same Silent-Null Pattern as WEBSERVICE-BUG-2
-
-Complete silent data loss — the date field is stored as `null` with no error indication. The record is created successfully with all non-date fields intact. Null date fields are indistinguishable from intentionally empty fields.
-
-### Scale: Limited but Real for Integrations
-
-Unlike [WEBSERVICE-BUG-2](ws-bug-2-latam-data-loss.md) (which affects an entire region's date convention), these formats are uncommon in typical VV scripts. The risk is highest for:
-
-- **Integration scripts** bridging between VV and timestamp-based systems (databases, message queues, IoT platforms) — epoch is the natural format in these contexts
-- **Data migration scripts** importing from systems that use compact ISO (`YYYYMMDD`) as a date identifier
-- **Healthcare integrations** using HL7 message formats (which use compact ISO dates)
-
-The epoch case is the most likely to occur in production — a script receiving a timestamp from an external database or message queue would naturally pass the numeric value to the API.
+The parser is flexible for well-known formats — compact ISO and epoch are specific gaps in its format vocabulary.
 
 ---
 
-## Proposed Fix
+## Verification
 
-### Minimum: Return Validation Errors for Unrecognized Formats
+Verified via the test harness (`run-ws-test.js`) on the demo environment at `vvdemo.visualvault.com`. 4 format tolerance tests confirmed that all four formats (compact ISO, inverted ISO, epoch as number, epoch as string) result in null — HTTP 200 returned in all cases with the date field stored as null. Both date-only and date+time field types produce the same result, confirming the field's calendar configuration has no effect on the parser. Epoch tests were independently confirmed in a separate test run.
 
-Same approach as [WEBSERVICE-BUG-2](ws-bug-2-latam-data-loss.md) — the server should return a clear error instead of silently storing null:
+Direct database inspection of DateTest-001704 (compact ISO), DateTest-001706 (epoch number), and DateTest-001708 (compact ISO re-test) confirmed NULL across all datetime columns — records exist with document IDs and non-date fields intact, but all date columns are empty.
 
-```
-Current:  POST { Field7: "20260315" }      → 200 OK, Field7 = null
-Fixed:    POST { Field7: "20260315" }      → 400 Bad Request
-          { "error": "Unrecognized date format for Field7. Use ISO 8601 (YYYY-MM-DD)." }
-```
+**Limitations**: Testing was performed on the demo environment only. The server-side parser code is .NET and not available in this repository — parser behavior was characterized through input/output testing. Other epoch representations (seconds instead of milliseconds, negative values, epoch 0) were not tested.
 
-### Optional: Add Compact ISO and Epoch Support
-
-If there is demand, the server parser could be extended to recognize:
-
-- **Compact ISO** (`"20260315"`) → parse as `YYYYMMDD` → `"2026-03-15T00:00:00Z"`
-- **Epoch milliseconds** (number or string) → `new Date(value).toISOString()` → ISO+Z
-
-This is lower priority than [WEBSERVICE-BUG-2](ws-bug-2-latam-data-loss.md) (DD/MM support) because the affected population is smaller. The minimum viable fix is validation errors for unrecognized formats.
+This bug report is backed by a supporting test repository containing automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ---
 
-## Fix Impact Assessment
+## Technical Root Cause
 
-### What Changes If Fixed
+The VV REST API's server-side date parser does not include compact ISO 8601 (`YYYYMMDD`), inverted ISO (`YYYY-DD-MM`), or epoch timestamps (numeric or string) in its format vocabulary. When the parser encounters a value that does not match any recognized format, it returns null without generating an error. The calling code stores the null value and returns HTTP 200 to the client.
 
-- Scripts sending compact ISO or epoch values get an explicit error instead of silent data loss
-- Optional: these formats become accepted inputs
+**File locations**: The parser is server-side .NET code, not available in this repository. The parser's format vocabulary was characterized entirely through input/output testing — submitting various formats via `postForms()` and inspecting database values. The specific .NET method or class has not been identified.
 
-### Backwards Compatibility Risk: NONE
+This is the same silent-null mechanism as [WEBSERVICE-BUG-2](ws-bug-2-latam-data-loss.md) and [WEBSERVICE-BUG-3](ws-bug-3-ambiguous-dates.md) — all three bugs stem from the parser's lack of error reporting when it encounters an unrecognized format.
 
-These formats are currently silently broken. There is no existing correct data created through them — only null values. Any change (error or acceptance) is an improvement.
+---
 
-### Regression Risk: LOW
+## Workarounds and Fix Recommendations
 
-The parser change only affects formats that currently produce null. All 20+ accepted formats are unaffected. Standard regression testing of the format tolerance matrix would verify no accepted format broke.
-
-### Testing Recommendation
-
-After the fix, verify all four formats either return an error or store correctly. If epoch support is added, test edge cases: negative epoch, epoch 0 (Unix epoch), epoch in seconds vs milliseconds, string epoch with leading zeros.
+See [ws-bug-5-fix-recommendations.md](ws-bug-5-fix-recommendations.md) for workarounds, proposed fix, and impact assessment.

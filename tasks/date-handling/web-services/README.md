@@ -27,7 +27,7 @@ REST API date handling investigation. Tests how dates are sent, stored, and retu
 ### Prerequisites (Direct Runner — API-only tests)
 
 1. `npm install` completed (dependencies installed)
-2. `testing/config/vv-config.json` with `clientId` and `clientSecret` fields filled in (see [dev-setup.md section 4.3](../../docs/guides/dev-setup.md#43-create-vv-credentials-file))
+2. `.env.json` with `clientId`, `clientSecret`, `username`, and `loginPassword` filled in (see [dev-setup.md section 4.3](../../docs/guides/dev-setup.md#43-create-credentials-file))
 3. That's it — no server, no VV Microservice registration, no form button needed
 
 **Quick smoke test:**
@@ -116,19 +116,7 @@ node --inspect-brk testing/scripts/run-ws-test.js --action WS-1 --configs A --in
 TZ=UTC node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 ```
 
-**Credentials**: Reads from `testing/config/vv-config.json`. Required fields:
-
-```json
-{
-    "loginUrl": "https://vvdemo.visualvault.com",
-    "customerAlias": "EmanuelJofre",
-    "databaseAlias": "Main",
-    "clientId": "YOUR_CLIENT_ID",
-    "clientSecret": "YOUR_CLIENT_SECRET",
-    "username": "your.email@example.com",
-    "password": "your-password"
-}
-```
+**Credentials**: Reads from the root `.env.json` via `testing/fixtures/env-config.js`. See `.env.example.json` for the schema.
 
 ### Exploration flow (MCP)
 
