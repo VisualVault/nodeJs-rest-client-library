@@ -75,7 +75,7 @@ When `--skip-verify` is present, the command **does not open a browser**. Instea
 
 ### 0.1 — Read credentials
 
-Read `testing/config/vv-config.json` for VV instance URL, username, password. If missing, stop and instruct user to create from `testing/config/vv-config.example.json`.
+Read credentials from the root `.env.json` by loading `testing/fixtures/env-config.js` (`loadConfig()`) to get VV instance URL, username, password. If `.env.json` does not exist, stop and instruct the user to create it from `.env.example.json`.
 
 ### 0.2 — Launch browser
 

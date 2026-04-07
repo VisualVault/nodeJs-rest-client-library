@@ -114,7 +114,7 @@ If none exist, report: "No verified data found for {id}. Run without --skip-veri
 
 ### 0.1 — Read credentials
 
-Read `testing/config/vv-config.json` to get VV instance URL, username, password, customerAlias, and databaseAlias. If the file does not exist, stop and instruct the user to create it from `testing/config/vv-config.example.json`.
+Read credentials from the root `.env.json` by loading `testing/fixtures/env-config.js` (`loadConfig()`) to get VV instance URL, username, password, customerAlias, and databaseAlias. If `.env.json` does not exist, stop and instruct the user to create it from `.env.example.json`.
 
 ### 0.2 — Determine timezone
 
@@ -153,7 +153,7 @@ Then navigate to the DateTest form template URL (from Phase 1 step 4). After nav
 **If no auth state or state is expired:**
 
 ```bash
-playwright-cli goto "<loginUrl from vv-config.json>"
+playwright-cli goto "<loginUrl from .env.json>"
 playwright-cli snapshot
 ```
 
@@ -164,8 +164,8 @@ Identify the login form elements from the snapshot. The VV login page has:
 - A "Log In" button
 
 ```bash
-playwright-cli fill e{username_ref} "<username from vv-config.json>"
-playwright-cli fill e{password_ref} "<password from vv-config.json>"
+playwright-cli fill e{username_ref} "<username from .env.json>"
+playwright-cli fill e{password_ref} "<password from .env.json>"
 playwright-cli click e{login_ref}
 ```
 

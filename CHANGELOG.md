@@ -12,11 +12,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 - Bug report standard (`docs/standards/bug-report-standard.md`) — document structure, 21 writing principles, severity levels, reading guide, companion doc format, field config appendix pattern
 - Fix-recommendation companion docs for all 7 Forms calendar bugs (`bug-{1-7}-fix-recommendations.md`) — workarounds, proposed fixes, impact assessments separated from bug reports
+- Fix-recommendation companion docs for all 6 Web Services bugs (`ws-bug-{1-6}-fix-recommendations.md`) and Dashboard bug (`formdashboard-bug-1-fix-recommendations.md`)
+- `testing/fixtures/env-config.js` — unified credential loader: reads `.env.json`, maps fields for Playwright and WS runner consumers. Replaces scattered credential references
+- `.env.example.json` — credential template at repo root (replaces deleted `testing/config/vv-config.example.json`)
+- `testing/scripts/export-wadnr-templates.js` — Playwright-based form template XML export from VV FormTemplateAdmin (pagination, parallel workers, resume support)
+- `testing/scripts/inventory-wadnr-fields.js` — parses WADNR template XMLs, maps calendar fields to Config A–H, generates field inventory with heuristic model assessment
+- `tasks/date-handling/wadnr-impact/` — WADNR project impact analysis: 77 templates exported (12 failed server-side), 35 contain calendar fields (137 total), configuration assessment with 8 likely misconfigurations identified
 
 ### Changed
 
 - Refactored all 7 Forms calendar bug reports (FORM-BUG-1 through FORM-BUG-7) to comply with bug report standard: standalone structure, jargon-free "What Happens," conditions-based "When This Applies," "How to Reproduce" for support audience, Verification summary replacing raw test data, field config appendix, supporting repository notice
-- Replaced "fake Z" terminology with "literal Z" across all bug docs (neutral language per standard)
+- Refactored all 6 Web Services bug reports (WEBSERVICE-BUG-1 through WEBSERVICE-BUG-6) and FORMDASHBOARD-BUG-1 to comply with bug report standard: same restructuring as Forms bugs, plus tone fixes ("fake"→"incorrect", editorial language removed), non-standard "Impact Analysis" sections eliminated
+- Replaced "fake Z" terminology with "incorrect Z" / "literal Z" across all bug docs (neutral language per standard)
 - Corrected "same timezone = safe" assumption in FORM-BUG-4 severity — DST transitions, business travel, and multi-timezone US states break the self-consistency pattern
 - Added V2 init path limitation to `docs/reference/form-fields.md` (flag resets on reload, cannot test init path via console)
 
@@ -46,6 +53,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `docs/reference/form-fields.md` expanded: field type enum table with 7 new types from production template analysis (Label, Dropdown, Checkbox, CellField, UploadButton, FormIDStamp), `mask`/`placeholder` calendar properties
 - `docs/reference/vv-form-api.md` expanded: script event type IDs (onChange/onBlur/onClick), `VV.Form.Template` namespace correction, `CentralDateValidation` operator details, `CloseAndUnlockForm` method, `CreateFormInstance` full signature and FormsAPI payload format
 - WS-10 action handler in `webservice-test-harness.js`: compares `postForms` vs `forminstance/` (FormsAPI) endpoints. Includes `createFormRecordViaFormInstance()` helper and `verify-ws10-browser.js` browser verification script with compare + save-stabilize modes (Freshdesk #124697)
+- FormTemplateAdmin grid architecture documented in `docs/architecture/visualvault-platform.md`: Telerik RadGrid column layout (12 cols), Export mechanism (`__doPostBack` → XML download), pagination details, ASP.NET strict mode workaround (`addScriptTag`)
+- Authentication & Login section in `docs/architecture/visualvault-platform.md`: post-login redirect differences across VV environments (vvdemo → FormDataAdmin, vv5dev → VVPortalUI/home)
+- WADNR Environment Reference in `docs/architecture/visualvault-platform.md`: 228 templates (89 active), top calendar field counts per template
 - FormsAPI service architecture documented in `docs/architecture/visualvault-platform.md`: separate .NET service, endpoint catalog, JWT auth, form template ID hierarchy, storage format difference (CB-29)
 - `docs/reference/api-date-patterns.md` expanded: CB-29 endpoint storage format warning — `postForms` stores ISO+Z, `forminstance/` stores US format (no TZ); workaround for migration scripts
 - `docs/guides/scripting.md` expanded: FormsAPI access patterns via `vvClient.formsApi.formInstances.postForm()`, payload format, error handling, comparison table vs `postForms`

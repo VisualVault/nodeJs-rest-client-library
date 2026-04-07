@@ -27,12 +27,14 @@ tasks/date-handling/
     analysis/                        # Analysis & conclusions
       overview.md                    # Executive summary, confirmed bugs, code paths, V1/V2 comparison
       bug-{1-7}.md                   # Individual bug documents (FORM-BUG-1 through FORM-BUG-7)
+      bug-{1-7}-fix-recommendations.md  # Companion docs (workarounds, proposed fixes, impact)
     results.md                       # Live browser test evidence (source of truth)
   web-services/                      # REST API date handling investigation
     README.md                        # Test environment setup, harness usage, architecture
     analysis/                        # Analysis & conclusions
       overview.md                    # Executive summary, issues registry, confirmed behaviors, developer guidance
       ws-bug-{1-6}.md               # Individual bug documents (WEBSERVICE-BUG-1 through WEBSERVICE-BUG-6)
+      ws-bug-{1-6}-fix-recommendations.md  # Companion docs (workarounds, proposed fixes, impact)
     matrix.md                        # Test matrix — WS-1 through WS-10 categories (148 slots, complete)
     results.md                       # Live test evidence
     test-cases/                      # Individual TC spec files
@@ -41,7 +43,8 @@ tasks/date-handling/
   dashboards/                        # Dashboard date display investigation (COMPLETE — 44/44)
     analysis/                        # Analysis & conclusions
       overview.md                    # Architecture, confirmed behaviors, design observations, test coverage
-      formdashboard-bug-1-format-inconsistency.md  # FORMDASHBOARD-BUG-1: .NET vs Angular format mismatch
+      formdashboard-bug-1-format-inconsistency.md      # FORMDASHBOARD-BUG-1: .NET vs Angular format mismatch
+      formdashboard-bug-1-fix-recommendations.md       # Companion doc (workarounds, proposed fix, impact)
     matrix.md                        # Test matrix — DB-1 through DB-8 (44 slots, complete)
     results.md                       # Live test evidence
     test-cases/                      # Individual TC spec files

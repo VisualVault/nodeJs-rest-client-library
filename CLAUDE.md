@@ -44,6 +44,8 @@ nodeV2/
       ws-log.js                      # Log shim for WS harness scripts (proxies to server lib)
     fixtures/                        # Shared test data and config
       vv-config.js                   # FIELD_MAP, form URLs, saved records
+      env-config.js                  # Loads .env.json, maps credentials for Playwright and WS runners
+      ws-config.js                   # Web service API config (endpoints, auth, field mapping)
       test-data.js                   # All test case definitions (data-driven)
     reporters/                       # Custom Playwright reporters
       regression-reporter.js         # Captures results + actual values → JSON
@@ -59,6 +61,8 @@ nodeV2/
       verify-ws10-browser.js         # Playwright verification for WS-10 (postForms vs forminstance)
       verify-format-mismatch.js      # Dashboard vs Forms format comparison
       explore-dashboard.js           # Dashboard grid capture + TZ comparison
+      export-wadnr-templates.js     # Playwright-based WADNR form template XML export
+      inventory-wadnr-fields.js     # Parse template XMLs, generate field inventory with config assessment
     date-handling/                   # Date-handling test specs (1 per category + dashboard specs)
   docs/                              # Shared documentation
     architecture/                    # Platform architecture, component diagrams, data flow
@@ -73,9 +77,12 @@ nodeV2/
       forms-calendar/                # Forms calendar field testing (7 bugs, ~242 slots)
         analysis/                    # Analysis & conclusions (overview + 7 bug reports + 7 fix-recommendation companions)
       web-services/                  # REST API date handling testing (148 slots, complete — WS-1 through WS-10)
-        analysis/                    # Analysis & conclusions (overview + 6 finding documents)
+        analysis/                    # Analysis & conclusions (overview + 6 bug reports + 6 fix-recommendation companions)
       dashboards/                    # Dashboard date display testing (44/44 complete — DB-1 thru DB-8 all done)
-        analysis/                    # Analysis & conclusions (overview + 1 bug document)
+        analysis/                    # Analysis & conclusions (overview + 1 bug report + 1 fix-recommendation companion)
+      wadnr-impact/                  # WADNR project impact analysis (77 templates exported, 35 with 137 calendar fields)
+        field-inventory.md           # Per-template field inventory with config assessment
+        form-templates/              # Exported XML templates (77 files)
     form-templates/                  # XML template analysis, generator, redesigned DateTest v2
         README.md                    # Template format docs and generator usage
         datetest-v2.xml              # Redesigned DateTest form template
@@ -119,9 +126,10 @@ This is a **microservices execution environment** — middleware between VisualV
 
 OAuth token-based via `common.js`:
 
-- Scripts provide credentials via `getCredentials()`
-- Server-side credentials load from `.env.json` (gitignored) at `app.js` startup into `global.VV_ENV`. Scripts read `global.VV_ENV` with fallback to placeholder defaults
-- Direct runner (`run-ws-test.js`) reads from `testing/config/vv-config.json` instead
+- All credentials live in a single root `.env.json` (gitignored, multi-environment format with `activeEnv` selector)
+- Server path: `app.js` loads `.env.json` into `global.VV_ENV`; scripts read via `getCredentials()` (client_credentials flow: `clientId`/`clientSecret`)
+- Test path: `testing/fixtures/env-config.js` loads `.env.json` and maps fields for Playwright and WS runner consumers
+- Direct runner (`run-ws-test.js`) and Playwright tests both read from `.env.json` via `env-config.js`
 - `common.js` handles token acquisition and auto-refresh (30s before expiry)
 - All API calls use Bearer token in Authorization header
 

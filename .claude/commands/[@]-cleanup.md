@@ -174,7 +174,7 @@ Check whether these files are tracked by git (`git ls-files`):
 
 - `testing/config/auth-state.json`
 - `testing/config/auth-state-pw.json`
-- `testing/config/vv-config.json`
+- `.env.json`
 - `testing/config/saved-records.json`
 - Any file matching `*.env`, `*credential*`, `*secret*`
 
@@ -185,7 +185,7 @@ If tracked: **CRITICAL**. If present on disk but gitignored: **INFO** (expected)
 Read `.gitignore` and verify it has entries covering:
 
 - Auth state files (`auth-state*.json`)
-- Config files with credentials (`vv-config.json`)
+- Config files with credentials (`.env.json`)
 - Test result directories (`test-results/`)
 - Playwright report directories (`playwright-report/`)
 - Screenshot directories
