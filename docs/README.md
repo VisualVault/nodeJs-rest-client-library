@@ -18,6 +18,10 @@ docs/
 
 - [visualvault-platform.md](architecture/visualvault-platform.md) — URL structure, navigation map, Enterprise Tools (Microservices, Scheduled Services, Queries), how nodeV2 integrates, demo environment reference
 
+### Standards
+
+- [bug-report-standard.md](standards/bug-report-standard.md) — Bug report structure, writing principles, severity levels, companion doc format, field configuration appendix pattern
+
 ### Guides
 
 - [dev-setup.md](guides/dev-setup.md) — **Canonical setup guide** — environment setup, Playwright, credentials, code quality, troubleshooting

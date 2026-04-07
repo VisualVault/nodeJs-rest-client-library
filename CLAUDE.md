@@ -63,6 +63,7 @@ nodeV2/
   docs/                              # Shared documentation
     architecture/                    # Platform architecture, component diagrams, data flow
     standards/                       # Coding standards, patterns, conventions
+      bug-report-standard.md         # Bug report structure, writing principles, companion doc format
     guides/                          # How-to guides, onboarding, troubleshooting
     reference/                       # API reference, config options, field types
   tasks/                             # Investigation and task workspace
@@ -70,7 +71,7 @@ nodeV2/
     date-handling/                   # Active: cross-platform date bug investigation
       analysis/                      # Cross-cutting root cause analysis (temporal models)
       forms-calendar/                # Forms calendar field testing (7 bugs, ~242 slots)
-        analysis/                    # Analysis & conclusions (overview + 7 per-bug documents)
+        analysis/                    # Analysis & conclusions (overview + 7 bug reports + 7 fix-recommendation companions)
       web-services/                  # REST API date handling testing (148 slots, complete — WS-1 through WS-10)
         analysis/                    # Analysis & conclusions (overview + 6 finding documents)
       dashboards/                    # Dashboard date display testing (44/44 complete — DB-1 thru DB-8 all done)

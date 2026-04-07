@@ -10,6 +10,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 ### Added
 
+- Bug report standard (`docs/standards/bug-report-standard.md`) — document structure, 21 writing principles, severity levels, reading guide, companion doc format, field config appendix pattern
+- Fix-recommendation companion docs for all 7 Forms calendar bugs (`bug-{1-7}-fix-recommendations.md`) — workarounds, proposed fixes, impact assessments separated from bug reports
+
+### Changed
+
+- Refactored all 7 Forms calendar bug reports (FORM-BUG-1 through FORM-BUG-7) to comply with bug report standard: standalone structure, jargon-free "What Happens," conditions-based "When This Applies," "How to Reproduce" for support audience, Verification summary replacing raw test data, field config appendix, supporting repository notice
+- Replaced "fake Z" terminology with "literal Z" across all bug docs (neutral language per standard)
+- Corrected "same timezone = safe" assumption in FORM-BUG-4 severity — DST transitions, business travel, and multi-timezone US states break the self-consistency pattern
+- Added V2 init path limitation to `docs/reference/form-fields.md` (flag resets on reload, cannot test init path via console)
+
 - Support for adding index fields to a folder ([#71](https://github.com/VisualVault/nodeJs-rest-client-library/pull/71))
 - Get user role permissions ([#70](https://github.com/VisualVault/nodeJs-rest-client-library/pull/70))
 - CurrentUser namespace and WhoAmI endpoint ([#69](https://github.com/VisualVault/nodeJs-rest-client-library/pull/69))

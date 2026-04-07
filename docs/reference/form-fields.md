@@ -95,6 +95,8 @@ This flag is service-level (not per-field) — it applies to all calendar fields
 - Server flag or non-empty `modelId` → V2 (`true`)
 - **Manual console activation**: `VV.Form.calendarValueService.useUpdatedCalendarValueLogic = true` — the flag is writable, enabling V2 testing on standalone forms without needing Object View URLs. Confirmed live 2026-04-03.
 
+**V2 init path limitation**: The flag resets to `false` on page reload. Console activation works for post-load operations (e.g., testing `GetFieldValue` under V2 — see TC-8-V2), but cannot test the V2 **init path** (`initCalendarValueV2`) because the flag must be `true` before the form loads. Testing the init path requires either a valid Object View context (`?ObjectID=` with a real object) or the server-side flag enabled on the account.
+
 **parseDateString is V2-only.** The `CalendarValueService.parseDateString()` function (line ~104126 in main.js) is only called under V2:
 
 - `normalizeCalValue()` (line 102798) — gated by `useUpdatedCalendarValueLogic`
@@ -240,4 +242,6 @@ Confirmed via direct SQL query on `DateTest-000004` (saved from BRT, UTC-3). Fie
 
 The database stores no timezone context — there is no suffix distinguishing a UTC value from a local value. A SQL query or report filtering `WHERE Field5 = '3/15/2026 12:00:00 AM'` from a UTC+ machine would match, but the meaning of that timestamp differs per field type. Reports or scheduled scripts that join or compare dates across field types will silently produce incorrect results.
 
-**V1 DateTime save/reload self-consistency (confirmed 2026-04-06):** Despite the inline Z-stripping in V1, DateTime field save/reload is self-consistent across timezones. `getSaveValue()` formats DateTime values as local time without Z (`"YYYY-MM-DDTHH:mm:ss"`). On reload, `initCalendarValueV1()` parses this Z-less string as local time via `new Date()`, which reconstructs the original value. This means cross-TZ reload of DateTime fields shows the **same** stored value regardless of the loading user's timezone (verified: BRT-saved Config D loaded correctly in BRT, IST, and UTC0). Date-only fields do NOT have this property — they are affected by FORM-BUG-7 at the save step, and the incorrect value is then preserved consistently across TZ reloads.
+**V1 DateTime save/reload self-consistency (confirmed 2026-04-06):** Despite the inline Z-stripping in V1, DateTime field save/reload is self-consistent **when the UTC offset hasn't changed between save and load**. `getSaveValue()` formats DateTime values as local time without Z (`"YYYY-MM-DDTHH:mm:ss"`). On reload, `initCalendarValueV1()` parses this Z-less string as local time via `new Date()`, which reconstructs the original value. Verified: BRT-saved Config D loaded correctly in BRT, IST, and UTC0.
+
+**Important**: This self-consistency is narrower than "same timezone." DST transitions change the UTC offset within the same named timezone (e.g., EST UTC-5 → EDT UTC-4), so a value saved in winter and loaded in summer shifts by 1 hour even for the same user in the same city. Business travel across timezones and multi-timezone US states (Indiana, Texas, Florida, Tennessee) also break the assumption. Date-only fields do NOT have this property — they are affected by FORM-BUG-7 at the save step, and the incorrect value is then preserved consistently across TZ reloads.
