@@ -4,35 +4,18 @@ Configuration files for VV platform Playwright testing. These files are shared b
 
 ## Files
 
-| File                     | Committed | Purpose                                                                  |
-| ------------------------ | :-------: | ------------------------------------------------------------------------ |
-| `vv-config.example.json` |    Yes    | Template for VV credentials — copy to `vv-config.json` and fill in       |
-| `vv-config.json`         |    No     | Your VV instance credentials (gitignored)                                |
-| `tz-brt.json`            |    Yes    | Timezone config for `playwright-cli --config` (America/Sao_Paulo, UTC-3) |
-| `tz-ist.json`            |    Yes    | Timezone config for `playwright-cli --config` (Asia/Calcutta, UTC+5:30)  |
-| `tz-utc0.json`           |    Yes    | Timezone config for `playwright-cli --config` (Etc/GMT, UTC+0)           |
-| `auth-state.json`        |    No     | Saved auth cookies for `playwright-cli` sessions (gitignored)            |
-| `auth-state-pw.json`     |    No     | Saved auth cookies for `@playwright/test` runs (gitignored)              |
-| `screenshots/`           |    No     | Test evidence screenshots (gitignored)                                   |
+| File                 | Committed | Purpose                                                                  |
+| -------------------- | :-------: | ------------------------------------------------------------------------ |
+| `tz-brt.json`        |    Yes    | Timezone config for `playwright-cli --config` (America/Sao_Paulo, UTC-3) |
+| `tz-ist.json`        |    Yes    | Timezone config for `playwright-cli --config` (Asia/Calcutta, UTC+5:30)  |
+| `tz-utc0.json`       |    Yes    | Timezone config for `playwright-cli --config` (Etc/GMT, UTC+0)           |
+| `auth-state.json`    |    No     | Saved auth cookies for `playwright-cli` sessions (gitignored)            |
+| `auth-state-pw.json` |    No     | Saved auth cookies for `@playwright/test` runs (gitignored)              |
+| `screenshots/`       |    No     | Test evidence screenshots (gitignored)                                   |
 
-## Setup
+## Credentials Setup
 
-1. Copy the example config:
-
-    ```bash
-    cp testing/config/vv-config.example.json testing/config/vv-config.json
-    ```
-
-2. Edit `vv-config.json` with your credentials:
-
-    | Field           | Description                   | Example                          |
-    | --------------- | ----------------------------- | -------------------------------- |
-    | `instance`      | VV instance name (subdomain)  | `vvdemo`                         |
-    | `loginUrl`      | Full URL to the VV login page | `https://vvdemo.visualvault.com` |
-    | `username`      | Your VV username (email)      | `user@company.com`               |
-    | `password`      | Your VV password              |                                  |
-    | `customerAlias` | VV customer/tenant identifier | `EmanuelJofre`                   |
-    | `databaseAlias` | VV database name              | `Main`                           |
+All credentials live in the root `.env.json` file (gitignored). See `.env.example.json` for the schema and [Dev Setup Guide](../../docs/guides/dev-setup.md#43-create-credentials-file) for field descriptions.
 
 ## Auth State Files
 

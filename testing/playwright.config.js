@@ -15,6 +15,7 @@
  */
 const { defineConfig } = require('@playwright/test');
 const path = require('path');
+const { loadConfig } = require('./fixtures/env-config');
 
 const AUTH_STATE_PATH = path.join(__dirname, 'config', 'auth-state-pw.json');
 
@@ -59,7 +60,7 @@ module.exports = defineConfig({
     globalSetup: './global-setup.js',
 
     use: {
-        baseURL: 'https://vvdemo.visualvault.com',
+        baseURL: loadConfig().baseUrl,
         storageState: AUTH_STATE_PATH,
         screenshot: 'only-on-failure',
         trace: 'retain-on-failure',

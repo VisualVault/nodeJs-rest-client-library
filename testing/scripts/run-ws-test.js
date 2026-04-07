@@ -17,7 +17,6 @@
  */
 
 const path = require('path');
-const fs = require('fs');
 
 // ---------- Parse CLI args ----------
 
@@ -82,16 +81,15 @@ Environment:
 async function main() {
     const args = parseArgs();
 
-    // Load credentials
-    const configPath = path.join(__dirname, '..', 'config', 'vv-config.json');
-    if (!fs.existsSync(configPath)) {
-        console.error(`Config not found: ${configPath}`);
-        console.error(
-            'Create testing/config/vv-config.json with: loginUrl, customerAlias, databaseAlias, clientId, clientSecret, username, password'
-        );
+    // Load credentials from root .env.json (single source of truth)
+    const { loadConfig } = require('../fixtures/env-config');
+    let config;
+    try {
+        config = loadConfig();
+    } catch (err) {
+        console.error(err.message);
         process.exit(1);
     }
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
     const requiredFields = [
         'loginUrl',
@@ -104,7 +102,7 @@ async function main() {
     ];
     const missing = requiredFields.filter((f) => !config[f]);
     if (missing.length > 0) {
-        console.error(`Missing fields in vv-config.json: ${missing.join(', ')}`);
+        console.error(`Missing fields in .env.json: ${missing.join(', ')}`);
         process.exit(1);
     }
 

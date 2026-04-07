@@ -17,10 +17,10 @@ const FORM_TEMPLATE_ID = '6be0265c-152a-f111-ba23-0afff212cc87';
 
 // Customer and database identifiers for API authentication
 const API_CONFIG = {
-    baseUrl: vvConfig.baseUrl || 'https://vvdemo.visualvault.com',
+    baseUrl: vvConfig.baseUrl,
     customerAlias: vvConfig.customerAlias,
     databaseAlias: vvConfig.databaseAlias,
-    userId: vvConfig.userId,
+    userId: vvConfig.username,
     password: vvConfig.password,
     clientId: vvConfig.clientId,
     clientSecret: vvConfig.clientSecret,

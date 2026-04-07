@@ -11,15 +11,14 @@
  */
 const path = require('path');
 const fs = require('fs');
-
-const VV_CONFIG_PATH = path.join(__dirname, '..', 'config', 'vv-config.json');
+const { loadConfig } = require('./env-config');
 
 // Auth state for @playwright/test (Layer 2 — test runner).
 // Separate from testing/config/auth-state.json which is used by playwright-cli (Layer 1 — command).
 // Both are gitignored. See README.md "Auth Flow" section for details.
 const AUTH_STATE_PATH = path.join(__dirname, '..', 'config', 'auth-state-pw.json');
 
-const vvConfig = JSON.parse(fs.readFileSync(VV_CONFIG_PATH, 'utf8'));
+const vvConfig = loadConfig();
 
 // DateTest form template URL — navigating here creates a fresh form instance with all fields empty.
 // The formid, xcid, and xcdid GUIDs identify the DateTest form template in the VV demo environment.

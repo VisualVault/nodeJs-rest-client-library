@@ -49,7 +49,7 @@ Layer 2: npx playwright test (CI/regression)
   Auth state: testing/config/auth-state-pw.json
 
 Shared config:
-  testing/config/vv-config.json     VV credentials
+  .env.json (root)                  VV credentials (unified)
   testing/config/tz-{tz}.json       Timezone overrides (CLI only)
   testing/playwright.config.js      Test runner config (3 TZ projects)
 ```
@@ -90,7 +90,7 @@ Shared config:
 | File                           | Purpose                                                             |
 | ------------------------------ | ------------------------------------------------------------------- |
 | `../playwright.config.js`      | TZ × browser matrix (12 projects: 4 TZ × 3 browsers), auth state    |
-| `../config/vv-config.json`     | VV credentials (gitignored)                                         |
+| `../../.env.json`              | VV credentials (gitignored, unified config)                         |
 | `../config/saved-records.json` | Auto-created DataID URLs for cross-TZ tests (gitignored, cached 1h) |
 | `../config/tz-*.json`          | Timezone overrides for `playwright-cli` (Layer 1 only)              |
 
@@ -190,7 +190,7 @@ If `new Date().toString()` doesn't match the expected offset:
 If tests fail with a login page instead of the form:
 
 - Delete `testing/config/auth-state-pw.json` and re-run
-- Verify credentials in `testing/config/vv-config.json`
+- Verify credentials in `.env.json`
 - Check if the VV instance is accessible
 
 ### Field Not Found

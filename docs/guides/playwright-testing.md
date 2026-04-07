@@ -48,7 +48,7 @@ This command:
 | `testing/helpers/vv-calendar.js` | Calendar helpers: popup (date-only + DateTime + legacy popup), typed input |
 | `testing/helpers/ws-log.js`      | Log shim for WS harness scripts (proxies to server lib logger)             |
 | `testing/global-setup.js`        | Auto-login + create saved records via browser UI (per-TZ, cached 1h)       |
-| `testing/config/vv-config.json`  | VV credentials (gitignored)                                                |
+| `.env.json` (root)               | VV credentials (gitignored, unified config)                                |
 
 ## Extending to Non-Date Testing
 

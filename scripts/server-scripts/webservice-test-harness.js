@@ -12,8 +12,8 @@ module.exports.getCredentials = function () {
         databaseAlias,
         clientId,
         clientSecret,
-        userId: env.userId || clientId,
-        password: env.password || clientSecret,
+        userId: env.clientId || clientId,
+        password: env.clientSecret || clientSecret,
         audience: env.audience || '',
     };
 };

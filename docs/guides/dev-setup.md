@@ -68,26 +68,30 @@ npm install -g @playwright/cli@latest
 
 This is only needed for the `/@-test-forms-date-pw` command (Layer 1). The headless test runner (Layer 2) uses `@playwright/test` which is already in devDependencies.
 
-### 4.3 Create VV Credentials File
+### 4.3 Create Credentials File
+
+All credentials (server, Playwright, WS runner) live in a single root `.env.json`:
 
 ```bash
-cp testing/config/vv-config.example.json testing/config/vv-config.json
+cp .env.example.json .env.json
 ```
 
-Edit `testing/config/vv-config.json`:
+Edit `.env.json`:
 
-| Field           | Description                             | Default                          |
-| --------------- | --------------------------------------- | -------------------------------- |
-| `instance`      | VV instance name                        | `vvdemo`                         |
-| `loginUrl`      | VV login URL                            | `https://vvdemo.visualvault.com` |
-| `username`      | Your VV email                           | —                                |
-| `password`      | Your VV password                        | —                                |
-| `customerAlias` | Customer alias for your tenant          | —                                |
-| `databaseAlias` | Database alias                          | `Main`                           |
-| `clientId`      | OAuth app client ID (for WS runner)     | —                                |
-| `clientSecret`  | OAuth app client secret (for WS runner) | —                                |
+| Field           | Description                          | Example                          |
+| --------------- | ------------------------------------ | -------------------------------- |
+| `activeEnv`     | Which environment to use             | `vvdemo`                         |
+| `baseUrl`       | Full VV instance URL                 | `https://vvdemo.visualvault.com` |
+| `customerAlias` | Customer alias for your tenant       | `EmanuelJofre`                   |
+| `databaseAlias` | Database alias                       | `Main`                           |
+| `clientId`      | OAuth app client ID                  | —                                |
+| `clientSecret`  | OAuth app client secret              | —                                |
+| `username`      | Your VV email (for browser login)    | `user@company.com`               |
+| `loginPassword` | Your VV password (for browser login) | —                                |
 
-`clientId` and `clientSecret` are required for the WS test runner (`run-ws-test.js`). Register an API application in VV Admin to obtain these. Playwright tests do not need them (they use browser auth).
+`clientId`/`clientSecret`: Register an API application in VV Admin to obtain these. Used by server scripts (client_credentials flow) and the WS runner (password grant).
+
+`username`/`loginPassword`: Your human VV login. Used by Playwright browser auth and the WS direct runner.
 
 This file is gitignored. Never commit credentials.
 
@@ -123,15 +127,16 @@ npm run test:pw:brt
 
 ### 4.5 Project Matrix (TZ × Browser)
 
-Tests run across a matrix of 3 timezones × 3 browsers = 9 Playwright projects. Playwright's `timezoneId` context option simulates timezones at the browser level — no system timezone changes needed.
+Tests run across a matrix of 4 timezones × 3 browsers = 12 Playwright projects. Playwright's `timezoneId` context option simulates timezones at the browser level — no system timezone changes needed.
 
 **Timezones:**
 
-| TZ   | IANA Name           | Offset   |
-| ---- | ------------------- | -------- |
-| BRT  | `America/Sao_Paulo` | UTC-3    |
-| IST  | `Asia/Calcutta`     | UTC+5:30 |
-| UTC0 | `Etc/GMT`           | UTC+0    |
+| TZ   | IANA Name             | Offset        |
+| ---- | --------------------- | ------------- |
+| BRT  | `America/Sao_Paulo`   | UTC-3         |
+| IST  | `Asia/Kolkata`        | UTC+5:30      |
+| UTC0 | `UTC`                 | UTC+0         |
+| PST  | `America/Los_Angeles` | UTC-8 / UTC-7 |
 
 **Browsers:**
 
@@ -141,17 +146,18 @@ Tests run across a matrix of 3 timezones × 3 browsers = 9 Playwright projects. 
 | firefox  | Playwright's bundled Firefox                |
 | webkit   | Playwright's bundled WebKit (Safari engine) |
 
-Project names follow the pattern `{TZ}-{browser}` (e.g., `BRT-chromium`, `IST-firefox`, `UTC0-webkit`).
+Project names follow the pattern `{TZ}-{browser}` (e.g., `BRT-chromium`, `IST-firefox`, `PST-webkit`).
 
 Config details: `testing/playwright.config.js` (serial execution, `workers: 1`, 60s timeout).
 
 ### 4.6 Run Tests
 
 ```bash
-npm run test:pw              # All projects (3 TZ × 3 browsers)
+npm run test:pw              # All projects (4 TZ × 3 browsers)
 npm run test:pw:brt          # BRT — all browsers
 npm run test:pw:ist          # IST — all browsers
 npm run test:pw:utc0         # UTC+0 — all browsers
+npm run test:pw:pst          # PST — all browsers
 npm run test:pw:chromium     # Chromium — all TZs
 npm run test:pw:firefox      # Firefox — all TZs
 npm run test:pw:webkit       # WebKit (Safari) — all TZs
@@ -175,35 +181,19 @@ You can also target a single cell: `npx playwright test --config=testing/playwri
 
 WS testing uses a direct Node.js runner to call the VV API. No server or browser needed for API-only tests.
 
-### 5.0 Server-Side Credentials (`.env.json`)
+### 5.0 How Credentials Are Used
 
-When running tests through VV's Microservice routing (browser path), the server needs credentials to authenticate API calls. Create `.env.json` in the repo root (gitignored):
+The root `.env.json` (created in section 4.3) serves all credential consumers:
 
-```json
-{
-    "activeEnv": "vvdemo",
-    "environments": {
-        "vvdemo": {
-            "baseUrl": "https://vvdemo.visualvault.com",
-            "customerAlias": "YourCustomer",
-            "databaseAlias": "Main",
-            "clientId": "YOUR_CLIENT_ID",
-            "clientSecret": "YOUR_CLIENT_SECRET",
-            "userId": "YOUR_CLIENT_ID",
-            "password": "YOUR_CLIENT_SECRET",
-            "audience": ""
-        }
-    }
-}
-```
+- **Server path:** `app.js` loads the active environment into `global.VV_ENV` at startup. Server-side scripts read from this global via `getCredentials()`, using `clientId`/`clientSecret` for the OAuth client_credentials flow.
+- **Playwright tests:** `global-setup.js` uses `username`/`loginPassword` for browser login.
+- **WS direct runner:** `run-ws-test.js` uses `username`/`loginPassword` + `clientId`/`clientSecret` for the OAuth password grant.
 
-`app.js` loads the active environment into `global.VV_ENV` at startup. Server-side scripts read from this global via `getCredentials()`. Switch environments by changing `activeEnv` and restarting the server.
-
-The direct runner (`run-ws-test.js`) uses `testing/config/vv-config.json` instead — it doesn't go through the server.
+Switch environments by changing `activeEnv` and restarting the server.
 
 ### 5.1 Prerequisites
 
-- VV credentials in `testing/config/vv-config.json` with `clientId` and `clientSecret` fields (see section 4.3)
+- VV credentials in `.env.json` with `clientId`, `clientSecret`, `username`, and `loginPassword` fields (see section 4.3)
 - To obtain OAuth credentials: register an API application in VV Admin (Admin Tools > API Applications, or contact your VV admin)
 
 ### 5.2 Quick Start (Direct Runner)
@@ -273,7 +263,7 @@ If `new Date().toString()` doesn't match the expected offset:
 Tests fail showing a login page instead of the form:
 
 - Delete `testing/config/auth-state-pw.json` and re-run
-- Verify credentials in `testing/config/vv-config.json`
+- Verify credentials in `.env.json`
 - Check if the VV instance is accessible
 
 ### `playwright-cli` not found
