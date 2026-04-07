@@ -2,53 +2,73 @@
 
 ## What Happens
 
-When a user enters a date into a legacy calendar field, the value stored in the database depends on **how** the date was entered — even though both methods produce the same visual result. Selecting March 15, 2026 via the **calendar popup** stores a UTC datetime string like `"2026-03-15T03:00:00.000Z"`, while **typing** the same date stores a local format like `"2026-03-15"`. Because the database column is a `datetime` type (not a date-only type), these two strings become two different datetime values: `2026-03-15 03:00:00.000` vs `2026-03-15 00:00:00.000` — a 3-hour difference in São Paulo (UTC-3).
+Calendar fields accept dates two ways: clicking a date in the **calendar popup**, or **typing** the date directly into the input field. When a field is configured with legacy mode, these two methods store different values in the database — even though both show the same date on screen.
 
-The form **displays the correct date** after reload regardless of input method (the load path normalizes both formats). But the underlying database values differ, which means SQL queries, reports, and dashboards that filter by date may return inconsistent results depending on how the date was originally entered.
+For example, entering March 15, 2026 in São Paulo (UTC-3): the popup stores the equivalent of 3:00 AM while typing stores midnight. The form displays the correct date after reload in both cases, but the underlying database values differ by 3 hours — meaning SQL queries, reports, and dashboards that filter by date may return inconsistent results depending on how the date was originally entered.
 
-This only affects fields configured with **legacy mode enabled** (`useLegacy=true`). Non-legacy fields are immune — both input methods produce identical stored values.
+---
+
+## When This Applies
+
+Three conditions must all be true:
+
+### 1. The field must be configured with legacy mode (`useLegacy=true`)
+
+Non-legacy fields are not affected. The `useLegacy` flag is a per-field configuration — a form can have both legacy and non-legacy fields side by side. See [Why Non-Legacy Fields Are Safe](#why-non-legacy-fields-are-safe) for the technical explanation.
+
+### 2. The date was entered via the calendar popup
+
+Typed input stores the correct value. The inconsistency only appears when a date is entered through the calendar popup.
+
+### 3. The user's timezone is not UTC+0
+
+At UTC+0, the two stored values are numerically identical — the bug exists but is invisible. The magnitude of the difference equals the user's UTC offset (e.g., 3 hours in São Paulo, 5.5 hours in Mumbai). See [What Gets Stored](#what-gets-stored--side-by-side) for the full breakdown.
+
+**Field configuration scope** — the `ignoreTimezone` and `enableTime` flags have no effect on whether this bug occurs. All four legacy configs are affected equally:
+
+| Config | Field   | enableTime | ignoreTimezone | useLegacy | Affected?  |
+| ------ | ------- | ---------- | -------------- | --------- | ---------- |
+| E      | Field12 | —          | —              | ✅        | ✅ **Yes** |
+| F      | Field11 | —          | ✅             | ✅        | ✅ **Yes** |
+| G      | Field14 | ✅         | —              | ✅        | ✅ **Yes** |
+| H      | Field13 | ✅         | ✅             | ✅        | ✅ **Yes** |
+| A      | Field7  | —          | —              | —         | ❌ No      |
+| D      | Field5  | ✅         | ✅             | —         | ❌ No      |
 
 ---
 
 ## Severity: MEDIUM
 
-Upgraded from Low after confirming that the format difference translates to an actual data difference in the SQL Server `datetime` column (3-hour offset in São Paulo, 5.5-hour in Mumbai, etc.). Originally classified as Low because it appeared to be a cosmetic format difference.
+The format difference translates to an actual data difference in the SQL Server `datetime` column — a 3-hour offset in São Paulo, 5.5 hours in Mumbai. The form display normalizes correctly on reload (V1's init path re-parses the value), so end users re-opening the form see the correct date. However, any consumer that reads the raw database value — web service scripts, SQL queries, reports, dashboards — gets the un-normalized value and will see the offset. The impact is limited to legacy fields, which are the older configuration path.
 
 ---
 
-## Who Is Affected
+## How to Reproduce
 
-- **End users** entering dates in legacy calendar fields — the stored value depends on whether they clicked the popup or typed the date, but they have no way to know which format was stored
-- **Reports and SQL queries** that filter by date ranges — a query like `WHERE Field12 = '2026-03-15'` matches typed values but misses popup values (which are stored with a time component)
-- **Dashboards** displaying the stored datetime — popup-entered dates show a time offset that typed dates don't
-- **All timezones** — the format inconsistency exists everywhere, though the magnitude of the datetime difference equals the user's UTC offset
+1. Set system timezone to `America/Sao_Paulo` (BRT, UTC-3) and restart the browser
+2. Open the DateTest form template URL (creates a new empty form)
+3. On **Field12** (Config E: date-only, legacy), click the calendar icon and select March 15, 2026
+4. In the browser console, check the stored value:
+    ```javascript
+    VV.Form.VV.FormPartition.getValueObjectValue('Field12');
+    // Returns: "2026-03-15T03:00:00.000Z"  (popup path — raw UTC)
+    ```
+5. Clear the field
+6. Type `03/15/2026` in the same field and press Tab
+7. Check the stored value again:
+    ```javascript
+    VV.Form.VV.FormPartition.getValueObjectValue('Field12');
+    // Returns: "2026-03-15"  (typed path — formatted by getSaveValue)
+    ```
 
-Non-legacy fields are **not affected**. In non-legacy mode, an upstream normalization step (`normalizeCalValue()`) processes the Date object before it reaches the divergent handlers, ensuring both paths produce the same stored value.
+**Expected**: Both input methods store the same value.
+**Actual**: Popup stores `"2026-03-15T03:00:00.000Z"`, typed stores `"2026-03-15"` — these become different `datetime` values in the database.
 
----
+This bug report is backed by a supporting test repository containing Playwright automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
-## Which Fields Are Affected
-
-VisualVault calendar fields have three configuration flags that control their behavior:
-
-| Flag             | What It Controls                                                           |
-| ---------------- | -------------------------------------------------------------------------- |
-| `enableTime`     | Whether the field stores time in addition to date (date-only vs date+time) |
-| `ignoreTimezone` | Whether timezone conversion is skipped (treat value as display time)       |
-| `useLegacy`      | Whether the field uses the older rendering/save code path                  |
-
-FORM-BUG-2 affects **only fields with `useLegacy=true`** — regardless of the other two flags. In the test form, these are Fields 11-14 (referred to as Configs E, F, G, H in the testing matrix):
-
-| Field   | Config | enableTime | ignoreTimezone | useLegacy | Affected? |
-| ------- | :----: | :--------: | :------------: | :-------: | :-------: |
-| Field12 |   E    |    off     |      off       |  **yes**  |  **Yes**  |
-| Field11 |   F    |    off     |      yes       |  **yes**  |  **Yes**  |
-| Field14 |   G    |     on     |      off       |  **yes**  |  **Yes**  |
-| Field13 |   H    |     on     |      yes       |  **yes**  |  **Yes**  |
-| Field7  |   A    |    off     |      off       |    no     |    No     |
-| Field5  |   D    |     on     |      yes       |    no     |    No     |
-
-The `ignoreTimezone` flag has **no effect** on this bug — Configs E and F behave identically, as do G and H.
+```bash
+npx playwright test testing/date-handling/cat-1-legacy-popup.spec.js --project=BRT-chromium
+```
 
 ---
 
@@ -58,7 +78,7 @@ The `ignoreTimezone` flag has **no effect** on this bug — Configs E and F beha
 
 The calendar field has two separate handler functions for user input:
 
-1. **Calendar popup handler** (`calChangeSetValue`): When the user clicks a date in the popup calendar, this function converts the selected Date object to an ISO string via `.toISOString()` and stores it directly — bypassing the formatting step that other paths use.
+1. **Calendar popup handler** (`calChangeSetValue`): When the user clicks a date in the popup, this function converts the selected Date object to a string via `.toISOString()` and stores it directly — bypassing the formatting step that other paths use.
 
 2. **Typed input handler** (`calChange`): When the user types a date and presses Tab, this function also converts to ISO via `.toISOString()`, but then passes the result through a formatting function called `getSaveValue()` before storing. `getSaveValue()` reformats the value:
     - For date-only fields: extracts just `"YYYY-MM-DD"` (e.g., `"2026-03-15"`)
@@ -91,121 +111,35 @@ Both represent March 15 from the user's perspective, but the database stores:
 | Calendar Popup | `calChangeSetValue` | None (raw ISO)     | `"2026-03-15T03:00:00.000Z"` |
 | Typed Input    | `calChange`         | `getSaveValue()`   | `"2026-03-15T00:00:00"`      |
 
-### DOM Discovery: Same Popup Widget, Different Toggle
+### Popup Widget Architecture
 
-During testing, we discovered that legacy and non-legacy fields use the **same underlying Kendo calendar popup widget**. The only difference is how the popup is triggered:
+Legacy and non-legacy fields use the **same underlying Kendo calendar popup widget**. The only difference is how the popup is triggered:
 
 - **Non-legacy**: `<kendo-datepicker>` wrapper with a toggle button (`<span role="button" aria-label="Toggle calendar">`)
 - **Legacy**: Custom wrapper (`<div class="d-picker">`) with an icon trigger (`<span class="k-icon k-i-calendar cal-icon">`)
 
 Both open the same `<kendo-popup>` → `<kendo-calendar>` structure. The bug is not in the popup itself — it's in which handler function receives the selection.
 
----
+### Post-Save Display vs Database
 
-## Steps to Reproduce
+After saving, the form reloads and the V1 initialization path normalizes the in-memory value. A popup-entered Field12 post-save becomes `"2026-03-15"` (normalized from the UTC string). The **display normalizes on next load**, but the **database retains the original UTC time**. Any consumer reading the raw database value — web service scripts, SQL queries, reports, dashboards — sees the un-normalized value with the timezone offset.
 
-1. Open a form with a legacy calendar field (e.g., Field12: `useLegacy=true`, `enableTime=false`)
-2. Select March 15, 2026 via the **calendar popup**
-3. In DevTools console, check the stored value:
-    ```javascript
-    VV.Form.VV.FormPartition.getValueObjectValue('Field12');
-    // Returns: "2026-03-15T03:00:00.000Z"  (raw toISOString — popup path)
-    ```
-4. Clear the field
-5. **Type** `03/15/2026` in the input field and press Tab
-6. Check the stored value again:
-    ```javascript
-    VV.Form.VV.FormPartition.getValueObjectValue('Field12');
-    // Returns: "2026-03-15"  (formatted by getSaveValue — typed path)
-    ```
+### Relationship to Other Bugs
 
-The two values represent the same intended date but are stored differently.
+| Bug        | Relationship                                                                                                                                                                        |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FORM-BUG-4 | `getSaveValue()` strips the Z suffix — this is the function the popup handler skips, creating the format divergence. FORM-BUG-2 is the popup skipping FORM-BUG-4's formatting step. |
+| FORM-BUG-7 | Date-only fields in UTC+ store the wrong day regardless of input method — FORM-BUG-7 affects both handlers equally. FORM-BUG-2 is independent of FORM-BUG-7.                        |
 
 ---
 
-## Workarounds
+## Verification
 
-### 1. Standardize Input Method
+Verified on the demo environment at `vvdemo.visualvault.com` across São Paulo/BRT (UTC-3) and Mumbai/IST (UTC+5:30) using both manual browser testing and automated Playwright scripts (Chromium). Manual results (2026-03-31) and Playwright results (2026-04-06) produced identical values, confirming reproducibility.
 
-If a field uses legacy mode, establish a convention (popup only or typed only) to ensure consistent format across all records. This doesn't fix existing data but prevents future inconsistency.
+All 4 legacy configs (E, F, G, H) confirmed buggy via popup — stored values differ from typed input. Non-legacy Config A (control) produces identical values from both input methods, confirming the bug is legacy-only. The typed path is correct for all configs; the popup path is the defective one. Database comparison confirms the format difference translates to a real `datetime` difference (3-hour offset in São Paulo). Overall: Category 1 (popup) 20/20 complete — 7 PASS, 13 FAIL; Category 2 (typed) 16/16 complete — 11 PASS, 5 FAIL.
 
-### 2. Switch to Non-Legacy Mode
-
-Setting `useLegacy=false` eliminates this bug entirely — both input methods produce identical stored values. However, non-legacy mode with `enableTime=true` and `ignoreTimezone=true` introduces [FORM-BUG-5](bug-5-fake-z-drift.md) (progressive drift on GetFieldValue round-trips).
-
-### 3. Normalize on Read
-
-When reading values via scripts, parse through `new Date()` before comparing — this handles both formats:
-
-```javascript
-const raw = VV.Form.VV.FormPartition.getValueObjectValue('Field12');
-const normalized = raw ? new Date(raw).toISOString() : '';
-```
-
----
-
-## Test Evidence
-
-Testing conducted across São Paulo/BRT (UTC-3) and Mumbai/IST (UTC+5:30) using both manual browser testing and automated Playwright scripts.
-
-### Automated Verification Results
-
-**Standalone audit script** — Playwright headless Chromium, São Paulo timezone:
-
-| Config      | Field   | Popup Raw                    | Typed Raw               | Raw Match | Bug? |
-| ----------- | ------- | ---------------------------- | ----------------------- | --------- | ---- |
-| A (control) | Field7  | `"2026-03-15"`               | `"2026-03-15"`          | Yes       | No   |
-| E           | Field12 | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15"`          | **No**    | Yes  |
-| F           | Field11 | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15"`          | **No**    | Yes  |
-| G           | Field14 | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15T00:00:00"` | **No**    | Yes  |
-| H           | Field13 | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15T00:00:00"` | **No**    | Yes  |
-
-Config A (non-legacy control) produces identical values from both input methods — confirming the bug is legacy-only.
-
-**Formal Playwright spec results** — Cat 1 Legacy Popup (`cat-1-legacy-popup.spec.js --project BRT-chromium`):
-
-| Test    | Expected                | Received                     | Result |
-| ------- | ----------------------- | ---------------------------- | ------ |
-| 1-E-BRT | `"2026-03-15"`          | `"2026-03-15T03:00:00.000Z"` | FAIL   |
-| 1-F-BRT | `"2026-03-15"`          | `"2026-03-15T03:00:00.000Z"` | FAIL   |
-| 1-G-BRT | `"2026-03-15T00:00:00"` | `"2026-03-15T03:00:00.000Z"` | FAIL   |
-| 1-H-BRT | `"2026-03-15T00:00:00"` | `"2026-03-15T03:00:00.000Z"` | FAIL   |
-
-**Cat 2 Typed Input** — all legacy configs pass (typed path stores correct format):
-
-| Test    | Expected                | Received                | Result |
-| ------- | ----------------------- | ----------------------- | ------ |
-| 2-E-BRT | `"2026-03-15"`          | `"2026-03-15"`          | PASS   |
-| 2-F-BRT | `"2026-03-15"`          | `"2026-03-15"`          | PASS   |
-| 2-G-BRT | `"2026-03-15T00:00:00"` | `"2026-03-15T00:00:00"` | PASS   |
-| 2-H-BRT | `"2026-03-15T00:00:00"` | `"2026-03-15T00:00:00"` | PASS   |
-
-**Manual vs automated comparison** — all values identical between manual testing (2026-03-31) and Playwright automation (2026-04-06), confirming reproducibility.
-
-### Database Evidence
-
-Two records created via Playwright with the same date (March 15, 2026), different input methods:
-
-| Record | Method       | Field12 (date-only) pre-save | Field14 (date+time) pre-save |
-| ------ | ------------ | ---------------------------- | ---------------------------- |
-| Popup  | Legacy popup | `"2026-03-15T03:00:00.000Z"` | `"2026-03-15T03:00:00.000Z"` |
-| Typed  | Typed input  | `"2026-03-15"`               | `"2026-03-15T00:00:00"`      |
-
-**Expected database values:**
-
-| Field               | Popup DB Value            | Typed DB Value            | Difference  |
-| ------------------- | ------------------------- | ------------------------- | ----------- |
-| Field12 (date-only) | `2026-03-15 03:00:00.000` | `2026-03-15 00:00:00.000` | **3 hours** |
-| Field14 (date+time) | `2026-03-15 03:00:00.000` | `2026-03-15 00:00:00.000` | **3 hours** |
-
-SQL queries like `WHERE Field12 = '2026-03-15'` match typed but **not** popup values. The 3-hour difference equals the São Paulo UTC offset — different timezones would produce different offsets (e.g., 5.5 hours in Mumbai).
-
-**Post-save normalization**: After saving, the form reloads and the V1 initialization path normalizes the in-memory value. Popup Field12 post-save becomes `"2026-03-15"` (normalized from the UTC string). The **display normalizes on next load**, but the **database retains the original UTC time**.
-
-### Overall Test Counts
-
-- Category 1 (Calendar Popup): 20/20 complete — 7 PASS, 13 FAIL
-- Category 2 (Typed Input): 16/16 complete — 11 PASS, 5 FAIL
+This bug report is backed by a supporting test repository containing Playwright automation scripts, per-test results, database comparison scripts, and raw test data. Access can be requested from the Solution Architecture team.
 
 ---
 
@@ -250,61 +184,25 @@ For the default code path (V1):
 
 The popup handler bypasses this entirely, storing the raw `toISOString()` output (e.g., `"2026-03-15T03:00:00.000Z"` — full UTC datetime with Z suffix and milliseconds).
 
-### What the Fix Should Do
+---
 
-Both handlers should produce identical stored values. The popup handler should route through `getSaveValue()` just like the typed handler:
+## Appendix: Field Configuration Reference
 
-```javascript
-calChangeSetValue(e) {
-    let t = e && !isNaN(e.getDate()) ? e.toISOString() : "";
-    this.value = e;
-    this.data.text = this.data.value = t;
+The test form has 8 field configurations referred to by letter throughout this document:
 
-    // Route through getSaveValue() for consistency with calChange()
-    let saveValue = this.calendarValueService.getSaveValue(
-        this.data.value,
-        this.data.enableTime,
-        this.data.ignoreTimezone
-    );
-
-    this.updateFormValueSubject(this.data.name, saveValue);
-}
-```
-
-### Interaction with Other Bugs
-
-| Bug        | Relationship                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------------- |
-| FORM-BUG-4 | `getSaveValue()` strips the Z suffix — this is the function the popup handler skips, creating the format divergence |
-| FORM-BUG-7 | Date-only fields in UTC+ store the wrong day regardless of input method — FORM-BUG-7 affects both handlers equally  |
+| Config | Field   | enableTime | ignoreTimezone | useLegacy | Description                 |
+| ------ | ------- | ---------- | -------------- | --------- | --------------------------- |
+| A      | Field7  | —          | —              | —         | Date-only baseline          |
+| B      | Field10 | —          | ✅             | —         | Date-only + ignoreTZ        |
+| C      | Field6  | ✅         | —              | —         | DateTime UTC (control)      |
+| D      | Field5  | ✅         | ✅             | —         | DateTime + ignoreTZ         |
+| E      | Field12 | —          | —              | ✅        | Legacy date-only            |
+| F      | Field11 | —          | ✅             | ✅        | Legacy date-only + ignoreTZ |
+| G      | Field14 | ✅         | —              | ✅        | Legacy DateTime             |
+| H      | Field13 | ✅         | ✅             | ✅        | Legacy DateTime + ignoreTZ  |
 
 ---
 
-## Fix Impact Assessment
+## Workarounds and Fix Recommendations
 
-### What Changes If Fixed
-
-- Popup and typed input produce identical stored values for all legacy configs
-- Legacy popup no longer stores raw `toISOString()` with Z suffix and milliseconds
-- Reload behavior becomes consistent regardless of how the date was originally entered
-- SQL queries return consistent results for the same date regardless of input method
-
-### Backwards Compatibility Risk: LOW
-
-- Existing data stored via legacy popup in raw format still loads correctly (`parseDateString` handles both formats on reload)
-- The change only affects future saves — existing records retain their stored format until edited
-- No change to the visual date selection experience
-
-### Regression Risk: LOW
-
-- The change is additive (adding a `getSaveValue()` call to the popup path)
-- Must verify that `getSaveValue()` produces correct results for all legacy config combinations
-- Must verify popup display is not affected (the visual selection itself doesn't change)
-- Non-legacy configs are completely unaffected (they already converge through `normalizeCalValue()`)
-
-### Artifacts Created During Investigation
-
-- `testing/helpers/vv-calendar.js` — added `selectDateViaLegacyPopup()` function
-- `testing/date-handling/cat-1-legacy-popup.spec.js` — formal Playwright spec for legacy popup tests
-- `testing/scripts/audit-bug2-db-evidence.js` — popup vs typed save script for DB comparison
-- Run files: `tc-1-{E,F,G,H}-BRT-run-2.md`
+See [bug-2-fix-recommendations.md](bug-2-fix-recommendations.md) for workarounds, proposed code fix, and fix impact assessment.

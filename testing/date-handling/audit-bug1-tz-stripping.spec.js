@@ -8,6 +8,11 @@
  * Key finding under investigation: parseDateString() is only called in V2, not V1.
  * V1 has equivalent inline Z-handling but through different code paths.
  *
+ * Note on Z origin: The database (SQL Server datetime) stores no Z. The Z tested
+ * in Phase 1 comes from API response serialization (postForms → FormInstance/Controls
+ * adds Z, see CB-29) and browser-side toISOString() (preset/CurrentDate defaults).
+ * Saved user data arrives WITHOUT Z (getSaveValue strips it before storage).
+ *
  * 5 phases:
  *   Phase 1 — Direct parseDateString() invocation (function-level verification)
  *   Phase 2 — V1 call trace via monkey-patch (proves parseDateString is NOT called in V1)

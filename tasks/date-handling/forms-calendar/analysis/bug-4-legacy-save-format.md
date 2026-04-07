@@ -4,51 +4,68 @@
 
 When a user saves a form with a date+time calendar field, the system permanently removes the UTC timezone marker (`Z`) from the value before storing it. The result is a datetime string like `"2026-03-15T00:00:00"` — there is no way to determine from this stored value alone whether it represents midnight UTC, midnight São Paulo, or midnight Mumbai. The timezone context is irrecoverably lost.
 
-**For users in the same timezone**, this is invisible. The save path strips the timezone marker, and the load path re-parses the value as local time — since both happen in the same timezone, the date displays correctly. The two bugs (stripping on save and re-interpreting on load) cancel each other out.
+The bug is masked when a value is saved and loaded at the same UTC offset — the save path strips the marker, and the load path re-parses as local time, producing the correct display. But any change in UTC offset between save and load — a different timezone, business travel, or even a DST transition in the same city — causes the date to shift.
 
-**For cross-timezone teams**, the system breaks. A date saved by a user in São Paulo (UTC-3) and loaded by a user in Mumbai (UTC+5:30) will be reinterpreted with an 8.5-hour shift — the stored local time from São Paulo is treated as Mumbai local time, a completely different moment.
+---
 
-This only affects **date+time fields** (`enableTime=true`). Date-only fields are unaffected because their save path extracts just the `"YYYY-MM-DD"` portion, which is timezone-unambiguous.
+## When This Applies
+
+Three conditions must all be true:
+
+### 1. The field must be date+time (`enableTime=true`)
+
+Date-only fields are unaffected — their save path extracts just the `"YYYY-MM-DD"` portion, which is timezone-unambiguous. All four date+time configs (C, D, G, H) are affected regardless of `ignoreTimezone` or `useLegacy`:
+
+| Config | enableTime | ignoreTimezone | useLegacy | Affected?                       |
+| ------ | ---------- | -------------- | --------- | ------------------------------- |
+| C      | ✅         | —              | —         | ✅ **Yes** — Z stripped on save |
+| D      | ✅         | ✅             | —         | ✅ **Yes** — Z stripped on save |
+| G      | ✅         | —              | ✅        | ✅ **Yes** — Z stripped on save |
+| H      | ✅         | ✅             | ✅        | ✅ **Yes** — Z stripped on save |
+| A      | —          | —              | —         | ❌ No — date-only               |
+| B      | —          | ✅             | —         | ❌ No — date-only               |
+| E      | —          | —              | ✅        | ❌ No — date-only               |
+| F      | —          | ✅             | ✅        | ❌ No — date-only               |
+
+### 2. The form is running the V1 code path (the default)
+
+The FormViewer's calendar initialization has two versions. **V1** is the default — it ran during all testing on the demo environment. **V2** is an updated version that activates under specific conditions. The V2 save path correctly preserves the Z suffix; this bug is V1-only.
+
+### 3. The impact depends on whether the saved value is read from a different timezone
+
+- **Same UTC offset at save and load**: The save path strips Z and converts to local time; the load path re-parses as local time. The two operations cancel out — the date displays correctly. Note: "same timezone" is not sufficient — DST transitions change the UTC offset (e.g., EST UTC-5 → EDT UTC-4), so a value saved in winter and loaded in summer shifts by 1 hour even for the same user in the same city.
+- **Different UTC offset**: A value saved from São Paulo (`"2026-03-15T00:00:00"` = São Paulo midnight) loaded from Mumbai is reinterpreted as Mumbai midnight — an 8.5-hour shift that crosses a day boundary. This also applies to business travel, remote work across timezones, and multi-timezone states (e.g., Indiana, Texas, Florida).
+- **SQL queries, reports, dashboards, REST API**: These read the raw database value. The stored `"2026-03-15T00:00:00"` has no timezone context — any consumer that adds a Z or assumes UTC will misinterpret it.
 
 ---
 
 ## Severity: MEDIUM
 
-Same-timezone usage (the majority of deployments) is not visibly affected. Cross-timezone impact is real but less common. The V2 code path correctly preserves the timezone marker — this bug is V1-only and will be resolved when V2 is enabled globally.
+The self-consistent double-stripping pattern (FORM-BUG-4 strips on save, V1 load re-parses as local) masks the bug only when save and load happen in the exact same UTC offset. This is narrower than "same timezone" — DST transitions change the offset twice a year (e.g., EST UTC-5 → EDT UTC-4), so a value saved in winter and loaded in summer shifts by 1 hour even for the same user in the same city. Business travel, remote work from a different timezone, and multi-timezone states (e.g., Indiana, Texas, Florida, Tennessee) also break the assumption. Any downstream consumer that reads the raw database value (SQL queries, reports, REST API) is affected regardless of timezone — the stored value has no timezone context.
 
 ---
 
-## Who Is Affected
+## How to Reproduce
 
-- **Cross-timezone teams** sharing forms — a date saved from one timezone and loaded from another will display differently. The shift equals the difference between the two timezones (e.g., 8.5 hours between São Paulo and Mumbai).
-- **SQL queries and reports** comparing datetime values across records saved by users in different timezones — the stored values represent different moments even for the same intended time.
-- **REST API consumers** reading form data — the API normalizes all dates to ISO+Z on read, but the underlying data is ambiguous. The API adds a `Z` to what may be a local-time value, creating a [similar problem to FORM-BUG-5](bug-5-fake-z-drift.md).
-- **Same-timezone users** are not visibly affected — the double-stripping pattern (strip on save + re-parse on load) is self-consistent when the timezone doesn't change.
+1. Set system timezone to `America/Sao_Paulo` (BRT, UTC-3) and restart the browser
+2. Open the DateTest form template URL
+3. On **Field6** (Config C: DateTime, ignoreTZ=false), type `03/15/2026 12:00 AM` and press Tab
+4. In the browser console, check the stored value:
+    ```javascript
+    VV.Form.VV.FormPartition.getValueObjectValue('Field6');
+    // Returns: "2026-03-15T00:00:00"  — no Z suffix
+    ```
+5. **Expected**: `"2026-03-15T03:00:00.000Z"` (UTC representation of midnight São Paulo, with Z)
+6. **Actual**: `"2026-03-15T00:00:00"` — Z stripped, timezone context lost
 
----
+**Cross-timezone reproduction:**
 
-## Which Fields Are Affected
+1. Save the form from São Paulo — Config C stores `"2026-03-15T00:00:00"`
+2. Switch system timezone to Mumbai (`Asia/Calcutta`) and restart browser
+3. Reload the same record
+4. The load path interprets `"2026-03-15T00:00:00"` as Mumbai local time → internally becomes `"2026-03-14T18:30:00.000Z"` — a different UTC instant from what was saved
 
-Calendar fields have three configuration flags:
-
-| Flag             | What It Controls                                                           |
-| ---------------- | -------------------------------------------------------------------------- |
-| `enableTime`     | Whether the field stores time in addition to date (date-only vs date+time) |
-| `ignoreTimezone` | Whether timezone conversion is skipped (treat value as display time)       |
-| `useLegacy`      | Whether the field uses the older rendering/save code path                  |
-
-FORM-BUG-4 affects **all date+time fields** (`enableTime=true`) regardless of the other two flags:
-
-| Config | enableTime | ignoreTimezone | useLegacy | Affected?                             |
-| :----: | :--------: | :------------: | :-------: | ------------------------------------- |
-|   C    |  **true**  |      off       |    off    | **Yes** — Z stripped on save          |
-|   D    |  **true**  |       on       |    off    | **Yes** — Z stripped on save          |
-|   G    |  **true**  |      off       |    on     | **Yes** — Z stripped on save          |
-|   H    |  **true**  |       on       |    on     | **Yes** — Z stripped on save          |
-|   A    |    off     |      off       |    off    | No — date-only, extracts date portion |
-|   B    |    off     |       on       |    off    | No — date-only                        |
-|   E    |    off     |      off       |    on     | No — date-only                        |
-|   F    |    off     |       on       |    on     | No — date-only                        |
+This bug report is backed by a supporting test repository containing Playwright automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ---
 
@@ -56,9 +73,9 @@ FORM-BUG-4 affects **all date+time fields** (`enableTime=true`) regardless of th
 
 ### The Save Chain
 
-When a user enters a date+time value (via typed input, calendar popup, or `SetFieldValue`), the value flows through this chain before being stored:
+When a user enters a date+time value, the value flows through this chain before being stored:
 
-```
+```text
 User enters date
     ↓
 Handler converts to Date object → .toISOString()
@@ -75,6 +92,24 @@ SQL Server stores as datetime: 2026-03-15 00:00:00.000 (timezone-unaware)
 
 The critical step is `getSaveValue()`. Its format string `'YYYY-MM-DD[T]HH:mm:ss'` deliberately excludes `Z` (or any timezone designator) and milliseconds. The `moment(input)` call also implicitly converts from UTC to local time before formatting — so `"2026-03-15T00:00:00.000Z"` (UTC midnight) becomes `"2026-03-14T21:00:00"` in São Paulo (UTC-3).
 
+### getSaveValue() Input/Output
+
+**São Paulo (UTC-3):**
+
+| Input                                       | Output                  | Z Present? |
+| ------------------------------------------- | ----------------------- | ---------- |
+| `"2026-03-15T00:00:00.000Z"` (UTC midnight) | `"2026-03-14T21:00:00"` | **No**     |
+| `"2026-03-15T03:00:00.000Z"` (BRT midnight) | `"2026-03-15T00:00:00"` | **No**     |
+| `"2026-03-15T00:00:00"` (no Z)              | `"2026-03-15T00:00:00"` | **No**     |
+
+**Mumbai (UTC+5:30):**
+
+| Input                                       | Output                  | Z Present? |
+| ------------------------------------------- | ----------------------- | ---------- |
+| `"2026-03-15T00:00:00.000Z"` (UTC midnight) | `"2026-03-15T05:30:00"` | **No**     |
+
+Every output is Z-less. The Z is always stripped, regardless of input format.
+
 ### What the Stored Value Means — Or Doesn't
 
 After Z is stripped, the value `"2026-03-15T00:00:00"` is ambiguous:
@@ -85,13 +120,13 @@ After Z is stripped, the value `"2026-03-15T00:00:00"` is ambiguous:
 | Mumbai (UTC+5:30) | Midnight Mumbai time    | 2026-03-14 18:30 UTC |
 | London (UTC+0)    | Midnight UTC            | 2026-03-15 00:00 UTC |
 
-All three users intended midnight March 15 local time. All three produce the same stored string `"2026-03-15T00:00:00"`. But these represent three different moments in time, and the database cannot distinguish between them.
+All three users intended midnight March 15 local time. All three produce the same stored string. But these represent three different moments in time, and the database cannot distinguish between them.
 
 ### The Double-Stripping Pattern
 
 FORM-BUG-4 and [FORM-BUG-1](bug-1-timezone-stripping.md) form a complementary pair:
 
-```
+```text
 SAVE PATH (FORM-BUG-4):
   Date object → .toISOString() → "...Z" → getSaveValue() → strips Z → stored as "..."
 
@@ -99,232 +134,80 @@ LOAD PATH (FORM-BUG-1 / V1 equivalent):
   Stored "..." → parseDateString() or inline code → strips Z (no-op, already gone) → parses as local
 ```
 
-**Same-timezone round-trip**: São Paulo saves `"2026-03-15T00:00:00"` (local midnight). São Paulo reloads → parses as São Paulo local midnight → displays March 15 00:00. **Correct** — the two bugs cancel out.
+**Same-offset round-trip**: São Paulo saves `"2026-03-15T00:00:00"` (local midnight) during BRT (UTC-3). São Paulo reloads during BRT → parses as São Paulo local midnight → displays March 15 00:00. **Correct** — but only because the UTC offset hasn't changed between save and load. A DST transition or timezone change would break this.
 
 **Cross-timezone round-trip**: São Paulo saves `"2026-03-15T00:00:00"` (São Paulo midnight = 03:00 UTC). Mumbai reloads → parses as Mumbai local midnight (= 18:30 UTC on March 14). **Wrong** — the date has shifted 8.5 hours and crossed a day boundary.
 
-### What Should Happen
+### Downstream Effect on GetFieldValue
 
-DateTime values should preserve their timezone indicator:
+The Z-less stored value is also misinterpreted by `GetFieldValue()`:
 
-```javascript
-// CORRECT: Preserve UTC marker
-result = moment(input).toISOString(); // → "2026-03-15T00:00:00.000Z" (Z preserved)
-```
+| Config | GetFieldValue Output         | Changed from Raw? | Effect                                                                               |
+| ------ | ---------------------------- | ----------------- | ------------------------------------------------------------------------------------ |
+| C      | `"2026-03-15T03:00:00.000Z"` | **Yes**           | Applies `new Date(value).toISOString()` — reinterprets local as UTC, adds +3h offset |
+| D      | `"2026-03-15T00:00:00.000Z"` | **Yes**           | Adds literal Z to local time (FORM-BUG-5)                                            |
+| G      | `"2026-03-15T00:00:00"`      | No                | Legacy passthrough — returns raw value                                               |
+| H      | `"2026-03-15T00:00:00"`      | No                | Legacy passthrough — returns raw value                                               |
 
-The V2 code path already does this — `getSaveValue()` under V2 uses `moment(input).toISOString()` (for `ignoreTimezone=false`) or `moment(input).tz('UTC', true).toISOString()` (for `ignoreTimezone=true`), both of which preserve the `Z` suffix.
+Config C's `GetFieldValue` applies a real UTC conversion to the stored local-time value — producing a shifted result. This is a direct downstream consequence of FORM-BUG-4: because the stored value has no timezone marker, any function that assumes or adds one will misinterpret it.
 
----
+### Relationship to Other Bugs
 
-## Steps to Reproduce
-
-1. Open a form with a date+time field (e.g., Field6: Config C, or Field5: Config D)
-2. Type or select a date/time (e.g., March 15, 12:00 AM)
-3. In DevTools console, check the raw stored value:
-    ```javascript
-    VV.Form.VV.FormPartition.getValueObjectValue('Field6');
-    // Returns: "2026-03-15T00:00:00"  — no Z suffix, no timezone info
-    ```
-4. Compare with the ISO value that went into `getSaveValue()` (which had `Z` from `.toISOString()`):
-    - The input was `"2026-03-15T03:00:00.000Z"` (in São Paulo)
-    - The stored output is `"2026-03-15T00:00:00"` — Z gone, milliseconds gone, time converted to local
-
-**Cross-timezone reproduction:**
-
-1. Save a form from São Paulo — a Config C field stores `"2026-03-15T00:00:00"` (São Paulo local midnight)
-2. Switch system timezone to Mumbai and reload the same record
-3. The load path interprets `"2026-03-15T00:00:00"` as Mumbai local time → converts to UTC as `"2026-03-14T18:30:00.000Z"` — a completely different UTC instant from what was saved
+| Bug        | Relationship                                                                                                                                                   |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FORM-BUG-1 | Complementary pair: FORM-BUG-4 strips Z on save, FORM-BUG-1 strips Z on load. Self-consistent for same-TZ, breaks for cross-TZ. Both must be fixed together.   |
+| FORM-BUG-5 | Config D: `GetFieldValue` adds literal Z to the Z-less stored value. Different manifestation but same root pattern — the stored value has no timezone context. |
+| FORM-BUG-3 | V2 hardcoded params feed into `getSaveValue()` which would preserve Z under V2 — FORM-BUG-3 affects the parse but not the save format.                         |
 
 ---
 
-## Workarounds
+## Verification
 
-### 1. Same-Timezone Deployment
+Verified on the demo environment at `vvdemo.visualvault.com` across São Paulo/BRT (UTC-3) and Mumbai/IST (UTC+5:30) using direct `getSaveValue()` invocation, end-to-end typed input verification, and automated Playwright regression. Z-stripping confirmed for all date+time configs (C, D, G, H) in both timezones. Cross-timezone reload shift confirmed end-to-end (São Paulo save → Mumbai reload produces 8.5-hour shift on Config C).
 
-If all users accessing a form are in the same timezone, the double-stripping pattern is self-consistent. This is the implicit workaround most deployments rely on today.
+`getSaveValue()` source code confirmed at line ~104106 — format string `'YYYY-MM-DD[T]HH:mm:ss'` visibly lacks Z. V2 path correctly preserves Z in the same function.
 
-### 2. Server-Side Date Handling
+Playwright regression: Category 2 (typed input) 16/16 complete — 11 PASS, 5 FAIL; Category 3 (server reload) 18/18 complete — 10 PASS, 8 FAIL. FORM-BUG-4 failures confirmed via automated assertion on Config C.
 
-Write dates via the REST API instead of the Forms UI. The API stores values in ISO+Z format, bypassing `getSaveValue()` entirely.
-
-### 3. Use `ignoreTimezone=true` (Config D)
-
-For Config D, `getSaveValue` still strips Z (same behavior), but the _intent_ of `ignoreTimezone` is to store display time — so the ambiguity is by design. This doesn't fix the bug but aligns with the field's intended semantics.
-
-### 4. Enable V2 Code Path
-
-If `useUpdatedCalendarValueLogic` can be set to `true` (via server flag or Object View context), `getSaveValue()` preserves the Z suffix. However, V2 has its own bugs ([FORM-BUG-1](bug-1-timezone-stripping.md), [FORM-BUG-3](bug-3-hardcoded-params.md)) that must be fixed first.
-
----
-
-## Test Evidence
-
-Testing conducted across São Paulo/BRT (UTC-3) and Mumbai/IST (UTC+5:30) using direct function invocation, end-to-end verification, and automated Playwright regression.
-
-### Direct Function Invocation — getSaveValue() Z-Stripping
-
-**São Paulo (UTC-3):**
-
-| Input                                       | Output                  | Z Present? |
-| ------------------------------------------- | ----------------------- | :--------: |
-| `"2026-03-15T00:00:00.000Z"` (UTC midnight) | `"2026-03-14T21:00:00"` |   **No**   |
-| `"2026-03-15T03:00:00.000Z"` (BRT midnight) | `"2026-03-15T00:00:00"` |   **No**   |
-| `"2026-03-15T00:00:00"` (no Z)              | `"2026-03-15T00:00:00"` |   **No**   |
-
-**Mumbai (UTC+5:30):**
-
-| Input                                       | Output                  | Z Present? |
-| ------------------------------------------- | ----------------------- | :--------: |
-| `"2026-03-15T00:00:00.000Z"` (UTC midnight) | `"2026-03-15T05:30:00"` |   **No**   |
-
-### Direct Function Invocation — GetFieldValue Reinterpretation
-
-The same stored value `"2026-03-15T00:00:00"` fed through `GetFieldValue()` output transformation:
-
-| Config | GetFieldValue Output         | Changed from Raw? | Bug                               |
-| ------ | ---------------------------- | :---------------: | --------------------------------- |
-| C      | `"2026-03-15T03:00:00.000Z"` |      **Yes**      | FORM-BUG-4 (+3h reinterpretation) |
-| D      | `"2026-03-15T00:00:00.000Z"` |      **Yes**      | FORM-BUG-5 (fake Z)               |
-| G      | `"2026-03-15T00:00:00"`      |        No         | Safe (legacy passthrough)         |
-| H      | `"2026-03-15T00:00:00"`      |        No         | Safe (legacy passthrough)         |
-
-Config C's `GetFieldValue` applies `new Date(value).toISOString()` — a real UTC conversion. The stored local-time value `"2026-03-15T00:00:00"` is reinterpreted as São Paulo local midnight and converted to UTC (+3h). This is a downstream effect of FORM-BUG-4: because the stored value has no timezone marker, `GetFieldValue` treats it as local time.
-
-Legacy configs (G, H) are immune — `GetFieldValue` returns the raw stored value unchanged.
-
-### End-to-End Verification
-
-**São Paulo, Config C, typed "03/15/2026 12:00 AM":**
-
-- Raw stored: `"2026-03-15T00:00:00"` — Z stripped by getSaveValue (FORM-BUG-4)
-- GetFieldValue: `"2026-03-15T03:00:00.000Z"` — reinterpreted as local → UTC (+3h)
-
-**Mumbai, Config C, typed "03/15/2026 12:00 AM":**
-
-- Raw stored: `"2026-03-15T00:00:00"` — Z stripped by getSaveValue (FORM-BUG-4)
-- GetFieldValue: `"2026-03-14T18:30:00.000Z"` — reinterpreted as Mumbai local → UTC (-5.5h, crosses day boundary)
-
-### Playwright Regression
-
-- Category 2 (Typed Input): 16/16 complete — 11 PASS, 5 FAIL
-- Category 3 (Server Reload): 18/18 complete — 10 PASS, 8 FAIL (corrected from 14P/4F)
-- Category 7 (SetFieldValue): 38/39 done — 29 PASS, 9 FAIL
-- Playwright Cat 2 TC-2-C-BRT: FAIL at API assertion — confirms FORM-BUG-4 via automated test
-
-### Source Code Verification
-
-- `getSaveValue()` confirmed at line 104106 — format string `'YYYY-MM-DD[T]HH:mm:ss'` visibly lacks Z
-- `getCalendarFieldValue()` confirmed at line 104122 — `new Date(t).toISOString()` reinterprets Z-less value
-- V2 path correctly preserves Z in both functions
+This bug report is backed by a supporting test repository containing Playwright automation scripts, per-test results, and raw test data. Access can be requested from the Solution Architecture team.
 
 ---
 
 ## Technical Root Cause
 
-### The Defective Function
+The defective code is shown in [The Save Chain](#the-save-chain) above. This section adds file locations.
 
 **File**: `main.js` (bundled FormViewer application)
 **Function**: `CalendarValueService.getSaveValue()` — line ~104100
 
-```javascript
-getSaveValue(input, enableTime, ignoreTimezone) {
-    let result = typeof input === 'string' ? input : input.toISOString();
+The V1 path uses `moment(input).format('YYYY-MM-DD[T]HH:mm:ss')` which:
 
-    if (this.useUpdatedCalendarValueLogic) {
-        // V2 path — preserves timezone ✓
-        result = ignoreTimezone
-            ? moment(input).tz('UTC', true).toISOString()   // Keeps Z
-            : moment(input).toISOString();                    // Keeps Z
-    } else if (input.length > 0) {
-        // V1 path (DEFAULT) — strips timezone ✗
-        if (enableTime) {
-            const format = 'YYYY-MM-DD[T]HH:mm:ss';
-            result = moment(input).format(format);  // No Z, no milliseconds
-        } else {
-            if (input.indexOf('T') > 0) {
-                result = input.substring(0, input.indexOf('T'));  // Date-only: OK
-            }
-        }
-    }
+1. Strips the Z suffix (format string doesn't include it)
+2. Converts UTC to local time implicitly (`moment(input)` parses Z as UTC, `.format()` outputs local)
 
-    return result;
-}
-```
+The V2 path in the same function uses `moment(input).toISOString()` — preserving Z and full precision. Both paths coexist in the same function, gated by `useUpdatedCalendarValueLogic`.
 
-The V1 `moment().format('YYYY-MM-DD[T]HH:mm:ss')` call does two destructive things:
-
-1. **Strips the Z suffix**: The format string doesn't include `Z` or `ZZ`, so the output has no timezone indicator.
-2. **Converts to local time implicitly**: `moment(input)` parses Z-suffixed input as UTC, then `.format()` outputs in the user's local timezone. So `"2026-03-15T00:00:00.000Z"` in São Paulo becomes `"2026-03-14T21:00:00"` — the correct local time, but stored without any indication that it's São Paulo time.
-
-### Where This Function Is Called
-
-`getSaveValue()` is called on every save operation for every calendar field — it is the final transformation before the value is sent to the server. It sits at the end of both the popup and typed-input save chains.
-
-### Interaction with Other Bugs
-
-| Bug        | Relationship                                                                                                                           |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| FORM-BUG-1 | Complementary pair: FORM-BUG-4 strips Z on save, FORM-BUG-1 strips Z on load. Self-consistent for same-TZ, breaks for cross-TZ.        |
-| FORM-BUG-5 | Config D: `GetFieldValue` adds fake `[Z]` to the Z-less stored value. Different manifestation but same root pattern.                   |
-| FORM-BUG-3 | V2 hardcoded params feed into `getSaveValue()` which would preserve Z under V2 — FORM-BUG-3 affects the parse but not the save format. |
+`getSaveValue()` is called on every save operation for every calendar field — it is the final transformation before the value is sent to the server.
 
 ---
 
-## Proposed Fix
+## Appendix: Field Configuration Reference
 
-### Before (Current — V1 Path)
+The test form has 8 field configurations referred to by letter throughout this document:
 
-```javascript
-if (enableTime) {
-    const format = 'YYYY-MM-DD[T]HH:mm:ss';
-    result = moment(input).format(format); // Strips Z and milliseconds
-}
-```
-
-### After (Fixed)
-
-```javascript
-if (enableTime) {
-    result = moment(input).toISOString(); // Preserves Z and full precision
-}
-```
-
-### Key Changes
-
-1. **Replace `moment().format(...)` with `moment().toISOString()`** — preserves Z suffix and milliseconds
-2. **Remove V1/V2 branching** — both paths should preserve timezone. The `ignoreTimezone` flag should affect display formatting only, not storage.
-3. **Date-only path unchanged** — extracting `"YYYY-MM-DD"` is correct for date-only fields
+| Config | Field   | enableTime | ignoreTimezone | useLegacy | Description                 |
+| ------ | ------- | ---------- | -------------- | --------- | --------------------------- |
+| A      | Field7  | —          | —              | —         | Date-only baseline          |
+| B      | Field10 | —          | ✅             | —         | Date-only + ignoreTZ        |
+| C      | Field6  | ✅         | —              | —         | DateTime UTC (control)      |
+| D      | Field5  | ✅         | ✅             | —         | DateTime + ignoreTZ         |
+| E      | Field12 | —          | —              | ✅        | Legacy date-only            |
+| F      | Field11 | —          | ✅             | ✅        | Legacy date-only + ignoreTZ |
+| G      | Field14 | ✅         | —              | ✅        | Legacy DateTime             |
+| H      | Field13 | ✅         | ✅             | ✅        | Legacy DateTime + ignoreTZ  |
 
 ---
 
-## Fix Impact Assessment
+## Workarounds and Fix Recommendations
 
-### What Changes If Fixed
-
-- All datetime values stored with Z suffix (UTC marker preserved)
-- Cross-timezone reloads produce correct dates
-- Stored values are self-documenting — `"2026-03-15T00:00:00.000Z"` is unambiguously UTC
-- The double-stripping pattern (FORM-BUG-4 + FORM-BUG-1) is broken — if FORM-BUG-1 is also fixed, the full save-load chain preserves timezone
-
-### Backwards Compatibility Risk: HIGH
-
-**This is the most significant compatibility concern across all 7 bugs.**
-
-- **Existing data**: All datetime values currently in the database are stored without Z in local-time format. If FORM-BUG-4 is fixed but FORM-BUG-1 / V1 load path is not, the load path would receive Z-suffixed values and handle them differently than before.
-- **Both bugs must be fixed together**: FORM-BUG-1 and FORM-BUG-4 form a complementary pair. Fixing one without the other creates a new inconsistency.
-- **Data migration dilemma**: Existing stored values cannot be retroactively fixed — there's no way to determine which timezone they were saved from. Options:
-    - **No migration**: Fix code only, old data stays wrong — users see old dates shift on display
-    - **Blanket shift**: Add offset to all datetime values from known-TZ users — risks corrupting records where the stored value was intentional
-    - **Accept mixed state**: Old dates wrong, new dates correct — inconsistency in the same database
-- **Recommendation**: Fix the code. Do not attempt data migration. The existing wrong data is consistently wrong within same-timezone deployments, and the fix prevents future corruption.
-
-### Regression Risk: HIGH
-
-- **High-traffic function**: `getSaveValue()` is called on every save for every calendar field. Any change affects all form saves platform-wide.
-- **Format change**: Downstream systems (reports, APIs, scheduled scripts) that parse the stored format may break if they expect the Z-less format.
-- **Must coordinate with FORM-BUG-1 fix**: The save and load paths must be updated in lockstep.
-- **Testing scope**: All 8 configurations × datetime scenarios × multiple timezones must be regression-tested.
-
-### Artifacts Created During Investigation
-
-- `testing/scripts/audit-bug4-save-format.js` — comprehensive audit script (5 tests, São Paulo + Mumbai)
+See [bug-4-fix-recommendations.md](bug-4-fix-recommendations.md) for workarounds, proposed code fix, backwards compatibility analysis, and fix impact assessment.

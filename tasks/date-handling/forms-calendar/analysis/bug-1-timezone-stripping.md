@@ -2,57 +2,108 @@
 
 ## What Happens
 
-When a form with calendar fields is loaded — whether from saved data, a preset default, or a URL parameter — the system strips the UTC timezone marker (`Z`) from date values before parsing them. This changes the meaning of the date: a value that represents midnight UTC becomes midnight in the user's local timezone, silently shifting the stored date by the user's timezone offset.
+When a calendar field loads a date value that ends with a `Z` suffix (meaning "this time is in UTC"), the form's date parsing code silently removes the `Z` before interpreting the value. This changes the meaning of the date: what was midnight UTC becomes midnight in the user's local timezone, shifting the actual moment in time by the user's timezone offset.
 
-For example, if a date was saved as `"2026-03-15T00:00:00.000Z"` (midnight UTC, March 15), a user in Mumbai (UTC+5:30) loading this form would get the value reinterpreted as midnight Mumbai time — which is actually 18:30 UTC on March 14. The date has shifted backward by 5.5 hours without any warning.
+For example, a preset default that resolves to `"2026-03-15T00:00:00.000Z"` (midnight UTC, March 15) would be reinterpreted as midnight Mumbai time for a user in IST (UTC+5:30) — which is actually 18:30 UTC on March 14. The date shifts backward by 5.5 hours without any warning.
 
-**Current scope**: This defect exists in an updated version of the form loading code (called "V2") that is **not yet active in standard production forms**. However, the current production code ("V1") contains equivalent inline code that produces the same conceptual problem through different means. See [Background](#background-how-the-form-loads-dates) for what V1 and V2 mean and when each runs.
+---
+
+## When This Applies
+
+Three conditions must all be true for this bug to produce a visible effect:
+
+### 1. The date value must arrive with a `Z` suffix
+
+The database is SQL Server `datetime` — a timezone-unaware type that stores no `Z`. The `Z` is **added by the layers between the database and the browser**, and whether it's present depends on how the value reaches the form:
+
+| Load Scenario                                 | Z Present? | Origin of the Z                                                                                                                                                                     |
+| --------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **API-created records** (`postForms`)         | Yes        | `FormInstance/Controls` response serialization appends `Z` to datetime values from `postForms`-created records ([CB-29](../../web-services/analysis/ws-bug-1-cross-layer-shift.md)) |
+| **Preset / CurrentDate defaults**             | Yes        | Browser-side `toISOString()` on the `Date` object produces an ISO string with `Z`                                                                                                   |
+| **Saved user data** (normal form save/reload) | **No**     | `getSaveValue()` strips `Z` before storage; the reload value arrives as `"2026-03-15T00:00:00"` (no Z)                                                                              |
+| **URL parameters**                            | Varies     | Depends on what the caller puts in the URL — may or may not include `Z`                                                                                                             |
+
+For saved user data (the most common load scenario), the Z-stripping is a **no-op** — the Z was already removed by the save path. The bug manifests primarily on **preset defaults** and **API-created records**, where the Z is injected by serialization layers outside the form's control.
+
+### 2. The user's timezone must not be UTC+0
+
+At UTC+0, local time equals UTC — stripping the `Z` changes the label but not the numeric value. The bug is invisible.
+
+### 3. The field must match the affected configuration for the active code path
+
+The FormViewer's calendar initialization has two versions. **V1** is the default — it ran during all testing on the demo environment. **V2** is an updated version that activates under specific conditions (see [Background](#background)). Both versions strip the Z, but for different field configurations:
+
+| Code Path | Field Configuration                      | Z-Stripped?                                        | Bug Applies?                                                     |
+| --------- | ---------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------- |
+| **V1**    | DateTime + ignoreTZ=true (Configs D, H)  | Yes — inline `replace("Z","")`                     | **Yes**                                                          |
+| **V1**    | DateTime + ignoreTZ=false (Configs C, G) | No — `new Date(value)` preserves Z                 | No — correct                                                     |
+| **V1**    | Date-only (Configs A, B, E, F)           | N/A — T-truncation removes time+Z together         | No — separate defect ([FORM-BUG-7](bug-7-wrong-day-utc-plus.md)) |
+| **V2**    | All configurations                       | Yes — `parseDateString()` strips Z unconditionally | **Yes**                                                          |
+
+**V1** is the default on the demo environment and ran during the bulk of testing. **V2** activates under specific conditions (see [Background](#background)). We do not know what system-level configuration controls V2 activation in other environments.
 
 ---
 
 ## Severity: MEDIUM
 
-The V2 function where this bug lives is not called in standard form usage today. The V1 production code has equivalent Z-handling behavior, but its effects are absorbed into the other bugs in this investigation (primarily [FORM-BUG-7](bug-7-wrong-day-utc-plus.md) for date-only fields and [FORM-BUG-4](bug-4-legacy-save-format.md) for DateTime fields). This bug becomes actionable when V2 is enabled globally.
+- **V1 impact (active)**: Limited to DateTime + ignoreTZ=true fields (Configs D, H) when values arrive with Z — primarily API-created records and preset defaults. For saved user data, V1's save/reload cycle is self-consistent (no Z on reload), so the defect is a no-op.
+- **V2 impact (uncertain scope)**: Affects all field configurations, but V2 activation is controlled by a server-side flag whose admin-level configuration is unknown. V2 was confirmed functional via manual console activation on the demo environment.
+- **Overall**: The V1 scope is narrow (one field config combination, only on Z-bearing values). The V2 scope is broad but its activation status in the wild is unknown.
 
 ---
 
-## Who Is Affected
+## How to Reproduce
 
-**V2 code path** (not the default — requires specific activation):
+### Manual (V1 — DateTime + ignoreTZ=true, preset default)
 
-- Forms opened in **Object View mode** (`?ObjectID=` URL parameter)
-- Forms opened with a non-empty `modelId` context
-- Accounts where the `useUpdatedCalendarValueLogic` server flag is enabled
-- All field configurations (date-only and date+time alike)
-- All timezones except UTC+0
+1. Set system timezone to `Asia/Calcutta` (IST, UTC+5:30) and restart the browser
+2. Open the DateTest form template URL (creates a new empty form)
+3. Observe **Field16** (Config D preset: DateTime, ignoreTZ=true, preset date 3/1/2026)
+4. Open browser console and run: `VV.Form.VV.FormPartition.getValueObjectValue('Field16')`
+5. **Expected**: value representing March 1, 2026 with no timezone shift
+6. **Actual**: value is shifted by -5.5 hours (the IST offset), because the preset arrived as an ISO string with Z and the Z was stripped before parsing
 
-**V1 code path** (the default for all standard forms):
+### Manual (V2 — all configurations)
 
-- Not affected by this specific function (`parseDateString` is never called)
-- Affected by equivalent inline code that strips `Z` in similar ways — these effects are documented under [FORM-BUG-4](bug-4-legacy-save-format.md) (save path) and [FORM-BUG-7](bug-7-wrong-day-utc-plus.md) (date-only parsing)
+1. Set system timezone to `Asia/Calcutta` and restart the browser
+2. Open the DateTest form template URL
+3. In the browser console, activate V2: `VV.Form.calendarValueService.useUpdatedCalendarValueLogic = true`
+4. Set a value via API: `VV.Form.SetFieldValue('Field7', '2026-03-15T00:00:00.000Z')`
+5. Read it back: `VV.Form.VV.FormPartition.getValueObjectValue('Field7')`
+6. **Expected**: stored date is March 15
+7. **Actual**: stored date is March 14 (shifted backward by 5.5 hours)
+
+### Automated
+
+This bug report is backed by a supporting test repository containing Playwright automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
+
+```bash
+npx playwright test testing/date-handling/audit-bug1-tz-stripping.spec.js --project=IST-chromium
+```
 
 ---
 
-## Background: How the Form Loads Dates
+## Background
 
-The VisualVault FormViewer has two versions of its calendar field initialization logic, controlled by an internal flag called `useUpdatedCalendarValueLogic`:
+This section adds detail on V1/V2 activation and testing coverage beyond what [When This Applies](#3-the-field-must-match-the-affected-configuration-for-the-active-code-path) introduces.
 
-- **V1** (`flag = false`, the default): The current production code path used by all standard standalone forms. When a form loads, V1 processes saved dates through inline code in a function called `initCalendarValueV1()`. This code handles timezone markers on a case-by-case basis — sometimes stripping them, sometimes preserving them, depending on the field configuration.
+**V2 activation**: Three setter locations in `main.js` can flip `useUpdatedCalendarValueLogic` to `true`:
 
-- **V2** (`flag = true`): An updated code path intended as V1's successor. V2 routes all date parsing through a centralized function called `parseDateString()`. This function is where FORM-BUG-1 lives. V2 activates only in specific contexts:
-    - Forms opened via Object View (`?ObjectID=` in the URL)
-    - Forms with a `modelId` context
-    - Accounts with the server-side flag enabled
+- The form is opened in Object View mode (`?ObjectID=` in the URL)
+- The form has a non-empty `modelId` context
+- The `setUserInfo()` response includes the flag
 
-**All testing in this investigation was conducted against V1** (the default). V2 could not be activated on the test environment.
+These are code-level observations — we do not know what admin or account-level configuration controls the server flag. The flag is also writable from the console: `VV.Form.calendarValueService.useUpdatedCalendarValueLogic = true`.
 
-The three **field configuration flags** referenced throughout this document:
+**Testing coverage**: The bulk of this investigation ran under V1 (the demo environment default). V2 was activated manually via console for targeted tests — [TC-8-V2](../test-cases/tc-8-V2.md) confirmed FORM-BUG-5 is absent under V2 and that `parseDateString` is called. The `?ObjectID=` URL approach was attempted but requires a valid Object View context that the demo environment did not expose.
 
-| Flag             | What It Controls                                                           |
-| ---------------- | -------------------------------------------------------------------------- |
-| `enableTime`     | Whether the field stores time in addition to date (date-only vs date+time) |
-| `ignoreTimezone` | Whether timezone conversion is skipped (treat value as display time)       |
-| `useLegacy`      | Whether the field uses the older rendering/save code path                  |
+**Per-field configuration flags** referenced throughout this document:
+
+| Flag             | What It Controls                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------- |
+| `enableTime`     | Whether the field stores time in addition to date (date-only vs date+time)                  |
+| `ignoreTimezone` | Whether timezone conversion is skipped (treat value as display time)                        |
+| `useLegacy`      | Whether the field uses the older rendering/save code path (per-field, independent of V1/V2) |
 
 ---
 
@@ -69,48 +120,63 @@ These represent different moments in time for anyone not in UTC+0. In São Paulo
 
 ### What the Code Does
 
-The `parseDateString()` function's first operation is to unconditionally remove the `Z`:
+**V2 — `parseDateString()` (all field configurations):**
+
+The function's first operation is to unconditionally remove the `Z`:
 
 ```javascript
+// CalendarValueService.parseDateString() — line ~104126
 let stripped = input.replace('Z', '');
 // "2026-03-15T00:00:00.000Z" becomes "2026-03-15T00:00:00.000"
 ```
 
 After this, the value is parsed as if it were in the user's local timezone. The UTC context is permanently lost.
 
+**V1 — inline code in `initCalendarValueV1()` (DateTime + ignoreTZ=true only):**
+
+```javascript
+// initCalendarValueV1() — lines ~102889/102893
+e = this.data.value.replace('Z', '');
+// Then: new Date(e) — same effect as parseDateString
+```
+
+This produces identical output to `parseDateString(input, true, true)` — verified at both São Paulo and Mumbai timezones. The V1 `ignoreTZ=false` path (`new Date(this.data.value)`) preserves the Z and parses correctly.
+
 ### Step-by-Step Example
 
-A date is saved as `"2026-03-15T00:00:00.000Z"` (midnight UTC, March 15). A user in Mumbai loads this form with V2 active:
+A preset default resolves to `"2026-03-15T00:00:00.000Z"` (midnight UTC, March 15). A user in Mumbai loads this form:
 
-```
-1. parseDateString receives: "2026-03-15T00:00:00.000Z"
-2. Strips Z:                 "2026-03-15T00:00:00.000"
-3. Parses as Mumbai local:   March 15, 00:00 IST = March 14, 18:30 UTC
-4. Stores internally:        "2026-03-14T18:30:00.000Z"
+```text
+1. Code receives:     "2026-03-15T00:00:00.000Z"
+2. Strips Z:          "2026-03-15T00:00:00.000"
+3. Parses as local:   March 15, 00:00 IST = March 14, 18:30 UTC
+4. Stores internally: "2026-03-14T18:30:00.000Z"
 
 Result: The date shifted backward by 5.5 hours (Mumbai's UTC offset)
 ```
 
 For a user in São Paulo loading the same value:
 
-```
-1. parseDateString receives: "2026-03-15T00:00:00.000Z"
-2. Strips Z:                 "2026-03-15T00:00:00.000"
-3. Parses as São Paulo local: March 15, 00:00 BRT = March 15, 03:00 UTC
-4. Stores internally:         "2026-03-15T03:00:00.000Z"
+```text
+1. Code receives:     "2026-03-15T00:00:00.000Z"
+2. Strips Z:          "2026-03-15T00:00:00.000"
+3. Parses as local:   March 15, 00:00 BRT = March 15, 03:00 UTC
+4. Stores internally: "2026-03-15T03:00:00.000Z"
 
 Result: The date shifted forward by 3 hours (São Paulo's UTC offset)
 ```
 
 For a user in London (UTC+0):
 
-```
+```text
 1-4: No shift — local time equals UTC. The bug is invisible.
 ```
 
-### The Recovery Branch — Partially Works, Partially Backfires
+This example applies to both V1 (DateTime + ignoreTZ=true) and V2 (all configurations) — the Z-stripping mechanism is the same.
 
-The function has a second branch for fields where `ignoreTimezone` is `false`. After stripping the Z, it attempts to recover the UTC meaning using `.tz("UTC", true).local()`:
+### The Recovery Branch (V2 Only)
+
+The `parseDateString()` function has a second branch for fields where `ignoreTimezone` is `false`. After stripping the Z, it attempts to recover the UTC meaning using `.tz("UTC", true).local()`:
 
 - **For date+time fields**: The recovery works correctly — it re-labels the local-parsed time as UTC and converts to local. Verified at 0h shift in São Paulo, Mumbai, and London.
 - **For date-only fields**: The recovery **backfires in UTC- timezones**. The `.local()` conversion shifts midnight backward (e.g., -3h in São Paulo), crossing into the previous calendar day. Then a `.startOf("day")` call snaps to that previous day's midnight. Result: **-1 day error** in São Paulo.
@@ -123,70 +189,22 @@ This means the `ignoreTimezone=false` branch is paradoxically **worse** than `ig
 | Mumbai    | **-1 day** (recovery shifts past midnight) | -5.5h (wrong time, correct day)   |
 | London    | Correct                                    | Correct                           |
 
----
-
-## The V1 Equivalent
-
-V1 does not call `parseDateString()` — this was verified by instrumenting the function during automated testing (zero calls logged during V1 operations). However, V1 has inline code in `initCalendarValueV1()` that handles the Z marker on a case-by-case basis:
-
-| V1 Inline Code                                     | What It Does                                               | Equivalent To                       |
-| -------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------- |
-| `this.data.value.replace("Z", "")` + `new Date(e)` | Strips Z, parses as local (DateTime + ignoreTimezone=true) | parseDateString(input, true, true)  |
-| `new Date(this.data.value)` (ignoreTimezone=false) | Preserves Z, correct parse                                 | parseDateString(input, true, false) |
-| T-truncation + `moment(dateString).toDate()`       | Strips everything after T, parses date as local midnight   | This is FORM-BUG-7, not FORM-BUG-1  |
-
-The V1 inline `replace("Z","") + new Date()` produces identical output to `parseDateString(input, true, true)` — verified at both São Paulo and Mumbai timezones.
+V1 does not have this recovery branch — its `ignoreTimezone=false` path preserves the Z entirely (`new Date(this.data.value)`), which is correct.
 
 ### Relationship to FORM-BUG-7
 
-The original analysis stated that FORM-BUG-1 is "the root enabler for FORM-BUG-7." **This was corrected during the audit — it is incorrect for V1.**
+In V1, FORM-BUG-1 and FORM-BUG-7 are **independent mechanisms** despite producing similar symptoms:
 
-- FORM-BUG-7 in V1 is caused by `moment(dateOnlyString).toDate()` parsing date-only strings as local midnight — a completely independent mechanism
-- In V1's date-only path, the time portion (including any Z) is truncated before parsing, so Z-stripping is incidental, not causal
-- FORM-BUG-1 would only enable FORM-BUG-7 in V2, where `parseDateString` is called with the full ISO string including Z
+- FORM-BUG-7 is caused by `moment(dateOnlyString).toDate()` parsing date-only strings as local midnight — Z is never involved because V1 truncates everything after `T` before parsing
+- FORM-BUG-1's Z-stripping only matters for DateTime values where the full ISO string (including Z) is preserved
 
-The two bugs are conceptual siblings (both stem from local-time reinterpretation) but operate through different code paths.
+In V2, the two bugs are connected: `parseDateString()` receives the full ISO string with Z, strips it, then passes the result to the same local-midnight parsing — so FORM-BUG-1 feeds into FORM-BUG-7.
 
----
+Both bugs stem from local-time reinterpretation, but they operate through different code paths in V1.
 
-## Test Evidence
+### V1 Save/Reload Self-Consistency
 
-All testing conducted via automated Playwright scripts across three timezones: São Paulo/BRT (UTC-3), Mumbai/IST (UTC+5:30), and London/UTC+0. 19 tests per timezone, 5 verification phases.
-
-Spec file: `testing/date-handling/audit-bug1-tz-stripping.spec.js`
-
-### parseDateString() Output by Timezone
-
-**Input: `"2026-03-15T00:00:00.000Z"` (midnight UTC)**
-
-| enableTime | ignoreTZ | São Paulo (UTC-3)                       | Mumbai (UTC+5:30)                       | London (UTC+0)             | Correct Value              |
-| ---------- | -------- | --------------------------------------- | --------------------------------------- | -------------------------- | -------------------------- |
-| true       | true     | `2026-03-15T03:00:00.000Z` (+3h)        | `2026-03-14T18:30:00.000Z` (-5.5h)      | `2026-03-15T00:00:00.000Z` | `2026-03-15T00:00:00.000Z` |
-| true       | false    | `2026-03-15T00:00:00.000Z`              | `2026-03-15T00:00:00.000Z`              | `2026-03-15T00:00:00.000Z` | `2026-03-15T00:00:00.000Z` |
-| false      | true     | `2026-03-15T03:00:00.000Z` (same day)   | `2026-03-14T18:30:00.000Z` (**-1 day**) | `2026-03-15T00:00:00.000Z` | `2026-03-15T00:00:00.000Z` |
-| false      | false    | `2026-03-14T03:00:00.000Z` (**-1 day**) | `2026-03-14T18:30:00.000Z` (**-1 day**) | `2026-03-15T00:00:00.000Z` | `2026-03-15T00:00:00.000Z` |
-
-**Input: `"2026-03-15T12:00:00.000Z"` (noon UTC)**
-
-| enableTime | ignoreTZ | São Paulo                                                | Mumbai                                         | London                     |
-| ---------- | -------- | -------------------------------------------------------- | ---------------------------------------------- | -------------------------- |
-| true       | true     | `2026-03-15T15:00:00.000Z` (+3h)                         | `2026-03-15T06:30:00.000Z` (-5.5h)             | `2026-03-15T12:00:00.000Z` |
-| false      | true     | `2026-03-15T03:00:00.000Z` (collapsed to local midnight) | `2026-03-14T18:30:00.000Z` (-1 day, collapsed) | `2026-03-15T00:00:00.000Z` |
-
-**Input: `"2026-03-15"` (date-only string, no Z)**
-
-| enableTime | ignoreTZ | São Paulo                               | Mumbai                              | London                     |
-| ---------- | -------- | --------------------------------------- | ----------------------------------- | -------------------------- |
-| false      | false    | `2026-03-14T03:00:00.000Z` (**-1 day**) | `2026-03-14T18:30:00.000Z` (-1 day) | `2026-03-15T00:00:00.000Z` |
-| false      | true     | `2026-03-15T03:00:00.000Z` (same day)   | `2026-03-14T18:30:00.000Z` (-1 day) | `2026-03-15T00:00:00.000Z` |
-
-### V1 Call Trace Verification
-
-Monkey-patched `parseDateString` during V1 operations (typed input, SetFieldValue, calendar popup) — **zero calls logged**. Confirms `parseDateString` is V2-only.
-
-V1 inline `replace("Z","") + new Date()` tested against `parseDateString(input, true, true)` at both São Paulo and Mumbai — **identical output**.
-
-### Cross-Timezone Saved Record Reload
+Saved record reload demonstrates that V1's save/reload cycle is self-consistent for DateTime fields **when the UTC offset hasn't changed between save and load** — the save path strips Z, and the reload path parses the Z-less string as local, reconstructing the original time. This self-consistency breaks if the user's UTC offset changes (different timezone, DST transition, or travel):
 
 **Record saved from São Paulo, loaded in 3 timezones:**
 
@@ -195,8 +213,6 @@ V1 inline `replace("Z","") + new Date()` tested against `parseDateString(input, 
 | Field7 | date-only           | `2026-03-15`          | `2026-03-15`          | `2026-03-15`          |
 | Field5 | date+time, ignoreTZ | `2026-03-15T00:00:00` | `2026-03-15T00:00:00` | `2026-03-15T00:00:00` |
 
-V1 DateTime reload is self-consistent: the save path strips Z, and the reload path parses the Z-less string as local — reconstructing the original time. No cross-timezone shift on reload.
-
 **Record saved from Mumbai, loaded in 3 timezones:**
 
 | Field  | Configuration       | São Paulo Load        | Mumbai Load           | London Load           |
@@ -204,47 +220,32 @@ V1 DateTime reload is self-consistent: the save path strips Z, and the reload pa
 | Field7 | date-only           | `2026-03-14`          | `2026-03-14`          | `2026-03-14`          |
 | Field5 | date+time, ignoreTZ | `2026-03-15T00:00:00` | `2026-03-15T00:00:00` | `2026-03-15T00:00:00` |
 
-The date-only field shows `2026-03-14` everywhere — FORM-BUG-7 was baked in during the Mumbai save (user entered March 15, stored as March 14). The V1 reload path preserves this incorrect value consistently. The date+time field is correct in all timezones — V1's save/reload cycle is self-consistent for date+time fields even with Z-stripping.
+The date-only field shows `2026-03-14` everywhere — FORM-BUG-7 was baked in during the Mumbai save (user entered March 15, stored as March 14). The date+time field is correct in all timezones.
 
-### Corrections From Original Analysis
+This self-consistency is why the V1 Z-stripping is a no-op for saved user data: there's no Z to strip on reload.
 
-| Original Claim                            | Audit Finding                                                                  | Status          |
-| ----------------------------------------- | ------------------------------------------------------------------------------ | --------------- |
-| Mumbai date-only shift = -2 days          | Actual: -1 day                                                                 | **Corrected**   |
-| Code path: V1 and V2                      | parseDateString is V2-only; V1 has equivalent inline code                      | **Corrected**   |
-| Root enabler for FORM-BUG-7               | FORM-BUG-7 in V1 is independent (moment local-midnight parse, not Z-stripping) | **Corrected**   |
-| ignoreTZ=false recovery "partially works" | Recovery works for date+time but **backfires for date-only at UTC-** (-1 day)  | **New Finding** |
-| Affected scenarios: typed input           | Typed input goes through V1 normalizeCalValue, not parseDateString             | **Corrected**   |
+---
+
+## Verification
+
+Verified via automated Playwright scripts across 3 timezones (São Paulo/BRT UTC-3, Mumbai/IST UTC+5:30, London/UTC+0) on the demo environment at `vvdemo.visualvault.com`. 10 input combinations tested per timezone via direct `parseDateString()` invocation, plus V1 inline equivalence comparison, V1 call trace (monkey-patch), and cross-timezone saved record reload. 19 tests per timezone, 5 verification phases — all timezone-dependent shifts confirmed as documented above.
+
+V1 inline `replace("Z","") + new Date()` produces **identical output** to `parseDateString(input, true, true)` at both São Paulo and Mumbai — confirming the V1 and V2 code paths produce the same defective result for DateTime + ignoreTZ=true. `parseDateString` was confirmed V2-only via monkey-patch instrumentation (zero calls during V1 operations).
+
+This bug report is backed by a supporting test repository containing Playwright automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ---
 
 ## Technical Root Cause
 
-### The Defective Function
+The defective code is shown in [What the Code Does](#what-the-code-does) above. This section adds file locations and call sites.
+
+### V2: `parseDateString()`
 
 **File**: `main.js` (bundled FormViewer application)
 **Function**: `CalendarValueService.parseDateString()` — line ~104126
 
-```javascript
-parseDateString(input, enableTime, ignoreTimezone) {
-    let result;
-    let stripped = input.replace("Z", "");  // ← Unconditionally removes UTC marker
-
-    if (ignoreTimezone) {
-        result = moment(stripped);           // Parses as LOCAL time (wrong for UTC input)
-    } else {
-        result = moment(stripped).tz("UTC", true).local();  // Attempts recovery
-    }
-
-    if (!enableTime) {                      // Date-only fields
-        result = result.startOf("day");     // Collapses to local midnight
-    }
-
-    return result.toISOString();
-}
-```
-
-### Where This Function Is Called (V2 Only)
+Call sites (V2 only):
 
 | Line   | Calling Function               | When                               |
 | ------ | ------------------------------ | ---------------------------------- |
@@ -254,94 +255,35 @@ parseDateString(input, enableTime, ignoreTimezone) {
 | 102948 | `initCalendarValueV2()`        | Form load — preset date            |
 | 104133 | `formatDateStringForDisplay()` | Display formatting (also V2-gated) |
 
-### V1 Equivalent Inline Code
+### V1: Inline Code in `initCalendarValueV1()`
 
-| V1 Code Location    | What It Does                              | Same Effect As                           |
-| ------------------- | ----------------------------------------- | ---------------------------------------- |
-| Lines 102889/102893 | `value.replace("Z", "")` + `new Date(e)`  | parseDateString(input, true, true)       |
-| Line 102893         | `new Date(this.data.value)` (preserves Z) | parseDateString(input, true, false)      |
-| Line 102912         | T-truncation + `moment(e).toDate()`       | Different mechanism — this is FORM-BUG-7 |
+**File**: `main.js`
+**Location**: Lines ~102889/102893
+**Scope**: DateTime + ignoreTZ=true only (Configs D, H)
 
----
+V1's `ignoreTimezone=false` path at line ~102893 uses `new Date(this.data.value)` without stripping Z — correct behavior.
 
-## Workarounds
-
-This bug is currently dormant because V2 is not active in standard form usage. The default V1 code path is the effective workaround.
-
-For the V1 equivalent behaviors:
-
-- **Date-only field shift in UTC+**: See [FORM-BUG-7 workarounds](bug-7-wrong-day-utc-plus.md)
-- **DateTime Z-stripping on save**: See [FORM-BUG-4 workarounds](bug-4-legacy-save-format.md)
-- **Current Date default** (`new Date()` directly) bypasses all string parsing — safe across all timezones
-- **Server-side date computation** via REST API bypasses all client-side parsing
+V1's date-only path uses T-truncation + `moment(e).toDate()` — a different mechanism documented under [FORM-BUG-7](bug-7-wrong-day-utc-plus.md).
 
 ---
 
-## Proposed Fix
+## Appendix: Field Configuration Reference
 
-### Before (Current)
+The test form has 8 field configurations referred to by letter throughout this document:
 
-```javascript
-parseDateString(input, enableTime, ignoreTimezone) {
-    let result;
-    let stripped = input.replace("Z", "");  // Unconditionally removes Z
-
-    if (ignoreTimezone) {
-        result = moment(stripped);
-    } else {
-        result = moment(stripped).tz("UTC", true).local();
-    }
-
-    if (!enableTime) {
-        result = result.startOf("day");
-    }
-
-    return result.toISOString();
-}
-```
-
-### After (Fixed)
-
-```javascript
-parseDateString(input, enableTime, ignoreTimezone) {
-    if (enableTime) {
-        // DateTime: preserve the value as-is, including timezone
-        return new Date(input).toISOString();
-    } else {
-        // Date-only: extract the date portion and anchor to UTC midnight
-        let dateStr = input.includes("T") ? input.substring(0, input.indexOf("T")) : input;
-        dateStr = dateStr.replace("Z", "");
-        return new Date(dateStr + "T00:00:00.000Z").toISOString();
-    }
-}
-```
-
-### Key Changes
-
-1. **DateTime values**: Parse with `new Date()` which respects the Z suffix natively — no stripping needed
-2. **Date-only values**: Extract the date portion and explicitly anchor to UTC midnight, ensuring the calendar date is preserved regardless of the user's timezone
-3. **Removed**: The `ignoreTimezone` branching inside this function — the `ignoreTimezone` flag should affect display formatting, not how the value is parsed from storage
+| Config | Field   | enableTime | ignoreTimezone | useLegacy | Description                 |
+| ------ | ------- | ---------- | -------------- | --------- | --------------------------- |
+| A      | Field7  | —          | —              | —         | Date-only baseline          |
+| B      | Field10 | —          | ✅             | —         | Date-only + ignoreTZ        |
+| C      | Field6  | ✅         | —              | —         | DateTime UTC (control)      |
+| D      | Field5  | ✅         | ✅             | —         | DateTime + ignoreTZ         |
+| E      | Field12 | —          | —              | ✅        | Legacy date-only            |
+| F      | Field11 | —          | ✅             | ✅        | Legacy date-only + ignoreTZ |
+| G      | Field14 | ✅         | —              | ✅        | Legacy DateTime             |
+| H      | Field13 | ✅         | ✅             | ✅        | Legacy DateTime + ignoreTZ  |
 
 ---
 
-## Fix Impact Assessment
+## Workarounds and Fix Recommendations
 
-### What Changes If Fixed
-
-- V2 form loads correctly preserve UTC dates regardless of user timezone
-- V2 preset dates display the correct day for all users
-- V2 URL parameter dates are interpreted correctly
-- V1 is unaffected (requires separate fixes to inline code at lines 102889, 102893, 102907-102912)
-
-### Backwards Compatibility Risk: HIGH
-
-Existing saved data was stored with V1 behavior. V1's DateTime + ignoreTimezone save/reload cycle is self-consistent: Z is stripped on save (FORM-BUG-4), and the Z-less value is parsed correctly as local time on reload. Fixing `parseDateString` alone could break this self-consistency if V2 is enabled without a coordinated fix to the save path.
-
-**Migration consideration**: Old data stored without Z needs to remain parseable as local time. If V2 is enabled globally, the save path (FORM-BUG-4 fix) and the load path (this fix) must be deployed together to maintain round-trip consistency.
-
-### Regression Risk
-
-- `parseDateString` is called on every V2 form load for every calendar field
-- Fix must be tested across all 8 field configurations and multiple timezones
-- Must verify that V1 inline code is also updated if this fix is deployed alongside V2 enablement
-- The V1 code path must remain completely unaffected
+See [bug-1-fix-recommendations.md](bug-1-fix-recommendations.md) for workarounds, proposed code fixes (V1 and V2), and fix impact assessment.
