@@ -3994,6 +3994,65 @@ const TEST_DATA = [
         bugs: [],
         notes: 'C→A IST: Source C returns "2026-03-14T18:30:00.000Z" (real UTC of IST midnight). Target A truncates at T → "2026-03-14". Wrong date — the UTC date portion is previous day. Not a URL bug — the UTC representation correctly has Mar 14.',
     },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Category 4 — URL Parameter Save/Reload Tests
+    // Verify that URL-param-sourced values persist correctly after save+reload.
+    // Confirms bug-affected values are locked into the DB, and clean values
+    // survive the round-trip through the server.
+    // ═══════════════════════════════════════════════════════════════════════
+
+    {
+        id: '4-A-isoT-BRT-reload',
+        category: 4,
+        categoryName: 'URL Parameters',
+        config: 'A',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'urlParamReload',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '2026-03-15T00:00:00',
+        urlParamValue: '2026-03-15T00:00:00',
+        expectedRaw: '2026-03-15',
+        expectedApi: '2026-03-15',
+        bugs: [],
+        notes: 'Clean baseline: date-only URL param → save → reload. Value should survive round-trip unchanged. Confirms TargetDateTest save path works and enableQListener does not interfere on reload (saved record URL has no field params).',
+    },
+    {
+        id: '4-D-z-BRT-reload',
+        category: 4,
+        categoryName: 'URL Parameters',
+        config: 'D',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'urlParamReload',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '2026-03-15T00:00:00.000Z',
+        urlParamValue: '2026-03-15T00:00:00.000Z',
+        expectedRaw: '2026-03-14T21:00:00',
+        expectedApi: '2026-03-14T21:00:00.000Z',
+        bugs: ['Bug #1', 'Bug #5'],
+        notes: 'FORM-BUG-1 locked in DB: UTC midnight Z-stripped → parsed as UTC (.000 residue) → BRT 21:00 Mar 14. After save+reload, the wrong value persists self-consistently (V1 DateTime reload reconstructs local time).',
+    },
+    {
+        id: '4-FAR-DD-BRT-reload',
+        category: 4,
+        categoryName: 'URL Parameters',
+        config: 'D',
+        tz: 'BRT',
+        tzOffset: 'GMT-0300',
+        action: 'fillinRelateReload',
+        inputDate: { year: 2026, month: 3, day: 15 },
+        inputDateStr: '2026-03-15T00:00:00',
+        sourceConfig: 'D',
+        targetConfig: 'D',
+        expectedSourceRaw: '2026-03-15T00:00:00',
+        expectedSourceGfv: '2026-03-15T00:00:00.000Z',
+        expectedRaw: '2026-03-14T21:00:00',
+        expectedApi: '2026-03-14T21:00:00.000Z',
+        bugs: ['Bug #5', 'Bug #1'],
+        notes: 'Full FillinAndRelate chain → save → reload. Source D fake Z (.000Z) compounds with target D Z-strip (.000 residue → UTC parse). Wrong value (21:00 Mar 14) persists in DB after save. Reload confirms the bug is permanent — the record is corrupted.',
+    },
 ];
 
 module.exports = { TEST_DATA };
