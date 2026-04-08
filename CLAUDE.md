@@ -62,7 +62,8 @@ nodeV2/
       verify-format-mismatch.js      # Dashboard vs Forms format comparison
       explore-dashboard.js           # Dashboard grid capture + TZ comparison
       export-wadnr-templates.js     # Playwright-based WADNR form template XML export
-      inventory-wadnr-fields.js     # Parse template XMLs, generate field inventory with config assessment
+      inventory-wadnr-fields.js     # Parse template XMLs, generate field inventory with config + script interactions
+      inventory-wadnr-scripts.js    # Parse template XMLs, generate script-level date interaction report
     date-handling/                   # Date-handling test specs (1 per category + dashboard specs)
   docs/                              # Shared documentation
     architecture/                    # Platform architecture, component diagrams, data flow
@@ -81,7 +82,10 @@ nodeV2/
       dashboards/                    # Dashboard date display testing (44/44 complete — DB-1 thru DB-8 all done)
         analysis/                    # Analysis & conclusions (overview + 1 bug report + 1 fix-recommendation companion)
       wadnr-impact/                  # WADNR project impact analysis (77 templates exported, 35 with 137 calendar fields)
-        field-inventory.md           # Per-template field inventory with config assessment
+        field-inventory.md           # Per-template field inventory with config assessment + script interactions
+        script-inventory.md          # Script-level analysis: date field interactions, WS calls, global function usage
+        bug-analysis/                # Case studies mapping real bugs to investigation findings
+          case-study-124697.md       # Freshdesk #124697 — postForms time mutation (DRAFT)
         form-templates/              # Exported XML templates (77 files)
     form-templates/                  # XML template analysis, generator, redesigned DateTest v2
         README.md                    # Template format docs and generator usage

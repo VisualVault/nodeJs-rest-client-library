@@ -16,8 +16,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `testing/fixtures/env-config.js` — unified credential loader: reads `.env.json`, maps fields for Playwright and WS runner consumers. Replaces scattered credential references
 - `.env.example.json` — credential template at repo root (replaces deleted `testing/config/vv-config.example.json`)
 - `testing/scripts/export-wadnr-templates.js` — Playwright-based form template XML export from VV FormTemplateAdmin (pagination, parallel workers, resume support)
-- `testing/scripts/inventory-wadnr-fields.js` — parses WADNR template XMLs, maps calendar fields to Config A–H, generates field inventory with heuristic model assessment
+- `testing/scripts/inventory-wadnr-fields.js` — parses WADNR template XMLs, maps calendar fields to Config A–H, generates field inventory with heuristic model assessment and script interaction tracking (GFV/SFV, bulk reads, FillinAndRelate, date APIs)
+- `testing/scripts/inventory-wadnr-scripts.js` — parses WADNR template XMLs for script-level analysis: date field interactions, web service calls, global function usage, round-trip detection
 - `tasks/date-handling/wadnr-impact/` — WADNR project impact analysis: 77 templates exported (12 failed server-side), 35 contain calendar fields (137 total), configuration assessment with 8 likely misconfigurations identified
+- `tasks/date-handling/wadnr-impact/bug-analysis/case-study-124697.md` — case study mapping Freshdesk #124697 (postForms time mutation) to FORM-BUG-1, FORM-BUG-5, WEBSERVICE-BUG-4; layer-by-layer analysis of `forminstance/` workaround limits
 
 ### Changed
 
