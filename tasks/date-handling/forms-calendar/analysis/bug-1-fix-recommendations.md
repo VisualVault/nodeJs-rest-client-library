@@ -116,3 +116,4 @@ This aligns V1's `ignoreTZ=true` path with the `ignoreTZ=false` path, which alre
 - V2: `parseDateString` is called on every V2 form load for every calendar field — fix must be tested across all 8 field configurations and multiple timezones
 - V1: Fix is scoped to two lines (~102889/102893) affecting only DateTime + ignoreTZ=true — narrow blast radius
 - Both fixes should be deployed together for consistency
+- **URL parameter input** (`enableQListener=true` fields): fix applies to same V1 code path and should be tested via URL param scenarios (Category 4 test suite provides baseline). FillinAndRelate chains are the highest-impact regression case — D→D transfers currently compound FORM-BUG-5+BUG-1; after fix, the Z should be preserved and parsed correctly, eliminating the chain corruption

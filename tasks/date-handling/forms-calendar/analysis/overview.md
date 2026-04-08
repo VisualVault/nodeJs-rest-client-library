@@ -120,7 +120,7 @@ Source: [`../matrix.md`](../matrix.md) | Full evidence: [`../summaries/`](../sum
 | 1. Calendar Popup         |   20    |    7    |   13   |    0    | **Complete** |
 | 2. Typed Input            |   16    |   11    |   5    |    0    | **Complete** |
 | 3. Server Reload          |   18    |   14    |   4    |    0    | **Complete** |
-| 4. URL Parameters         |    5    |    0    |   0    |    5    | Pending      |
+| 4. URL Parameters         |   39    |   39    |   0    |    0    | **Complete** |
 | 5. Preset Date            |   18    |   11    |   7    |    0    | **Complete** |
 | 6. Current Date           |   15    |   13    |   2    |    0    | **Complete** |
 | 7. SetFieldValue formats  |   39    |   29    |   9    |    1    | 38/39 done   |
@@ -132,13 +132,13 @@ Source: [`../matrix.md`](../matrix.md) | Full evidence: [`../summaries/`](../sum
 | 11. Cross-Timezone        |   14    |    0    |   0    |   13    | Pending      |
 | 12. Edge Cases            |   20    |    5    |   9    |    5    | Partial      |
 | 13. Database              |   10    |    2    |   0    |    8    | Pending      |
-| **TOTAL**                 | **242** | **130** | **72** | **37**  |              |
+| **TOTAL**                 | **276** | **169** | **72** | **32**  |              |
 
-**Executed**: 202 of 242 slots (83%). **Failure rate**: 72/202 = 36%.
+**Executed**: 241 of 276 slots (87%). **Failure rate**: 72/241 = 30%.
 
-**Fully complete** (all slots executed): Categories 1, 2, 3, 5, 6, 8B, 9.
+**Fully complete** (all slots executed): Categories 1, 2, 3, 4, 5, 6, 8B, 9.
 
-**Not yet tested**: Category 4 (requires `enableQListener=true` fields), Category 11 (requires OS-level TZ switching), Category 13 (requires direct SQL access).
+**Not yet tested**: Category 11 (requires OS-level TZ switching), Category 13 (requires direct SQL access).
 
 **Timezones tested**: BRT (UTC-3), IST (UTC+5:30), UTC+0. Additional spot checks: PST/PDT (UTC-7), JST (UTC+9) in Category 9.
 
@@ -389,7 +389,7 @@ Based on live test evidence. Each cell indicates which bugs are **confirmed acti
 | 1. Calendar Popup   | #7 `[LIVE]`, #5 `[LIVE]`                     | 20/20 |    35%    | Complete                    |
 | 2. Typed Input      | #7 `[LIVE]`                                  | 16/16 |    69%    | Complete                    |
 | 3. Saved Data       | #7 `[CODE]` on load path, #4 `[CODE]`        | 18/18 |    78%    | Complete                    |
-| 4. URL Parameter    | #1 `[CODE]`, #4 `[CODE]`                     |  0/5  |     —     | Pending                     |
+| 4. URL Parameter    | #1 `[LIVE]`, #5 `[LIVE]`; #7 immune          | 39/39 |   100%    | Complete (2026-04-08)       |
 | 5. Preset Date      | #7 `[LIVE]`, #5 `[LIVE]`                     | 18/18 |    61%    | Complete                    |
 | 6. Current Date     | #5 `[LIVE]` (Config D only)                  | 15/15 |    87%    | Complete                    |
 | 7. SetFieldValue    | #7 `[LIVE]`, #5 `[LIVE]`                     | 38/39 |    76%    | 1 pending                   |

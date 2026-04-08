@@ -16,14 +16,14 @@ Three conditions must all be true for this bug to produce a visible effect:
 
 The database is SQL Server `datetime` — a timezone-unaware type that stores no `Z`. The `Z` is **added by the layers between the database and the browser**, and whether it's present depends on how the value reaches the form:
 
-| Load Scenario                                 | Z Present? | Origin of the Z                                                                                                                                                                     |
-| --------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **API-created records** (`postForms`)         | Yes        | `FormInstance/Controls` response serialization appends `Z` to datetime values from `postForms`-created records ([CB-29](../../web-services/analysis/ws-bug-1-cross-layer-shift.md)) |
-| **Preset / CurrentDate defaults**             | Yes        | Browser-side `toISOString()` on the `Date` object produces an ISO string with `Z`                                                                                                   |
-| **Saved user data** (normal form save/reload) | **No**     | `getSaveValue()` strips `Z` before storage; the reload value arrives as `"2026-03-15T00:00:00"` (no Z)                                                                              |
-| **URL parameters**                            | Varies     | Depends on what the caller puts in the URL — may or may not include `Z`                                                                                                             |
+| Load Scenario                                 | Z Present? | Origin of the Z                                                                                                                                                                                                                               |
+| --------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **API-created records** (`postForms`)         | Yes        | `FormInstance/Controls` response serialization appends `Z` to datetime values from `postForms`-created records ([CB-29](../../web-services/analysis/ws-bug-1-cross-layer-shift.md))                                                           |
+| **Preset / CurrentDate defaults**             | Yes        | Browser-side `toISOString()` on the `Date` object produces an ISO string with `Z`                                                                                                                                                             |
+| **Saved user data** (normal form save/reload) | **No**     | `getSaveValue()` strips `Z` before storage; the reload value arrives as `"2026-03-15T00:00:00"` (no Z)                                                                                                                                        |
+| **URL parameters** (`enableQListener=true`)   | Varies     | Depends on what the caller puts in the URL. **FillinAndRelateForm chains** pass `GetFieldValue()` output which includes FORM-BUG-5's fake `.000Z` on Config D — confirmed to trigger this bug on the receiving form (Category 4, 2026-04-08). |
 
-For saved user data (the most common load scenario), the Z-stripping is a **no-op** — the Z was already removed by the save path. The bug manifests primarily on **preset defaults** and **API-created records**, where the Z is injected by serialization layers outside the form's control.
+For saved user data (the most common load scenario), the Z-stripping is a **no-op** — the Z was already removed by the save path. The bug manifests on **preset defaults**, **API-created records**, and **URL parameter input** (including FillinAndRelate chains), where the Z is injected by serialization layers or upstream bugs outside the form's control.
 
 ### 2. The user's timezone must not be UTC+0
 
@@ -33,22 +33,22 @@ At UTC+0, local time equals UTC — stripping the `Z` changes the label but not 
 
 The FormViewer's calendar initialization has two versions. **V1** is the default — it ran during all testing on the demo environment. **V2** is an updated version that activates under specific conditions (see [Background](#background)). Both versions strip the Z, but for different field configurations:
 
-| Code Path | Field Configuration                      | Z-Stripped?                                        | Bug Applies?                                                     |
-| --------- | ---------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------- |
-| **V1**    | DateTime + ignoreTZ=true (Configs D, H)  | Yes — inline `replace("Z","")`                     | **Yes**                                                          |
-| **V1**    | DateTime + ignoreTZ=false (Configs C, G) | No — `new Date(value)` preserves Z                 | No — correct                                                     |
-| **V1**    | Date-only (Configs A, B, E, F)           | N/A — T-truncation removes time+Z together         | No — separate defect ([FORM-BUG-7](bug-7-wrong-day-utc-plus.md)) |
-| **V2**    | All configurations                       | Yes — `parseDateString()` strips Z unconditionally | **Yes**                                                          |
+| Code Path | Field Configuration                      | Z-Stripped?                                        | Bug Applies?                                                                                  |
+| --------- | ---------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **V1**    | DateTime + ignoreTZ=true (Configs D, H)  | Yes — inline `replace("Z","")`                     | **Yes** — all sources including URL params                                                    |
+| **V1**    | DateTime + ignoreTZ=false (Configs C, G) | No — `new Date(value)` preserves Z                 | No — correct (raw loses Z but API recovers via `toISOString`)                                 |
+| **V1**    | Date-only (Configs A, B, E, F)           | N/A — T-truncation removes time+Z together         | No — separate defect ([FORM-BUG-7](bug-7-wrong-day-utc-plus.md)). URL params immune to BUG-7. |
+| **V2**    | All configurations                       | Yes — `parseDateString()` strips Z unconditionally | **Yes**                                                                                       |
 
-**V1** is the default on the demo environment and ran during the bulk of testing. **V2** activates under specific conditions (see [Background](#background)). We do not know what system-level configuration controls V2 activation in other environments.
+**V1** is the default on the demo environment and ran during the bulk of testing. V1's Z-stripping applies to **all value sources** in `initCalendarValueV1()` — including URL parameter input via `enableQListener=true` fields (confirmed live, Category 4, 2026-04-08). **V2** activates under specific conditions (see [Background](#background)).
 
 ---
 
-## Severity: MEDIUM
+## Severity: MEDIUM–HIGH
 
-- **V1 impact (active)**: Limited to DateTime + ignoreTZ=true fields (Configs D, H) when values arrive with Z — primarily API-created records and preset defaults. For saved user data, V1's save/reload cycle is self-consistent (no Z on reload), so the defect is a no-op.
+- **V1 impact (active)**: Affects DateTime + ignoreTZ=true fields (Configs D, H) when values arrive with Z — API-created records, preset defaults, **and URL parameter input** (including FillinAndRelate chains). For saved user data, V1's save/reload is self-consistent (no Z on reload). **FillinAndRelate chains are the highest-impact V1 vector** — FORM-BUG-5's fake `.000Z` on `GetFieldValue()` output feeds directly into this bug when passed to another form via URL params, and save/reload confirms the corruption is permanent.
 - **V2 impact (uncertain scope)**: Affects all field configurations, but V2 activation is controlled by a server-side flag whose admin-level configuration is unknown. V2 was confirmed functional via manual console activation on the demo environment.
-- **Overall**: The V1 scope is narrow (one field config combination, only on Z-bearing values). The V2 scope is broad but its activation status in the wild is unknown.
+- **Overall**: V1 scope is wider than initially assessed. While saved user data is safe, **any cross-form data transfer** (FillinAndRelate, API integration, URL-based workflows) involving Config D/H DateTime fields is vulnerable. Severity raised from MEDIUM to MEDIUM–HIGH based on FillinAndRelate chain evidence.
 
 ---
 
@@ -201,6 +201,34 @@ In V1, FORM-BUG-1 and FORM-BUG-7 are **independent mechanisms** despite producin
 In V2, the two bugs are connected: `parseDateString()` receives the full ISO string with Z, strips it, then passes the result to the same local-midnight parsing — so FORM-BUG-1 feeds into FORM-BUG-7.
 
 Both bugs stem from local-time reinterpretation, but they operate through different code paths in V1.
+
+### Interaction with FORM-BUG-5 in FillinAndRelate Chains (2026-04-08)
+
+When `GetFieldValue()` output from a Config D field is passed to another form via `FillinAndRelateForm` (a global function that builds URL params from field values), FORM-BUG-5's fake `.000Z` suffix feeds directly into this bug:
+
+```text
+Source form (Config D):
+  GetFieldValue() → "2026-03-15T00:00:00.000Z"  (fake Z from FORM-BUG-5)
+
+FillinAndRelate URL:
+  &Field5=2026-03-15T00%3A00%3A00.000Z
+
+Target form (Config D, enableQListener=true):
+  V1 strips Z:    "2026-03-15T00:00:00.000"  (note: .000 remains!)
+  new Date():     Parsed as UTC midnight      (.000 suffix triggers UTC parse in V8)
+  getSaveValue(): "2026-03-14T21:00:00"       (BRT local = UTC midnight - 3h)
+```
+
+**The bugs compound rather than cancel.** The `.000` millisecond residue is the critical mechanism: Chrome/V8 parses `new Date("2026-03-15T00:00:00.000")` as UTC (midnight UTC), while `new Date("2026-03-15T00:00:00")` (without ms) is parsed as local midnight. This means the fake Z from FORM-BUG-5 changes the parsing semantics even after the `Z` character itself is removed.
+
+**Save/reload confirms permanence**: the corrupted value (`2026-03-14T21:00:00` in BRT, `2026-03-15T05:30:00` in IST) persists self-consistently after save — V1's reload reconstructs the same wrong value. The record is permanently corrupted.
+
+**Cross-config transfers are also affected:**
+
+- D→C: fake Z from source treated as real UTC by target Config C (which preserves Z via `new Date()`)
+- C→D: real UTC from source stripped by target Config D; `.000` causes UTC parse which accidentally recovers the correct local time in BRT
+
+Confirmed via 9 FillinAndRelate chain tests + 3 save/reload persistence tests (Category 4, 2026-04-08).
 
 ### V1 Save/Reload Self-Consistency
 

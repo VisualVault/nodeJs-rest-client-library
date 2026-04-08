@@ -109,3 +109,4 @@ Scripts that relied on the Z being "real" were already getting wrong results —
 - All automated tests for the affected field configuration across all tested timezones
 - Verify that other field configurations are completely unaffected
 - Audit scripts that call `GetFieldValue()` on affected fields for Z-dependent parsing
+- **FillinAndRelate chains**: test D→D and D→C cross-form transfers — after fix, `GetFieldValue` should return local time without `.000Z`, eliminating the chain corruption where FORM-BUG-5 feeds into FORM-BUG-1 on the receiving form (Category 4 test suite provides 9 chain baseline tests + 3 save/reload persistence tests, 2026-04-08)

@@ -48,9 +48,9 @@ Users in UTC+ timezones store -1 day. Users in UTC- and UTC+0 are unaffected:
 
 UTC- users are safe because their local midnight is still the same UTC calendar day. For example, São Paulo midnight March 15 = UTC 03:00 March 15 — the date portion is still March 15.
 
-### 3. Every input method is affected
+### 3. Most input methods are affected
 
-This is not limited to one entry path. Calendar popup, typed input, preset defaults, `SetFieldValue()`, and form load all produce the same wrong result:
+Calendar popup, typed input, preset defaults, `SetFieldValue()`, and form load all produce the wrong result:
 
 | Input Method | Input Value                  | Stored in Mumbai (IST)  | Stored in São Paulo (BRT) |
 | ------------ | ---------------------------- | ----------------------- | ------------------------- |
@@ -58,6 +58,8 @@ This is not limited to one entry path. Calendar popup, typed input, preset defau
 | Any format   | `"03/15/2026"`               | `"2026-03-14"` (-1 day) | `"2026-03-15"` (correct)  |
 | Any format   | `"2026-03-15T00:00:00"`      | `"2026-03-14"` (-1 day) | `"2026-03-15"` (correct)  |
 | Any format   | `"2026-03-15T00:00:00.000Z"` | `"2026-03-14"` (-1 day) | `"2026-03-15"` (correct)  |
+
+**Exception: URL parameter input** (`enableQListener=true` fields) is **immune** to this bug. Date-only strings passed via URL query parameters store the correct date even in IST. The URL parameter code path in V1 uses `substring(0, indexOf('T'))` to truncate the time portion, then stores the date string directly — bypassing the `moment(input).toDate()` local-midnight parsing that causes this bug. Confirmed across all date-only configs (A, B, E, F) in both BRT and IST (Category 4, 36 tests, 2026-04-08). This makes URL parameters the safest input path for date-only values in UTC+ environments.
 
 ---
 
