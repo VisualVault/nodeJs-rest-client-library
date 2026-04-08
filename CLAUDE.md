@@ -41,6 +41,8 @@ nodeV2/
     helpers/                         # Reusable page helpers
       vv-form.js                     # Generic VV form automation (13 functions)
       vv-calendar.js                 # Calendar popup + typed input helpers
+      vv-admin.js                    # VV admin page scraping (login, RadGrid, __doPostBack, dock panels)
+      vv-sync.js                     # Shared manifest, sync diff, README generation for exports
       ws-log.js                      # Log shim for WS harness scripts (proxies to server lib)
     fixtures/                        # Shared test data and config
       vv-config.js                   # FIELD_MAP, form URLs, saved records
@@ -61,9 +63,16 @@ nodeV2/
       verify-ws10-browser.js         # Playwright verification for WS-10 (postForms vs forminstance)
       verify-format-mismatch.js      # Dashboard vs Forms format comparison
       explore-dashboard.js           # Dashboard grid capture + TZ comparison
-      export-wadnr-templates.js     # Playwright-based WADNR form template XML export
-      inventory-wadnr-fields.js     # Parse template XMLs, generate field inventory with config + script interactions
-      inventory-wadnr-scripts.js    # Parse template XMLs, generate script-level date interaction report
+      export-wadnr.js               # Unified WADNR export orchestrator (scripts, schedules, globals)
+      export-wadnr-scripts.js      # Web services export (backward-compat wrapper → components/scripts.js)
+      export-wadnr-globals.js      # Global functions export (FormViewer runtime introspection)
+      export-wadnr-templates.js    # Playwright-based WADNR form template XML export
+      components/                   # Per-component export modules for export-wadnr.js
+        scripts.js                  # outsideprocessadmin: API metadata + dock panel source extraction
+        schedules.js                # scheduleradmin: grid scraping for schedule config
+        globals.js                  # FormViewer: VV.Form.Global runtime introspection
+      inventory-wadnr-fields.js    # Parse template XMLs, generate field inventory with config + script interactions
+      inventory-wadnr-scripts.js   # Parse template XMLs, generate script-level date interaction report
     date-handling/                   # Date-handling test specs (1 per category + dashboard specs)
   docs/                              # Shared documentation
     architecture/                    # Platform architecture, component diagrams, data flow
@@ -87,6 +96,10 @@ nodeV2/
         bug-analysis/                # Case studies mapping real bugs to investigation findings
           case-study-124697.md       # Freshdesk #124697 — postForms time mutation (DRAFT)
         form-templates/              # Exported XML templates (77 files)
+        global-functions/            # Extracted VV.Form.Global functions (157 .js files + README)
+        web-services/                # Extracted microservice scripts (271 .js files + manifest + README)
+          scripts/                   # Individual script source files
+        schedules/                   # Scheduled service configuration (manifest + README)
     form-templates/                  # XML template analysis, generator, redesigned DateTest v2
         README.md                    # Template format docs and generator usage
         datetest-v2.xml              # Redesigned DateTest form template
@@ -232,7 +245,7 @@ npm run test:dash:regression                        # Dashboard: grid capture + 
 - `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture, save, URL param navigation
 - `helpers/vv-calendar.js` — calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input, legacy fields
 - `global-setup.js` — auto-login + create saved records via browser UI (per-TZ, cached 1h)
-- `date-handling/cat-*.spec.js` — 15 parameterized spec files (cat-1-calendar-popup, cat-1-legacy-popup, 2, 3, 4-url-params, 4-fillinrelate, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 11-cross-timezone, 12)
+- `date-handling/cat-*.spec.js` — 16 parameterized spec files (cat-1-calendar-popup, cat-1-legacy-popup, 2, 3, 4-url-params, 4-fillinrelate, 4-reload, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 11-cross-timezone, 12)
 - `date-handling/dash-*.spec.js` — 4 dashboard specs (filter, sort, export, cross-layer)
 - `date-handling/audit-bug1-tz-stripping.spec.js` — Bug #1 TZ stripping audit
 

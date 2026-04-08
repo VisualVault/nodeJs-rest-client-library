@@ -23,6 +23,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Category 4 (URL Parameters) Playwright test suite: 2 spec files (`cat-4-url-params.spec.js`, `cat-4-fillinrelate.spec.js`), 36 test-data entries, `gotoWithUrlParams()` helper in `vv-form.js`, TargetDateTest form URL in `vv-config.js`
 - `tasks/date-handling/forms-calendar/examples/fillinandrelated.js` — production FillinAndRelateForm global function example documenting the URL parameter chain pattern
 - Read-only environment guard: per-customer `readOnly` flag in `.env.json` blocks POST/PUT/DELETE at the `httpHelper` HTTP layer (`common.js`). Propagated through `authorize` → `vvClient` → all sub-APIs. POST-as-read allowlist for search and scheduledProcess endpoints. `VV_FORCE_WRITE=1` env var override
+- Unified WADNR export framework (`testing/scripts/export-wadnr.js`) — orchestrator for extracting multiple VV admin components via shared browser session. Components: `scripts` (outsideprocessadmin, 272 microservices), `schedules` (scheduleradmin, 21 scheduled services), `globals` (FormViewer runtime, 157 functions). Sync mode compares `modifyDate` from API manifests to skip unchanged items
+- `testing/helpers/vv-admin.js` — reusable VV admin page helpers: login, RadGrid pagination, `__doPostBack` triggers, dock panel extraction via AJAX response interception, generic grid column reader (`readGridRows`)
+- `testing/helpers/vv-sync.js` — shared manifest load/save/diff and README generation for all export components
+- `testing/scripts/export-wadnr-globals.js` — extracts all `VV.Form.Global` functions from WADNR FormViewer via runtime introspection (`.toString()`)
+- WADNR artifact exports: 271 web service scripts (`web-services/scripts/`), 157 global function files (`global-functions/`), 21 schedule configs (`schedules/`), cross-linked READMEs
+- Category 13 (Database Verification) test suite: 8 new TC specs + run files + summaries using REST API reads (`run-ws-test.js --action WS-2`) as alternative to direct SQL access. Key finding: API write path (`postForms`) stores dates uniformly — mixed timezone storage is Forms Angular-only
 
 ### Changed
 
