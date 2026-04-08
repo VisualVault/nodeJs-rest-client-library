@@ -161,6 +161,32 @@ As a control, Config C (`ignoreTimezone=false`) uses real UTC conversion and pro
 | FORM-BUG-6 | Same function, same code path. FORM-BUG-6 is what happens when this function receives an empty value — it returns `"Invalid Date"` instead of `""`. Both bugs are fixed by the same code change.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | FORM-BUG-7 | Independent mechanism. FORM-BUG-7 affects date-only fields; FORM-BUG-5 affects date+time fields. They never overlap on the same field.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
+### Multi-User Compound Drift (confirmed 2026-04-08)
+
+When users in **different timezones** each perform a GFV round-trip on the same Config D field, the drift from each user's timezone **accumulates**. Each user independently applies their own TZ offset via the fake Z mechanism:
+
+| Step | User | TZ          | Action         | Value After                          |
+| ---- | ---- | ----------- | -------------- | ------------------------------------ |
+| 0    | —    | —           | Initial value  | `"2026-03-15T00:00:00"`              |
+| 1    | A    | IST (+5:30) | GFV round-trip | `"2026-03-15T05:30:00"` (+5:30h)     |
+| 2    | B    | BRT (-3)    | GFV round-trip | `"2026-03-15T02:30:00"` (+2:30h net) |
+
+Production scenario: IST helpdesk sets a date → BRT admin reviews and updates via a GFV-based script → date silently shifts +2:30h from midnight to 2:30 AM. Neither user is aware the other's timezone contributes to the corruption.
+
+Confirmed by TC-11-roundtrip-cross (sequential BRT→IST→BRT) and TC-11-D-concurrent-IST-edit (concurrent user simulation) — both produced identical +2:30h net drift.
+
+### DST Spring-Forward Anomaly (confirmed 2026-04-08)
+
+On US DST transition day (March 8, 2026), the fake Z interacts with DST boundaries:
+
+1. Input `"2026-03-08T02:00:00"` — 2:00 AM doesn't exist (springs to 3:00 AM)
+2. V8 resolves to 3:00 AM PDT (UTC-7)
+3. GFV appends fake Z: `"2026-03-08T03:00:00.000Z"`
+4. SFV parses as UTC: Mar 8 03:00 UTC falls **before** the DST transition (DST starts at 10:00 UTC = 2:00 AM PST)
+5. In the pre-DST window: UTC 03:00 = PST 19:00 = **Mar 7 7:00 PM** (UTC-8, not UTC-7)
+
+Result: the round-trip crosses **both** the day boundary (Mar 8 → Mar 7) and the DST boundary (PDT → PST), producing -8h drift instead of the expected -7h (PDT). Confirmed by TC-12-dst-US-PST.
+
 ---
 
 ## Verification

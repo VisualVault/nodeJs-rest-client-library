@@ -232,7 +232,7 @@ npm run test:dash:regression                        # Dashboard: grid capture + 
 - `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture, save, URL param navigation
 - `helpers/vv-calendar.js` — calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input, legacy fields
 - `global-setup.js` — auto-login + create saved records via browser UI (per-TZ, cached 1h)
-- `date-handling/cat-*.spec.js` — 14 parameterized spec files (cat-1-calendar-popup, cat-1-legacy-popup, 2, 3, 4-url-params, 4-fillinrelate, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 12)
+- `date-handling/cat-*.spec.js` — 15 parameterized spec files (cat-1-calendar-popup, cat-1-legacy-popup, 2, 3, 4-url-params, 4-fillinrelate, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 11-cross-timezone, 12)
 - `date-handling/dash-*.spec.js` — 4 dashboard specs (filter, sort, export, cross-layer)
 - `date-handling/audit-bug1-tz-stripping.spec.js` — Bug #1 TZ stripping audit
 

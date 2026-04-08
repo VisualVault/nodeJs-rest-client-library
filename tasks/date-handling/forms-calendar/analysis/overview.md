@@ -105,7 +105,7 @@ Which bugs affect which field configuration. Based on live test results and code
 **Key patterns**:
 
 - **FORM-BUG-5**: Only Config D — requires `enableTime=true` + `ignoreTimezone=true` + `useLegacy=false`
-- **FORM-BUG-6**: Only Configs C and D when field is empty — requires `enableTime=true` + `!useLegacy`
+- **FORM-BUG-6**: Only Configs C and D when field is empty — requires `enableTime=true` + `!useLegacy`. `null` input triggers same behavior as `""` (confirmed 2026-04-08). `useLegacy=true` confirmed safe — all legacy configs return `""` correctly (TC-8-H-empty).
 - **FORM-BUG-7**: Only date-only configs (A/B/E/F, `enableTime=false`), only UTC+ timezones. BRT and UTC0 unaffected.
 - **Legacy (E–H)**: Immune to FORM-BUG-5 (`useLegacy=true` bypasses fake Z). Still vulnerable to FORM-BUG-7 on date-only fields. See [Appendix C](#appendix-c-legacy-config-eh-characterization).
 
@@ -684,6 +684,10 @@ getCalendarFieldValue(fieldDef, value) {
 
 **Workaround**: See [Part 3, items #1 and #2](#workaround-1-bug-5-use-uselegacytrue-or-gdoc).
 
+**Multi-user compound drift (confirmed 2026-04-08)**: When users in different TZs each do a GFV round-trip on the same record, drift accumulates: IST user (+5:30h) → BRT user (-3h) = net +2:30h from original midnight. Production scenario for multi-TZ organizations. See TC-11-roundtrip-cross, TC-11-D-concurrent-IST-edit.
+
+**DST spring-forward anomaly (confirmed 2026-04-08)**: On US DST transition day (Mar 8), V8 advances non-existent 2AM→3AM PDT. Fake Z `"T03:00:00.000Z"` lands in pre-DST window (UTC 03:00 < DST start at UTC 10:00) → resolves as PST Mar 7 19:00 (-8h, not PDT -7h). Crosses both day and DST boundary. See TC-12-dst-US-PST.
+
 ---
 
 ### FORM-BUG-6: GetFieldValue Returns `"Invalid Date"` for Empty Config C/D Fields
@@ -698,7 +702,9 @@ getCalendarFieldValue(fieldDef, value) {
 
 **Impact**: `GetFieldValue()` returns `"Invalid Date"` (a truthy non-empty string) instead of `""` or `null`. Any developer check `if (VV.Form.GetFieldValue('field'))` incorrectly evaluates to `true` for an empty field.
 
-**Affected Scenarios**: 8 (GetFieldValue)
+**Scope fully mapped (2026-04-08)**: Config C **throws RangeError** (`new Date("").toISOString()` → Invalid Date → `.toISOString()` throws). Config D returns **truthy string** `"Invalid Date"` (`moment("").format()` → "Invalid Date"). `null` input via SFV triggers same behavior as `""` (TC-12-null-input). Config A returns `""` correctly (TC-12-empty-Config-A — `enableTime=false` skips the buggy branch). `useLegacy=true` **confirmed safe** (TC-8-H-empty returns `""`).
+
+**Affected Scenarios**: 8 (GetFieldValue), 12 (Edge Cases — null/empty scope tests)
 
 **Workaround**: See [Part 3, item #3](#workaround-3-bug-6-invalid-date-guard).
 
@@ -728,11 +734,13 @@ getCalendarFieldValue(fieldDef, value) {
 
 **Note on Date object double-shift**: Code analysis predicts that `Date` objects undergo two local-midnight conversions in `normalizeCalValue()` (first `toISOString()`, then strip-and-reparse), producing -2 days in IST. This was **never reproduced in live testing** — all live test paths (popup, typed, SetFieldValue with strings) showed -1 day consistently. The -2 day path may only trigger when a `Date` object is directly passed to `SetFieldValue`, which was not tested in isolation.
 
-**V1 load path also affected**: `initCalendarValueV1` uses `moment(e).toDate()` for date-only saved data, URL params, and preset values — same root cause. UTC+ users get the wrong day on form load. `[CODE — confirmed in source, not independently live-tested for reload path]`
+**V1 load path — cross-TZ reload does NOT corrupt (confirmed 2026-04-08)**: Despite `initCalendarValueV1` using `moment(e).toDate()` in the code path, **cross-TZ form load preserves raw date-only values unchanged**. BRT-saved `"2026-03-15"` loaded in IST retains `"2026-03-15"` (TC-11-A-save-BRT-load-IST PASS). Also confirmed for Configs B (TC-11-B) and E/legacy (TC-11-E). The server returns the stored string as-is, and the form load path stores it without re-parsing through the buggy moment path. **FORM-BUG-7 fires at INPUT/SAVE time** (SFV, typed input, preset init), not at load time. This corrects the earlier `[CODE]` prediction.
 
 **Round-trip compounding**: In Category 9, FORM-BUG-7 causes -1 day per round-trip on date-only fields in UTC+ (9-B-IST). After 3 round-trips, a date shifts by 3 days. `[LIVE]`
 
-**Affected Scenarios**: 1, 2, 5, 7, 9 (all user-input and API paths for date-only fields)
+**GDOC round-trip double-shift (confirmed 2026-04-08)**: `GetDateObjectFromCalendar(field).toISOString()` → `SetFieldValue()` triggers a **compound -3 day shift** for date-only fields in IST. Mechanism: (1) initial SFV stores "2026-03-14" (-1 day, BUG-7), (2) GDOC ISO = "2026-03-13T18:30:00.000Z" (correct UTC for Mar 14 IST midnight), (3) SFV strips to "2026-03-13" (UTC date portion) → BUG-7 again → stores "2026-03-12". GDOC itself returns a correct Date object — the failure is in SFV's handling of the ISO Z string for date-only fields. BRT is immune (UTC- midnight = same UTC day). **GDOC round-trip is UNSAFE for date-only fields in UTC+.** See TC-9-GDOC-A-IST-1.
+
+**Affected Scenarios**: 1, 2, 5, 7, 9, 9-GDOC (all user-input and API paths for date-only fields)
 
 **Affected Configs**: A, B, E, F (`enableTime=false`)
 

@@ -37,6 +37,12 @@ The bug triggers when the field has no value. The failure mode depends on the fi
 
 This bug is not timezone-dependent — empty is empty everywhere.
 
+**`null` input (confirmed 2026-04-08):** `SetFieldValue(field, null)` normalizes to empty internally, then triggers the same Bug #6 behavior as `""`. Config D returns `"Invalid Date"` for both `null` and `""` — they are not distinct inputs for this bug (TC-12-null-input).
+
+**`useLegacy=true` confirmed safe (2026-04-08):** Config H (DateTime + ignoreTZ + legacy) returns `""` for empty fields (TC-8-H-empty). The legacy GFV path returns raw values before reaching `getCalendarFieldValue()`, bypassing both the `moment().format()` and `new Date().toISOString()` branches. All legacy configs (E, F, G, H) are immune.
+
+**Complete Bug #6 scope**: Config C **throws** (RangeError), Config D returns **truthy string** (`"Invalid Date"`), Configs A/B/E/F/G/H return `""` **correctly**.
+
 ---
 
 ## Severity: MEDIUM (Config D) / HIGH (Config C)

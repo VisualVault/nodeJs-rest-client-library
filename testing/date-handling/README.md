@@ -1,12 +1,12 @@
 # Date-Handling Playwright Test Suite
 
-Automated regression tests for VisualVault Forms calendar field date-handling behavior. Verifies how dates are stored, transformed, and returned across 8 field configurations and 4 timezones (BRT, IST, UTC0, PST).
+Automated regression tests for VisualVault Forms calendar field date-handling behavior. Verifies how dates are stored, transformed, and returned across 8 field configurations and 5 timezones (BRT, IST, UTC0, PST, JST).
 
 ## Why This Exists
 
 The VisualVault platform has **7 confirmed date-handling bugs** affecting how calendar fields store and return dates depending on field configuration and user timezone. This test suite:
 
-- Runs the same scenarios across BRT (UTC-3), IST (UTC+5:30), UTC+0, and PST/PDT (UTC-8/-7) to expose timezone-dependent bugs
+- Runs the same scenarios across BRT (UTC-3), IST (UTC+5:30), UTC+0, PST/PDT (UTC-8/-7), and JST (UTC+9) to expose timezone-dependent bugs
 - Covers ~242 test slots across 13 categories (popup, typed input, reload, SetFieldValue, GetFieldValue, round-trip, etc.)
 - Produces both human-readable test documentation (in `tasks/date-handling/`) and reusable Playwright specs (here)
 
@@ -80,6 +80,7 @@ Shared config:
 | `cat-8b-getdateobject.spec.js`    | Category 8B — GetDateObjectFromCalendar return tests                                    |
 | `cat-9-gfv-roundtrip.spec.js`     | Category 9 — GFV round-trip drift tests (SetFieldValue → GetFieldValue → SetFieldValue) |
 | `cat-9-gdoc-roundtrip.spec.js`    | Category 9-GDOC — GDOC round-trip tests (SetFieldValue → GetDateObject → SetFieldValue) |
+| `cat-11-cross-timezone.spec.js`   | Category 11 — cross-timezone reload, multi-user compound drift, TZ spectrum tests       |
 | `cat-12-edge-cases.spec.js`       | Category 12 — edge case and boundary condition tests                                    |
 | `audit-bug1-tz-stripping.spec.js` | FORM-BUG-1 audit — independent Playwright verification of parseDateString() Z-stripping |
 | `dash-filter.spec.js`             | DB-5 — dashboard SQL filter tests (WHERE clause on date fields)                         |
@@ -125,14 +126,15 @@ Each config also has a `enableInitialValue` variant (for Preset Date / Current D
 
 ## Timezone Projects
 
-Tests run across 4 timezone contexts to expose timezone-dependent bugs:
+Tests run across 5 timezone contexts to expose timezone-dependent bugs:
 
-| Project | IANA Name           | Offset   | Why                                                                                                                    |
-| ------- | ------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
-| BRT     | America/Sao_Paulo   | UTC-3    | **UTC- control**: local midnight is same calendar day in UTC. Most bugs hidden.                                        |
-| IST     | Asia/Calcutta       | UTC+5:30 | **UTC+ exposure**: local midnight is previous day in UTC. FORM-BUG-7 visible. Non-integer offset stress-tests parsing. |
-| UTC0    | Etc/GMT             | UTC+0    | **Boundary control**: local = UTC. Verifies bugs are timezone-dependent, not universal.                                |
-| PST     | America/Los_Angeles | UTC-8/-7 | **DST exposure**: PDT (UTC-7) active March–November. Tests DST-sensitive edge cases.                                   |
+| Project | IANA Name           | Offset   | Why                                                                                                                                                           |
+| ------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BRT     | America/Sao_Paulo   | UTC-3    | **UTC- control**: local midnight is same calendar day in UTC. Most bugs hidden.                                                                               |
+| IST     | Asia/Calcutta       | UTC+5:30 | **UTC+ exposure**: local midnight is previous day in UTC. FORM-BUG-7 visible. Non-integer offset stress-tests parsing.                                        |
+| UTC0    | Etc/GMT             | UTC+0    | **Boundary control**: local = UTC. Verifies bugs are timezone-dependent, not universal.                                                                       |
+| PST     | America/Los_Angeles | UTC-8/-7 | **DST exposure**: PDT (UTC-7) active March–November. Tests DST-sensitive edge cases.                                                                          |
+| JST     | Asia/Tokyo          | UTC+9    | **Large UTC+ offset**: largest positive offset tested. Verifies drift proportional to offset. CLI-only (`tz-jst.json`) — not in Playwright runner config yet. |
 
 Playwright's `timezoneId` context option simulates these timezones at the browser level — no system timezone changes or Chrome restarts needed. `new Date().toString()` inside the page returns the simulated timezone.
 
