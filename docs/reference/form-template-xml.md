@@ -152,6 +152,14 @@ Groups can target built-in form controls (SaveButton, tabs, etc.) using well-kno
 
 Pattern: `00000001-0000-0000-0000-e1000000f0XX`. These are referenced in `<FieldMember xsi:type="FormControlFieldMember">` entries within group field collections.
 
+A separate built-in GUID is used as the `ControlId` target for `onDataLoad` (EventId 16) script assignments:
+
+| GUID                                   | Purpose           |
+| -------------------------------------- | ----------------- |
+| `00000001-0000-0000-0000-e0000000f010` | onDataLoad target |
+
+Pattern: `e0000000f010` (note: `e0` prefix, not `e1` like the form controls above).
+
 ---
 
 ## Script Library
@@ -183,8 +191,21 @@ Bind scripts to controls and events:
 <FormScriptAssignment>
     <ScriptItemId>...</ScriptItemId>     <!-- References FormScriptItem -->
     <ControlId>...</ControlId>           <!-- Field GUID to bind to -->
-    <EventId>4</EventId>                 <!-- 1=onChange, 3=onBlur, 4=onClick, 15=form-level -->
+    <EventId>4</EventId>                 <!-- See EventId table below -->
 </FormScriptAssignment>
+```
+
+#### EventId Reference
+
+| EventId | Event      | Typical handler signature            | Notes                                                                                        |
+| :-----: | ---------- | ------------------------------------ | -------------------------------------------------------------------------------------------- |
+|   `1`   | onChange   | `event, control`                     | Dropdown selection, checkbox toggle, field value change                                      |
+|   `3`   | onBlur     | `calendarObject` or `event, control` | Calendar fields receive `calendarObject`; text fields receive `event, control`               |
+|   `4`   | onClick    | `event, control`                     | Button click (most common)                                                                   |
+|  `10`   | (unknown)  | —                                    | Observed in WADNR `Communications-Log` template; needs investigation                         |
+|  `15`   | formLevel  | —                                    | Form-level validation/logic (not bound to a specific control)                                |
+|  `16`   | onDataLoad | `event`                              | Runs after form data loads; bound to built-in control `00000001-0000-0000-0000-e0000000f010` |
+
 ```
 
 ### Script Versioning
@@ -200,3 +221,4 @@ Template exports may contain multiple versions of the same script with `_0`, `_1
 - Null values use `xsi:nil="true"`: `<ObjectProperty xsi:nil="true" />`
 - GUIDs use lowercase hex with hyphens: `7f7b433e-f36b-1410-896b-005f6a77cdf8`
 - Zero GUID (`00000000-0000-0000-0000-000000000000`) indicates "not set" / null reference
+```

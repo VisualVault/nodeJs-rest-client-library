@@ -305,7 +305,9 @@ Controls the V1/V2 code path switch and provides shared date functions.
 
 ## `VV.Form.Global` — Script Library Functions
 
-User-defined helper functions loaded from the form template's `scriptLibrary` config. These are NOT platform methods — they are customer/template-specific. The DateTest template includes:
+User-defined helper functions loaded from the site-level script library. These are NOT platform methods — they are customer/site-specific and vary between environments. The functions below were catalogued from the DateTest template (demo) and WADNR template exports.
+
+### Demo Environment (DateTest)
 
 | Function                                                           | Params | Description                                                                                                                                                                                                               |
 | ------------------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -333,6 +335,35 @@ User-defined helper functions loaded from the form template's `scriptLibrary` co
 | `LoadBootstrapCSS()`                                               | 0      | Loads Bootstrap CSS into the form                                                                                                                                                                                         |
 | `LoadModalSettings()`                                              | 0      | Loads modal dialog settings                                                                                                                                                                                               |
 | `SetupReg()`                                                       | 0      | Setup/registration helper                                                                                                                                                                                                 |
+
+### WADNR Environment (fpOnline)
+
+Global functions discovered from WADNR template XML analysis (77 templates, 3560 scripts). Implementations are site-level — not in template XML. Full usage counts in [`wadnr-impact/script-inventory.md`](../../tasks/date-handling/wadnr-impact/script-inventory.md).
+
+**Date-related** (implementations unknown — flagged for investigation):
+
+| Function                                                           | Templates | Description                                                                                                                                                            |
+| ------------------------------------------------------------------ | :-------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GetDateUTC()`                                                     |     4     | Returns a UTC date string. Used to set `Date Created` / `Date Completed` on Task form. Format unknown — if ISO+Z, triggers normalizeCalValue shift on Config D fields. |
+| `CentralDateValidation(value, type, compValue, compUnit, compQty)` |     3     | Date validation with comparison logic (same signature as demo env).                                                                                                    |
+| `FormatDateTextField()`                                            |     2     | Formats a date text field. Parameters and behavior unknown.                                                                                                            |
+| `FormatDateFields()`                                               |     2     | Formats multiple date fields. Parameters and behavior unknown.                                                                                                         |
+| `GetCurrentDate()`                                                 |     1     | Returns current date. Format unknown.                                                                                                                                  |
+
+**High-usage utilities** (top 10 by template count):
+
+| Function               | Templates | Description                                     |
+| ---------------------- | :-------: | ----------------------------------------------- |
+| `CloseAndUnlockForm`   |    77     | Closes form and unlocks it (all templates)      |
+| `DisplayModalLoad`     |    77     | Shows loading modal (all templates)             |
+| `DisplayModal`         |    58     | Shows a modal dialog (SweetAlert-style)         |
+| `CentralValidation`    |    52     | Field value validation                          |
+| `ValidationModal`      |    50     | Shows validation error summary                  |
+| `FillinAndRelateForm`  |    36     | Creates related form records with field copying |
+| `isNullEmptyUndefined` |    36     | Null/empty/undefined check                      |
+| `CentralMessages`      |    32     | Centralized message handling                    |
+| `RefreshFormElements`  |    26     | Refreshes form UI elements                      |
+| `GetCurrentRoles`      |    23     | Returns current user's roles                    |
 
 ---
 
