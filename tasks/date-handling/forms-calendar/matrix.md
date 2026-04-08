@@ -44,7 +44,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 1. Calendar Popup         |   20    |    4    |   16   |    0    |    0    |    0    |   0   |
 | 2. Typed Input            |   16    |    8    |   8    |    0    |    0    |    0    |   0   |
 | 3. Server Reload          |   18    |   10    |   8    |    0    |    0    |    0    |   0   |
-| 4. URL Parameters         |   36    |   36    |   0    |    0    |    0    |    0    |   0   |
+| 4. URL Parameters         |   39    |   39    |   0    |    0    |    0    |    0    |   0   |
 | 5. Preset Date            |   18    |   11    |   7    |    0    |    0    |    0    |   0   |
 | 6. Current Date           |   15    |   13    |   2    |    0    |    0    |    0    |   0   |
 | 7. SetFieldValue formats  |   39    |   23    |   16   |    0    |    0    |    0    |   0   |
@@ -216,6 +216,16 @@ Simulates production `FillinAndRelateForm` pattern: source GFV output → URL pa
 | 4-FAR-CD-BRT |   C    |   D    | BRT | `2026-03-15T03:00:00.000Z` (real UTC) | `2026-03-15T00:00:00` | `2026-03-15T00:00:00.000Z` | `2026-03-15T00:00:00` | `2026-03-15T00:00:00.000Z` | PASS   | 2026-04-08 |
 | 4-FAR-CA-BRT |   C    |   A    | BRT | `2026-03-15T03:00:00.000Z` (real UTC) | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 |
 | 4-FAR-CA-IST |   C    |   A    | IST | `2026-03-14T18:30:00.000Z` (real UTC) | `2026-03-14`          | `2026-03-14`               | `2026-03-14`          | `2026-03-14`               | PASS   | 2026-04-08 |
+
+### 4C — Save/Reload Persistence Tests
+
+Verify URL-param-sourced values persist after save + full page reload. Creates actual TargetDateTest records in vvdemo.
+
+| Test ID             | Config | TZ  | URL Param Value                        | Expected Post-Reload Raw | Expected Post-Reload API   | Actual Post-Reload Raw | Actual Post-Reload API     | Status | Run Date   |
+| ------------------- | :----: | :-: | -------------------------------------- | ------------------------ | -------------------------- | ---------------------- | -------------------------- | ------ | ---------- |
+| 4-A-isoT-BRT-reload |   A    | BRT | `2026-03-15T00:00:00`                  | `2026-03-15`             | `2026-03-15`               | `2026-03-15`           | `2026-03-15`               | PASS   | 2026-04-08 |
+| 4-D-z-BRT-reload    |   D    | BRT | `2026-03-15T00:00:00.000Z`             | `2026-03-14T21:00:00`    | `2026-03-14T21:00:00.000Z` | `2026-03-14T21:00:00`  | `2026-03-14T21:00:00.000Z` | PASS   | 2026-04-08 |
+| 4-FAR-DD-BRT-reload |  D→D   | BRT | Source GFV: `...T00:00:00.000Z` (fake) | `2026-03-14T21:00:00`    | `2026-03-14T21:00:00.000Z` | `2026-03-14T21:00:00`  | `2026-03-14T21:00:00.000Z` | PASS   | 2026-04-08 |
 
 ---
 
