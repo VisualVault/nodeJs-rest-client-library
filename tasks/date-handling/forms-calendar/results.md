@@ -2032,3 +2032,24 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 **Key outcomes**: 1 FAIL. +9h drift confirmed exactly as predicted. Completes Bug #5 TZ characterization.
 
 - 2026-04-08 [TC-11-load-Tokyo Run 1](runs/tc-11-load-Tokyo-run-1.md) — JST — FAIL — Bug #5 +9h drift (largest positive, completes TZ spectrum)
+
+## Session 2026-04-08 (Cat 11 BRT→IST concurrent edit)
+
+**Purpose**: Test compound Bug #5 drift in BRT→IST direction — reverse of tc-11-D-concurrent-IST-edit.
+**Key outcomes**: 1 FAIL. Same +2:30h net drift as IST→BRT. BRT-first crosses day boundary in intermediate state (Mar 15 → Mar 14).
+
+- 2026-04-08 [TC-11-concurrent-edit Run 1](runs/tc-11-concurrent-edit-run-1.md) — BRT+IST — FAIL — BRT→IST compound: -3h (day boundary) then +5:30h = +2:30h net drift
+
+## Session 2026-04-08 (Cat 13 Database Verification via API)
+
+**Purpose**: Verify raw DB storage via REST API reads — cross-TZ comparison, config comparison, preset vs user-input, API write path uniformity, query consistency.
+**Key outcomes**: 2 PASS, 4 FAIL. Mixed timezone storage confirmed at DB level. API write path stores uniformly (no C/D divergence). BUG-7 visible in IST-saved records. Date queries miss IST data.
+
+- 2026-04-08 [TC-13-B-storage Run 1](runs/tc-13-B-storage-run-1.md) — BRT — PASS — Config A = Config B (ignoreTZ no effect on date-only)
+- 2026-04-08 [TC-13-ws-input Run 1](runs/tc-13-ws-input-run-1.md) — BRT — PASS — API write path stores all configs uniformly (no C/D divergence)
+- 2026-04-08 [TC-13-cross-tz-save Run 1](runs/tc-13-cross-tz-save-run-1.md) — BRT+IST — FAIL — BUG-7: IST Config A stores Mar 14 instead of Mar 15
+- 2026-04-08 [TC-13-query-consistency Run 1](runs/tc-13-query-consistency-run-1.md) — BRT — FAIL — Date query misses IST records (BUG-7 storage)
+- 2026-04-08 [TC-13-C-vs-D-storage Run 1](runs/tc-13-C-vs-D-storage-run-1.md) — BRT — FAIL — Browser: C=T03:00 (UTC), D=T00:00 (local); API: C=D
+- 2026-04-08 [TC-13-preset-vs-user-input Run 1](runs/tc-13-preset-vs-user-input-run-1.md) — BRT+IST — FAIL — Preset stores UTC (T03:00), user-input stores local (T00:00)
+- 2026-04-08 [TC-13-after-roundtrip Run 1](runs/tc-13-after-roundtrip-run-1.md) — BRT — FAIL — Bug #5 drift -3h persists to DB after 1 trip (DateTest-001919)
+- 2026-04-08 [TC-13-multi-roundtrip-db Run 1](runs/tc-13-multi-roundtrip-db-run-1.md) — BRT — FAIL — 8 trips = -24h (full day lost) persists to DB (DateTest-001920)
