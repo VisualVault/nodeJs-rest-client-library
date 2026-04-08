@@ -179,21 +179,338 @@ function assessField(fieldName, configId, enableTime) {
     return { likelyModel: 'Uncertain', match: '⚠️', reason: 'Cannot determine intended model from name' };
 }
 
+// ─── Script Analysis ─────────────────────────────────────────────────────────
+
+const EVENT_NAMES = {
+    1: 'onChange',
+    3: 'onBlur',
+    4: 'onClick',
+    15: 'formLevel',
+    16: 'onDataLoad',
+};
+
+/**
+ * Extract scripts and their assignments from a parsed XML document.
+ * Returns a Map of scriptId → { name, code, type, assignments[] }
+ */
+function extractScripts(doc) {
+    const scripts = new Map();
+    const scriptItems = doc?.FormEntity?.ScriptLibrary?.FormScriptItem;
+    if (!scriptItems) return scripts;
+    const itemList = Array.isArray(scriptItems) ? scriptItems : [scriptItems];
+    for (const item of itemList) {
+        scripts.set(item.ScriptItemId, {
+            name: item.Name || '(unnamed)',
+            code: String(item.Script || ''),
+            type: item.ScriptItemType || '',
+            assignments: [],
+        });
+    }
+    return scripts;
+}
+
+/**
+ * Resolve script assignments to control names using the control map.
+ */
+function resolveAssignments(doc, scripts, controlMap) {
+    const assignments = doc?.FormEntity?.ScriptAssignments?.FormScriptAssignment;
+    if (!assignments) return;
+    const assignList = Array.isArray(assignments) ? assignments : [assignments];
+    for (const assign of assignList) {
+        const script = scripts.get(assign.ScriptItemId);
+        if (!script) continue;
+        const control = controlMap.get(assign.ControlId);
+        const eventId = Number(assign.EventId) || 0;
+        script.assignments.push({
+            controlName: control ? control.name : assign.ControlId,
+            eventName: EVENT_NAMES[eventId] || `event-${eventId}`,
+        });
+    }
+}
+
+/**
+ * Analyze a script's code for all date-relevant interactions.
+ * Returns {
+ *   reads: string[],           — explicit GetFieldValue field names
+ *   writes: string[],          — explicit SetFieldValue field names
+ *   webServices: string[],     — WS names called
+ *   globals: string[],         — VV.Form.Global.X function names
+ *   bulkRead: boolean,         — uses getFormDataCollection (sends ALL fields to WS)
+ *   rawReads: string[],        — getValueObjectValue field names (raw access)
+ *   fillinRelate: boolean,     — calls FillinAndRelateForm (copies fields to new records)
+ *   copyFields: boolean,       — calls CopyFieldValues or SetFieldValuesFromObj
+ *   formSave: boolean,         — calls DoAjaxFormSave (persists in-memory values)
+ *   dateApis: string[],        — date manipulation APIs used (new Date, toISOString, moment, etc.)
+ * }
+ */
+function analyzeScriptCode(code) {
+    const reads = new Set();
+    const writes = new Set();
+    const webServices = new Set();
+    const globals = new Set();
+    const rawReads = new Set();
+    const dateApis = new Set();
+
+    if (!code) {
+        return {
+            reads: [],
+            writes: [],
+            webServices: [],
+            globals: [],
+            rawReads: [],
+            bulkRead: false,
+            fillinRelate: false,
+            copyFields: false,
+            formSave: false,
+            dateApis: [],
+        };
+    }
+
+    let m;
+
+    // Explicit GetFieldValue
+    const gfvRe = /GetFieldValue\s*\(\s*['"](.+?)['"]\s*\)/g;
+    while ((m = gfvRe.exec(code)) !== null) reads.add(m[1]);
+
+    // Explicit SetFieldValue
+    const sfvRe = /SetFieldValue\s*\(\s*['"](.+?)['"]\s*/g;
+    while ((m = sfvRe.exec(code)) !== null) writes.add(m[1]);
+
+    // Raw value access: getValueObjectValue
+    const rawRe = /getValueObjectValue\s*\(\s*['"](.+?)['"]\s*\)/g;
+    while ((m = rawRe.exec(code)) !== null) rawReads.add(m[1]);
+
+    // GetDateObjectFromCalendar — returns JS Date object for calendar field
+    const gdocRe = /GetDateObjectFromCalendar\s*\(\s*['"](.+?)['"]\s*\)/g;
+    while ((m = gdocRe.exec(code)) !== null) reads.add(m[1]);
+
+    // Web service names
+    const wsRe1 = /scripts\?name=(\w+)/g;
+    while ((m = wsRe1.exec(code)) !== null) webServices.add(m[1]);
+    const wsRe2 = /(?:webServiceName|websvcName|wsName)\s*=\s*['"](\w+)['"]/g;
+    while ((m = wsRe2.exec(code)) !== null) webServices.add(m[1]);
+
+    // Global functions
+    const globalRe = /VV\.Form\.Global\.(\w+)/g;
+    while ((m = globalRe.exec(code)) !== null) globals.add(m[1]);
+
+    // Bulk field collection (sends ALL fields to WS)
+    const bulkRead = /getFormDataCollection\s*\(/.test(code);
+
+    // FillinAndRelateForm (copies field values to related records)
+    const fillinRelate = /FillinAndRelateForm|FillAndRelateForm|FillAndRelate\w+|FillinAndRelate\w+/i.test(code);
+
+    // CopyFieldValues / SetFieldValuesFromObj
+    const copyFields = /CopyFieldValues|SetFieldValuesFromObj/i.test(code);
+
+    // DoAjaxFormSave (persists in-memory values — relevant for FORM-BUG-1 load shift)
+    const formSave = /DoAjaxFormSave\s*\(/.test(code);
+
+    // Date manipulation APIs
+    if (/new\s+Date\s*\(/.test(code)) dateApis.add('new Date()');
+    if (/\.toISOString\s*\(/.test(code)) dateApis.add('toISOString()');
+    if (/\.toLocaleString\s*\(/.test(code)) dateApis.add('toLocaleString()');
+    if (/\bmoment\s*\(/.test(code)) dateApis.add('moment()');
+    if (/\bdayjs\s*\(/.test(code)) dateApis.add('dayjs()');
+    if (/Date\.parse\s*\(/.test(code)) dateApis.add('Date.parse()');
+    if (/\.getTime\s*\(/.test(code)) dateApis.add('getTime()');
+    if (/\.getFullYear\s*\(|\.getMonth\s*\(|\.getDate\s*\(/.test(code)) dateApis.add('Date getters');
+
+    return {
+        reads: [...reads],
+        writes: [...writes],
+        webServices: [...webServices],
+        globals: [...globals],
+        rawReads: [...rawReads],
+        bulkRead,
+        fillinRelate,
+        copyFields,
+        formSave,
+        dateApis: [...dateApis],
+    };
+}
+
+/**
+ * Build a per-field script interaction map for a template.
+ * Returns Map<fieldName, {
+ *   reads: [{script, trigger}],
+ *   writes: [{script, trigger, source}],
+ *   rawReads: [{script}],
+ *   bulkReads: [{script, webServices}],  — scripts using getFormDataCollection that also call a WS
+ *   fillinRelate: [{script}],
+ *   copyFields: [{script}],
+ *   formSaves: [{script}],               — scripts that save the form (persists load-shifted values)
+ *   dateApis: [{script, apis}],           — scripts using date manipulation near field operations
+ * }>
+ */
+function buildFieldScriptMap(scripts, calendarFieldNames) {
+    const fieldMap = new Map();
+    for (const name of calendarFieldNames) {
+        fieldMap.set(name, {
+            reads: [],
+            writes: [],
+            rawReads: [],
+            bulkReads: [],
+            fillinRelate: [],
+            copyFields: [],
+            formSaves: [],
+            dateApis: [],
+        });
+    }
+
+    // Track template-level patterns that affect ALL calendar fields
+    const templateLevelPatterns = {
+        bulkReadScripts: [], // scripts using getFormDataCollection
+        fillinRelateScripts: [], // scripts calling FillinAndRelateForm
+        copyFieldsScripts: [], // scripts calling CopyFieldValues
+    };
+
+    for (const [, script] of scripts) {
+        const analysis = analyzeScriptCode(script.code);
+        const trigger =
+            script.assignments.length > 0
+                ? script.assignments.map((a) => `${a.controlName}:${a.eventName}`).join(', ')
+                : '';
+
+        // Explicit reads
+        for (const fieldName of analysis.reads) {
+            if (!fieldMap.has(fieldName)) continue;
+            fieldMap.get(fieldName).reads.push({ script: script.name, trigger });
+        }
+
+        // Raw reads
+        for (const fieldName of analysis.rawReads) {
+            if (!fieldMap.has(fieldName)) continue;
+            fieldMap.get(fieldName).rawReads.push({ script: script.name });
+        }
+
+        // Explicit writes
+        for (const fieldName of analysis.writes) {
+            if (!fieldMap.has(fieldName)) continue;
+            let source = 'inline';
+            if (analysis.webServices.length > 0) source = `WS: ${analysis.webServices.join(', ')}`;
+            else if (analysis.globals.some((g) => /date|time/i.test(g)))
+                source = `Global: ${analysis.globals.filter((g) => /date|time/i.test(g)).join(', ')}`;
+            fieldMap.get(fieldName).writes.push({ script: script.name, trigger, source });
+        }
+
+        // Template-level: bulkRead (getFormDataCollection) — affects ALL fields
+        if (analysis.bulkRead && analysis.webServices.length > 0) {
+            templateLevelPatterns.bulkReadScripts.push({
+                script: script.name,
+                webServices: [...analysis.webServices],
+            });
+        }
+
+        // Template-level: FillinAndRelateForm
+        if (analysis.fillinRelate) {
+            templateLevelPatterns.fillinRelateScripts.push({ script: script.name });
+        }
+
+        // Template-level: CopyFieldValues
+        if (analysis.copyFields) {
+            templateLevelPatterns.copyFieldsScripts.push({ script: script.name });
+        }
+
+        // Date API usage — attach to fields that this script explicitly touches
+        if (analysis.dateApis.length > 0) {
+            const touchedFields = new Set([...analysis.reads, ...analysis.writes]);
+            for (const fieldName of touchedFields) {
+                if (!fieldMap.has(fieldName)) continue;
+                fieldMap.get(fieldName).dateApis.push({ script: script.name, apis: analysis.dateApis });
+            }
+        }
+    }
+
+    // Apply template-level patterns to ALL calendar fields
+    for (const name of calendarFieldNames) {
+        const entry = fieldMap.get(name);
+        entry.bulkReads = templateLevelPatterns.bulkReadScripts;
+        entry.fillinRelate = templateLevelPatterns.fillinRelateScripts;
+        entry.copyFields = templateLevelPatterns.copyFieldsScripts;
+    }
+
+    return fieldMap;
+}
+
+/**
+ * Generate an auto-comment for a field based on its config, assessment, and script interactions.
+ */
+function generateComment(field, scriptInfo) {
+    const parts = [];
+
+    // FORM-BUG-6 awareness: check if any read script's code checks for "Invalid Date"
+    if (field._invalidDateCheck) {
+        parts.push('Script checks for "Invalid Date" (FORM-BUG-6 awareness)');
+    }
+
+    // Config D + written by WS
+    if (field.configId === 'D') {
+        const wsWrites = scriptInfo.writes.filter((w) => w.source.startsWith('WS:'));
+        if (wsWrites.length > 0) {
+            parts.push(`Value set from server WS — format unknown, may trigger normalizeCalValue shift`);
+        }
+        const globalWrites = scriptInfo.writes.filter((w) => w.source.startsWith('Global:'));
+        if (globalWrites.length > 0) {
+            parts.push(`Value set from ${globalWrites[0].source} — implementation unknown`);
+        }
+    }
+
+    // Round-trip detection (GFV/GDOC → SFV in same script)
+    if (scriptInfo.reads.length > 0 && scriptInfo.writes.length > 0) {
+        const readScripts = new Set(scriptInfo.reads.map((r) => r.script));
+        const writeScripts = new Set(scriptInfo.writes.map((w) => w.script));
+        const overlap = [...readScripts].filter((s) => writeScripts.has(s));
+        if (overlap.length > 0) {
+            parts.push(`GFV→SFV round-trip in: ${overlap.join(', ')}`);
+            if (field.configId === 'D') parts.push('⚠️ FORM-BUG-5 drift risk');
+        }
+    }
+
+    // Bulk read: getFormDataCollection sends ALL field values to a WS
+    if (scriptInfo.bulkReads.length > 0) {
+        const wsNames = scriptInfo.bulkReads.flatMap((b) => b.webServices);
+        parts.push(`Bulk-sent to WS via getFormDataCollection (${wsNames.join(', ')})`);
+    }
+
+    // FillinAndRelateForm: copies field values to new records
+    if (scriptInfo.fillinRelate.length > 0) {
+        const scripts = scriptInfo.fillinRelate.map((f) => f.script);
+        parts.push(`Field may be copied via FillinAndRelateForm (${scripts.join(', ')})`);
+    }
+
+    // CopyFieldValues: explicit field copying
+    if (scriptInfo.copyFields.length > 0) {
+        const scripts = scriptInfo.copyFields.map((f) => f.script);
+        parts.push(`Field may be copied via CopyFieldValues (${scripts.join(', ')})`);
+    }
+
+    // Date API usage on scripts that touch this field
+    if (scriptInfo.dateApis.length > 0) {
+        const apis = [...new Set(scriptInfo.dateApis.flatMap((d) => d.apis))];
+        parts.push(`Date APIs in touching scripts: ${apis.join(', ')}`);
+    }
+
+    return parts.join('. ');
+}
+
 function parseTemplate(filePath) {
     const xml = fs.readFileSync(filePath, 'utf-8');
     const parser = new XMLParser({
         ignoreAttributes: false,
         attributeNamePrefix: '@_',
-        isArray: (name) => name === 'BaseField',
+        isArray: (name) => ['BaseField', 'FormScriptItem', 'FormScriptAssignment', 'FormPage'].includes(name),
     });
     const doc = parser.parse(xml);
 
     // Navigate: FormEntity > FormPages > FormPage > FieldList > BaseField[]
     const formPages = doc?.FormEntity?.FormPages?.FormPage;
-    if (!formPages) return [];
+    if (!formPages) return { fields: [], scriptMap: new Map() };
 
     const pageList = Array.isArray(formPages) ? formPages : [formPages];
     const fields = [];
+    const controlMap = new Map();
+    const calendarFieldNames = [];
 
     for (const page of pageList) {
         const baseFields = page?.FieldList?.BaseField;
@@ -201,16 +518,20 @@ function parseTemplate(filePath) {
         const fieldList = Array.isArray(baseFields) ? baseFields : [baseFields];
 
         for (const field of fieldList) {
-            const fieldType = field['@_xsi:type'] || '';
+            const fieldType = field['@_xsi:type'] || field.FieldType || '';
+            const id = field.ID;
+            const name = field.Name || '(unnamed)';
+            controlMap.set(id, { name, fieldType });
+
             if (fieldType !== 'FieldCalendar3') continue;
 
             const enableTime = toBool(field.EnableTime);
             const ignoreTimezone = toBool(field.IgnoreTimezone);
             const useLegacy = toBool(field.UseLegacy);
             const config = getConfig(enableTime, ignoreTimezone, useLegacy);
-            const name = field.Name || '(unnamed)';
             const assessment = assessField(name, config.id, enableTime);
 
+            calendarFieldNames.push(name);
             fields.push({
                 name,
                 enableTime,
@@ -227,7 +548,30 @@ function parseTemplate(filePath) {
         }
     }
 
-    return fields;
+    // Extract and analyze scripts
+    const scripts = extractScripts(doc);
+    resolveAssignments(doc, scripts, controlMap);
+    const scriptMap = buildFieldScriptMap(scripts, calendarFieldNames);
+
+    // Detect "Invalid Date" checks in scripts that read calendar fields
+    for (const [, script] of scripts) {
+        if (/Invalid Date/i.test(script.code)) {
+            const analysis = analyzeScriptCode(script.code);
+            for (const fieldName of analysis.reads) {
+                const f = fields.find((ff) => ff.name === fieldName);
+                if (f) f._invalidDateCheck = true;
+            }
+        }
+    }
+
+    // Generate comments
+    for (const field of fields) {
+        const si = scriptMap.get(field.name) || { reads: [], writes: [] };
+        field.scriptInteractions = si;
+        field.comment = generateComment(field, si);
+    }
+
+    return { fields, scriptMap };
 }
 
 function generateMarkdown(formData, configSummary, assessmentSummary) {
@@ -375,6 +719,67 @@ function generateMarkdown(formData, configSummary, assessmentSummary) {
     lines.push('---');
     lines.push('');
 
+    // Script interaction summary
+    const fieldsWithScripts = [];
+    for (const form of formData) {
+        for (const field of form.fields) {
+            const si = field.scriptInteractions || {
+                reads: [],
+                writes: [],
+                rawReads: [],
+                bulkReads: [],
+                fillinRelate: [],
+                copyFields: [],
+            };
+            if (
+                si.reads.length > 0 ||
+                si.writes.length > 0 ||
+                si.rawReads.length > 0 ||
+                si.bulkReads.length > 0 ||
+                si.fillinRelate.length > 0 ||
+                si.copyFields.length > 0
+            ) {
+                fieldsWithScripts.push({ form: form.name, ...field });
+            }
+        }
+    }
+
+    lines.push('### Script Interactions Summary');
+    lines.push('');
+    lines.push(`**${fieldsWithScripts.length} calendar fields** are referenced by form scripts.`);
+    lines.push('');
+
+    if (fieldsWithScripts.length > 0) {
+        lines.push('| Form | Field | Config | Reads | Writes | Other | Comment |');
+        lines.push('| :--- | :---- | :----: | :---- | :----- | :---- | :------ |');
+        for (const f of fieldsWithScripts) {
+            const si = f.scriptInteractions;
+            const reads = si.reads.map((r) => r.script).join(', ') || '—';
+            const writes = si.writes.map((w) => `${w.script} (${w.source})`).join(', ') || '—';
+
+            // "Other" column: bulk reads, fill&relate, copy fields, raw reads
+            const otherParts = [];
+            if (si.bulkReads.length > 0) {
+                const wsNames = si.bulkReads.flatMap((b) => b.webServices);
+                otherParts.push(`Bulk→WS: ${wsNames.join(', ')}`);
+            }
+            if (si.fillinRelate.length > 0)
+                otherParts.push(`Fill&Relate: ${si.fillinRelate.map((f) => f.script).join(', ')}`);
+            if (si.copyFields.length > 0) otherParts.push(`Copy: ${si.copyFields.map((f) => f.script).join(', ')}`);
+            if (si.rawReads.length > 0) otherParts.push(`Raw: ${si.rawReads.map((r) => r.script).join(', ')}`);
+            const other = otherParts.join('; ') || '—';
+
+            const configTag = f.configId === 'D' ? `**${f.configId}**` : f.configId;
+            lines.push(
+                `| ${f.form} | ${f.name} | ${configTag} | ${reads} | ${writes} | ${other} | ${f.comment || ''} |`
+            );
+        }
+        lines.push('');
+    }
+
+    lines.push('---');
+    lines.push('');
+
     // Per-form tables
     lines.push('## Form Templates');
     lines.push('');
@@ -382,13 +787,50 @@ function generateMarkdown(formData, configSummary, assessmentSummary) {
     for (const form of formData) {
         lines.push(`### ${form.name}`);
         lines.push('');
-        lines.push('| Field Name | Config | Likely Model | Match | Initial Value |');
-        lines.push('| :--------- | :----: | :----------- | :---: | :------------ |');
+
+        // Check if any field has script interactions
+        const hasScripts = form.fields.some((f) => {
+            if (!f.scriptInteractions) return false;
+            const si = f.scriptInteractions;
+            return (
+                si.reads.length > 0 ||
+                si.writes.length > 0 ||
+                si.rawReads.length > 0 ||
+                si.bulkReads.length > 0 ||
+                si.fillinRelate.length > 0 ||
+                si.copyFields.length > 0
+            );
+        });
+
+        if (hasScripts) {
+            lines.push('| Field Name | Config | Likely Model | Match | Initial Value | Scripts | Comment |');
+            lines.push('| :--------- | :----: | :----------- | :---: | :------------ | :------ | :------ |');
+        } else {
+            lines.push('| Field Name | Config | Likely Model | Match | Initial Value |');
+            lines.push('| :--------- | :----: | :----------- | :---: | :------------ |');
+        }
+
         for (const field of form.fields) {
             const reasonSuffix = field.reason ? ` — ${field.reason}` : '';
-            lines.push(
-                `| ${field.name} | **${field.configId}** | ${field.likelyModel} | ${field.match}${reasonSuffix} | ${field.initialValue} |`
-            );
+            const si = field.scriptInteractions || { reads: [], writes: [] };
+
+            if (hasScripts) {
+                const scriptParts = [];
+                if (si.reads.length > 0) scriptParts.push(`R: ${si.reads.map((r) => r.script).join(', ')}`);
+                if (si.writes.length > 0) scriptParts.push(`W: ${si.writes.map((w) => w.script).join(', ')}`);
+                if (si.rawReads.length > 0) scriptParts.push(`Raw: ${si.rawReads.map((r) => r.script).join(', ')}`);
+                if (si.bulkReads.length > 0) scriptParts.push(`Bulk→WS`);
+                if (si.fillinRelate.length > 0) scriptParts.push(`Fill&Relate`);
+                if (si.copyFields.length > 0) scriptParts.push(`CopyFields`);
+                const scriptsCell = scriptParts.join(' · ') || '—';
+                lines.push(
+                    `| ${field.name} | **${field.configId}** | ${field.likelyModel} | ${field.match}${reasonSuffix} | ${field.initialValue} | ${scriptsCell} | ${field.comment || ''} |`
+                );
+            } else {
+                lines.push(
+                    `| ${field.name} | **${field.configId}** | ${field.likelyModel} | ${field.match}${reasonSuffix} | ${field.initialValue} |`
+                );
+            }
         }
         lines.push('');
     }
@@ -412,7 +854,7 @@ const assessmentSummary = { '✅': 0, '⚠️': 0, '❌': 0 };
 
 for (const file of xmlFiles) {
     const filePath = path.join(TEMPLATES_DIR, file);
-    const fields = parseTemplate(filePath);
+    const { fields } = parseTemplate(filePath);
     if (fields.length === 0) continue;
 
     const formName = file.replace('.xml', '');
