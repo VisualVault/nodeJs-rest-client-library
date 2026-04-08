@@ -1956,3 +1956,79 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-08 [TC-4-E-isoT-IST Run 1](runs/tc-4-E-isoT-IST-run-1.md) — IST — PASS — Chromium confirms Config E URL Parameters stores correctly
 - 2026-04-08 [TC-4-G-z-IST Run 1](runs/tc-4-G-z-IST-run-1.md) — IST — PASS — Chromium confirms Config G URL Parameters stores correctly
 - 2026-04-08 [TC-4-H-z-IST Run 1](runs/tc-4-H-z-IST-run-1.md) — IST — PASS — Chromium confirms Config H URL Parameters stores correctly
+
+## Session 2026-04-08 (Chromium regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Chromium.
+**Key outcomes**: 3 tests documented.
+
+- 2026-04-08 [TC-4-A-isoT-BRT-reload Run 1](runs/tc-4-A-isoT-BRT-reload-run-1.md) — BRT — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-D-z-BRT-reload Run 1](runs/tc-4-D-z-BRT-reload-run-1.md) — BRT — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-FAR-DD-BRT-reload Run 1](runs/tc-4-FAR-DD-BRT-reload-run-1.md) — BRT — PASS — Chromium confirms Config D URL Parameters stores correctly
+
+## Session 2026-04-08 (Cat 12 edge cases — BRT)
+
+**Purpose**: Verify 4 remaining PENDING Category 12 edge cases: null input, empty Config A/C scope tests, Config C near-midnight round-trip control.
+**Key outcomes**: 2 PASS, 2 FAIL. Bug #6 scope fully mapped (C throws, D truthy string, A immune). Config C round-trip stable (FORM-BUG-5 is D-specific).
+
+- 2026-04-08 [TC-12-null-input Run 1](runs/tc-12-null-input-run-1.md) — BRT — FAIL — Bug #6: null triggers same "Invalid Date" as empty string
+- 2026-04-08 [TC-12-empty-Config-A Run 1](runs/tc-12-empty-Config-A-run-1.md) — BRT — PASS — Config A immune to Bug #6 (enableTime=false)
+- 2026-04-08 [TC-12-empty-Config-C Run 1](runs/tc-12-empty-Config-C-run-1.md) — BRT — FAIL — Bug #6 variant: Config C throws RangeError on empty
+- 2026-04-08 [TC-12-config-C-near-midnight Run 1](runs/tc-12-config-C-near-midnight-run-1.md) — BRT — PASS — Config C 0 drift, proves Bug #5 requires ignoreTimezone=true
+
+## Session 2026-04-08 (Cat 9-GDOC — BRT)
+
+**Purpose**: Verify GDOC round-trip stability for Config A (date-only) and Config C (DateTime) in BRT.
+**Key outcomes**: 2 PASS. GDOC round-trip safe for both configs. 9-GDOC coverage: 4/5 PASS, 1 PENDING (A-IST).
+
+- 2026-04-08 [TC-9-GDOC-A-BRT-1 Run 1](runs/tc-9-GDOC-A-BRT-1-run-1.md) — BRT — PASS — Config A date-only GDOC round-trip 0 drift
+- 2026-04-08 [TC-9-GDOC-C-BRT-1 Run 1](runs/tc-9-GDOC-C-BRT-1-run-1.md) — BRT — PASS — Config C DateTime GDOC round-trip 0 drift (same as GFV)
+
+## Session 2026-04-08 (Cat 11 — BRT)
+
+**Purpose**: Verify Config H legacy immunity to FORM-BUG-5 across multiple round-trips.
+**Key outcomes**: 1 PASS. useLegacy=true confirmed stable after 3 trips — first Cat 11 test completed.
+
+- 2026-04-08 [TC-11-H-BRT-roundtrip Run 1](runs/tc-11-H-BRT-roundtrip-run-1.md) — BRT — PASS — Config H 0 drift after 3 GFV round-trips (useLegacy=true immune to Bug #5)
+
+## Session 2026-04-08 (Cat 9-GDOC + Cat 11 cross-TZ — IST/BRT)
+
+**Purpose**: GDOC round-trip on Config A in IST + 5 cross-TZ reload tests (BRT↔IST).
+**Key outcomes**: 1 FAIL (9-GDOC-A-IST-1: compound -3d Bug #7), 5 PASS. Major finding: cross-TZ LOAD does NOT introduce corruption — FORM-BUG-7 fires at input/save time only. Matrix predictions corrected for 4 rows.
+
+- 2026-04-08 [TC-9-GDOC-A-IST-1 Run 1](runs/tc-9-GDOC-A-IST-1-run-1.md) — IST — FAIL — Double Bug #7: GDOC round-trip on date-only shifts -3 days in IST
+- 2026-04-08 [TC-11-A-save-BRT-load-IST Run 1](runs/tc-11-A-save-BRT-load-IST-run-1.md) — IST — PASS — Config A date-only preserved BRT→IST (prediction corrected)
+- 2026-04-08 [TC-11-B-save-BRT-load-IST Run 1](runs/tc-11-B-save-BRT-load-IST-run-1.md) — IST — PASS — Config B preserved BRT→IST (ignoreTZ irrelevant for load)
+- 2026-04-08 [TC-11-C-save-BRT-load-IST Run 1](runs/tc-11-C-save-BRT-load-IST-run-1.md) — IST — PASS — Config C DateTime raw preserved; GFV re-interprets in IST
+- 2026-04-08 [TC-11-E-save-BRT-load-IST Run 1](runs/tc-11-E-save-BRT-load-IST-run-1.md) — IST — PASS — Config E legacy date-only preserved (prediction corrected)
+- 2026-04-08 [TC-11-save-IST-load-BRT Run 1](runs/tc-11-save-IST-load-BRT-run-1.md) — BRT — PASS — IST→BRT load preserves raw; Config A shows pre-existing IST save Bug #7
+
+## Session 2026-04-08 (Cat 11 compound drift — IST+BRT)
+
+**Purpose**: Test compound Bug #5 drift across TZ boundaries — multi-user and cross-TZ round-trip scenarios.
+**Key outcomes**: 2 FAIL. Both produce identical +2:30h net drift (IST +5:30h then BRT -3h). Worst-case production scenario for FORM-BUG-5.
+
+- 2026-04-08 [TC-11-roundtrip-cross Run 1](runs/tc-11-roundtrip-cross-run-1.md) — IST+BRT — FAIL — BRT→IST→BRT compound: +5:30h then -3h = +2:30h net drift
+- 2026-04-08 [TC-11-D-concurrent-IST-edit Run 1](runs/tc-11-D-concurrent-IST-edit-run-1.md) — IST+BRT — FAIL — User A IST + User B BRT concurrent edit: same +2:30h net drift
+
+## Session 2026-04-08 (Cat 11 UTC+0 control)
+
+**Purpose**: Verify Bug #5 is invisible at UTC+0 — fake Z coincidentally correct.
+**Key outcomes**: 1 PASS. Confirms Bug #5 masked at zero TZ offset.
+
+- 2026-04-08 [TC-11-load-UTC0 Run 1](runs/tc-11-load-UTC0-run-1.md) — UTC+0 — PASS — Config D 0 drift at UTC+0 (fake Z coincidentally correct)
+
+## Session 2026-04-08 (Cat 11 + Cat 12 PST/PDT)
+
+**Purpose**: Test Bug #5 drift at PDT offset + DST spring-forward anomaly.
+**Key outcomes**: 2 FAIL. PDT drift is -7h (not -8h PST — DST active). DST spring-forward creates compound anomaly: V8 advances 2AM→3AM, then Bug #5 round-trip crosses day+DST boundary to Mar 7 19:00 PST.
+
+- 2026-04-08 [TC-12-dst-US-PST Run 1](runs/tc-12-dst-US-PST-run-1.md) — PDT — FAIL — DST 2AM→3AM + Bug #5 → Mar 7 19:00 PST (day+DST boundary crossed)
+- 2026-04-08 [TC-11-load-PST Run 1](runs/tc-11-load-PST-run-1.md) — PDT — FAIL — Bug #5 -7h drift (PDT, matrix corrected from -8h PST)
+
+## Session 2026-04-08 (Cat 11 JST)
+
+**Purpose**: Test Bug #5 drift at JST (UTC+9) — largest positive offset in test spectrum.
+**Key outcomes**: 1 FAIL. +9h drift confirmed exactly as predicted. Completes Bug #5 TZ characterization.
+
+- 2026-04-08 [TC-11-load-Tokyo Run 1](runs/tc-11-load-Tokyo-run-1.md) — JST — FAIL — Bug #5 +9h drift (largest positive, completes TZ spectrum)
