@@ -1,16 +1,23 @@
 /**
  * Shared environment config loader.
  *
- * Reads the root .env.json (multi-environment format) and returns a flat
- * config object for the active environment. This is the single source of
- * truth for credentials — both server-side (via app.js → global.VV_ENV)
- * and test-side (via this loader) read from the same file.
+ * Reads the root .env.json (hierarchical server → customer format) and
+ * returns a flat config object for the active server/customer combination.
+ * This is the single source of truth for credentials — both server-side
+ * (via app.js → global.VV_ENV) and test-side (via this loader) read from
+ * the same file.
  *
- * Field mapping:
+ * .env.json structure:
+ *   activeServer / activeCustomer  →  selects the target
+ *   servers.{name}.baseUrl         →  VV instance URL
+ *   servers.{name}.customers.{name}  →  credentials + config
+ *
+ * Field mapping (returned flat object):
  *   .env.json field   →  returned property  →  purpose
  *   ─────────────────────────────────────────────────────
- *   activeEnv         →  instance            "vvdemo"
- *   baseUrl           →  baseUrl, loginUrl   full VV URL
+ *   activeServer +
+ *   activeCustomer    →  instance            "vvdemo/EmanuelJofre"
+ *   baseUrl           →  baseUrl, loginUrl   full VV URL (from server level)
  *   username          →  username            human login email
  *   loginPassword     →  password            human login password
  *   clientId          →  clientId            OAuth client ID
@@ -18,6 +25,7 @@
  *   customerAlias     →  customerAlias       VV tenant
  *   databaseAlias     →  databaseAlias       VV database
  *   audience          →  audience            OAuth audience (optional)
+ *   readOnly          →  readOnly            block write operations (default: false)
  */
 const path = require('path');
 const fs = require('fs');
@@ -32,24 +40,37 @@ function loadConfig() {
     }
 
     const raw = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
-    const envName = raw.activeEnv;
-    const env = raw.environments && raw.environments[envName];
+    const serverName = raw.activeServer;
+    const customerName = raw.activeCustomer;
 
-    if (!env) {
-        throw new Error(`No environment "${envName}" found in .env.json`);
+    const server = raw.servers && raw.servers[serverName];
+    if (!server) {
+        throw new Error(`No server "${serverName}" found in .env.json`);
+    }
+
+    const customer = server.customers && server.customers[customerName];
+    if (!customer) {
+        throw new Error(`No customer "${customerName}" found under server "${serverName}" in .env.json`);
+    }
+
+    const instance = `${serverName}/${customerName}`;
+
+    if (customer.readOnly === true) {
+        console.warn(`[READ-ONLY] ${instance} is marked readOnly. Write operations will be blocked.`);
     }
 
     return {
-        instance: envName,
-        loginUrl: env.baseUrl,
-        baseUrl: env.baseUrl,
-        username: env.username,
-        password: env.loginPassword,
-        clientId: env.clientId,
-        clientSecret: env.clientSecret,
-        customerAlias: env.customerAlias,
-        databaseAlias: env.databaseAlias,
-        audience: env.audience || '',
+        instance,
+        loginUrl: server.baseUrl,
+        baseUrl: server.baseUrl,
+        username: customer.username,
+        password: customer.loginPassword,
+        clientId: customer.clientId,
+        clientSecret: customer.clientSecret,
+        customerAlias: customer.customerAlias,
+        databaseAlias: customer.databaseAlias,
+        audience: customer.audience || '',
+        readOnly: customer.readOnly === true,
     };
 }
 

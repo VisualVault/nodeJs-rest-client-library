@@ -109,6 +109,7 @@ async function main() {
     // Authenticate with VV
     const clientLibrary = require(path.join(__dirname, '..', '..', 'lib', 'VVRestApi', 'VVRestApiNodeJs', 'VVRestApi'));
     const vvAuthorize = new clientLibrary.authorize();
+    vvAuthorize.readOnly = config.readOnly || false;
 
     console.log(`Authenticating with ${config.loginUrl} as ${config.customerAlias}/${config.databaseAlias}...`);
 

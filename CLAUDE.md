@@ -126,12 +126,48 @@ This is a **microservices execution environment** — middleware between VisualV
 
 OAuth token-based via `common.js`:
 
-- All credentials live in a single root `.env.json` (gitignored, multi-environment format with `activeEnv` selector)
-- Server path: `app.js` loads `.env.json` into `global.VV_ENV`; scripts read via `getCredentials()` (client_credentials flow: `clientId`/`clientSecret`)
-- Test path: `testing/fixtures/env-config.js` loads `.env.json` and maps fields for Playwright and WS runner consumers
+- All credentials live in a single root `.env.json` (gitignored, hierarchical format: `servers.{name}.customers.{name}`)
+- Active target selected by `activeServer` + `activeCustomer` at root level
+- Server path: `app.js` resolves the active server/customer and stores in `global.VV_ENV`; scripts read via `getCredentials()` (client_credentials flow: `clientId`/`clientSecret`)
+- Test path: `testing/fixtures/env-config.js` resolves `.env.json` and returns a flat config object for Playwright and WS runner consumers
 - Direct runner (`run-ws-test.js`) and Playwright tests both read from `.env.json` via `env-config.js`
 - `common.js` handles token acquisition and auto-refresh (30s before expiry)
 - All API calls use Bearer token in Authorization header
+
+### `.env.json` structure
+
+```json
+{
+    "activeServer": "vvdemo",
+    "activeCustomer": "EmanuelJofre",
+    "servers": {
+        "vvdemo": {
+            "baseUrl": "https://vvdemo.visualvault.com",
+            "customers": {
+                "EmanuelJofre": {
+                    "customerAlias": "EmanuelJofre",
+                    "databaseAlias": "Main",
+                    "clientId": "...",
+                    "clientSecret": "...",
+                    "username": "...",
+                    "loginPassword": "...",
+                    "audience": "",
+                    "readOnly": false
+                }
+            }
+        }
+    }
+}
+```
+
+### Read-Only Environments
+
+Per-environment `"readOnly": true` in `.env.json` blocks all write operations (POST/PUT/DELETE) at the `httpHelper` HTTP layer in `common.js`. Use this for production/client environments (e.g., WADNR) that should never be modified during development or testing.
+
+- Guard enforced in `common.js::__doVvClientCallRequest()` before any HTTP mutation reaches the network
+- POST-as-read operations are allowlisted (search, scheduledProcess completion)
+- Override with `VV_FORCE_WRITE=1` env var for exceptional cases: `VV_FORCE_WRITE=1 node run-ws-test.js ...`
+- Startup warning logged when a readOnly environment is active
 
 ## Development Commands
 
