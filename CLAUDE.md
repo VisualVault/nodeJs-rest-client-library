@@ -39,7 +39,7 @@ nodeV2/
     global-setup.js                  # Auto-login + create saved records before test runs
     config/                          # Credentials, TZ configs, auth state
     helpers/                         # Reusable page helpers
-      vv-form.js                     # Generic VV form automation (11 functions)
+      vv-form.js                     # Generic VV form automation (12 functions)
       vv-calendar.js                 # Calendar popup + typed input helpers
       ws-log.js                      # Log shim for WS harness scripts (proxies to server lib)
     fixtures/                        # Shared test data and config
@@ -227,12 +227,12 @@ npm run test:dash:regression                        # Dashboard: grid capture + 
 
 **Test infrastructure** (in `testing/`):
 
-- `fixtures/vv-config.js` — form URLs, field config map (A-H), record definitions, saved records
+- `fixtures/vv-config.js` — form URLs (DateTest + TargetDateTest), field config map (A-H), record definitions, saved records
 - `fixtures/test-data.js` — all test case definitions as structured data (data-driven)
-- `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture, save
+- `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture, save, URL param navigation
 - `helpers/vv-calendar.js` — calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input, legacy fields
 - `global-setup.js` — auto-login + create saved records via browser UI (per-TZ, cached 1h)
-- `date-handling/cat-*.spec.js` — 12 parameterized spec files (cat-1, cat-1-legacy-popup, 2, 3, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 12)
+- `date-handling/cat-*.spec.js` — 14 parameterized spec files (cat-1, cat-1-legacy-popup, 2, 3, 4-url-params, 4-fillinrelate, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 12)
 - `date-handling/dash-*.spec.js` — 4 dashboard specs (filter, sort, export, cross-layer)
 
 Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)

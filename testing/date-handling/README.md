@@ -71,6 +71,8 @@ Shared config:
 | `cat-1-legacy-popup.spec.js`      | Category 1 — legacy popup tests for Configs E-H (FORM-BUG-2 audit spec)                 |
 | `cat-2-typed-input.spec.js`       | Category 2 — keyboard segment-by-segment date entry tests                               |
 | `cat-3-server-reload.spec.js`     | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                   |
+| `cat-4-url-params.spec.js`        | Category 4 — URL parameter input tests (TargetDateTest form, `enableQListener=true`)    |
+| `cat-4-fillinrelate.spec.js`      | Category 4 — FillinAndRelate chain tests (source GFV → URL encode → target form)        |
 | `cat-5-preset-date.spec.js`       | Category 5 — preset date default auto-population tests                                  |
 | `cat-6-current-date.spec.js`      | Category 6 — current date default auto-population tests                                 |
 | `cat-7-setfieldvalue.spec.js`     | Category 7 — SetFieldValue input format tests (Date obj, ISO±Z, US, epoch)              |

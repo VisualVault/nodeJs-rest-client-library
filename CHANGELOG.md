@@ -20,6 +20,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `testing/scripts/inventory-wadnr-scripts.js` — parses WADNR template XMLs for script-level analysis: date field interactions, web service calls, global function usage, round-trip detection
 - `tasks/date-handling/wadnr-impact/` — WADNR project impact analysis: 77 templates exported (12 failed server-side), 35 contain calendar fields (137 total), configuration assessment with 8 likely misconfigurations identified
 - `tasks/date-handling/wadnr-impact/bug-analysis/case-study-124697.md` — case study mapping Freshdesk #124697 (postForms time mutation) to FORM-BUG-1, FORM-BUG-5, WEBSERVICE-BUG-4; layer-by-layer analysis of `forminstance/` workaround limits
+- Category 4 (URL Parameters) Playwright test suite: 2 spec files (`cat-4-url-params.spec.js`, `cat-4-fillinrelate.spec.js`), 36 test-data entries, `gotoWithUrlParams()` helper in `vv-form.js`, TargetDateTest form URL in `vv-config.js`
+- `tasks/date-handling/forms-calendar/examples/fillinandrelated.js` — production FillinAndRelateForm global function example documenting the URL parameter chain pattern
 
 ### Changed
 
@@ -28,6 +30,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Replaced "fake Z" terminology with "incorrect Z" / "literal Z" across all bug docs (neutral language per standard)
 - Corrected "same timezone = safe" assumption in FORM-BUG-4 severity — DST transitions, business travel, and multi-timezone US states break the self-consistency pattern
 - Added V2 init path limitation to `docs/reference/form-fields.md` (flag resets on reload, cannot test init path via console)
+- FORM-BUG-1 scope corrected in `docs/reference/form-fields.md`: V1 also strips Z for DateTime+ignoreTZ=true via inline `e.replace('Z','')` — confirmed live via Cat 4 URL parameter tests. Added `enableQListener` property documentation, `.000` ms parsing behavior section, and FillinAndRelate chain transfer table
+- Fixed `testing/global-setup.js` BASE_URL construction — was using `vvConfig.instance` (contains `/`) instead of `vvConfig.baseUrl`, producing malformed URLs like `https://vvdemo/EmanuelJofre.visualvault.com`
 
 - Support for adding index fields to a folder ([#71](https://github.com/VisualVault/nodeJs-rest-client-library/pull/71))
 - Get user role permissions ([#70](https://github.com/VisualVault/nodeJs-rest-client-library/pull/70))
