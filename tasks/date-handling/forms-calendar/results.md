@@ -1914,3 +1914,45 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-03 [TC-9-D-UTC0 Run 1](runs/tc-9-D-UTC0-run-1.md) — UTC0 — PASS — FORM-BUG-5 present but 0 drift (coincidental)
 - 2026-04-03 [TC-9-D-PST-1 Run 1](runs/tc-9-D-PST-1-run-1.md) — PST — FAIL — FORM-BUG-5: PDT -7h drift (DST active)
 - 2026-04-03 [TC-9-D-JST-1 Run 1](runs/tc-9-D-JST-1-run-1.md) — JST — FAIL — FORM-BUG-5: +9h drift (most extreme UTC+)
+
+## Session 2026-04-08 (Chromium regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Chromium.
+**Key outcomes**: 36 tests documented.
+
+- 2026-04-08 [TC-4-FAR-DD-BRT Run 1](runs/tc-4-FAR-DD-BRT-run-1.md) — BRT — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-FAR-AA-BRT Run 1](runs/tc-4-FAR-AA-BRT-run-1.md) — BRT — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-FAR-DC-BRT Run 1](runs/tc-4-FAR-DC-BRT-run-1.md) — BRT — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-FAR-CD-BRT Run 1](runs/tc-4-FAR-CD-BRT-run-1.md) — BRT — PASS — Chromium confirms Config C URL Parameters stores correctly
+- 2026-04-08 [TC-4-FAR-CA-BRT Run 1](runs/tc-4-FAR-CA-BRT-run-1.md) — BRT — PASS — Chromium confirms Config C URL Parameters stores correctly
+- 2026-04-08 [TC-4-A-isoT-BRT Run 1](runs/tc-4-A-isoT-BRT-run-1.md) — BRT — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-A-iso-BRT Run 1](runs/tc-4-A-iso-BRT-run-1.md) — BRT — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-A-isoZ-BRT Run 1](runs/tc-4-A-isoZ-BRT-run-1.md) — BRT — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-A-us-BRT Run 1](runs/tc-4-A-us-BRT-run-1.md) — BRT — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-B-isoT-BRT Run 1](runs/tc-4-B-isoT-BRT-run-1.md) — BRT — PASS — Chromium confirms Config B URL Parameters stores correctly
+- 2026-04-08 [TC-4-C-z-BRT Run 1](runs/tc-4-C-z-BRT-run-1.md) — BRT — PASS — Chromium confirms Config C URL Parameters stores correctly
+- 2026-04-08 [TC-4-C-noz-BRT Run 1](runs/tc-4-C-noz-BRT-run-1.md) — BRT — PASS — Chromium confirms Config C URL Parameters stores correctly
+- 2026-04-08 [TC-4-D-z-BRT Run 1](runs/tc-4-D-z-BRT-run-1.md) — BRT — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-D-noz-BRT Run 1](runs/tc-4-D-noz-BRT-run-1.md) — BRT — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-D-midnight-z-BRT Run 1](runs/tc-4-D-midnight-z-BRT-run-1.md) — BRT — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-E-isoT-BRT Run 1](runs/tc-4-E-isoT-BRT-run-1.md) — BRT — PASS — Chromium confirms Config E URL Parameters stores correctly
+- 2026-04-08 [TC-4-F-isoT-BRT Run 1](runs/tc-4-F-isoT-BRT-run-1.md) — BRT — PASS — Chromium confirms Config F URL Parameters stores correctly
+- 2026-04-08 [TC-4-G-z-BRT Run 1](runs/tc-4-G-z-BRT-run-1.md) — BRT — PASS — Chromium confirms Config G URL Parameters stores correctly
+- 2026-04-08 [TC-4-H-z-BRT Run 1](runs/tc-4-H-z-BRT-run-1.md) — BRT — PASS — Chromium confirms Config H URL Parameters stores correctly
+- 2026-04-08 [TC-4-FAR-DD-IST Run 1](runs/tc-4-FAR-DD-IST-run-1.md) — IST — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-FAR-AA-IST Run 1](runs/tc-4-FAR-AA-IST-run-1.md) — IST — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-FAR-DC-IST Run 1](runs/tc-4-FAR-DC-IST-run-1.md) — IST — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-FAR-CA-IST Run 1](runs/tc-4-FAR-CA-IST-run-1.md) — IST — PASS — Chromium confirms Config C URL Parameters stores correctly
+- 2026-04-08 [TC-4-A-isoT-IST Run 1](runs/tc-4-A-isoT-IST-run-1.md) — IST — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-A-iso-IST Run 1](runs/tc-4-A-iso-IST-run-1.md) — IST — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-A-isoZ-IST Run 1](runs/tc-4-A-isoZ-IST-run-1.md) — IST — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-A-us-IST Run 1](runs/tc-4-A-us-IST-run-1.md) — IST — PASS — Chromium confirms Config A URL Parameters stores correctly
+- 2026-04-08 [TC-4-B-isoT-IST Run 1](runs/tc-4-B-isoT-IST-run-1.md) — IST — PASS — Chromium confirms Config B URL Parameters stores correctly
+- 2026-04-08 [TC-4-C-z-IST Run 1](runs/tc-4-C-z-IST-run-1.md) — IST — PASS — Chromium confirms Config C URL Parameters stores correctly
+- 2026-04-08 [TC-4-C-noz-IST Run 1](runs/tc-4-C-noz-IST-run-1.md) — IST — PASS — Chromium confirms Config C URL Parameters stores correctly
+- 2026-04-08 [TC-4-D-z-IST Run 1](runs/tc-4-D-z-IST-run-1.md) — IST — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-D-noz-IST Run 1](runs/tc-4-D-noz-IST-run-1.md) — IST — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-D-midnight-z-IST Run 1](runs/tc-4-D-midnight-z-IST-run-1.md) — IST — PASS — Chromium confirms Config D URL Parameters stores correctly
+- 2026-04-08 [TC-4-E-isoT-IST Run 1](runs/tc-4-E-isoT-IST-run-1.md) — IST — PASS — Chromium confirms Config E URL Parameters stores correctly
+- 2026-04-08 [TC-4-G-z-IST Run 1](runs/tc-4-G-z-IST-run-1.md) — IST — PASS — Chromium confirms Config G URL Parameters stores correctly
+- 2026-04-08 [TC-4-H-z-IST Run 1](runs/tc-4-H-z-IST-run-1.md) — IST — PASS — Chromium confirms Config H URL Parameters stores correctly

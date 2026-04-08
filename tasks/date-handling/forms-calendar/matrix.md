@@ -44,7 +44,7 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 1. Calendar Popup         |   20    |    4    |   16   |    0    |    0    |    0    |   0   |
 | 2. Typed Input            |   16    |    8    |   8    |    0    |    0    |    0    |   0   |
 | 3. Server Reload          |   18    |   10    |   8    |    0    |    0    |    0    |   0   |
-| 4. URL Parameters         |    5    |    0    |   0    |    5    |    0    |    0    |   0   |
+| 4. URL Parameters         |   36    |   36    |   0    |    0    |    0    |    0    |   0   |
 | 5. Preset Date            |   18    |   11    |   7    |    0    |    0    |    0    |   0   |
 | 6. Current Date           |   15    |   13    |   2    |    0    |    0    |    0    |   0   |
 | 7. SetFieldValue formats  |   39    |   23    |   16   |    0    |    0    |    0    |   0   |
@@ -161,17 +161,61 @@ Save form, open saved record in a new tab. Compare displayed dates and GFV retur
 
 ## 4 — URL Parameters
 
-Open form with date pre-filled via URL query string.
-**Bugs exercised**: FORM-BUG-1 (`parseDateString` strips Z on load)
-**Blocker**: Requires fields with `enableQListener=true` — not present in current test form.
+Open TargetDateTest form with date pre-filled via URL query string (`enableQListener=true`).
+**Bugs exercised**: FORM-BUG-1 (Z stripped on all DateTime configs), FORM-BUG-5 (fake Z on Config D API)
+**Form**: TargetDateTest (`formid=203734a0-5433-f111-ba23-0afff212cc87`) — identical to DateTest except `enableQListener=true` on all fields.
+**Key findings**:
 
-| Test ID          | Config | TZ  | URL Value                         | Expected                                     | Actual | Status  | Run Date | Evidence |
-| ---------------- | :----: | :-: | --------------------------------- | -------------------------------------------- | ------ | ------- | -------- | -------- |
-| 4-D-Z            |   D    | BRT | `?field=2026-03-15T00:00:00.000Z` | `parseDateString` strips Z → stored as local | —      | PENDING | —        | —        |
-| 4-D-noZ          |   D    | BRT | `?field=2026-03-15T00:00:00`      | treated as local                             | —      | PENDING | —        | —        |
-| 4-C-Z            |   C    | BRT | `?field=2026-03-15T00:00:00.000Z` | `parseDateString` strips Z                   | —      | PENDING | —        | —        |
-| 4-A-dateonly     |   A    | BRT | `?field=2026-03-15`               | should show March 15                         | —      | PENDING | —        | —        |
-| 4-D-midnight-IST |   D    | IST | `?field=2026-03-15T00:00:00.000Z` | may shift to Mar 15 05:30 on load            | —      | PENDING | —        | —        |
+1. Date-only configs do NOT exhibit FORM-BUG-7 via URL params (unlike SetFieldValue).
+2. DateTime configs universally strip Z from raw storage (FORM-BUG-1).
+3. **`.000` residue from FORM-BUG-5**: After stripping Z from `"...T00:00:00.000Z"`, the `.000` ms suffix remains → `new Date("...T00:00:00.000")` is parsed as **UTC** (not local) by Chrome/V8. This means FORM-BUG-5 + FORM-BUG-1 **compound** in FillinAndRelate chains rather than canceling.
+
+| Test ID            | Config | TZ  | URL Value                  | Expected Raw          | Expected API               | Actual Raw            | Actual API                 | Status | Run Date   | Evidence |
+| ------------------ | :----: | :-: | -------------------------- | --------------------- | -------------------------- | --------------------- | -------------------------- | ------ | ---------- | -------- |
+| 4-A-isoT-BRT       |   A    | BRT | `2026-03-15T00:00:00`      | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-A-iso-BRT        |   A    | BRT | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-A-isoZ-BRT       |   A    | BRT | `2026-03-15T00:00:00.000Z` | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-A-us-BRT         |   A    | BRT | `03/15/2026`               | `03/15/2026`          | `03/15/2026`               | `03/15/2026`          | `03/15/2026`               | PASS   | 2026-04-08 | PW       |
+| 4-A-isoT-IST       |   A    | IST | `2026-03-15T00:00:00`      | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-A-iso-IST        |   A    | IST | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-A-isoZ-IST       |   A    | IST | `2026-03-15T00:00:00.000Z` | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-A-us-IST         |   A    | IST | `03/15/2026`               | `03/15/2026`          | `03/15/2026`               | `03/15/2026`          | `03/15/2026`               | PASS   | 2026-04-08 | PW       |
+| 4-B-isoT-BRT       |   B    | BRT | `2026-03-15T00:00:00`      | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-B-isoT-IST       |   B    | IST | `2026-03-15T00:00:00`      | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-C-z-BRT          |   C    | BRT | `2026-03-15T14:30:00.000Z` | `2026-03-15T11:30:00` | `2026-03-15T14:30:00.000Z` | `2026-03-15T11:30:00` | `2026-03-15T14:30:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-C-noz-BRT        |   C    | BRT | `2026-03-15T14:30:00`      | `2026-03-15T14:30:00` | `2026-03-15T17:30:00.000Z` | `2026-03-15T14:30:00` | `2026-03-15T17:30:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-C-z-IST          |   C    | IST | `2026-03-15T14:30:00.000Z` | `2026-03-15T20:00:00` | `2026-03-15T14:30:00.000Z` | `2026-03-15T20:00:00` | `2026-03-15T14:30:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-C-noz-IST        |   C    | IST | `2026-03-15T14:30:00`      | `2026-03-15T14:30:00` | `2026-03-15T09:00:00.000Z` | `2026-03-15T14:30:00` | `2026-03-15T09:00:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-D-z-BRT          |   D    | BRT | `2026-03-15T14:30:00.000Z` | `2026-03-15T11:30:00` | `2026-03-15T11:30:00.000Z` | `2026-03-15T11:30:00` | `2026-03-15T11:30:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-D-noz-BRT        |   D    | BRT | `2026-03-15T14:30:00`      | `2026-03-15T14:30:00` | `2026-03-15T14:30:00.000Z` | `2026-03-15T14:30:00` | `2026-03-15T14:30:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-D-z-IST          |   D    | IST | `2026-03-15T14:30:00.000Z` | `2026-03-15T20:00:00` | `2026-03-15T20:00:00.000Z` | `2026-03-15T20:00:00` | `2026-03-15T20:00:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-D-noz-IST        |   D    | IST | `2026-03-15T14:30:00`      | `2026-03-15T14:30:00` | `2026-03-15T14:30:00.000Z` | `2026-03-15T14:30:00` | `2026-03-15T14:30:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-D-midnight-z-BRT |   D    | BRT | `2026-03-15T00:00:00.000Z` | `2026-03-14T21:00:00` | `2026-03-14T21:00:00.000Z` | `2026-03-14T21:00:00` | `2026-03-14T21:00:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-D-midnight-z-IST |   D    | IST | `2026-03-15T00:00:00.000Z` | `2026-03-15T05:30:00` | `2026-03-15T05:30:00.000Z` | `2026-03-15T05:30:00` | `2026-03-15T05:30:00.000Z` | PASS   | 2026-04-08 | PW       |
+| 4-E-isoT-BRT       |   E    | BRT | `2026-03-15T00:00:00`      | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-E-isoT-IST       |   E    | IST | `2026-03-15T00:00:00`      | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-F-isoT-BRT       |   F    | BRT | `2026-03-15T00:00:00`      | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 | PW       |
+| 4-G-z-BRT          |   G    | BRT | `2026-03-15T14:30:00.000Z` | `2026-03-15T11:30:00` | `2026-03-15T11:30:00`      | `2026-03-15T11:30:00` | `2026-03-15T11:30:00`      | PASS   | 2026-04-08 | PW       |
+| 4-G-z-IST          |   G    | IST | `2026-03-15T14:30:00.000Z` | `2026-03-15T20:00:00` | `2026-03-15T20:00:00`      | `2026-03-15T20:00:00` | `2026-03-15T20:00:00`      | PASS   | 2026-04-08 | PW       |
+| 4-H-z-BRT          |   H    | BRT | `2026-03-15T14:30:00.000Z` | `2026-03-15T11:30:00` | `2026-03-15T11:30:00`      | `2026-03-15T11:30:00` | `2026-03-15T11:30:00`      | PASS   | 2026-04-08 | PW       |
+| 4-H-z-IST          |   H    | IST | `2026-03-15T14:30:00.000Z` | `2026-03-15T20:00:00` | `2026-03-15T20:00:00`      | `2026-03-15T20:00:00` | `2026-03-15T20:00:00`      | PASS   | 2026-04-08 | PW       |
+
+### 4B — FillinAndRelate Chain Tests
+
+Simulates production `FillinAndRelateForm` pattern: source GFV output → URL param → target form.
+**Critical finding**: FORM-BUG-5 `.000Z` suffix leaves `.000` residue after Z-strip, causing `new Date()` to parse as UTC instead of local — bugs **compound**, not cancel.
+
+| Test ID      | Source | Target | TZ  | Source GFV (URL param)                | Expected Target Raw   | Expected Target API        | Actual Target Raw     | Actual Target API          | Status | Run Date   |
+| ------------ | :----: | :----: | :-: | ------------------------------------- | --------------------- | -------------------------- | --------------------- | -------------------------- | ------ | ---------- |
+| 4-FAR-DD-BRT |   D    |   D    | BRT | `2026-03-15T00:00:00.000Z` (fake Z)   | `2026-03-14T21:00:00` | `2026-03-14T21:00:00.000Z` | `2026-03-14T21:00:00` | `2026-03-14T21:00:00.000Z` | PASS   | 2026-04-08 |
+| 4-FAR-DD-IST |   D    |   D    | IST | `2026-03-15T00:00:00.000Z` (fake Z)   | `2026-03-15T05:30:00` | `2026-03-15T05:30:00.000Z` | `2026-03-15T05:30:00` | `2026-03-15T05:30:00.000Z` | PASS   | 2026-04-08 |
+| 4-FAR-AA-BRT |   A    |   A    | BRT | `2026-03-15` (clean)                  | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 |
+| 4-FAR-AA-IST |   A    |   A    | IST | `2026-03-14` (BUG-7 at source)        | `2026-03-14`          | `2026-03-14`               | `2026-03-14`          | `2026-03-14`               | PASS   | 2026-04-08 |
+| 4-FAR-DC-BRT |   D    |   C    | BRT | `2026-03-15T00:00:00.000Z` (fake Z)   | `2026-03-14T21:00:00` | `2026-03-15T00:00:00.000Z` | `2026-03-14T21:00:00` | `2026-03-15T00:00:00.000Z` | PASS   | 2026-04-08 |
+| 4-FAR-DC-IST |   D    |   C    | IST | `2026-03-15T00:00:00.000Z` (fake Z)   | `2026-03-15T05:30:00` | `2026-03-15T00:00:00.000Z` | `2026-03-15T05:30:00` | `2026-03-15T00:00:00.000Z` | PASS   | 2026-04-08 |
+| 4-FAR-CD-BRT |   C    |   D    | BRT | `2026-03-15T03:00:00.000Z` (real UTC) | `2026-03-15T00:00:00` | `2026-03-15T00:00:00.000Z` | `2026-03-15T00:00:00` | `2026-03-15T00:00:00.000Z` | PASS   | 2026-04-08 |
+| 4-FAR-CA-BRT |   C    |   A    | BRT | `2026-03-15T03:00:00.000Z` (real UTC) | `2026-03-15`          | `2026-03-15`               | `2026-03-15`          | `2026-03-15`               | PASS   | 2026-04-08 |
+| 4-FAR-CA-IST |   C    |   A    | IST | `2026-03-14T18:30:00.000Z` (real UTC) | `2026-03-14`          | `2026-03-14`               | `2026-03-14`          | `2026-03-14`               | PASS   | 2026-04-08 |
 
 ---
 
