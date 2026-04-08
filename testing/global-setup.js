@@ -21,7 +21,7 @@ const { gotoAndWaitForVVForm, setFieldValue, saveFormOnly } = require('./helpers
 const { selectDateViaPopup, typeDateInField } = require('./helpers/vv-calendar');
 
 const SAVED_RECORDS_PATH = path.join(__dirname, 'config', 'saved-records.json');
-const BASE_URL = `https://${vvConfig.instance}.visualvault.com`;
+const BASE_URL = vvConfig.baseUrl;
 const CACHE_MAX_AGE_MS = 3600_000; // 1 hour
 
 /**

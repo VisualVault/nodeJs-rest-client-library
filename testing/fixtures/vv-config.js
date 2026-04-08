@@ -29,6 +29,15 @@ const FORM_TEMPLATE_URL =
     '&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939' +
     '&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939';
 
+// TargetDateTest form template URL — identical to DateTest except all fields have enableQListener=true.
+// Used for Category 4 (URL parameter input) tests. The form accepts date values via URL query params
+// (e.g., ?Field7=2026-03-15) which feed into initCalendarValueV1/V2 via the enableQListener code path.
+const TARGET_FORM_TEMPLATE_URL =
+    '/FormViewer/app?hidemenu=true' +
+    '&formid=203734a0-5433-f111-ba23-0afff212cc87' +
+    '&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939' +
+    '&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939';
+
 // Field configuration map: Config letter -> VV calendar field names and boolean flags.
 //
 // The DateTest form has 26 fields: 8 configs (A-H) × 3 initial-value modes.
@@ -248,4 +257,12 @@ function getSavedRecords() {
 
 const SAVED_RECORDS = getSavedRecords();
 
-module.exports = { vvConfig, AUTH_STATE_PATH, FORM_TEMPLATE_URL, FIELD_MAP, SAVED_RECORDS, RECORD_DEFINITIONS };
+module.exports = {
+    vvConfig,
+    AUTH_STATE_PATH,
+    FORM_TEMPLATE_URL,
+    TARGET_FORM_TEMPLATE_URL,
+    FIELD_MAP,
+    SAVED_RECORDS,
+    RECORD_DEFINITIONS,
+};

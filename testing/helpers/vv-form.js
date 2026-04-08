@@ -286,6 +286,27 @@ async function roundTripCycle(page, fieldName, times = 3) {
     return results;
 }
 
+/**
+ * Build a URL with query-string field params and navigate to the form.
+ *
+ * Used for Category 4 (URL parameter input) tests. Appends field=value pairs
+ * to the form template URL, then navigates and waits for VV.Form to load.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} templateUrl - relative form template URL (e.g., TARGET_FORM_TEMPLATE_URL)
+ * @param {Object<string, string>} fieldParams - { fieldName: value } pairs to append as query params
+ * @param {number} [timeout=60000]
+ */
+async function gotoWithUrlParams(page, templateUrl, fieldParams, timeout = 60000) {
+    const params = Object.entries(fieldParams)
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join('&');
+    const url = `${templateUrl}&${params}`;
+    await gotoAndWaitForVVForm(page, url, timeout);
+    // URL parameters are processed during Angular init — wait briefly for value propagation
+    await page.waitForTimeout(1500);
+}
+
 module.exports = {
     gotoAndWaitForVVForm,
     waitForVVForm,
@@ -299,4 +320,5 @@ module.exports = {
     saveFormOnly,
     saveFormAndReload,
     roundTripCycle,
+    gotoWithUrlParams,
 };
