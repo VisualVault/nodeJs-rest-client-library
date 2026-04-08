@@ -39,16 +39,18 @@ This command:
 
 ## Key Files
 
-| File                             | Purpose                                                                    |
-| -------------------------------- | -------------------------------------------------------------------------- |
-| `testing/playwright.config.js`   | TZ × browser matrix (12 projects: 4 TZ × 3 browsers), auth state           |
-| `testing/fixtures/vv-config.js`  | Form URLs, field config map (A-H), record definitions, saved records       |
-| `testing/fixtures/test-data.js`  | All test case definitions (data-driven parameterization)                   |
-| `testing/helpers/vv-form.js`     | Generic VV form helpers: navigation, field ops, value capture, save        |
-| `testing/helpers/vv-calendar.js` | Calendar helpers: popup (date-only + DateTime + legacy popup), typed input |
-| `testing/helpers/ws-log.js`      | Log shim for WS harness scripts (proxies to server lib logger)             |
-| `testing/global-setup.js`        | Auto-login + create saved records via browser UI (per-TZ, cached 1h)       |
-| `.env.json` (root)               | VV credentials (gitignored, unified config)                                |
+| File                             | Purpose                                                                                  |
+| -------------------------------- | ---------------------------------------------------------------------------------------- |
+| `testing/playwright.config.js`   | TZ × browser matrix (12 projects: 4 TZ × 3 browsers), auth state                         |
+| `testing/fixtures/vv-config.js`  | Form URLs, field config map (A-H), record definitions, saved records                     |
+| `testing/fixtures/test-data.js`  | All test case definitions (data-driven parameterization)                                 |
+| `testing/helpers/vv-form.js`     | Generic VV form helpers: navigation, field ops, value capture, save                      |
+| `testing/helpers/vv-calendar.js` | Calendar helpers: popup (date-only + DateTime + legacy popup), typed input               |
+| `testing/helpers/vv-admin.js`    | VV admin page scraping: login, RadGrid pagination, `__doPostBack`, dock panel extraction |
+| `testing/helpers/vv-sync.js`     | Shared manifest load/save/diff and README generation for export scripts                  |
+| `testing/helpers/ws-log.js`      | Log shim for WS harness scripts (proxies to server lib logger)                           |
+| `testing/global-setup.js`        | Auto-login + create saved records via browser UI (per-TZ, cached 1h)                     |
+| `.env.json` (root)               | VV credentials (gitignored, unified config)                                              |
 
 ## Extending to Non-Date Testing
 

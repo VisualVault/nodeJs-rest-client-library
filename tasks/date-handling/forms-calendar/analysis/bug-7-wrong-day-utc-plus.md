@@ -220,6 +220,8 @@ Edge cases confirmed: year boundary (Jan 1 → Dec 31), month boundary (Apr 1 �
 
 Test coverage across categories: Category 1 (popup) 20/20 — 7P/13F; Category 2 (typed) 16/16 — 11P/5F; Category 5 (preset) 18/18 — 11P/7F; Category 7 (SetFieldValue formats) 38/39 — 29P/9F; Category 9 (round-trip) 20/20 — 9P/11F; Category 12 (edge cases) — year/month/leap boundaries confirmed.
 
+**Database persistence confirmed (Cat 13, 2026-04-08):** The wrong date is stored in the database, not just displayed in the browser. API reads of cross-TZ records confirm: BRT Config A stores `"2026-03-15T00:00:00Z"` (correct), IST Config A stores `"2026-03-14T00:00:00Z"` (shifted -1 day). This means date queries like `[Field7] eq '2026-03-15'` will find BRT records but silently miss IST records — a data integrity issue that affects all downstream consumers (dashboards, reports, API queries). Evidence: `tc-13-cross-tz-save`, `tc-13-query-consistency`.
+
 This bug report is backed by a supporting test repository containing Playwright automation scripts, per-test results, and raw test data. Access can be requested from the Solution Architecture team.
 
 ---

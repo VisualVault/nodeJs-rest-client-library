@@ -175,6 +175,8 @@ Production scenario: IST helpdesk sets a date → BRT admin reviews and updates 
 
 Confirmed by TC-11-roundtrip-cross (sequential BRT→IST→BRT) and TC-11-D-concurrent-IST-edit (concurrent user simulation) — both produced identical +2:30h net drift.
 
+**Commutativity confirmed (2026-04-08)**: The reverse order (BRT first → IST second) produces the same +2:30h net drift (TC-11-concurrent-edit). However, the intermediate state differs: BRT-first crosses a **day boundary** (Mar 15 `T00:00:00` → Mar 14 `T21:00:00`), meaning any system reading the record between User A's and User B's edits sees the wrong calendar day. The net result is order-independent; the transient corruption is not.
+
 ### DST Spring-Forward Anomaly (confirmed 2026-04-08)
 
 On US DST transition day (March 8, 2026), the fake Z interacts with DST boundaries:
@@ -198,6 +200,8 @@ GetFieldValue output tested across all 8 field configs × 3 timezones: 18 of 19 
 Round-trip drift tested across 5 timezones: 20 of 20 complete — 9 PASS, 11 FAIL. Drift confirmed exactly proportional to timezone offset: BRT -3h, IST +5:30h, UTC+0 0h, PDT -7h, JST +9h. Year boundary crossing confirmed in São Paulo (Jan 1 → Dec 31 in single cycle).
 
 TZ-invariance proof (detailed in Problem in Detail above) independently confirmed via automated Playwright testing, with Config C as a control producing the expected different results across timezones.
+
+**Database persistence confirmed (Cat 13, 2026-04-08):** The drift is not a transient client-side display issue — it persists through the save pipeline to the database. After 1 round-trip in BRT, the API returns `"2026-03-14T21:00:00Z"` for a value set to `"2026-03-15T00:00:00"` (DateTest-001919). After 8 round-trips, the API returns `"2026-03-14T00:00:00Z"` — a full calendar day lost (DateTest-001920). Evidence: `tc-13-after-roundtrip`, `tc-13-multi-roundtrip-db`.
 
 This bug report is backed by a supporting test repository containing Playwright automation scripts, per-test results, and raw test data. Access can be requested from the Solution Architecture team.
 

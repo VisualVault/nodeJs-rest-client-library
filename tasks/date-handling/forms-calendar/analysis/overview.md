@@ -684,7 +684,7 @@ getCalendarFieldValue(fieldDef, value) {
 
 **Workaround**: See [Part 3, items #1 and #2](#workaround-1-bug-5-use-uselegacytrue-or-gdoc).
 
-**Multi-user compound drift (confirmed 2026-04-08)**: When users in different TZs each do a GFV round-trip on the same record, drift accumulates: IST user (+5:30h) → BRT user (-3h) = net +2:30h from original midnight. Production scenario for multi-TZ organizations. See TC-11-roundtrip-cross, TC-11-D-concurrent-IST-edit.
+**Multi-user compound drift (confirmed 2026-04-08)**: When users in different TZs each do a GFV round-trip on the same record, drift accumulates: IST user (+5:30h) → BRT user (-3h) = net +2:30h from original midnight. Drift is **commutative** — BRT-first then IST produces the same net +2:30h (TC-11-concurrent-edit), though the BRT-first intermediate state crosses a day boundary (Mar 15→Mar 14). Production scenario for multi-TZ organizations. See TC-11-roundtrip-cross, TC-11-D-concurrent-IST-edit, TC-11-concurrent-edit.
 
 **DST spring-forward anomaly (confirmed 2026-04-08)**: On US DST transition day (Mar 8), V8 advances non-existent 2AM→3AM PDT. Fake Z `"T03:00:00.000Z"` lands in pre-DST window (UTC 03:00 < DST start at UTC 10:00) → resolves as PST Mar 7 19:00 (-8h, not PDT -7h). Crosses both day and DST boundary. See TC-12-dst-US-PST.
 
@@ -788,6 +788,20 @@ All calendar fields are SQL Server `datetime` type (no `date`-only type). Values
 Both paths call `getSaveValue()` which strips the Z, but the upstream time representation differs: UTC object vs local-time ISO string.
 
 **Evidence:** `tasks/date-handling/forms-calendar/test-cases/tc-2-10-db-storage-mixed-tz-brt.md`
+
+#### API Write Path Stores Uniformly (Cat 13, 2026-04-08)
+
+The REST API write path (`postForms`) stores dates uniformly for all field configs — **no C/D divergence, no FORM-BUG-7**. When the same date (`2026-03-15`) is written via `postForms` to Configs A, B, C, and D, all four store identically as `"2026-03-15T00:00:00Z"` (DateTest-001915). This contrasts with browser-saved records where Config C stores real UTC (`T03:00:00` for BRT midnight) and Config D stores local midnight (`T00:00:00`).
+
+**Implication**: The mixed timezone storage is exclusively a **Forms Angular save pipeline issue** (`getSaveValue()` + `calChange()` + `toISOString()` branches). The VV server API layer stores date strings as-is without config-specific transformation. Developers using the REST API to set dates will not encounter the C/D divergence or FORM-BUG-7.
+
+**Evidence**: `tc-13-ws-input`, `tc-13-B-storage`, `tc-13-C-vs-D-storage`
+
+#### Query Consistency Impact (Cat 13, 2026-04-08)
+
+FORM-BUG-7's database-level impact extends to query results. A query for `[Field7] eq '2026-03-15'` finds BRT-saved records (000080, stored correctly) but misses IST-saved records (000084, stored as Mar 14 due to FORM-BUG-7). The query engine itself is correct — WS-8 tests confirm all query types PASS on fresh data. The inconsistency is in the stored data, not the query logic.
+
+**Evidence**: `tc-13-query-consistency`, `tc-13-cross-tz-save`
 
 ---
 

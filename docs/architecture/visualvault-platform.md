@@ -319,24 +319,69 @@ Where external service endpoints are registered. The Node.js server (`nodeV2`) a
 
 **How it connects to nodeV2:** When a form event fires or a scheduled process runs, VV calls the registered URL in this library. The `nodeV2` server receives the POST, executes the script code, and returns results.
 
+**REST API:** `GET /outsideprocesses` returns all registered microservices with metadata: `id`, `name`, `description`, `processCategory` (0=Form, 1=Scheduled, 5=Workflow), `processType`, `createDate`, `createBy`, `modifyDate`, `modifyBy`. Does **NOT** include script source code. Individual resource fetch (`GET /outsideprocesses/{id}`) returns HTTP 405 — not supported.
+
+**WADNR stats (2026-04-08):** 272 registered microservices (44 Form, 19 Scheduled, 209 Workflow).
+
+#### Microservice Detail Panel
+
+Clicking a service name in the grid opens an inline **"MICROSERVICE DETAILS"** dock panel (Telerik RadDock, not a popup or separate page). The panel opens via ASP.NET `__doPostBack` AJAX partial postback.
+
+**Detail panel fields:**
+
+| Field                      | Element             | Notes                                                            |
+| -------------------------- | ------------------- | ---------------------------------------------------------------- |
+| Name                       | `txtOpName`         | Service name (editable)                                          |
+| Description                | `txtDescription`    | (editable)                                                       |
+| Service Type               | `ddlCategory`       | Dropdown                                                         |
+| Connection Type            | `ddlConnectionType` | Dropdown                                                         |
+| Timeout                    | `txtServiceTimeout` | Long Running Service Settings section                            |
+| Allow anonymous access     | checkbox            | Security Settings section                                        |
+| IP Address Restrictions    | text                | Security Settings section                                        |
+| Enable completion callback | checkbox            | Completion callback section                                      |
+| **Script source**          | `txtScriptCode`     | Full textarea ID: `ctl00_ContentBody_dockDetail_C_txtScriptCode` |
+| Script ID                  | `lblScriptId`       | GUID displayed at bottom of panel                                |
+
+**Grid column layout (10 columns, verified 2026-04-08):**
+
+| Index | Column              | Notes                                      |
+| :---: | ------------------- | ------------------------------------------ |
+|   0   | (Select)            | Checkbox                                   |
+|   1   | Service Name        | `lnkDetails` link — click opens dock panel |
+|   2   | Service Description | Text                                       |
+|   3   | Category            | ScriptType text                            |
+|   4   | Service Type        | "NodeServer"                               |
+|   5   | Timeout             | Numeric                                    |
+|   6   | Callback            | Boolean text                               |
+|   7   | ModifiedDate        | Timestamp                                  |
+|   8   | ModifiedBy          | Email                                      |
+
+**Automation (Playwright):** Script source extraction must use **response interception** (parse the AJAX response body for the textarea content) rather than DOM reads. The dock panel's textarea value becomes stale if the panel is hidden via CSS — hiding the panel prevents ASP.NET UpdatePanel from updating its content. Use `page.addScriptTag({ content: "__doPostBack(target, '')" })` to trigger postbacks (avoids strict-mode `arguments.callee` errors in `page.evaluate`). Response format is ASP.NET UpdatePanel delta: `length|type|id|content|...` (pipe-delimited).
+
 ### Scheduled Services
 
 **URL:** `/scheduleradmin`
 **UI Label:** "Scheduled Services"
 **Breadcrumb:** Control Panel > Enterprise Tools > Scheduled Services
 
-Cron-like configuration for automated scripts. Each schedule references a Microservice by name.
+Cron-like configuration for automated scripts. Each schedule references a Microservice by name. No REST API exists for listing schedules — the `scheduledProcess` manager only exposes `postCompletion()` and `runAllScheduledProcesses()`.
 
-| Column        | Notes                                                               |
-| ------------- | ------------------------------------------------------------------- |
-| Name          | Schedule name                                                       |
-| Enable        | On/Off toggle                                                       |
-| Run State     | `Idle` when not running                                             |
-| Set to Idle   | Reset button (force-stops if stuck)                                 |
-| Last Run Date | Timestamp of last execution                                         |
-| Recurrence    | e.g., "Every 2 Minutes", "Every 365 Days", "Recurrence Not Enabled" |
-| Next Run Date | Calculated next execution                                           |
-| Service Name  | References a Microservice from `/outsideprocessadmin`               |
+**Grid column layout (verified 2026-04-08, WADNR: 21 schedules):**
+
+| Index | Column        | Type     | Notes                                                                     |
+| :---: | ------------- | -------- | ------------------------------------------------------------------------- |
+|   0   | (Select)      | checkbox | Row selection                                                             |
+|   1   | Name          | link     | Schedule name (`lnkDetails`)                                              |
+|   2   | (View)        | link     | Detail view link                                                          |
+|   3   | Enable        | text     | `"True"` / `"False"` (not a checkbox)                                     |
+|   4   | Run State     | text     | `"Idle"` when not running                                                 |
+|   5   | Set to Idle   | button   | `"Reset"` button (force-stops if stuck)                                   |
+|   6   | Last Run Date | text     | Timestamp of last execution, or `"Not Run Yet"`                           |
+|   7   | Recurrence    | text     | e.g., `"Every 2 Minutes"`, `"Every 365 Days"`, `"Recurrence Not Enabled"` |
+|   8   | Next Run Date | text     | Calculated next execution timestamp                                       |
+|   9   | Service Name  | text     | References a Microservice from `/outsideprocessadmin`                     |
+
+**Note:** The documented column order had 8 columns, but the actual grid has 10 (index 2 "View" link and index 5 "Set to Idle" button were not listed). Verified by grid scraping on vv5dev/WADNR/fpOnline.
 
 ### Data Connections
 
@@ -550,14 +595,19 @@ The core API `postForms()` takes a template name and resolves it automatically. 
 
 ## WADNR Environment Reference
 
-| Item                           | Value                                                  |
-| ------------------------------ | ------------------------------------------------------ |
-| Environment                    | `vv5dev`                                               |
-| Customer                       | `WADNR`                                                |
-| Database                       | `fpOnline`                                             |
-| Base URL                       | `https://vv5dev.visualvault.com/app/WADNR/fpOnline/`   |
-| Form templates                 | 228 total (89 active, 139 z-prefixed) as of 2026-04-07 |
-| Templates with calendar fields | 35 of 77 exported (some exports failed server-side)    |
+| Item                           | Value                                                      |
+| ------------------------------ | ---------------------------------------------------------- |
+| Environment                    | `vv5dev`                                                   |
+| Customer                       | `WADNR`                                                    |
+| Database                       | `fpOnline`                                                 |
+| Base URL                       | `https://vv5dev.visualvault.com/app/WADNR/fpOnline/`       |
+| Customer GUID (`xcid`)         | `8b91162d-6e44-ef11-8295-92af04f88cc9`                     |
+| Database GUID (`xcdid`)        | `e8de4be1-6f44-ef11-8295-92af04f88cc9`                     |
+| Form templates                 | 228 total (89 active, 139 z-prefixed) as of 2026-04-07     |
+| Templates with calendar fields | 35 of 77 exported (some exports failed server-side)        |
+| Microservices registered       | 272 (44 Form, 19 Scheduled, 209 Workflow) as of 2026-04-08 |
+| Scheduled services             | 21 (13 enabled, 8 disabled) as of 2026-04-08               |
+| Global functions (runtime)     | 182 keys (157 functions + 25 properties) as of 2026-04-08  |
 
 **Top calendar field counts** (FieldCalendar3 per template):
 
@@ -625,6 +675,14 @@ The VV server has no date-only storage type. All date fields are stored as datet
 ### Data Passthrough
 
 The Node.js client library (`lib/`) performs **no data transformation** between script code and the VV server. Field values (including dates) are serialized via `JSON.stringify()` on the way out and `JSON.parse()` on the way back. Dates remain as strings throughout — never converted to/from JavaScript `Date` objects by the library. See [Scripting Guide](../guides/scripting.md) for the full data flow.
+
+### API Write Path Stores Dates Uniformly
+
+The VV REST API write path (`postForms`, `postFormRevision`) stores date strings as-is without applying config-specific transformations. All field configurations (A through H, regardless of `enableTime`, `ignoreTimezone`, or `useLegacy` flags) store the same input identically. For example, `"2026-03-15"` sent to Configs A, B, C, and D via `postForms` all store as `2026-03-15 00:00:00.000` in SQL Server.
+
+This contrasts with the **Forms browser save path**, where the Angular `getSaveValue()` pipeline applies different transformations per config: Config C stores real UTC (midnight BRT → `T03:00:00`), Config D stores local midnight as-is (`T00:00:00`), and date-only fields in UTC+ timezones store the wrong day (FORM-BUG-7). The mixed timezone storage problem is **exclusively a Forms Angular issue** — the API path is immune.
+
+**Implication**: Developers writing dates via the REST API get consistent, predictable storage regardless of field config. The API is the safer write path for date-critical workflows.
 
 ---
 
