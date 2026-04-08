@@ -1,0 +1,197 @@
+{
+    "generatedAt": "2026-04-08T20:57:11.314Z",
+    "environment": "vv5dev/WADNR/fpOnline",
+    "component": "schedules",
+    "totalItems": 21,
+    "schedules": [
+        {
+            "name": "AGOLPostFponlineDataToAGOLTables",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 12:15 AM",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/9/2026 12:15 AM",
+            "serviceName": "AGOLPostFponlineDataToAGOLTables"
+        },
+        {
+            "name": "AGOLSendUpdatedDataToPendingDataForm",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 12:00 AM",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/9/2026 12:00 AM",
+            "serviceName": "AGOLSendUpdatedDataToPendingDataForm"
+        },
+        {
+            "name": "CommunicationLogSendDigest",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/7/2026 7:00 PM",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/8/2026 7:00 PM",
+            "serviceName": "CommunicationLogSendDigest"
+        },
+        {
+            "name": "CommunicationLogSendImmediate",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 1:48 PM",
+            "recurrence": "Every 15 Minutes",
+            "nextRunDate": "4/8/2026 2:03 PM",
+            "serviceName": "CommunicationLogSendImmediate"
+        },
+        {
+            "name": "FeeSCHFinalizePendingTransactions",
+            "enabled": false,
+            "runState": "Idle",
+            "lastRunDate": "Not Run Yet",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "1/9/2025 10:10 AM",
+            "serviceName": "FeeSCHFinalizePendingTransactions"
+        },
+        {
+            "name": "FeeSCHInstallmentReminderNotifications",
+            "enabled": false,
+            "runState": "Idle",
+            "lastRunDate": "Not Run Yet",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "1/9/2025 10:15 AM",
+            "serviceName": "FeeSCHInstallmentReminderNotifications"
+        },
+        {
+            "name": "fpnpLoadTesting",
+            "enabled": false,
+            "runState": "Idle",
+            "lastRunDate": "Not Run Yet",
+            "recurrence": "Recurrence Not Enabled",
+            "nextRunDate": "3/13/2026 1:19 PM",
+            "serviceName": "fpnpLoadTesting"
+        },
+        {
+            "name": "LibCreatezActivtyMapGISJSON",
+            "enabled": false,
+            "runState": "Idle",
+            "lastRunDate": "Not Run Yet",
+            "recurrence": "Every 1 Years",
+            "nextRunDate": "12/11/2024 10:52 AM",
+            "serviceName": "LibCreatezActivtyMapGISJSON"
+        },
+        {
+            "name": "PostMapToGISFolder",
+            "enabled": false,
+            "runState": "Idle",
+            "lastRunDate": "Not Run Yet",
+            "recurrence": "Every 365 Days",
+            "nextRunDate": "11/22/2024 7:57 AM",
+            "serviceName": "CommunicationLogSendDigest"
+        },
+        {
+            "name": "PostPermitsToDOR",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 12:01 AM",
+            "recurrence": "Every 24 Hours",
+            "nextRunDate": "4/9/2026 12:01 AM",
+            "serviceName": "PostPermitsToDOR"
+        },
+        {
+            "name": "SCH_FPNP_NotificationSystem",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/7/2026 6:00 PM",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/8/2026 6:00 PM",
+            "serviceName": "SCH_FPNP_NotificationSystem"
+        },
+        {
+            "name": "SCHExpirationMaintenanceInARP",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 2:00 AM",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/9/2026 2:00 AM",
+            "serviceName": "SCHExpirationMaintenanceInARP"
+        },
+        {
+            "name": "SCHFPANExpirationClearOfflineFlags",
+            "enabled": false,
+            "runState": "Idle",
+            "lastRunDate": "Not Run Yet",
+            "recurrence": "Every 24 Hours",
+            "nextRunDate": "2/4/2026 7:43 AM",
+            "serviceName": "SCHFPANExpirationClearOfflineFlags"
+        },
+        {
+            "name": "SCHGenerateWorkQueueExcelFiles",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 12:01 AM",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/9/2026 12:01 AM",
+            "serviceName": "SCHGenerateWorkQueueExcelFiles"
+        },
+        {
+            "name": "SCHHardDeleteReadyRecords",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 8:10 AM",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/9/2026 8:10 AM",
+            "serviceName": "SCHHardDeleteReadyRecords"
+        },
+        {
+            "name": "SCHRemindExternalReviewerNotification",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 7:07 AM",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/9/2026 7:07 AM",
+            "serviceName": "ReminderExternalReviewerEmailNotification"
+        },
+        {
+            "name": "SCHRetriggerBoxWorkflow",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 11:04 AM",
+            "recurrence": "Every 5 Hours",
+            "nextRunDate": "4/8/2026 4:04 PM",
+            "serviceName": "SCHRetriggerBoxWorkflow"
+        },
+        {
+            "name": "SCHSoftDeleteStaleRecords",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/8/2026 5:32 AM",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/9/2026 5:32 AM",
+            "serviceName": "SCHSoftDeleteStaleRecords"
+        },
+        {
+            "name": "SCHSoftDeleteWarningNotifications",
+            "enabled": false,
+            "runState": "Idle",
+            "lastRunDate": "Not Run Yet",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "4/10/2025 5:25 AM",
+            "serviceName": "SCHSoftDeleteWarningNotifications"
+        },
+        {
+            "name": "SendReconciliationReport",
+            "enabled": false,
+            "runState": "Idle",
+            "lastRunDate": "Not Run Yet",
+            "recurrence": "Every 1 Days",
+            "nextRunDate": "11/20/2025 1:35 PM",
+            "serviceName": "sendReconciliationReport"
+        },
+        {
+            "name": "ShoppingCartSCHDisableStaleCarts",
+            "enabled": true,
+            "runState": "Idle",
+            "lastRunDate": "4/7/2026 9:30 AM",
+            "recurrence": "Every 1 Weeks",
+            "nextRunDate": "4/14/2026 9:30 AM",
+            "serviceName": "ShoppingCartSCHDisableStaleCarts"
+        }
+    ]
+}

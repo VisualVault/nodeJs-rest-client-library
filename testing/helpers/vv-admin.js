@@ -73,10 +73,9 @@ function adminUrl(config, section) {
  * @param {number} timeout - ms
  */
 async function triggerPostback(page, target, urlMatch, timeout = 30000) {
-    const responsePromise = page.waitForResponse(
-        resp => resp.request().method() === 'POST' && resp.url().includes(urlMatch),
-        { timeout }
-    ).catch(() => null);
+    const responsePromise = page
+        .waitForResponse((resp) => resp.request().method() === 'POST' && resp.url().includes(urlMatch), { timeout })
+        .catch(() => null);
 
     await page.addScriptTag({
         content: `__doPostBack('${target.replace(/'/g, "\\'")}', '');`,
@@ -93,15 +92,17 @@ async function triggerPostback(page, target, urlMatch, timeout = 30000) {
 async function getGridDetailLinks(page) {
     return page.evaluate(() => {
         const links = document.querySelectorAll('a[id*="lnkDetails"]');
-        return Array.from(links).map(a => {
-            const href = a.getAttribute('href') || '';
-            const match = href.match(/__doPostBack\('([^']+)'/);
-            return {
-                name: a.textContent.trim(),
-                linkId: a.id,
-                postbackTarget: match ? match[1] : null,
-            };
-        }).filter(l => l.postbackTarget);
+        return Array.from(links)
+            .map((a) => {
+                const href = a.getAttribute('href') || '';
+                const match = href.match(/__doPostBack\('([^']+)'/);
+                return {
+                    name: a.textContent.trim(),
+                    linkId: a.id,
+                    postbackTarget: match ? match[1] : null,
+                };
+            })
+            .filter((l) => l.postbackTarget);
     });
 }
 
@@ -147,22 +148,36 @@ async function goToNextGridPage(page, currentPage, urlMatch) {
  * @returns {object|null} {source, ...extraFields} or null on failure
  */
 async function extractDockPanelDetail(page, linkId, textareaId, urlMatch, opts = {}) {
-    // Set up response interception BEFORE clicking
-    let capturedBody = null;
-    const responsePromise = page.waitForResponse(async resp => {
-        if (resp.request().method() === 'POST' && resp.url().includes(urlMatch)) {
-            capturedBody = await resp.text();
-            return true;
-        }
-        return false;
-    }, { timeout: 20000 }).catch(() => null);
+    // Extract the postback target from the link's href
+    const postbackTarget = await page.evaluate((id) => {
+        const link = document.getElementById(id);
+        if (!link) return null;
+        const href = link.getAttribute('href') || '';
+        const m = href.match(/__doPostBack\('([^']+)'/);
+        return m ? m[1] : null;
+    }, linkId);
 
-    // Click with force to bypass the open dock panel overlay
-    try {
-        await page.click(`#${linkId}`, { force: true, timeout: 10000 });
-    } catch {
-        return null;
-    }
+    if (!postbackTarget) return null;
+
+    // Set up response interception BEFORE triggering the postback
+    let capturedBody = null;
+    const responsePromise = page
+        .waitForResponse(
+            async (resp) => {
+                if (resp.request().method() === 'POST' && resp.url().includes(urlMatch)) {
+                    capturedBody = await resp.text();
+                    return true;
+                }
+                return false;
+            },
+            { timeout: 20000 }
+        )
+        .catch(() => null);
+
+    // Trigger __doPostBack via injected <script> tag — bypasses click/overlay issues
+    await page.addScriptTag({
+        content: `__doPostBack('${postbackTarget.replace(/'/g, "\\'")}', '');`,
+    });
 
     await responsePromise;
     if (!capturedBody) return null;
@@ -231,6 +246,68 @@ async function getGridInfo(page) {
     });
 }
 
+/**
+ * Read all data rows from the current RadGrid page.
+ * Generic column extraction — handles text, checkboxes, links, and inputs.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {Array<{name: string, index: number, type?: string}>} columnDefs
+ *   type: 'text' (default) | 'checkbox' | 'link' | 'input'
+ * @returns {Array<object>} one object per row with column names as keys
+ */
+async function readGridRows(page, columnDefs) {
+    return page.evaluate((cols) => {
+        const rows = document.querySelectorAll('.rgMasterTable tbody tr.rgRow, .rgMasterTable tbody tr.rgAltRow');
+        if (rows.length === 0) {
+            // Fallback: try any data rows in the grid table
+            const table = document.querySelector('#ctl00_ContentBody_DG1_ctl00');
+            if (table) {
+                const allRows = table.querySelectorAll('tbody tr');
+                return extractFromRows(allRows, cols);
+            }
+            return [];
+        }
+        return extractFromRows(rows, cols);
+
+        function extractFromRows(rowList, colDefs) {
+            return Array.from(rowList)
+                .map((row) => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    const obj = {};
+                    for (const col of colDefs) {
+                        const cell = cells[col.index];
+                        if (!cell) {
+                            obj[col.name] = null;
+                            continue;
+                        }
+                        const type = col.type || 'text';
+                        switch (type) {
+                            case 'checkbox': {
+                                const cb = cell.querySelector('input[type="checkbox"]');
+                                obj[col.name] = cb ? cb.checked : null;
+                                break;
+                            }
+                            case 'link': {
+                                const a = cell.querySelector('a');
+                                obj[col.name] = a ? a.textContent.trim() : cell.textContent.trim();
+                                break;
+                            }
+                            case 'input': {
+                                const inp = cell.querySelector('input, select');
+                                obj[col.name] = inp ? inp.value : cell.textContent.trim();
+                                break;
+                            }
+                            default:
+                                obj[col.name] = cell.textContent.trim();
+                        }
+                    }
+                    return obj;
+                })
+                .filter((row) => Object.values(row).some((v) => v !== null && v !== ''));
+        }
+    }, columnDefs);
+}
+
 module.exports = {
     loadEnvConfig,
     login,
@@ -241,4 +318,5 @@ module.exports = {
     extractDockPanelDetail,
     hideDockPanel,
     getGridInfo,
+    readGridRows,
 };
