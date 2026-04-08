@@ -22,7 +22,8 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 tasks/date-handling/
   CLAUDE.md                          # This file — overall context
   analysis/                          # Cross-cutting root cause analysis
-    temporal-models.md               # Four temporal mental models — maps every bug to model confusion
+    temporal-models.md               # Root cause analysis — 14 bugs, 4 temporal models, architectural limitations
+    fix-strategy.md                  # Fix categories per model, design decisions, traps to avoid
   forms-calendar/                    # Forms calendar field investigation
     analysis/                        # Analysis & conclusions
       overview.md                    # Executive summary, confirmed bugs, code paths, V1/V2 comparison
