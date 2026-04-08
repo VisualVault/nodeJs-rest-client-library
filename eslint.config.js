@@ -4,7 +4,13 @@ const globals = require('globals');
 
 module.exports = [
     {
-        ignores: ['node_modules/', 'scripts/test-scripts/', 'tasks/**/main.js', 'lib/VVRestApi/'],
+        ignores: [
+            'node_modules/',
+            'scripts/test-scripts/',
+            'tasks/**/main.js',
+            'tasks/**/bug-analysis/',
+            'lib/VVRestApi/',
+        ],
     },
     js.configs.recommended,
     prettier,
