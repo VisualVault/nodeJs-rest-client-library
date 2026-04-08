@@ -1,6 +1,6 @@
 # Case Study: Freshdesk #124697 — postForms Time Mutation in WADNR
 
-> **Status**: DRAFT — pending identification of the specific production field(s) that triggered the report.
+> **Status**: DRAFT — updated with John's clarification (2026-04-08). Scope confirmed as all Config D fields, triggered by legacy data migration.
 
 | Field            | Value                                                                 |
 | ---------------- | --------------------------------------------------------------------- |
@@ -19,7 +19,13 @@
 
 ### Summary
 
-Time data written to a calendar field via the `postForms` API is silently overwritten the first time a user opens the form record in the browser. The shift happens on load — before the user makes any changes. Saving the form commits the shifted value to the database. Subsequent opens do not shift the value further.
+Time data written to calendar fields via the `postForms` API is silently overwritten the first time a user opens the form record in the browser. The shift happens on load — before the user makes any changes. Saving the form commits the shifted value to the database. Subsequent opens do not shift the value further.
+
+### Migration Context
+
+John's report was triggered by a **legacy data migration** — importing hundreds of thousands of records from a previous provider into WADNR's VisualVault environment. The affected scope is not a single field but **all calendar fields configured with `enableTime=true` + `ignoreTimezone=true`** (Config D in our classification). After bulk import via `postForms`, John observed that time values in these fields shifted when the form was first opened in the browser.
+
+John is **not aware** of the broader date bug investigation documented in this repository. His analysis was narrowly scoped to the import path: "data goes in correct, comes out shifted after first form open." He did not evaluate whether the field configurations themselves were appropriate, or whether data created natively through the Forms UI exhibits the same or different issues.
 
 ### Reproduction Environment
 
@@ -63,9 +69,14 @@ This confirms a one-time corruption on first open — consistent with the `initC
 
 ## 2. Production Field(s)
 
-<!-- PENDING: John Sevilla's response identifying which specific WADNR production form(s) and field(s) originally surfaced the inconsistency. The ticket states "the client noticed an inconsistency" but does not name the form or field. John isolated the issue into a test harness before filing. -->
+John clarified (2026-04-08) that the report was **not about a specific field** — it targets **all calendar fields with `enableTime=true` + `ignoreTimezone=true`** (Config D). The ticket phrasing _"a Calendar control that has time enabled and 'Ignore Timezones' enabled"_ describes the configuration class, not a single instance.
 
-The original production form and field are unknown. The ticket says: _"Recently, the client noticed an inconsistency with the 'time' value of a Calendar control that has time enabled and 'Ignore Timezones' enabled."_ John then created the `zzzJohnDevTest` harness to reproduce cleanly.
+The trigger was the legacy data migration: after importing records via `postForms`, John noticed that time values in Config D fields shifted on first form open. He created the `zzzJohnDevTest` harness to isolate and reproduce the behavior cleanly before filing the ticket.
+
+**Important**: John did not analyze this from a holistic perspective. He identified the symptom (import path produces shifted times) but did not consider:
+- Whether the field configurations were appropriate in the first place (8 of 12 are likely misconfigured — see below)
+- Whether data created natively through the Forms UI has the same or different issues
+- Whether the workaround (`forminstance/`) creates a data consistency gap with future UI-created records
 
 ### Potentially Affected WADNR Fields
 
@@ -171,7 +182,42 @@ The `forminstance/` workaround is a **write-path band-aid** that prevents corrup
 
 ---
 
-## 5. Risk Profile for WADNR
+## 5. What John's Analysis Did Not Cover
+
+John's report correctly identified the `postForms` time mutation and led to a working migration path (`forminstance/`). However, his narrow scope — focused solely on the import path — leaves several systemic issues unaddressed. This is not criticism of John's work; he solved his immediate problem. But it provides context for why the holistic investigation matters.
+
+### 5.1 Configuration Validity
+
+John assumed the Config D setting was correct for all affected fields and blamed the import tool. Our [field inventory](../field-inventory.md) shows **8 of 12 Config D fields are likely misconfigured** — field names like "Date of Receipt", "Received Date", and "Date Created" suggest calendar dates (Model 1), not date+time values. These fields expose a time picker users don't need and store time-stamped values that make date-only queries unreliable. The bug John reported may be a symptom compounded by a configuration error.
+
+### 5.2 Native Data Quality
+
+John compared imported data against what the form displays after open. He did not compare imported data against data **created natively through the Forms UI** — which is how WADNR staff create records day-to-day. Our investigation shows that UI-created data on Config D fields is also subject to:
+
+- [FORM-BUG-1](../../forms-calendar/analysis/bug-1-timezone-stripping.md): Z stripped on form load, value reinterpreted as local time (one-time shift)
+- [FORM-BUG-5](../../forms-calendar/analysis/bug-5-fake-z-drift.md): `GetFieldValue()` appends fake `[Z]` to local values, corrupting any script round-trip
+
+The imported data (via `forminstance/`) may actually be **more correct** than what the system produces natively. This inverts John's framing: the problem isn't that imported data gets corrupted — it's that the system corrupts data by default, and the import workaround happens to avoid the corruption path.
+
+### 5.3 Post-Migration Data Consistency
+
+After migration completes, the database will contain records from three creation paths with different date accuracy:
+
+| Creation Path | Records | Date Quality |
+| --- | --- | --- |
+| **Imported** (via `forminstance/`) | Legacy data (hundreds of thousands) | ✅ Correct — bypasses V1 bugs |
+| **UI-created** (Forms frontend) | All future records by WADNR staff | ❌ Subject to FORM-BUG-1 shift on first open |
+| **Script-created** (via `postForms`) | Any records created by server scripts | ❌ Subject to original time mutation |
+
+This creates a **mixed-quality dataset** that grows more inconsistent over time. Dashboard queries and date-range reports will return different results depending on when and how records were created — not on their logical content.
+
+### 5.4 Script Interactions
+
+Per [script-inventory.md](../script-inventory.md), **11 WADNR scripts** interact with Config D fields. None of the 11 perform GFV→SFV round-trips in template-level code, so FORM-BUG-5 drift from round-trips is not active in template scripts. However, `VV.Form.Global.FillinAndRelateForm` (used in 36 templates) is site-level code not available in template XML — its date handling behavior is unknown and flagged for review.
+
+---
+
+## 6. Risk Profile for WADNR
 
 ### Immediate Risk (Migration)
 
@@ -180,16 +226,17 @@ With the `forminstance/` workaround, migrated records will display correct dates
 - No form button scripts on the affected forms read Config D values with `GetFieldValue` and write them back ([FORM-BUG-5](../../forms-calendar/analysis/bug-5-fake-z-drift.md) drift)
 - No downstream integrations read the values via the standard `getForms` API and trust the UTC marker ([WEBSERVICE-BUG-1](../../web-services/analysis/ws-bug-1-cross-layer-shift.md))
 
-<!-- PENDING: Identify which WADNR form scripts, if any, perform GetFieldValue → SetFieldValue round-trips on Config D fields. This determines whether FORM-BUG-5 drift is a theoretical or active risk. -->
+**Script analysis result** (2026-04-08): Per [script-inventory.md](../script-inventory.md), **no template-level scripts** perform GFV→SFV round-trips on Config D fields. The 11 Config D script interactions are either SetFieldValue-only (writes) or GetFieldValue-only (reads for validation). FORM-BUG-5 drift from round-trips is **not active** in template scripts. Caveat: `VV.Form.Global.FillinAndRelateForm` (site-level, 36 templates) is uninspected.
 
-### Ongoing Risk (Post-Migration)
+### Ongoing Risk (Post-Migration) — Data Divergence
 
-After migration, the data lives in a system where:
+After migration, the data lives in a system where imported and future records have **different date quality** (see Section 5.3). The gap widens over time:
 
-1. **Any form script** using the standard `GetFieldValue` → `SetFieldValue` pattern on Config D fields will introduce drift
-2. **Any API integration** reading dates from the standard endpoint will receive false UTC markers
-3. **Any new records** created via `postForms` (the standard SDK method) will be subject to the original time shift bug — the workaround only applies to records created via `forminstance/`
-4. **Dashboard queries** across records from different creation paths may return inconsistent results
+1. **UI-created records** (how WADNR staff work daily) go through the V1 init path → subject to FORM-BUG-1 Z-stripping on first open. Every new record will carry a shifted time value.
+2. **Script-created records** via `postForms` (the standard SDK method) are subject to the original time mutation bug — the `forminstance/` workaround only applies to the migration scripts, not to production code paths.
+3. **Any form script** using `GetFieldValue` → `SetFieldValue` on Config D fields will introduce FORM-BUG-5 drift — though no template-level scripts currently do this (see above).
+4. **Any API integration** reading dates from the standard endpoint will receive false UTC markers ([WEBSERVICE-BUG-1](../../web-services/analysis/ws-bug-1-cross-layer-shift.md)).
+5. **Dashboard queries and date-range reports** across records from different creation eras will return inconsistent results — queries cannot distinguish correct imported values from shifted native values in the same `datetime` column.
 
 ### Configuration Risk (The 8 Mismatched Fields)
 
@@ -199,21 +246,22 @@ Eight of the 12 Config D fields should probably be Config B (date-only + `ignore
 - **New exposure**: Config B date-only fields are vulnerable to [FORM-BUG-7](../../forms-calendar/analysis/bug-7-wrong-day-utc-plus.md) (wrong day stored for UTC+ users). WADNR users in Pacific time (UTC-8/UTC-7) would not be affected, but any users in UTC+ timezones would see dates shift by one day
 - **Data migration impact**: Existing records with time components stored in Config D fields would display differently after reconfiguration — the time component would be hidden but still present in the DB
 
-<!-- PENDING: Confirm with John whether these 8 fields actually carry meaningful time data in production, or if the time component is always midnight/zero (which would indicate the fields are used as date-only in practice despite the Config D setting). -->
+<!-- John confirmed (2026-04-08) the report covers ALL Config D fields. He did not evaluate whether individual fields carry meaningful time data. This question remains critical for reconfiguration decisions. -->
 
 ---
 
-## 6. Open Questions
+## 7. Open Questions
 
-1. **Which production field(s) triggered the original report?** — Pending John Sevilla's response
-2. **Do any WADNR form scripts perform GFV→SFV round-trips on Config D fields?** — Determines FORM-BUG-5 exposure
-3. **Do the 8 mismatched "Date of Receipt" fields carry meaningful time data?** — Determines whether reconfiguration to Config B is safe
+1. ~~**Which production field(s) triggered the original report?**~~ — **ANSWERED** (2026-04-08): Not a specific field. John's report covers all Config D fields, triggered by legacy data migration across the entire field class.
+2. ~~**Do any WADNR form scripts perform GFV→SFV round-trips on Config D fields?**~~ — **ANSWERED** (2026-04-08): No template-level round-trips found. 11 scripts interact with Config D fields but none perform GFV→SFV on the same field. `VV.Form.Global.FillinAndRelateForm` (site-level) is uninspected.
+3. **Do the 8 mismatched "Date of Receipt" fields carry meaningful time data?** — **CRITICAL**: Determines whether reconfiguration to Config B is safe. John did not evaluate this — he assumed Config D was correct for all fields.
 4. **Are WADNR users exclusively in Pacific timezone?** — If yes, FORM-BUG-7 risk is zero for a Config B migration; if any users operate from UTC+ (e.g., remote workers, international stakeholders), FORM-BUG-7 applies
 5. **Does any WADNR integration read form data via the standard REST API?** — Determines WEBSERVICE-BUG-1 exposure beyond the Forms UI
+6. **Does John's migration script import data into all 12 Config D fields, or only a subset?** — Determines which fields have correct imported data vs. which were never touched by the migration
 
 ---
 
-## 7. References
+## 8. References
 
 | Document                                                                             | Relationship                                                            |
 | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |

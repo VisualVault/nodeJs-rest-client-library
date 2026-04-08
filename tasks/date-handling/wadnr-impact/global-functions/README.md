@@ -1,0 +1,196 @@
+# WADNR Global Functions
+
+Extracted from `VV.Form.Global` on vv5dev (WADNR/fpOnline).
+Generated: 2026-04-08
+
+| # | Function | Params | Size |
+| --: | :------- | :----: | ---: |
+| 1 | [AddRecordLogic](./AddRecordLogic.js) | 1 | 3.4 KB |
+| 2 | [AddRecordModal](./AddRecordModal.js) | 2 | 3.3 KB |
+| 3 | [AddressCheckSameAddressMatch](./AddressCheckSameAddressMatch.js) | 1 | 2.6 KB |
+| 4 | [AddressCopySourceToDestination](./AddressCopySourceToDestination.js) | 1 | 3.6 KB |
+| 5 | [AddressVerification](./AddressVerification.js) | 3 | 12.8 KB |
+| 6 | [AddressVerificationOnBlur](./AddressVerificationOnBlur.js) | 1 | 5.7 KB |
+| 7 | [AddToTextboxList](./AddToTextboxList.js) | 1 | 4.8 KB |
+| 8 | [AdminSave](./AdminSave.js) | 0 | 1.8 KB |
+| 9 | [AssessFee](./AssessFee.js) | 0 | 0.8 KB |
+| 10 | [AssignPermissionsToAFolder](./AssignPermissionsToAFolder.js) | 1 | 2.1 KB |
+| 11 | [BlankFields](./BlankFields.js) | 3 | 3.2 KB |
+| 12 | [BuildAjaxFormSaveWithStaleCheck](./BuildAjaxFormSaveWithStaleCheck.js) | 1 | 3.6 KB |
+| 13 | [BuildUploadFolderPath](./BuildUploadFolderPath.js) | 1 | 1.3 KB |
+| 14 | [BuildUrls](./BuildUrls.js) | 3 | 1.7 KB |
+| 15 | [CalculateAge](./CalculateAge.js) | 2 | 1.1 KB |
+| 16 | [CalculateFirstLetterRangeFolderName](./CalculateFirstLetterRangeFolderName.js) | 1 | 3.2 KB |
+| 17 | [CallLibAssociatedDocumentRelationUpdate](./CallLibAssociatedDocumentRelationUpdate.js) | 3 | 2.9 KB |
+| 18 | [CallLibGetIndividual](./CallLibGetIndividual.js) | 1 | 3.3 KB |
+| 19 | [CallLibStatusHistoryCreate](./CallLibStatusHistoryCreate.js) | 8 | 3.8 KB |
+| 20 | [CentralCheckboxValidation](./CentralCheckboxValidation.js) | 2 | 1.8 KB |
+| 21 | [CentralDateValidation](./CentralDateValidation.js) | 5 | 6.2 KB |
+| 22 | [CentralDOBValidation](./CentralDOBValidation.js) | 3 | 2.1 KB |
+| 23 | [CentralEmailValidation](./CentralEmailValidation.js) | 1 | 1.6 KB |
+| 24 | [CentralMessages](./CentralMessages.js) | 2 | 8.9 KB |
+| 25 | [CentralNameValidation](./CentralNameValidation.js) | 1 | 1.8 KB |
+| 26 | [CentralNumericValidation](./CentralNumericValidation.js) | 3 | 2.9 KB |
+| 27 | [CentralTimeValidation](./CentralTimeValidation.js) | 1 | 0.2 KB |
+| 28 | [CentralValidation](./CentralValidation.js) | 2 | 3.5 KB |
+| 29 | [CheckboxRadioButton](./CheckboxRadioButton.js) | 2 | 0.4 KB |
+| 30 | [CheckboxValidation](./CheckboxValidation.js) | 3 | 0.5 KB |
+| 31 | [ClearFields](./ClearFields.js) | 1 | 0.5 KB |
+| 32 | [ClearFieldValidationErrors](./ClearFieldValidationErrors.js) | 1 | 0.8 KB |
+| 33 | [CommentInsertwithName](./CommentInsertwithName.js) | 3 | 2.9 KB |
+| 34 | [CopyFieldValues](./CopyFieldValues.js) | 3 | 2.6 KB |
+| 35 | [CreateFeeRecord](./CreateFeeRecord.js) | 2 | 4.5 KB |
+| 36 | [CustomCSS](./CustomCSS.js) | 0 | 1.4 KB |
+| 37 | [DatagridClearSelected](./DatagridClearSelected.js) | 1 | 0.4 KB |
+| 38 | [DatagridCountRows](./DatagridCountRows.js) | 1 | 0.7 KB |
+| 39 | [DatagridFindRows](./DatagridFindRows.js) | 1 | 0.9 KB |
+| 40 | [DatagridFindSelectedRows](./DatagridFindSelectedRows.js) | 1 | 0.9 KB |
+| 41 | [DatagridSelectLoad](./DatagridSelectLoad.js) | 1 | 4.5 KB |
+| 42 | [DatagridSelectObserve](./DatagridSelectObserve.js) | 1 | 5.2 KB |
+| 43 | [DateMilestoneCalculateKPI](./DateMilestoneCalculateKPI.js) | 1 | 3.0 KB |
+| 44 | [Debounce](./Debounce.js) | 2 | 1.9 KB |
+| 45 | [DisplayConfirmMessaging](./DisplayConfirmMessaging.js) | 4 | 4.0 KB |
+| 46 | [DisplayMapDynamically](./DisplayMapDynamically.js) | 1 | 3.5 KB |
+| 47 | [DisplayMessaging](./DisplayMessaging.js) | 2 | 2.4 KB |
+| 48 | [DisplayModal](./DisplayModal.js) | 1 | 12.6 KB |
+| 49 | [DisplayModalLoad](./DisplayModalLoad.js) | 0 | 0.4 KB |
+| 50 | [DisplayModalLoadBootstrapCSS](./DisplayModalLoadBootstrapCSS.js) | 0 | 110.7 KB |
+| 51 | [DisplayModalLoadCSS](./DisplayModalLoadCSS.js) | 0 | 48.4 KB |
+| 52 | [DisplayModalLoadSettings](./DisplayModalLoadSettings.js) | 0 | 0.9 KB |
+| 53 | [DisplayModalLoadSwal](./DisplayModalLoadSwal.js) | 0 | 0.6 KB |
+| 54 | [DisplayModalRemoveHiddenSweetAlertElements](./DisplayModalRemoveHiddenSweetAlertElements.js) | 0 | 3.2 KB |
+| 55 | [EnterValidFPANNumber](./EnterValidFPANNumber.js) | 2 | 6.7 KB |
+| 56 | [EvaluateGroupsandConditions](./EvaluateGroupsandConditions.js) | 1 | 2.9 KB |
+| 57 | [FillAndRelateAmendmentRequest](./FillAndRelateAmendmentRequest.js) | 0 | 2.7 KB |
+| 58 | [FillAndRelateLTA5Day](./FillAndRelateLTA5Day.js) | 0 | 0.7 KB |
+| 59 | [FillAndRelateRenewal](./FillAndRelateRenewal.js) | 0 | 0.7 KB |
+| 60 | [FillAndRelateTransferRequest](./FillAndRelateTransferRequest.js) | 0 | 0.7 KB |
+| 61 | [FillinAndRelateForm](./FillinAndRelateForm.js) | 3 | 2.9 KB |
+| 62 | [FontAwesomeIconsLoad](./FontAwesomeIconsLoad.js) | 0 | 0.4 KB |
+| 63 | [FormatCurrency](./FormatCurrency.js) | 1 | 0.4 KB |
+| 64 | [FormatDateFields](./FormatDateFields.js) | 1 | 1.8 KB |
+| 65 | [FormatDateTextField](./FormatDateTextField.js) | 1 | 1.2 KB |
+| 66 | [FormatFEIN](./FormatFEIN.js) | 1 | 1.3 KB |
+| 67 | [FormatPhone](./FormatPhone.js) | 1 | 1.8 KB |
+| 68 | [FormatSSN](./FormatSSN.js) | 1 | 0.8 KB |
+| 69 | [FormatTime](./FormatTime.js) | 1 | 1.6 KB |
+| 70 | [FormatTimeHHMM](./FormatTimeHHMM.js) | 3 | 2.0 KB |
+| 71 | [FormatZipCode](./FormatZipCode.js) | 1 | 0.8 KB |
+| 72 | [FormValidations](./FormValidations.js) | 4 | 3.8 KB |
+| 73 | [GetCurrentDate](./GetCurrentDate.js) | 0 | 0.3 KB |
+| 74 | [GetCurrentIndividual](./GetCurrentIndividual.js) | 0 | 2.8 KB |
+| 75 | [GetCurrentRoles](./GetCurrentRoles.js) | 0 | 0.8 KB |
+| 76 | [getDatagridRows](./getDatagridRows.js) | 2 | 1.0 KB |
+| 77 | [GetDateUTC](./GetDateUTC.js) | 0 | 0.5 KB |
+| 78 | [GetFolderPathFromFPANumber](./GetFolderPathFromFPANumber.js) | 3 | 2.8 KB |
+| 79 | [GetFormData](./GetFormData.js) | 1 | 0.6 KB |
+| 80 | [GetFormPrefix](./GetFormPrefix.js) | 1 | 0.8 KB |
+| 81 | [GetIndividualIdByUserId](./GetIndividualIdByUserId.js) | 0 | 4.2 KB |
+| 82 | [GetInstructions](./GetInstructions.js) | 1 | 3.6 KB |
+| 83 | [GetLabelValue](./GetLabelValue.js) | 1 | 0.9 KB |
+| 84 | [getLicenseForProvider](./getLicenseForProvider.js) | 0 | 2.9 KB |
+| 85 | [GetMapToken](./GetMapToken.js) | 0 | 2.7 KB |
+| 86 | [GetPendingRelatedFees](./GetPendingRelatedFees.js) | 1 | 0.5 KB |
+| 87 | [GetURLParamValue](./GetURLParamValue.js) | 2 | 0.8 KB |
+| 88 | [GIS_BuildCalciteLayout](./GIS_BuildCalciteLayout.js) | 0 | 13.6 KB |
+| 89 | [GIS_BuildFormElementsForLayer](./GIS_BuildFormElementsForLayer.js) | 1 | 3.7 KB |
+| 90 | [GIS_CancelActiveEditing](./GIS_CancelActiveEditing.js) | 0 | 1.4 KB |
+| 91 | [GIS_CreateEditorDropDownListPane](./GIS_CreateEditorDropDownListPane.js) | 4 | 2.6 KB |
+| 92 | [GIS_CreateMapView](./GIS_CreateMapView.js) | 2 | 3.8 KB |
+| 93 | [GIS_DisplayDangerAlert](./GIS_DisplayDangerAlert.js) | 2 | 1.0 KB |
+| 94 | [GIS_GetGISPortalID](./GIS_GetGISPortalID.js) | 0 | 0.4 KB |
+| 95 | [GIS_GetMapViewManager](./GIS_GetMapViewManager.js) | 0 | 1.8 KB |
+| 96 | [GIS_GetModalGISMap](./GIS_GetModalGISMap.js) | 3 | 19.7 KB |
+| 97 | [GIS_onLoad](./GIS_onLoad.js) | 1 | 9.8 KB |
+| 98 | [GIS_SetupEditorBtn](./GIS_SetupEditorBtn.js) | 7 | 23.3 KB |
+| 99 | [GIS_SetupGISSearchTSR](./GIS_SetupGISSearchTSR.js) | 1 | 11.4 KB |
+| 100 | [GIS_SetupPreviousViewBtn](./GIS_SetupPreviousViewBtn.js) | 1 | 2.3 KB |
+| 101 | [GIS_SetupPrintWidget](./GIS_SetupPrintWidget.js) | 3 | 40.6 KB |
+| 102 | [GIS_SetupSearchAddress](./GIS_SetupSearchAddress.js) | 1 | 2.8 KB |
+| 103 | [GIS_SetupUIWidgets](./GIS_SetupUIWidgets.js) | 6 | 3.5 KB |
+| 104 | [GIS_SetupUploadShapefile](./GIS_SetupUploadShapefile.js) | 4 | 15.1 KB |
+| 105 | [GIS_ShowDangerAlert](./GIS_ShowDangerAlert.js) | 2 | 1.8 KB |
+| 106 | [HyphenatedToProperCase](./HyphenatedToProperCase.js) | 1 | 0.9 KB |
+| 107 | [injectPlaceholder](./injectPlaceholder.js) | 1 | 2.4 KB |
+| 108 | [IsFillAndRelate](./IsFillAndRelate.js) | 0 | 0.5 KB |
+| 109 | [IsMapLoaded](./IsMapLoaded.js) | 0 | 0.1 KB |
+| 110 | [isNullEmptyUndefined](./isNullEmptyUndefined.js) | 1 | 1.3 KB |
+| 111 | [LoadBootstrapCSS](./LoadBootstrapCSS.js) | 0 | 112.2 KB |
+| 112 | [LoadInFPANRelations](./LoadInFPANRelations.js) | 0 | 4.3 KB |
+| 113 | [LoadModalSettings](./LoadModalSettings.js) | 0 | 0.3 KB |
+| 114 | [MeasureTaskComplete](./MeasureTaskComplete.js) | 3 | 12.1 KB |
+| 115 | [MessageModal](./MessageModal.js) | 11 | 3.6 KB |
+| 116 | [NormalizeNameCapitalization](./NormalizeNameCapitalization.js) | 1 | 0.9 KB |
+| 117 | [OpenDatagridRowReadOnly](./OpenDatagridRowReadOnly.js) | 1 | 0.7 KB |
+| 118 | [OpenGISModal](./OpenGISModal.js) | 1 | 1.6 KB |
+| 119 | [OpenShoppingCart](./OpenShoppingCart.js) | 1 | 1.9 KB |
+| 120 | [OpenURLFromGUID](./OpenURLFromGUID.js) | 3 | 1.8 KB |
+| 121 | [PopulateGuidtoParent](./PopulateGuidtoParent.js) | 2 | 3.5 KB |
+| 122 | [PostPDFMapToDocLib](./PostPDFMapToDocLib.js) | 3 | 6.5 KB |
+| 123 | [RedirectToSubmitted](./RedirectToSubmitted.js) | 0 | 0.5 KB |
+| 124 | [RefreshFormElements](./RefreshFormElements.js) | 1 | 3.5 KB |
+| 125 | [RegisterDatagrids](./RegisterDatagrids.js) | 1 | 0.2 KB |
+| 126 | [ReloadParentDataGridOrRRC](./ReloadParentDataGridOrRRC.js) | 2 | 0.4 KB |
+| 127 | [RRCGetItemsGUID](./RRCGetItemsGUID.js) | 1 | 4.5 KB |
+| 128 | [RRCGetSelectedItemGuids](./RRCGetSelectedItemGuids.js) | 1 | 3.7 KB |
+| 129 | [RRCGetSelectedItemsfromFormButton](./RRCGetSelectedItemsfromFormButton.js) | 1 | 2.3 KB |
+| 130 | [RRCGetSelectedRows](./RRCGetSelectedRows.js) | 2 | 0.6 KB |
+| 131 | [SaveBeforeUpload](./SaveBeforeUpload.js) | 1 | 1.1 KB |
+| 132 | [SecurityQuestionsModal](./SecurityQuestionsModal.js) | 0 | 11.2 KB |
+| 133 | [SetFieldValuesFromObj](./SetFieldValuesFromObj.js) | 3 | 4.7 KB |
+| 134 | [SetLabelTokenValue](./SetLabelTokenValue.js) | 3 | 1.9 KB |
+| 135 | [SetLabelValue](./SetLabelValue.js) | 2 | 1.1 KB |
+| 136 | [SetProperCaseFieldValue](./SetProperCaseFieldValue.js) | 1 | 0.9 KB |
+| 137 | [SetRadioCheckbox](./SetRadioCheckbox.js) | 2 | 1.2 KB |
+| 138 | [SetupReg](./SetupReg.js) | 0 | 3.8 KB |
+| 139 | [SignatoryDisableButtonByFieldName](./SignatoryDisableButtonByFieldName.js) | 1 | 0.9 KB |
+| 140 | [SSNValidation](./SSNValidation.js) | 1 | 0.9 KB |
+| 141 | [StripHtmlTags](./StripHtmlTags.js) | 1 | 0.2 KB |
+| 142 | [SubmitApplicationUpdate](./SubmitApplicationUpdate.js) | 0 | 4.9 KB |
+| 143 | [SyncARP](./SyncARP.js) | 1 | 3.7 KB |
+| 144 | [ToProperCase](./ToProperCase.js) | 1 | 0.2 KB |
+| 145 | [Uint8ArrayToBase64](./Uint8ArrayToBase64.js) | 1 | 0.5 KB |
+| 146 | [UncheckAdminOverrideAndSave](./UncheckAdminOverrideAndSave.js) | 0 | 0.8 KB |
+| 147 | [UpdateWindowLocationURL](./UpdateWindowLocationURL.js) | 0 | 1.0 KB |
+| 148 | [UseCustomQuery](./UseCustomQuery.js) | 3 | 2.0 KB |
+| 149 | [ValidateCheckboxFields](./ValidateCheckboxFields.js) | 3 | 1.4 KB |
+| 150 | [ValidateFPANNumberOwnership](./ValidateFPANNumberOwnership.js) | 4 | 7.7 KB |
+| 151 | [ValidationModal](./ValidationModal.js) | 1 | 11.4 KB |
+| 152 | [ValidationModalGoToField](./ValidationModalGoToField.js) | 1 | 3.8 KB |
+| 153 | [VerifySubFormRelationship](./VerifySubFormRelationship.js) | 0 | 5.2 KB |
+| 154 | [ViewDocumentsModal](./ViewDocumentsModal.js) | 1 | 17.8 KB |
+| 155 | [ViewDocumentsModalAccept](./ViewDocumentsModalAccept.js) | 1 | 6.1 KB |
+| 156 | [ViewDocumentsModalDelete](./ViewDocumentsModalDelete.js) | 1 | 7.0 KB |
+| 157 | [ViewDocumentsModalInvalid](./ViewDocumentsModalInvalid.js) | 1 | 7.2 KB |
+
+**Total**: 157 functions
+
+## Non-Function Properties
+
+| Name | Type | Value |
+| :--- | :--- | :---- |
+| gisLoadPromise | object | `null` |
+| gisLastError | object | `null` |
+| gisIsLoading | boolean | `false` |
+| preFetchedWebMapResponse | object | `[{"name":"token","value":"AAPTajQqDHs1Xf0iX2ISMuDy9Tg..0fiwjoeNmu1skkY6Mo61jp6FX` |
+| mapState | object | `{"_map":null,"_view":null,"_calciteAppNav":null,"_calciteAppPanel":null,"_editor` |
+| PhoneReg | object | `{}` |
+| EmailReg | object | `{}` |
+| URLReg | object | `{}` |
+| BlankReg | object | `{}` |
+| ZipReg | object | `{}` |
+| DDSelectReg | object | `{}` |
+| TimeReg | object | `{}` |
+| PartnerReg | object | `{}` |
+| CGASScore | object | `{}` |
+| DoubleDigitCheck | object | `{}` |
+| SSN | object | `{}` |
+| EIN | object | `{}` |
+| NPI | object | `{}` |
+| Currency | object | `{}` |
+| Percent | object | `{}` |
+| NumberOnly | object | `{}` |
+| NameReg | object | `{}` |
+| NameNumberReg | object | `{}` |
+| MedicaidIDRecipient | object | `{}` |
+| MedicaidIDProvider | object | `{}` |
