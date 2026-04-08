@@ -22,8 +22,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `tasks/date-handling/wadnr-impact/bug-analysis/case-study-124697.md` — case study mapping Freshdesk #124697 (postForms time mutation) to FORM-BUG-1, FORM-BUG-5, WEBSERVICE-BUG-4; layer-by-layer analysis of `forminstance/` workaround limits
 - Category 4 (URL Parameters) Playwright test suite: 2 spec files (`cat-4-url-params.spec.js`, `cat-4-fillinrelate.spec.js`), 36 test-data entries, `gotoWithUrlParams()` helper in `vv-form.js`, TargetDateTest form URL in `vv-config.js`
 - `tasks/date-handling/forms-calendar/examples/fillinandrelated.js` — production FillinAndRelateForm global function example documenting the URL parameter chain pattern
+- Read-only environment guard: per-customer `readOnly` flag in `.env.json` blocks POST/PUT/DELETE at the `httpHelper` HTTP layer (`common.js`). Propagated through `authorize` → `vvClient` → all sub-APIs. POST-as-read allowlist for search and scheduledProcess endpoints. `VV_FORCE_WRITE=1` env var override
 
 ### Changed
+
+- `.env.json` restructured from flat `environments` map to hierarchical `servers → customers` structure reflecting VV platform architecture. Selectors changed from `activeEnv` to `activeServer` + `activeCustomer`. `env-config.js` and `app.js` resolve the new hierarchy; `loadConfig()` return shape unchanged
+- ESLint config: excluded `lib/VVRestApi/` and `tasks/**/bug-analysis/` from linting (upstream code and captured VV script artifacts with pre-existing errors that blocked lint-staged)
 
 - Refactored all 7 Forms calendar bug reports (FORM-BUG-1 through FORM-BUG-7) to comply with bug report standard: standalone structure, jargon-free "What Happens," conditions-based "When This Applies," "How to Reproduce" for support audience, Verification summary replacing raw test data, field config appendix, supporting repository notice
 - Refactored all 6 Web Services bug reports (WEBSERVICE-BUG-1 through WEBSERVICE-BUG-6) and FORMDASHBOARD-BUG-1 to comply with bug report standard: same restructuring as Forms bugs, plus tone fixes ("fake"→"incorrect", editorial language removed), non-standard "Impact Analysis" sections eliminated

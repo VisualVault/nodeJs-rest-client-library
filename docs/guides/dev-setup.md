@@ -76,22 +76,39 @@ All credentials (server, Playwright, WS runner) live in a single root `.env.json
 cp .env.example.json .env.json
 ```
 
-Edit `.env.json`:
+Edit `.env.json`. The file uses a hierarchical structure: **servers → customers**.
 
-| Field           | Description                          | Example                          |
-| --------------- | ------------------------------------ | -------------------------------- |
-| `activeEnv`     | Which environment to use             | `vvdemo`                         |
-| `baseUrl`       | Full VV instance URL                 | `https://vvdemo.visualvault.com` |
-| `customerAlias` | Customer alias for your tenant       | `EmanuelJofre`                   |
-| `databaseAlias` | Database alias                       | `Main`                           |
-| `clientId`      | OAuth app client ID                  | —                                |
-| `clientSecret`  | OAuth app client secret              | —                                |
-| `username`      | Your VV email (for browser login)    | `user@company.com`               |
-| `loginPassword` | Your VV password (for browser login) | —                                |
+**Root-level selectors:**
+
+| Field            | Description                   | Example        |
+| ---------------- | ----------------------------- | -------------- |
+| `activeServer`   | Which VV server to target     | `vvdemo`       |
+| `activeCustomer` | Which customer on that server | `EmanuelJofre` |
+
+**Server-level properties** (under `servers.{name}`):
+
+| Field     | Description          | Example                          |
+| --------- | -------------------- | -------------------------------- |
+| `baseUrl` | Full VV instance URL | `https://vvdemo.visualvault.com` |
+
+**Customer-level properties** (under `servers.{name}.customers.{name}`):
+
+| Field           | Description                          | Example            |
+| --------------- | ------------------------------------ | ------------------ |
+| `customerAlias` | Customer alias for your tenant       | `EmanuelJofre`     |
+| `databaseAlias` | Database alias                       | `Main`             |
+| `clientId`      | OAuth app client ID                  | —                  |
+| `clientSecret`  | OAuth app client secret              | —                  |
+| `username`      | Your VV email (for browser login)    | `user@company.com` |
+| `loginPassword` | Your VV password (for browser login) | —                  |
+| `audience`      | OAuth audience (optional)            | `""`               |
+| `readOnly`      | Block write operations               | `false`            |
 
 `clientId`/`clientSecret`: Register an API application in VV Admin to obtain these. Used by server scripts (client_credentials flow) and the WS runner (password grant).
 
 `username`/`loginPassword`: Your human VV login. Used by Playwright browser auth and the WS direct runner.
+
+`readOnly`: Set to `true` for production/client environments (e.g., WADNR) to block all write operations at the HTTP layer. Override with `VV_FORCE_WRITE=1` env var for exceptional cases.
 
 This file is gitignored. Never commit credentials.
 
@@ -185,11 +202,11 @@ WS testing uses a direct Node.js runner to call the VV API. No server or browser
 
 The root `.env.json` (created in section 4.3) serves all credential consumers:
 
-- **Server path:** `app.js` loads the active environment into `global.VV_ENV` at startup. Server-side scripts read from this global via `getCredentials()`, using `clientId`/`clientSecret` for the OAuth client_credentials flow.
+- **Server path:** `app.js` resolves `activeServer`/`activeCustomer` into `global.VV_ENV` at startup. Server-side scripts read from this global via `getCredentials()`, using `clientId`/`clientSecret` for the OAuth client_credentials flow.
 - **Playwright tests:** `global-setup.js` uses `username`/`loginPassword` for browser login.
 - **WS direct runner:** `run-ws-test.js` uses `username`/`loginPassword` + `clientId`/`clientSecret` for the OAuth password grant.
 
-Switch environments by changing `activeEnv` and restarting the server.
+Switch targets by changing `activeServer` and/or `activeCustomer` and restarting the server.
 
 ### 5.1 Prerequisites
 

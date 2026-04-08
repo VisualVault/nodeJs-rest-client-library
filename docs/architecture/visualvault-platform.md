@@ -4,6 +4,24 @@ Reference for navigating, understanding, and scripting against the VisualVault p
 
 ---
 
+## Multi-Tenant Hierarchy
+
+VV uses a three-level tenancy model. Each level is a distinct scope for data, configuration, and access control:
+
+```
+Server (environment)          e.g., vvdemo.visualvault.com, vv5dev.visualvault.com
+  └─ Customer (tenant/org)    e.g., EmanuelJofre, WADNR, CityOfLincoln
+       └─ Database (workspace) e.g., Main, fpOnline, Phase2
+```
+
+- **Server**: the VV instance. Multiple customers can exist on the same server
+- **Customer** (`customerAlias`): the organization/tenant. Has its own users, groups, API applications, and OAuth credentials
+- **Database** (`databaseAlias`): a workspace within a customer. Has its own forms, documents, folders, scripts, and scheduled processes. A customer can have multiple databases (e.g., `Main` for production, `Phase2` for a separate project)
+
+This hierarchy is reflected in URL paths, API authentication (`customerAlias`/`databaseAlias` parameters), and the `.env.json` structure (`servers → customers`).
+
+---
+
 ## URL Anatomy
 
 ### Main Application
