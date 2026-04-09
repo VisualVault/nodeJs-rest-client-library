@@ -19,6 +19,30 @@ const { loadConfig } = require('./fixtures/env-config');
 
 const AUTH_STATE_PATH = path.join(__dirname, 'config', 'auth-state-pw.json');
 
+// Write policy environment banner — warn when running against restricted environments
+const _envConfig = loadConfig();
+if (_envConfig.writePolicy && _envConfig.writePolicy.mode === 'allowlist') {
+    const allowedForms = (_envConfig.writePolicy.forms || []).map((f) => f.name || f.templateId).join(', ');
+    console.warn(
+        `\n\u26a0  RESTRICTED ENVIRONMENT: ${_envConfig.instance}\n` +
+            `   Write policy: allowlist\n` +
+            `   Allowed forms: ${allowedForms || '(none)'}\n` +
+            `   All other writes will throw.\n`
+    );
+} else if (_envConfig.readOnly && (!_envConfig.writePolicy || _envConfig.writePolicy.mode === 'blocked')) {
+    console.warn(
+        `\n\u26d4 BLOCKED ENVIRONMENT: ${_envConfig.instance}\n` + `   All write operations will be blocked.\n`
+    );
+}
+
+// Optional CI safety gate: VV_CONFIRM_ENV must match the active instance
+if (process.env.VV_CONFIRM_ENV && process.env.VV_CONFIRM_ENV !== _envConfig.instance) {
+    console.error(
+        `\nENVIRONMENT MISMATCH: VV_CONFIRM_ENV="${process.env.VV_CONFIRM_ENV}" but active instance is "${_envConfig.instance}".`
+    );
+    process.exit(1);
+}
+
 const timezones = [
     { name: 'BRT', timezoneId: 'America/Sao_Paulo' }, // UTC-3
     { name: 'IST', timezoneId: 'Asia/Kolkata' }, // UTC+5:30
@@ -58,6 +82,7 @@ module.exports = defineConfig({
     expect: { timeout: 10_000 },
 
     globalSetup: './global-setup.js',
+    globalTeardown: './global-teardown.js',
 
     use: {
         baseURL: loadConfig().baseUrl,

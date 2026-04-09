@@ -18,6 +18,7 @@
  */
 const { test, expect } = require('@playwright/test');
 const { loadConfig } = require('../../fixtures/env-config');
+const { guardedPut } = require('../../helpers/vv-request');
 
 const config = loadConfig();
 const BASE_URL = config.baseUrl;
@@ -47,7 +48,7 @@ async function getToken(request) {
 
 async function writeDateField(request, value) {
     const t = await getToken(request);
-    const resp = await request.put(`${BASE_URL}${API_BASE}/documents/${DOC_ID}/indexfields`, {
+    const resp = await guardedPut(request, `${BASE_URL}${API_BASE}/documents/${DOC_ID}/indexfields`, {
         headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
         data: { indexFields: JSON.stringify({ [DATE_FIELD_LABEL]: value }) },
     });

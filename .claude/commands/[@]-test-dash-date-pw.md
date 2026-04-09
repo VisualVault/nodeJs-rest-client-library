@@ -73,6 +73,18 @@ When `--skip-verify` is present, the command **does not open a browser**. Instea
 
 ## Phase 0 — Playwright session setup
 
+### 0.0 — Environment safety check
+
+Read `.env.json` config by running: `node -e "const c = require('./testing/fixtures/env-config').loadConfig(); console.log(JSON.stringify({instance: c.instance, readOnly: c.readOnly, writePolicy: c.writePolicy, baseUrl: c.baseUrl, customerAlias: c.customerAlias, databaseAlias: c.databaseAlias}, null, 2))"`
+
+Print environment banner:
+
+- **Unrestricted**: `Environment: {instance} (unrestricted)` — proceed
+- **Allowlist**: `⚠ RESTRICTED: {instance} — dashboard tests are read-only, proceeding.` — proceed (dashboard tests don't write)
+- **Blocked**: `Environment: {instance} (blocked — read-only OK for dashboard tests)` — proceed (dashboard tests don't write)
+
+Record the environment instance — include it in all generated artifacts. Use `baseUrl`, `customerAlias`, `databaseAlias` from config to construct the dashboard URL (do not hardcode `vvdemo/EmanuelJofre`).
+
 ### 0.1 — Read credentials
 
 Read credentials from the root `.env.json` by loading `testing/fixtures/env-config.js` (`loadConfig()`) to get VV instance URL, username, password. If `.env.json` does not exist, stop and instruct the user to create it from `.env.example.json`.
@@ -99,16 +111,19 @@ Or run any single test to trigger global-setup.
 
 ### 0.3 — Navigate to dashboard
 
+Use the `baseUrl`, `customerAlias`, and `databaseAlias` from the config loaded in 0.0 to construct the URL. Do NOT hardcode `vvdemo/EmanuelJofre/Main`.
+
 ```javascript
-await page.goto(
-    'https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25',
-    {
-        waitUntil: 'networkidle',
-        timeout: 60000,
-    }
-);
+// config values from Phase 0.0
+const dashboardUrl = `${config.baseUrl}/app/${config.customerAlias}/${config.databaseAlias}/FormDataDetails?Mode=ReadOnly&ReportID=e522c887-e72e-f111-ba23-0e3ceb11fc25`;
+await page.goto(dashboardUrl, {
+    waitUntil: 'networkidle',
+    timeout: 60000,
+});
 await page.waitForTimeout(3000); // RadGrid server render stabilization
 ```
+
+> Note: The `ReportID` GUID may differ per customer environment. If the dashboard does not load, check the project's `test-assets.md` for the correct ReportID.
 
 Verify the page loaded: check for `.rgMasterTable` selector. If not found, check if redirected to login page and re-authenticate.
 
@@ -534,12 +549,13 @@ Append a one-line entry to the current session in `dashboards/results.md`:
 
 ## Constraints
 
-1. **TC spec immutability**: Once created, TC spec files are never modified. Create a new run file for re-runs.
-2. **Run file immutability**: Never modify a run file — create a new one with incremented N.
-3. **Expected = correct behavior**: TC spec Expected Results always show what the system _should_ do, not what a buggy system produces.
-4. **No TZ suffix in IDs**: Dashboard tests don't use TZ suffixes (server-rendered, TZ irrelevant). Exception: DB-8 which tests TZ independence explicitly.
-5. **Cross-reference existing data**: Before creating new records, check forms-calendar and web-services results for records with known stored values.
-6. **Artifact paths**: All artifacts live under `tasks/date-handling/dashboards/` (test-cases/, runs/, summaries/).
+1. **Dashboard tests are read-only.** Do NOT click Save, Edit, or Delete buttons when navigating forms for DB-6 cross-layer comparison. Use `page.evaluate()` to read field values only. All form saves MUST go through `saveFormOnly()` from `testing/helpers/vv-form.js` — direct button clicks on Save are forbidden. See root `CLAUDE.md` § "Write Safety".
+2. **TC spec immutability**: Once created, TC spec files are never modified. Create a new run file for re-runs.
+3. **Run file immutability**: Never modify a run file — create a new one with incremented N.
+4. **Expected = correct behavior**: TC spec Expected Results always show what the system _should_ do, not what a buggy system produces.
+5. **No TZ suffix in IDs**: Dashboard tests don't use TZ suffixes (server-rendered, TZ irrelevant). Exception: DB-8 which tests TZ independence explicitly.
+6. **Cross-reference existing data**: Before creating new records, check forms-calendar and web-services results for records with known stored values.
+7. **Artifact paths**: All artifacts live under `tasks/date-handling/dashboards/` (test-cases/, runs/, summaries/).
 
 ## Artifact Sharing
 

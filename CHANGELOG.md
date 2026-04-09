@@ -10,6 +10,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 ### Added
 
+- Custom Queries extract component (`tools/extract/components/queries.js`) — API-first probe with Playwright fallback, parallel SQL extraction via dock panel response interception, hash-based incremental sync, connection discovery from ConnectionsAdmin grid
+- Renamed extract pipeline: `tools/export/` → `tools/extract/`, `projects/*/exports/` → `projects/*/extracts/`. Clarifies that the tools pull data from VV (extract), not push data out. All code, docs, commands updated.
 - Bug report standard (`docs/standards/bug-report-standard.md`) — document structure, 21 writing principles, severity levels, reading guide, companion doc format, field config appendix pattern
 - Fix-recommendation companion docs for all 7 Forms calendar bugs (`bug-{1-7}-fix-recommendations.md`) — workarounds, proposed fixes, impact assessments separated from bug reports
 - Fix-recommendation companion docs for all 6 Web Services bugs (`ws-bug-{1-6}-fix-recommendations.md`) and Dashboard bug (`formdashboard-bug-1-fix-recommendations.md`)
@@ -51,6 +53,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Export optimization: parallel template export (3 Playwright workers, ~3x faster), SHA-256 content-hash tracking in manifest for instant incremental sync, globals multi-template retry with record prioritization (5 attempts, 20s each)
 - `hashField` option in `vv-sync.computeChanges()` for content-hash-based change detection (skips unchanged items without date fields)
 - Per-project `test-assets.md` convention — catalogs platform-side test components (forms, WS, saved records) per environment. Created for `projects/emanueljofre/` and `projects/wadnr/`. Convention documented in `testing/CLAUDE.md` and `projects/CLAUDE.md` scaffolding template
+- Document Library date investigation (`tasks/date-handling/document-library/`): DOC-BUG-1 (timezone offset converted to UTC with Z stripped), DOC-BUG-2 (cannot clear date index field). 17 automated regression tests in `testing/specs/date-handling/doc-index-field-dates.spec.js`
+- `tools/explore/specs/document-dates.spec.js` — Document Library UI exploration spec (folder tree, grid, index fields tab, RadDateTimePicker)
+- **Write-policy security harness**: per-customer `writePolicy` in `.env.json` with 3 modes (`unrestricted`, `allowlist`, `blocked`). Central enforcement in `testing/fixtures/write-policy.js`. Guards at 4 layers: Playwright form saves (`vv-form.js`), Playwright API writes (`vv-request.js`), Node.js REST client (`common.js`), environment banner (`playwright.config.js`). Audit log flushed to `testing/config/write-audit.json` via `global-teardown.js`. Per-customer template URLs in `testing/fixtures/vv-config.js` (`CUSTOMER_TEMPLATES`). Write Safety sections added to all CLAUDE.md files. Commands updated with environment safety checks (`/@-test-ws-date-pw`, `/@-test-forms-date-pw`, `/@-test-dash-date-pw`, `/@-create-project`)
 
 ### Changed
 

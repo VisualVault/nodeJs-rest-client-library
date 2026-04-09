@@ -24,6 +24,7 @@ tasks/date-handling/
   forms-calendar/              # Forms investigation: analysis/, matrix.md, test-cases/, runs/, summaries/
   web-services/                # WS investigation: analysis/, matrix.md, test-cases/, runs/, summaries/
   dashboards/                  # Dashboard investigation: analysis/, matrix.md, test-cases/, runs/, summaries/
+  document-library/            # Document index field investigation: analysis/overview.md
 ```
 
 ## Key Facts

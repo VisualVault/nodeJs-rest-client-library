@@ -10,12 +10,27 @@ Create a new customer/environment project workspace under `projects/` with the s
 ## Usage
 
 ```
-/@-create-project <name> [--server <server>] [--customer <customer>] [--database <database>] [--readonly]
+/@-create-project <name> [--server <server>] [--customer <customer>] [--database <database>] [--readonly] [--write-policy <mode>]
 ```
 
-**Example:** `/@-create-project acme --server vv5dev --customer ACME --database Main --readonly`
+**Example:** `/@-create-project acme --server vv5dev --customer ACME --database Main --readonly --write-policy allowlist`
 
 If server/customer/database are not provided, prompt the user for them.
+
+### Write Policy Modes
+
+| Mode           | When to use                                                          | Default for                                    |
+| -------------- | -------------------------------------------------------------------- | ---------------------------------------------- |
+| `unrestricted` | Development sandboxes — all writes allowed                           | Non-readonly environments                      |
+| `allowlist`    | Active client projects — writes only to listed test harness forms/WS | Must be specified explicitly                   |
+| `blocked`      | No writes at all                                                     | Readonly environments without `--write-policy` |
+
+When `--write-policy allowlist` is specified, **prompt the user** for:
+
+1. Allowed form template IDs and human-readable names (e.g., `ff59bb37-... = zzzDate Test Harness`)
+2. Allowed web service names (e.g., `zzzJohnDevTestWebSvc`)
+
+See root `CLAUDE.md` § "Write Safety" for the full policy architecture.
 
 ---
 
@@ -32,7 +47,7 @@ If server/customer/database are not provided, prompt the user for them.
 ```
 projects/<name>/
   CLAUDE.md
-  exports/
+  extracts/
     web-services/
       scripts/
     schedules/
@@ -51,38 +66,59 @@ Use this template, filling in the provided values:
 
 ## Environment
 
-| Setting   | Value                              |
-| --------- | ---------------------------------- |
-| Server    | <server>                           |
-| Customer  | <customer>                         |
-| Database  | <database>                         |
-| Base URL  | https://<server>.visualvault.com   |
-| Read-Only | <Yes/No> (enforced in `.env.json`) |
+| Setting      | Value                                  |
+| ------------ | -------------------------------------- |
+| Server       | <server>                               |
+| Customer     | <customer>                             |
+| Database     | <database>                             |
+| Base URL     | https://<server>.visualvault.com       |
+| Read-Only    | <Yes/No> (enforced in `.env.json`)     |
+| Write Policy | `<mode>` — <description based on mode> |
 
-## Exports
+## Write Safety
 
-All data extracted via `tools/export/` from the <customer> admin panels on <server>.
+{If mode is "allowlist":}
 
-| Component          | Count | Location                    |
-| ------------------ | ----- | --------------------------- |
-| Web Services       | —     | `exports/web-services/`     |
-| Scheduled Services | —     | `exports/schedules/`        |
-| Global Functions   | —     | `exports/global-functions/` |
-| Form Templates     | —     | `exports/form-templates/`   |
+**Currently allowed writes:**
 
-Last full export: not yet run.
+- Form: `<name>` (template `<templateId>`) — create and update
+  {repeat for each allowed form}
+
+**Everything else is blocked.** Do not create records on non-allowlisted forms, invoke non-allowlisted web services, or modify documents. See root `CLAUDE.md` § "Write Safety" for the full policy.
+
+{If mode is "blocked":}
+
+**All write operations are blocked.** This environment is read-only. No form records, web service invocations, or document modifications.
+
+{If mode is "unrestricted":}
+
+Development sandbox — all writes allowed. See root `CLAUDE.md` § "Write Safety" for the guard architecture.
+
+## Extracts
+
+All data extracted via `tools/extract/` from the <customer> admin panels on <server>.
+
+| Component          | Count | Location                     |
+| ------------------ | ----- | ---------------------------- |
+| Web Services       | —     | `extracts/web-services/`     |
+| Scheduled Services | —     | `extracts/schedules/`        |
+| Global Functions   | —     | `extracts/global-functions/` |
+| Form Templates     | —     | `extracts/form-templates/`   |
+| Custom Queries     | —     | `extracts/custom-queries/`   |
+
+Last full extraction: not yet run.
 
 ## Commands
 
 ```bash
 # Export all components
-node tools/export/export.js --project <name>
+node tools/extract/extract.js --project <name>
 
 # Export just scripts
-node tools/export/export.js --project <name> --component scripts
+node tools/extract/extract.js --project <name> --component scripts
 
 # Dry-run
-node tools/export/export.js --project <name> --dry-run
+node tools/extract/extract.js --project <name> --dry-run
 ```
 ````
 
@@ -97,14 +133,36 @@ No analysis files yet. Run exports first, then use:
 
 - Platform date bugs: `tasks/date-handling/` (if applicable)
 
-```
+````
 
 ### 4. Check .env.json configuration
 
 Read root `.env.json`. Check if `servers.<server>.customers.<customer>` exists.
 
-- If it exists: report "Environment already configured in .env.json"
-- If it doesn't exist: report "Add this environment to .env.json:" and show the JSON path that needs to be added, referencing `.env.example.json` for the structure. Do NOT modify `.env.json`.
+- If it exists: report "Environment already configured in .env.json". Check if `writePolicy` matches the requested mode — warn if mismatched.
+- If it doesn't exist: report "Add this environment to .env.json:" and show the full JSON block including `writePolicy`. Reference `.env.example.json` for the base structure. Include the `writePolicy` block:
+  - For `blocked`: `"writePolicy": { "mode": "blocked" }` (or omit — `readOnly: true` without writePolicy defaults to blocked)
+  - For `allowlist`: show the full structure with the user-provided form/WS entries:
+    ```json
+    "writePolicy": {
+        "mode": "allowlist",
+        "forms": [
+            { "templateId": "<user-provided-id>", "name": "<user-provided-name>", "operations": ["create", "update"] }
+        ],
+        "webServices": [
+            { "name": "<user-provided-name>" }
+        ],
+        "documents": []
+    }
+    ```
+  - For `unrestricted`: no `writePolicy` block needed (absence = unrestricted when `readOnly: false`)
+- Do NOT modify `.env.json`.
+
+### 4.5. Template URL registration reminder
+
+If writePolicy mode is `allowlist`, remind the user:
+
+> To run Playwright tests against this environment, add form template URLs to `CUSTOMER_TEMPLATES` in `testing/fixtures/vv-config.js`. Each customer needs its own `formid`, `xcid`, and `xcdid` values. See the existing EmanuelJofre and WADNR entries for the pattern.
 
 ### 5. Update projects/CLAUDE.md
 
@@ -112,19 +170,19 @@ Read `projects/CLAUDE.md`. Add the new project to the "Active Projects" table.
 
 ### 6. Report
 
-```
+````
 
 Project created: projects/<name>/
 
 Structure:
 projects/<name>/CLAUDE.md
-projects/<name>/exports/ (web-services, schedules, global-functions, form-templates)
+projects/<name>/extracts/ (web-services, schedules, global-functions, form-templates, custom-queries)
 projects/<name>/analysis/
 
 Next steps:
 
 1. Ensure .env.json has the <server>/<customer> credentials
-2. Run: node tools/export/export.js --project <name> --dry-run
+2. Run: node tools/extract/extract.js --project <name> --dry-run
 3. Review and run without --dry-run to populate exports
 
 ```

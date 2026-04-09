@@ -203,6 +203,23 @@ async function captureDisplayValue(page, fieldName) {
  * @returns {Promise<{dataId: string, url: string}>} the DataID GUID and saved record URL path
  */
 async function saveFormOnly(page, timeout = 60000) {
+    // Write policy guard — extract template ID from the browser and validate before clicking Save.
+    // This is the sole chokepoint for all Playwright form saves (saveFormAndReload calls this too).
+    const { assertFormWriteAllowed } = require('../fixtures/write-policy');
+    const templateId = await page.evaluate(() =>
+        (
+            VV.Form.formId ||
+            (VV.Form.VV && VV.Form.VV.FormPartition && VV.Form.VV.FormPartition.FormId) ||
+            ''
+        ).toLowerCase()
+    );
+    const isNewRecord = await page.evaluate(() => {
+        const dataId = VV.Form.DataID || '';
+        const formId = (VV.Form.formId || '').toLowerCase();
+        return !dataId || dataId.toLowerCase() === formId;
+    });
+    assertFormWriteAllowed(templateId, isNewRecord ? 'create' : 'update');
+
     // Capture the pre-save DataID — on template forms, this is the formId (e.g., "6be0265c-...").
     // After save, VV.Form.DataID changes to the new record's DataID.
     const preSaveId = await page.evaluate(() => VV.Form.DataID || '');

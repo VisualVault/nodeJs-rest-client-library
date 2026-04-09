@@ -34,6 +34,19 @@ Examples:
 
 ---
 
+## Phase 0 — Environment Safety Check
+
+Before doing anything else, verify the active environment allows write operations.
+
+1. Read `.env.json` config by running: `node -e "const c = require('./testing/fixtures/env-config').loadConfig(); console.log(JSON.stringify({instance: c.instance, readOnly: c.readOnly, writePolicy: c.writePolicy}, null, 2))"`
+2. Print the environment banner:
+    - **Unrestricted** (no writePolicy or mode=unrestricted): `Environment: {instance} (unrestricted)` — proceed normally
+    - **Allowlist** (mode=allowlist): `⚠ RESTRICTED: {instance} — writes only to: {form/WS names from allowlist}`. Verify the DateTestWSHarness (or the target WS) is in `writePolicy.webServices`. If not listed, STOP and warn: "The target web service is not in the writePolicy allowlist for this environment."
+    - **Blocked** (readOnly=true, no writePolicy or mode=blocked): `⛔ BLOCKED: {instance} — no writes allowed. STOP.` Do not proceed. Inform the user this environment does not allow write operations.
+3. Record the environment instance and write policy mode — include these in all generated artifacts (Phase 3 Environment table, Phase 4 run file header).
+
+---
+
 ## Phase 1 — Load source material
 
 Read the following files before doing anything else:
@@ -327,6 +340,7 @@ When multiple test IDs are provided:
 - **TZ is always explicit** — never assume. Verify via `serverTimezone` in response.
 - **Debug mode raw data** goes in run files only, not in TC specs or summaries.
 - **Cross-reference Forms results** for WS-2: compare API return against known `getValueObjectValue()` values from `forms-calendar/results.md`.
+- **Respect write-policy.** This command invokes web services that create/modify form records. The `run-ws-test.js` runner enforces `writePolicy` from `.env.json` at runtime, but always run Phase 0 to verify the environment is appropriate BEFORE executing. Never skip the environment check.
 
 ## Artifact Sharing
 

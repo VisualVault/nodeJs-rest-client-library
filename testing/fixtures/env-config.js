@@ -71,6 +71,7 @@ function loadConfig() {
         databaseAlias: customer.databaseAlias,
         audience: customer.audience || '',
         readOnly: customer.readOnly === true,
+        writePolicy: customer.writePolicy || null,
     };
 }
 

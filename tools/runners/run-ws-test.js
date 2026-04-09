@@ -110,6 +110,7 @@ async function main() {
     const clientLibrary = require(path.join(__dirname, '..', '..', 'lib', 'VVRestApi', 'VVRestApiNodeJs', 'VVRestApi'));
     const vvAuthorize = new clientLibrary.authorize();
     vvAuthorize.readOnly = config.readOnly || false;
+    vvAuthorize.writePolicy = config.writePolicy || null;
 
     console.log(`Authenticating with ${config.loginUrl} as ${config.customerAlias}/${config.databaseAlias}...`);
 

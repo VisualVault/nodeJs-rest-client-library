@@ -22,12 +22,41 @@ Browser automation for VisualVault platform testing. Everything here is **shared
 4. Specs import from `fixtures/` (data) and `helpers/` (page interaction)
 5. Pipelines orchestrate: run specs -> collect results -> call `tools/generators/` for artifacts
 
+## Write Safety — Spec Authoring Rules
+
+Tests run against **live VV environments**, including active client projects. See root `CLAUDE.md` § "Write Safety" for full context.
+
+### Mandatory Chokepoints
+
+Every write operation in a spec MUST go through a guarded helper. No exceptions.
+
+| Operation      | Use This                                                                   | NEVER This                                                             |
+| -------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Save a form    | `saveFormOnly(page)` / `saveFormAndReload(page)` from `helpers/vv-form.js` | `page.click('button.btn-save')`, `page.evaluate(() => VV.Form.Save())` |
+| PUT to API     | `guardedPut(request, url, opts)` from `helpers/vv-request.js`              | `request.put(url, opts)`                                               |
+| POST to API    | `guardedPost(request, url, opts)` from `helpers/vv-request.js`             | `request.post(url, opts)`                                              |
+| DELETE via API | `guardedDelete(request, url, opts)` from `helpers/vv-request.js`           | `request.delete(url, opts)`                                            |
+
+### New Spec Checklist (if the spec writes data)
+
+1. Import from guarded helpers — `vv-form.js` for form saves, `vv-request.js` for API writes
+2. Verify the target form/resource is in the active customer's `writePolicy` allowlist (check `.env.json`)
+3. Add a comment at the top of the spec stating which environment it targets and what it writes
+4. Read-only specs (navigation, DOM inspection, GET requests) need no special treatment
+
+### Protected Files — Do Not Modify Without User Approval
+
+- `fixtures/write-policy.js` — central write enforcement
+- `helpers/vv-request.js` — guarded API wrappers
+- `helpers/vv-form.js` `saveFormOnly()` guard block (the lines between `WRITE POLICY GUARD` comments)
+
 ## Adding New Tests
 
 1. Add test case entries to `fixtures/test-data.js` (data-driven)
 2. Create or extend a spec file in `specs/date-handling/`
 3. Use `helpers/vv-form.js` and `helpers/vv-calendar.js` for page interaction
-4. Non-Playwright helpers (admin scraping, sync) live in `tools/helpers/`, not here
+4. **If the spec writes data**, follow the Write Safety checklist above
+5. Non-Playwright helpers (admin scraping, sync) live in `tools/helpers/`, not here
 
 ## Test Assets
 

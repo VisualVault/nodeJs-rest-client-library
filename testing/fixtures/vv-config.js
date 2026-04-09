@@ -20,23 +20,41 @@ const AUTH_STATE_PATH = path.join(__dirname, '..', 'config', 'auth-state-pw.json
 
 const vvConfig = loadConfig();
 
+// Per-customer form template URLs.
+// Each customer has its own test harness forms with different GUIDs.
+// xcid/xcdid accept alias strings (e.g., "EmanuelJofre"/"Main") as well as GUIDs.
+const CUSTOMER_TEMPLATES = {
+    EmanuelJofre: {
+        dateTest:
+            '/FormViewer/app?hidemenu=true' +
+            '&formid=6be0265c-152a-f111-ba23-0afff212cc87' +
+            '&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939' +
+            '&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
+        targetDateTest:
+            '/FormViewer/app?hidemenu=true' +
+            '&formid=203734a0-5433-f111-ba23-0afff212cc87' +
+            '&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939' +
+            '&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
+    },
+    WADNR: {
+        dateTest:
+            '/FormViewer/app?hidemenu=true' +
+            '&formid=ff59bb37-b331-f111-830f-d3ae5cbd0a3d' +
+            '&xcid=WADNR' +
+            '&xcdid=fpOnline',
+        // targetDateTest: not yet created for WADNR
+    },
+};
+
+const customerTemplates = CUSTOMER_TEMPLATES[vvConfig.customerAlias] || CUSTOMER_TEMPLATES.EmanuelJofre;
+
 // DateTest form template URL — navigating here creates a fresh form instance with all fields empty.
-// The formid, xcid, and xcdid GUIDs identify the DateTest form template in the VV demo environment.
 // Never use a saved record URL (DataID=) for tests that need a clean state.
-const FORM_TEMPLATE_URL =
-    '/FormViewer/app?hidemenu=true' +
-    '&formid=6be0265c-152a-f111-ba23-0afff212cc87' +
-    '&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939' +
-    '&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939';
+const FORM_TEMPLATE_URL = customerTemplates.dateTest;
 
 // TargetDateTest form template URL — identical to DateTest except all fields have enableQListener=true.
-// Used for Category 4 (URL parameter input) tests. The form accepts date values via URL query params
-// (e.g., ?Field7=2026-03-15) which feed into initCalendarValueV1/V2 via the enableQListener code path.
-const TARGET_FORM_TEMPLATE_URL =
-    '/FormViewer/app?hidemenu=true' +
-    '&formid=203734a0-5433-f111-ba23-0afff212cc87' +
-    '&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939' +
-    '&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939';
+// Used for Category 4 (URL parameter input) tests. May not be available for all customers.
+const TARGET_FORM_TEMPLATE_URL = customerTemplates.targetDateTest || null;
 
 // Field configuration map: Config letter -> VV calendar field names and boolean flags.
 //
@@ -223,6 +241,7 @@ const RECORD_DEFINITIONS = [
 // Fallback saved records for backward compatibility — used when saved-records.json
 // doesn't exist (e.g., running a single test without full setup). These are hardcoded
 // to the vvdemo EmanuelJofre/Main database and won't work in other environments.
+// Other customers (WADNR) must run global-setup.js to create their own records.
 const HARDCODED_SAVED_RECORDS = {
     'cat3-A-BRT':
         '/FormViewer/app?DataID=901ce05d-b2f7-42e9-8569-7f9d4caf258d&hidemenu=true&rOpener=1&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939',
@@ -260,6 +279,7 @@ const SAVED_RECORDS = getSavedRecords();
 module.exports = {
     vvConfig,
     AUTH_STATE_PATH,
+    CUSTOMER_TEMPLATES,
     FORM_TEMPLATE_URL,
     TARGET_FORM_TEMPLATE_URL,
     FIELD_MAP,

@@ -6,10 +6,10 @@ Standalone CLI utilities for working with VV environments. Not tied to Playwrigh
 
 | Folder        | Purpose                                       | Example usage                                                                 |
 | ------------- | --------------------------------------------- | ----------------------------------------------------------------------------- |
-| `export/`     | Extract data from any VV environment          | `node tools/export/export.js --output projects/wadnr/exports`                 |
+| `extract/`    | Extract data from any VV environment          | `node tools/extract/extract.js --output projects/wadnr/extracts`              |
 | `runners/`    | Execute workflows, WS harness, debug          | `node tools/runners/run-ws-test.js --action WS-2`                             |
 | `audit/`      | Verify platform behaviors in browser          | `node tools/audit/audit-bug5-fake-z.js`                                       |
-| `inventory/`  | Analyze exported project data                 | `node tools/inventory/inventory-fields.js`                                    |
+| `inventory/`  | Analyze extracted project data                | `node tools/inventory/inventory-fields.js`                                    |
 | `generators/` | Create structured artifacts from test results | `node tools/generators/generate-artifacts.js`                                 |
 | `explore/`    | Platform exploration + version monitoring     | `npm run explore:headed`, `npm run version:snapshot`                          |
 | `helpers/`    | Shared libraries used by tools                | `vv-admin.js`, `vv-sync.js`, `ws-api.js`, `vv-explore.js`, `build-context.js` |
@@ -24,6 +24,16 @@ npm run version:snapshot     # Capture current platform version state
 npm run version:diff         # Compare two most recent snapshots
 npm run version:list         # List available snapshots
 ```
+
+## Write Safety
+
+Tools connect to live VV environments. See root `CLAUDE.md` § "Write Safety" for the full policy.
+
+- **Extract tools are read-only by design.** All extract components set `readOnly: true` on their API clients. Do not add write operations to extract components.
+- **Explore specs are read-only.** They navigate and inspect — never click Save, Edit, or Delete in admin panels.
+- **Runners (`run-ws-test.js`)** respect `readOnly` and `writePolicy` from `.env.json`. The WS harness can invoke web services that create/modify forms — it is governed by the same write policy.
+- **Audit scripts** that create test records (e.g., `audit-bug2-db-evidence.js`) should use `saveFormOnly()` from `testing/helpers/vv-form.js` so the write-policy guard applies. New audit scripts that write data require explicit user approval.
+- **Do not modify** `lib/VVRestApi/VVRestApiNodeJs/common.js` (the API-layer write guard) without explicit user approval.
 
 ## Conventions
 

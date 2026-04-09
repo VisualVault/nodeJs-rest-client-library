@@ -93,22 +93,31 @@ Edit `.env.json`. The file uses a hierarchical structure: **servers → customer
 
 **Customer-level properties** (under `servers.{name}.customers.{name}`):
 
-| Field           | Description                          | Example            |
-| --------------- | ------------------------------------ | ------------------ |
-| `customerAlias` | Customer alias for your tenant       | `EmanuelJofre`     |
-| `databaseAlias` | Database alias                       | `Main`             |
-| `clientId`      | OAuth app client ID                  | —                  |
-| `clientSecret`  | OAuth app client secret              | —                  |
-| `username`      | Your VV email (for browser login)    | `user@company.com` |
-| `loginPassword` | Your VV password (for browser login) | —                  |
-| `audience`      | OAuth audience (optional)            | `""`               |
-| `readOnly`      | Block write operations               | `false`            |
+| Field           | Description                           | Example            |
+| --------------- | ------------------------------------- | ------------------ |
+| `customerAlias` | Customer alias for your tenant        | `EmanuelJofre`     |
+| `databaseAlias` | Database alias                        | `Main`             |
+| `clientId`      | OAuth app client ID                   | —                  |
+| `clientSecret`  | OAuth app client secret               | —                  |
+| `username`      | Your VV email (for browser login)     | `user@company.com` |
+| `loginPassword` | Your VV password (for browser login)  | —                  |
+| `audience`      | OAuth audience (optional)             | `""`               |
+| `readOnly`      | Block write operations                | `false`            |
+| `writePolicy`   | Fine-grained write control (optional) | See below          |
 
 `clientId`/`clientSecret`: Register an API application in VV Admin to obtain these. Used by server scripts (client_credentials flow) and the WS runner (password grant).
 
 `username`/`loginPassword`: Your human VV login. Used by Playwright browser auth and the WS direct runner.
 
 `readOnly`: Set to `true` for production/client environments (e.g., WADNR) to block all write operations at the HTTP layer. Override with `VV_FORCE_WRITE=1` env var for exceptional cases.
+
+`writePolicy` (optional): Fine-grained control over which writes are allowed on `readOnly` environments. Three modes:
+
+- `"unrestricted"` — all writes allowed (default when `readOnly: false`)
+- `"allowlist"` — only writes to listed forms/web services/documents (use for active client projects with test harnesses)
+- `"blocked"` — all writes blocked (default when `readOnly: true` without `writePolicy`)
+
+When `mode: "allowlist"`, specify allowed resources in `forms`, `webServices`, and `documents` arrays. See `.env.example.json` for the full schema. See root `CLAUDE.md` § "Write Safety" for the enforcement architecture.
 
 This file is gitignored. Never commit credentials.
 

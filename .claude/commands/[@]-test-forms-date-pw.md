@@ -112,6 +112,18 @@ If none exist, report: "No verified data found for {id}. Run without --skip-veri
 
 ## Phase 0 — Playwright session setup
 
+### 0.0 — Environment safety check
+
+This command creates form records (saves via Playwright). Verify the environment allows it.
+
+1. Read `.env.json` config by running: `node -e "const c = require('./testing/fixtures/env-config').loadConfig(); const vv = require('./testing/fixtures/vv-config'); console.log(JSON.stringify({instance: c.instance, readOnly: c.readOnly, writePolicy: c.writePolicy, templateUrl: vv.FORM_TEMPLATE_URL}, null, 2))"`
+2. Print environment banner:
+    - **Unrestricted**: `Environment: {instance} (unrestricted)` — proceed
+    - **Allowlist**: `⚠ RESTRICTED: {instance}`. Check that the DateTest form template URL (`FORM_TEMPLATE_URL` from `vv-config.js`) contains a `formid` that is in the customer's `writePolicy.forms` allowlist. If not: STOP and warn "The DateTest form template is not in the writePolicy allowlist. Add it to `.env.json` writePolicy.forms or switch to an unrestricted environment."
+    - **Blocked**: `⛔ BLOCKED: {instance} — no writes allowed. STOP.` This command creates form records and cannot run against a blocked environment.
+3. Verify `FORM_TEMPLATE_URL` is not null — if the active customer has no entry in `CUSTOMER_TEMPLATES` in `testing/fixtures/vv-config.js`, STOP and warn: "No form template URL configured for {customerAlias}. Add an entry to CUSTOMER_TEMPLATES in testing/fixtures/vv-config.js."
+4. Record the environment instance and write policy mode — include in all generated artifacts.
+
 ### 0.1 — Read credentials
 
 Read credentials from the root `.env.json` by loading `testing/fixtures/env-config.js` (`loadConfig()`) to get VV instance URL, username, password, customerAlias, and databaseAlias. If `.env.json` does not exist, stop and instruct the user to create it from `.env.example.json`.
@@ -805,6 +817,7 @@ This prevents orphan browser processes. In **batch mode**, close the browser onc
 - **Checkbox (☐) column is a transient execution aid.** Fill checkboxes during a run session to track progress, but do NOT commit TC files with filled checkboxes. The permanent execution record is the run file, not the ☐ column state.
 - **Matrix Evidence column links to the summary file**, not the TC spec. Format: `[summary](summaries/tc-{id}.md)`. For PENDING slots with no summary yet, link to the spec: `[spec](tc-{id}.md)`.
 - **results.md is a frozen archive** for sessions before 2026-04-01. New runs append only a one-line index entry (Phase 5C). Do not add narrative blocks to results.md for new tests.
+- **Respect write-policy.** This command creates form records via `saveFormOnly()` which enforces write-policy at runtime. Always run Phase 0.0 to verify the environment before launching a browser. The `FORM_TEMPLATE_URL` from `testing/fixtures/vv-config.js` is per-customer — it automatically resolves to the correct form template for the active customer. Never hardcode form URLs.
 - **No Findings or Key Finding section in TC files.** TC files are test procedures, not analytical records. Observations about whether the matrix prediction was right or wrong, which bugs were confirmed, and what sibling rows imply belong exclusively in run files (Phase 5A). The title encodes the behavioral finding; Fail Conditions encode the risk reasoning. Do not add any other analytical sections to TC files.
 - **Screenshots go to `testing/config/screenshots/`** — never committed to git.
 - **Auth state files (`testing/config/auth-state*.json`) are never committed** — they contain session cookies.

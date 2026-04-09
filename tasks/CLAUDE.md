@@ -21,8 +21,8 @@ Tasks hold **platform truth** ("FORM-BUG-5 adds a fake Z"). Projects hold **cust
 
 ## Active Tasks
 
-| Task                   | Description                                                                             |
-| ---------------------- | --------------------------------------------------------------------------------------- |
-| `date-handling/`       | Cross-platform date bug investigation (Forms, WS, Dashboards) — 14 confirmed bugs       |
-| `form-templates/`      | VV form template XML analysis, format documentation, template generation                |
-| `export-optimization/` | Export pipeline speed + reliability — parallel extraction, revision tracking, API-first |
+| Task                    | Description                                                                                         |
+| ----------------------- | --------------------------------------------------------------------------------------------------- |
+| `date-handling/`        | Cross-platform date bug investigation (Forms, WS, Dashboards, Document Library) — 16 confirmed bugs |
+| `form-templates/`       | VV form template XML analysis, format documentation, template generation                            |
+| `extract-optimization/` | Extract pipeline speed + reliability — parallel extraction, revision tracking, API-first            |
