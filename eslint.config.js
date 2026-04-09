@@ -9,9 +9,7 @@ module.exports = [
             'scripts/test-scripts/',
             'tasks/**/main.js',
             'tasks/**/bug-analysis/',
-            'tasks/**/web-services/scripts/',
-            'tasks/**/global-functions/',
-            'tasks/**/schedules/',
+            'projects/',
             'lib/VVRestApi/',
         ],
     },
@@ -50,6 +48,15 @@ module.exports = [
     },
     {
         files: ['testing/**/*.js'],
+        languageOptions: {
+            globals: {
+                VV: 'readonly',
+                document: 'readonly',
+            },
+        },
+    },
+    {
+        files: ['tools/**/*.js'],
         languageOptions: {
             globals: {
                 VV: 'readonly',

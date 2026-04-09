@@ -181,3 +181,13 @@ testing/tmp/
 
 # Large generated files
 tasks/date-handling/forms-calendar/main.js
+
+# ─── Shared repo boundaries ───────────────────────────────
+# Uncomment these lines when working on the shared team repo
+# (emanueljofre/nodeV2). Keep commented in your private workspace
+# so all work is version-controlled and backed up.
+#
+# /projects/
+# tasks/**/runs/
+# tasks/**/summaries/
+# tasks/**/results.md

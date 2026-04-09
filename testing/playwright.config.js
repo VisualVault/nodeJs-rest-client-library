@@ -41,7 +41,7 @@ const projects = timezones.flatMap((tz) =>
 );
 
 module.exports = defineConfig({
-    testDir: './date-handling',
+    testDir: './specs/date-handling',
 
     // Serial execution — VV creates server-side state per form instance,
     // and concurrent requests to the same VV instance can interfere.
