@@ -217,19 +217,19 @@ Switch targets by changing `activeServer` and/or `activeCustomer` and restarting
 
 ```bash
 # Smoke test — read an existing record
-node testing/scripts/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
+node tools/runners/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
 
 # Create a record via API
-node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 
 # Debug mode (includes raw API response)
-node testing/scripts/run-ws-test.js --action WS-2 --configs ALL --record-id DateTest-000080 --debug
+node tools/runners/run-ws-test.js --action WS-2 --configs ALL --record-id DateTest-000080 --debug
 
 # Simulate cloud/AWS timezone
-TZ=UTC node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+TZ=UTC node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 
 # Attach debugger (VS Code)
-node --inspect-brk testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+node --inspect-brk tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 ```
 
 The runner authenticates with VV, builds the ffCollection, calls the harness, and prints the JSON result. No local server needed.

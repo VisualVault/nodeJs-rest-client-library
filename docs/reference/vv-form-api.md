@@ -307,7 +307,7 @@ Controls the V1/V2 code path switch and provides shared date functions.
 
 User-defined helper functions loaded from the site-level script library. These are NOT platform methods — they are customer/site-specific and vary between environments. The functions below were catalogued from the DateTest template (demo) and WADNR template exports.
 
-**Runtime introspection:** Global functions are accessible via `Object.keys(VV.Form.Global)` in the FormViewer browser context. Each function's source code is readable via `.toString()` — they are user-defined JS, not minified or native code. Static XML analysis (template scripts that call `VV.Form.Global.*`) discovers only a subset — runtime introspection reveals all registered functions including those never called from template scripts. WADNR: static XML analysis found 31 unique functions; runtime introspection found **182 keys** (157 functions + 25 non-function properties including regex patterns, GIS state objects, and configuration). Full runtime extracts are in `tasks/date-handling/wadnr-impact/global-functions/`.
+**Runtime introspection:** Global functions are accessible via `Object.keys(VV.Form.Global)` in the FormViewer browser context. Each function's source code is readable via `.toString()` — they are user-defined JS, not minified or native code. Static XML analysis (template scripts that call `VV.Form.Global.*`) discovers only a subset — runtime introspection reveals all registered functions including those never called from template scripts. WADNR: static XML analysis found 31 unique functions; runtime introspection found **182 keys** (157 functions + 25 non-function properties including regex patterns, GIS state objects, and configuration). Full runtime extracts are in `projects/wadnr/exports/global-functions/`.
 
 ### Demo Environment (DateTest)
 
@@ -340,7 +340,7 @@ User-defined helper functions loaded from the site-level script library. These a
 
 ### WADNR Environment (fpOnline)
 
-Global functions discovered from WADNR template XML analysis (77 templates, 3560 scripts). Implementations are site-level — not in template XML. Full usage counts in [`wadnr-impact/script-inventory.md`](../../tasks/date-handling/wadnr-impact/script-inventory.md).
+Global functions discovered from WADNR template XML analysis (77 templates, 3560 scripts). Implementations are site-level — not in template XML. Full usage counts in [`wadnr-impact/script-inventory.md`](../../projects/wadnr/analysis/script-inventory.md).
 
 **Date-related** (implementations unknown — flagged for investigation):
 

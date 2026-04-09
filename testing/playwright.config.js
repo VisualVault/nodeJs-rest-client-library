@@ -11,7 +11,7 @@
  * Auth: global-setup.js logs into VV once and saves cookies to config/auth-state-pw.json.
  * All tests reuse these cookies via the storageState option.
  *
- * See testing/date-handling/README.md for full documentation.
+ * See testing/specs/date-handling/README.md for full documentation.
  */
 const { defineConfig } = require('@playwright/test');
 const path = require('path');

@@ -16,7 +16,9 @@ tasks/
 
 ## Active Tasks
 
-| Task                              | Status      | Description                                                                                              |
-| --------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------- |
-| [date-handling](date-handling/)   | In Progress | Cross-platform date handling bug investigation — Forms, Web Services, Dashboards + WADNR impact analysis |
-| [form-templates](form-templates/) | Active      | VV form template XML analysis, format documentation, and improved template generation                    |
+| Task                              | Status      | Description                                                                           |
+| --------------------------------- | ----------- | ------------------------------------------------------------------------------------- |
+| [date-handling](date-handling/)   | In Progress | Cross-platform date handling bug investigation — Forms, Web Services, Dashboards      |
+| [form-templates](form-templates/) | Active      | VV form template XML analysis, format documentation, and improved template generation |
+
+> **Note:** Customer-specific project work (exports, impact analysis) lives in `projects/`. See [projects/wadnr/](../projects/wadnr/) for the WADNR project.

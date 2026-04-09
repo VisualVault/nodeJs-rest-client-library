@@ -99,7 +99,7 @@ From the matrix row, derive the `run-ws-test.js` arguments:
 Run the harness via Node.js:
 
 ```bash
-TZ={tz} node testing/scripts/run-ws-test.js \
+TZ={tz} node tools/runners/run-ws-test.js \
   --action {action} --configs {config} \
   --input-date {date} --record-id {record} \
   [--debug]

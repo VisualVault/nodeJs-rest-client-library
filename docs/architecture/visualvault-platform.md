@@ -224,7 +224,7 @@ The export dock panel (`dockExport`) starts **hidden** (`display: none`). The "E
 | Word   | `ctl00_ContentBody_ctrlPanelHolder_ctl0_dockExport_C_btnWordExport2`  |
 | XML    | `ctl00_ContentBody_ctrlPanelHolder_ctl0_dockExport_C_btnXMLExport2`   |
 
-**Reproducible test:** `npx playwright test testing/date-handling/dash-export.spec.js` (or individual format: `--grep "excel export"`)
+**Reproducible test:** `npx playwright test testing/specs/date-handling/dash-export.spec.js` (or individual format: `--grep "excel export"`)
 
 ### DataID = revisionId
 
@@ -621,7 +621,7 @@ The core API `postForms()` takes a template name and resolves it automatically. 
 | FPAN Notice of Decision    |        5        |
 | Forest Practices App/Notif |        5        |
 
-**Exported templates:** 77 of 89 active templates exported to `tasks/date-handling/wadnr-impact/form-templates/` via `testing/scripts/export-wadnr-templates.js`. 12 templates consistently failed (server-side export timeout).
+**Exported templates:** 77 of 89 active templates exported to `projects/wadnr/exports/form-templates/` via `tools/export/export-templates.js`. 12 templates consistently failed (server-side export timeout).
 
 ---
 

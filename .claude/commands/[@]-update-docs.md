@@ -23,7 +23,7 @@ These are the documentation files in the project and what each one covers:
 | `docs/reference/vv-form-api.md`             | VV.Form object structure, methods, automation patterns                            |
 | `docs/README.md`                            | Index of all docs/ contents                                                       |
 | `tasks/README.md`                           | Task index table (folder name, status, description)                               |
-| `testing/date-handling/README.md`           | Date-handling test suite context, field matrix, TZ rationale, debugging           |
+| `testing/specs/date-handling/README.md`     | Date-handling test suite context, field matrix, TZ rationale, debugging           |
 | `Readme-microservices.md`                   | Dev setup for microservices execution                                             |
 
 ### Single Source of Truth Principle
@@ -43,19 +43,19 @@ Run `git diff HEAD~10 --stat` and `git log --oneline -10` to understand recent c
 
 For each change, determine which docs **might** need updating using this mapping:
 
-| Change area                                  | Docs to check                                                                                      |
-| -------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `lib/VVRestApi/` (new features, API changes) | `CHANGELOG.md`, `README.md`, `CLAUDE.md` (API managers table)                                      |
-| `lib/VVRestApi/` (bug fixes, refactors)      | `CHANGELOG.md`                                                                                     |
-| `package.json` (scripts, deps, tooling)      | `CLAUDE.md` (dev commands), `CHANGELOG.md`, `docs/guides/dev-setup.md` (commands/tooling)          |
-| `scripts/`                                   | `CLAUDE.md` (repo structure if new dirs)                                                           |
-| `testing/` (helpers, fixtures, config)       | `docs/guides/dev-setup.md`, `docs/guides/playwright-testing.md`, `testing/date-handling/README.md` |
-| `testing/helpers/` (new or changed helpers)  | `docs/guides/playwright-testing.md` (key files table), `CLAUDE.md` (test infrastructure list)      |
-| `docs/` (new or updated files)               | `docs/README.md` if index needs update                                                             |
-| `tasks/` (new task folders)                  | `tasks/README.md` (task index table), `CLAUDE.md` (active tasks table)                             |
-| `.claude/` (commands, config)                | `CLAUDE.md` if it references commands                                                              |
-| Config files (eslint, prettier, husky, etc.) | `CHANGELOG.md` (tooling), `docs/guides/dev-setup.md` (code quality section)                        |
-| `app.js`, routes (new endpoints)             | `CLAUDE.md` (server architecture), `Readme-microservices.md`                                       |
+| Change area                                  | Docs to check                                                                                            |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `lib/VVRestApi/` (new features, API changes) | `CHANGELOG.md`, `README.md`, `CLAUDE.md` (API managers table)                                            |
+| `lib/VVRestApi/` (bug fixes, refactors)      | `CHANGELOG.md`                                                                                           |
+| `package.json` (scripts, deps, tooling)      | `CLAUDE.md` (dev commands), `CHANGELOG.md`, `docs/guides/dev-setup.md` (commands/tooling)                |
+| `scripts/`                                   | `CLAUDE.md` (repo structure if new dirs)                                                                 |
+| `testing/` (helpers, fixtures, config)       | `docs/guides/dev-setup.md`, `docs/guides/playwright-testing.md`, `testing/specs/date-handling/README.md` |
+| `testing/helpers/` (new or changed helpers)  | `docs/guides/playwright-testing.md` (key files table), `CLAUDE.md` (test infrastructure list)            |
+| `docs/` (new or updated files)               | `docs/README.md` if index needs update                                                                   |
+| `tasks/` (new task folders)                  | `tasks/README.md` (task index table), `CLAUDE.md` (active tasks table)                                   |
+| `.claude/` (commands, config)                | `CLAUDE.md` if it references commands                                                                    |
+| Config files (eslint, prettier, husky, etc.) | `CHANGELOG.md` (tooling), `docs/guides/dev-setup.md` (code quality section)                              |
+| `app.js`, routes (new endpoints)             | `CLAUDE.md` (server architecture), `Readme-microservices.md`                                             |
 
 ### 3. Read and evaluate each affected doc
 
@@ -74,7 +74,7 @@ Apply updates following these rules:
 - **CHANGELOG.md**: Add entries under `## [Unreleased]` in the correct subsection (Added/Changed/Fixed/Removed). Follow existing entry style. Keep entries concise. Scope: lib/ changes + project-wide tooling only.
 - **docs/guides/dev-setup.md**: Canonical setup guide. Update when dependencies, scripts, config, credentials, auth flow, or troubleshooting steps change. All other docs link here for setup — if this file is wrong, everything downstream is wrong.
 - **docs/guides/playwright-testing.md**: Patterns and architecture only. Setup steps link to `dev-setup.md`. Update when helpers change, new test directories are added, or extensibility patterns evolve.
-- **testing/date-handling/README.md**: Date-handling-specific context (field matrix, TZ rationale, debugging tips). Setup steps link to `dev-setup.md`. Update when field configs, categories, or test architecture changes.
+- **testing/specs/date-handling/README.md**: Date-handling-specific context (field matrix, TZ rationale, debugging tips). Setup steps link to `dev-setup.md`. Update when field configs, categories, or test architecture changes.
 - **docs/reference/**: Update when VV platform APIs, form field behaviors, or VV.Form object structure changes.
 - **tasks/README.md**: Update the task index table if tasks were added, completed, or removed.
 - **docs/README.md**: Update if new docs are added to `docs/` subdirectories.

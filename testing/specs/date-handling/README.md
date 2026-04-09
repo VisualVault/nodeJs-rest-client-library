@@ -18,7 +18,7 @@ Test matrix: `tasks/date-handling/forms-calendar/matrix.md`
 
 ## Quick Start
 
-> Environment setup (Node.js, Playwright, credentials): [Dev Setup Guide](../../docs/guides/dev-setup.md#4-playwright-testing-setup)
+> Environment setup (Node.js, Playwright, credentials): [Dev Setup Guide](../../../docs/guides/dev-setup.md#4-playwright-testing-setup)
 
 ```bash
 npm run test:pw:brt    # Run BRT timezone tests
@@ -62,11 +62,11 @@ Shared config:
 
 | File                              | Purpose                                                                                 |
 | --------------------------------- | --------------------------------------------------------------------------------------- |
-| `../fixtures/vv-config.js`        | Shared constants: form URL, field map (A-H), record definitions, saved record URLs      |
-| `../fixtures/test-data.js`        | All test case definitions as structured data (data-driven parameterization)             |
-| `../helpers/vv-form.js`           | Generic VV form helpers: navigation, field verification, value capture, save            |
-| `../helpers/vv-calendar.js`       | Calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input    |
-| `../global-setup.js`              | Runs before all tests: auth + creates saved records via browser UI per timezone         |
+| `../../fixtures/vv-config.js`     | Shared constants: form URL, field map (A-H), record definitions, saved record URLs      |
+| `../../fixtures/test-data.js`     | All test case definitions as structured data (data-driven parameterization)             |
+| `../../helpers/vv-form.js`        | Generic VV form helpers: navigation, field verification, value capture, save            |
+| `../../helpers/vv-calendar.js`    | Calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input    |
+| `../../global-setup.js`           | Runs before all tests: auth + creates saved records via browser UI per timezone         |
 | `cat-1-calendar-popup.spec.js`    | Category 1 — calendar popup date selection tests (non-legacy Kendo fields)              |
 | `cat-1-legacy-popup.spec.js`      | Category 1 — legacy popup tests for Configs E-H (FORM-BUG-2 audit spec)                 |
 | `cat-2-typed-input.spec.js`       | Category 2 — keyboard segment-by-segment date entry tests                               |
@@ -90,12 +90,12 @@ Shared config:
 
 ### External Config
 
-| File                           | Purpose                                                             |
-| ------------------------------ | ------------------------------------------------------------------- |
-| `../playwright.config.js`      | TZ × browser matrix (12 projects: 4 TZ × 3 browsers), auth state    |
-| `../../.env.json`              | VV credentials (gitignored, unified config)                         |
-| `../config/saved-records.json` | Auto-created DataID URLs for cross-TZ tests (gitignored, cached 1h) |
-| `../config/tz-*.json`          | Timezone overrides for `playwright-cli` (Layer 1 only)              |
+| File                              | Purpose                                                             |
+| --------------------------------- | ------------------------------------------------------------------- |
+| `../../playwright.config.js`      | TZ × browser matrix (12 projects: 4 TZ × 3 browsers), auth state    |
+| `../../../.env.json`              | VV credentials (gitignored, unified config)                         |
+| `../../config/saved-records.json` | Auto-created DataID URLs for cross-TZ tests (gitignored, cached 1h) |
+| `../../config/tz-*.json`          | Timezone overrides for `playwright-cli` (Layer 1 only)              |
 
 ---
 

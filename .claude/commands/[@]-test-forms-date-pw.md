@@ -23,7 +23,7 @@ This command produces **two independent artifact types**:
 
 The TC spec is the authoritative test procedure. The Playwright test is a regression harness derived from the same expected values. They share expected values but have completely different audiences and tooling references.
 
-See `testing/date-handling/README.md` and `docs/guides/playwright-testing.md` for full documentation.
+See `testing/specs/date-handling/README.md` and `docs/guides/playwright-testing.md` for full documentation.
 
 ## Usage
 
@@ -616,7 +616,7 @@ Always include:
 
 ## Phase 3B — Append test case to test-data.js
 
-Instead of generating individual spec files, append a test case entry to `testing/fixtures/test-data.js`. The parameterized category spec files (`testing/date-handling/cat-*.spec.js`) automatically pick up new entries.
+Instead of generating individual spec files, append a test case entry to `testing/fixtures/test-data.js`. The parameterized category spec files (`testing/specs/date-handling/cat-*.spec.js`) automatically pick up new entries.
 
 **Output file:** `testing/fixtures/test-data.js`
 
@@ -649,7 +649,7 @@ Read the file first, then append a new entry to the `TEST_DATA` array (before th
 
 - Expected values come from Phase 1 (correct/intended behavior), same as the TC markdown spec
 - If an entry with the same `id` already exists, do NOT duplicate — report that it exists and skip
-- If the category spec file doesn't exist yet (e.g., `cat-2-typed-input.spec.js`), create it following the pattern in `testing/date-handling/cat-1-calendar-popup.spec.js`
+- If the category spec file doesn't exist yet (e.g., `cat-2-typed-input.spec.js`), create it following the pattern in `testing/specs/date-handling/cat-1-calendar-popup.spec.js`
 - Add a category section comment (with `// ═══...`) if this is the first entry for a new category
 - Check that `testing/fixtures/test-data.js` exists; if not, stop and report
 

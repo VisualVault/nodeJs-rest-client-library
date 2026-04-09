@@ -7,7 +7,7 @@
  * - Field configuration map (8 configs A-H mapping to VV calendar field boolean flags)
  * - Saved record URLs for reload/cross-TZ tests
  *
- * See testing/date-handling/README.md for field configuration documentation.
+ * See testing/specs/date-handling/README.md for field configuration documentation.
  */
 const path = require('path');
 const fs = require('fs');

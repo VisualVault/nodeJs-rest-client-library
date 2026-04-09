@@ -86,17 +86,17 @@ The `ignoreTZ` and `useLegacy` flags do **not** affect the dashboard display for
 ### Exploration script
 
 ```bash
-node testing/scripts/explore-dashboard.js
+node tools/audit/explore-dashboard.js
 ```
 
-### Playwright spec files (in `testing/date-handling/`)
+### Playwright spec files (in `testing/specs/date-handling/`)
 
 ```bash
-npx playwright test testing/date-handling/dash-sort.spec.js             # DB-4: column sort
-npx playwright test testing/date-handling/dash-filter.spec.js           # DB-5: SQL filter
-npx playwright test testing/date-handling/dash-cross-layer.spec.js      # DB-6: dashboard vs form
-npx playwright test testing/date-handling/dash-export.spec.js           # DB-7: export verification
-node testing/scripts/explore-dashboard.js --compare                     # DB-8: TZ independence
+npx playwright test testing/specs/date-handling/dash-sort.spec.js             # DB-4: column sort
+npx playwright test testing/specs/date-handling/dash-filter.spec.js           # DB-5: SQL filter
+npx playwright test testing/specs/date-handling/dash-cross-layer.spec.js      # DB-6: dashboard vs form
+npx playwright test testing/specs/date-handling/dash-export.spec.js           # DB-7: export verification
+node tools/audit/explore-dashboard.js --compare                     # DB-8: TZ independence
 ```
 
 ---

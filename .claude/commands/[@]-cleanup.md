@@ -29,14 +29,14 @@ Run `git log --format='%ai' -1` to get the most recent commit date. This is the 
 
 For each file below, run `git log -1 --format='%ai %s' -- <path>` to get the last modification date and commit message. Process them in batch (one `git log` call per file is fine — they're fast):
 
-| Category     | Paths                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------- |
-| Root docs    | `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `Readme-microservices.md`                     |
-| Docs         | all `docs/**/*.md` files                                                                |
-| Task files   | `tasks/README.md`, `tasks/date-handling/CLAUDE.md`                                      |
-| Testing docs | `testing/README.md`, `testing/date-handling/README.md`, `testing/config/README.md`      |
-| Commands     | all `.claude/commands/*.md` files                                                       |
-| Config       | `package.json`, `eslint.config.js`, `.prettierrc`, `.gitignore`, `playwright.config.js` |
+| Category     | Paths                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| Root docs    | `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `Readme-microservices.md`                      |
+| Docs         | all `docs/**/*.md` files                                                                 |
+| Task files   | `tasks/README.md`, `tasks/date-handling/CLAUDE.md`                                       |
+| Testing docs | `testing/README.md`, `testing/specs/date-handling/README.md`, `testing/config/README.md` |
+| Commands     | all `.claude/commands/*.md` files                                                        |
+| Config       | `package.json`, `eslint.config.js`, `.prettierrc`, `.gitignore`, `playwright.config.js`  |
 
 ### 1C. Flag stale items
 

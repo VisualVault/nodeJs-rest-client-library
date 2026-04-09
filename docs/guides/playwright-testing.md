@@ -46,9 +46,9 @@ This command:
 | `testing/fixtures/test-data.js`  | All test case definitions (data-driven parameterization)                                 |
 | `testing/helpers/vv-form.js`     | Generic VV form helpers: navigation, field ops, value capture, save                      |
 | `testing/helpers/vv-calendar.js` | Calendar helpers: popup (date-only + DateTime + legacy popup), typed input               |
-| `testing/helpers/vv-admin.js`    | VV admin page scraping: login, RadGrid pagination, `__doPostBack`, dock panel extraction |
-| `testing/helpers/vv-sync.js`     | Shared manifest load/save/diff and README generation for export scripts                  |
-| `testing/helpers/ws-log.js`      | Log shim for WS harness scripts (proxies to server lib logger)                           |
+| `tools/helpers/vv-admin.js`      | VV admin page scraping: login, RadGrid pagination, `__doPostBack`, dock panel extraction |
+| `tools/helpers/vv-sync.js`       | Shared manifest load/save/diff and README generation for export scripts                  |
+| `tools/helpers/ws-log.js`        | Log shim for WS harness scripts (proxies to server lib logger)                           |
 | `testing/global-setup.js`        | Auto-login + create saved records via browser UI (per-TZ, cached 1h)                     |
 | `.env.json` (root)               | VV credentials (gitignored, unified config)                                              |
 
@@ -84,7 +84,7 @@ Three files in `testing/`:
 
 - `reporters/regression-reporter.js` — custom Playwright reporter that captures results + actual values to JSON
 - `scripts/run-regression.js` — CLI entry point (runs tests then triggers artifact generation)
-- `scripts/generate-artifacts.js` — reads JSON, creates/updates markdown artifacts
+- `tools/generators/generate-artifacts.js` — reads JSON, creates/updates markdown artifacts
 
 ### Usage
 
@@ -141,7 +141,7 @@ At least one of `--browser`, `--tz`, or `--project` is required (unless using `-
 The generator can also run independently with a custom input file:
 
 ```bash
-node testing/scripts/generate-artifacts.js --input path/to/results.json
+node testing/tools/generators/generate-artifacts.js --input path/to/results.json
 ```
 
 ### WS Pipeline (Node.js)

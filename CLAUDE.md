@@ -33,17 +33,43 @@ nodeV2/
       webservice-pattern.js          # Server-side web service template
       web-service-call-pattern.js    # Form button AJAX call template
     test-scripts/                    # Local test scripts
+  tools/                             # Standalone CLI tools (not Playwright-dependent)
+    export/                          # WADNR export orchestrators
+      export.js                      # Unified export orchestrator (scripts, schedules, globals)
+      export-scripts.js              # Web services export wrapper
+      export-globals.js              # Global functions export (FormViewer runtime introspection)
+      export-templates.js            # Playwright-based form template XML export
+      components/                    # Per-component export modules
+        scripts.js                   # outsideprocessadmin: API metadata + dock panel source extraction
+        schedules.js                 # scheduleradmin: grid scraping for schedule config
+        globals.js                   # FormViewer: VV.Form.Global runtime introspection
+    runners/                         # Direct Node.js CLI runners
+      run-ws-test.js                 # WS harness runner (auth + invocation, --debug, TZ= support)
+    audit/                           # Verification and exploration scripts
+      verify-ws4-browser.js          # Playwright verification for WS-4 cross-layer
+      verify-ws10-browser.js         # Playwright verification for WS-10 (postForms vs forminstance)
+      verify-format-mismatch.js      # Dashboard vs Forms format comparison
+      explore-dashboard.js           # Dashboard grid capture + TZ comparison
+    inventory/                       # Codebase analysis and inventory generation
+      inventory-fields.js            # Parse template XMLs, generate field inventory
+      inventory-scripts.js           # Parse template XMLs, generate script-level date report
+    generators/                      # Artifact generators (post-test processing)
+      generate-artifacts.js          # Forms artifact generator
+      generate-ws-artifacts.js       # WS artifact generator (matrix-based PASS/FAIL)
+      generate-dash-artifacts.js     # Dashboard artifact generator (format-pattern validation)
+    helpers/                         # Shared helpers (non-Playwright)
+      vv-admin.js                    # VV admin page scraping (login, RadGrid, __doPostBack, dock panels)
+      vv-sync.js                     # Shared manifest, sync diff, README generation for exports
+      ws-api.js                      # Web service API helper
+      ws-log.js                      # Log shim for WS harness scripts (proxies to server lib)
   testing/                           # Playwright testing infrastructure
     README.md                        # Testing infrastructure entry point
     playwright.config.js             # 4-TZ config (BRT, IST, UTC0, PST) × 3 browsers = 12 projects
     global-setup.js                  # Auto-login + create saved records before test runs
     config/                          # Credentials, TZ configs, auth state
-    helpers/                         # Reusable page helpers
+    helpers/                         # Playwright-specific page helpers
       vv-form.js                     # Generic VV form automation (13 functions)
       vv-calendar.js                 # Calendar popup + typed input helpers
-      vv-admin.js                    # VV admin page scraping (login, RadGrid, __doPostBack, dock panels)
-      vv-sync.js                     # Shared manifest, sync diff, README generation for exports
-      ws-log.js                      # Log shim for WS harness scripts (proxies to server lib)
     fixtures/                        # Shared test data and config
       vv-config.js                   # FIELD_MAP, form URLs, saved records
       env-config.js                  # Loads .env.json, maps credentials for Playwright and WS runners
@@ -51,29 +77,25 @@ nodeV2/
       test-data.js                   # All test case definitions (data-driven)
     reporters/                       # Custom Playwright reporters
       regression-reporter.js         # Captures results + actual values → JSON
-    scripts/                         # Regression pipeline orchestrators + generators
+    pipelines/                       # Regression pipeline orchestrators
       run-regression.js              # Forms pipeline: Playwright → artifacts
       run-ws-regression.js           # WS pipeline: run-ws-test.js → artifacts
-      run-ws-test.js                 # Direct Node.js CLI runner (auth + harness invocation)
       run-dash-regression.js         # Dashboard pipeline: grid capture → artifacts
-      generate-artifacts.js          # Forms artifact generator
-      generate-ws-artifacts.js       # WS artifact generator (matrix-based PASS/FAIL)
-      generate-dash-artifacts.js     # Dashboard artifact generator (format-pattern validation)
-      verify-ws4-browser.js          # Playwright verification for WS-4 cross-layer
-      verify-ws10-browser.js         # Playwright verification for WS-10 (postForms vs forminstance)
-      verify-format-mismatch.js      # Dashboard vs Forms format comparison
-      explore-dashboard.js           # Dashboard grid capture + TZ comparison
-      export-wadnr.js               # Unified WADNR export orchestrator (scripts, schedules, globals)
-      export-wadnr-scripts.js      # Web services export (backward-compat wrapper → components/scripts.js)
-      export-wadnr-globals.js      # Global functions export (FormViewer runtime introspection)
-      export-wadnr-templates.js    # Playwright-based WADNR form template XML export
-      components/                   # Per-component export modules for export-wadnr.js
-        scripts.js                  # outsideprocessadmin: API metadata + dock panel source extraction
-        schedules.js                # scheduleradmin: grid scraping for schedule config
-        globals.js                  # FormViewer: VV.Form.Global runtime introspection
-      inventory-wadnr-fields.js    # Parse template XMLs, generate field inventory with config + script interactions
-      inventory-wadnr-scripts.js   # Parse template XMLs, generate script-level date interaction report
-    date-handling/                   # Date-handling test specs (1 per category + dashboard specs)
+    specs/                           # Test spec files
+      date-handling/                  # Date-handling test specs (1 per category + dashboard specs)
+  projects/                          # Client project workspaces
+    wadnr/                           # WADNR project impact analysis
+      CLAUDE.md                      # Project-specific instructions
+      analysis/                      # Bug case studies and inventories
+        field-inventory.md           # Per-template field inventory with config assessment + script interactions
+        script-inventory.md          # Script-level analysis: date field interactions, WS calls, global function usage
+        bug-analysis/                # Case studies mapping real bugs to investigation findings
+          case-study-124697.md       # Freshdesk #124697 — postForms time mutation (DRAFT)
+      exports/                       # Exported artifacts from WADNR environment
+        form-templates/              # Exported XML templates (77 files)
+        global-functions/            # Extracted VV.Form.Global functions (157 .js files + README)
+        web-services/                # Extracted microservice scripts (271 .js files + manifest + README)
+        schedules/                   # Scheduled service configuration (manifest + README)
   docs/                              # Shared documentation
     architecture/                    # Platform architecture, component diagrams, data flow
     standards/                       # Coding standards, patterns, conventions
@@ -90,17 +112,6 @@ nodeV2/
         analysis/                    # Analysis & conclusions (overview + 6 bug reports + 6 fix-recommendation companions)
       dashboards/                    # Dashboard date display testing (44/44 complete — DB-1 thru DB-8 all done)
         analysis/                    # Analysis & conclusions (overview + 1 bug report + 1 fix-recommendation companion)
-      wadnr-impact/                  # WADNR project impact analysis (77 templates exported, 35 with 137 calendar fields)
-        field-inventory.md           # Per-template field inventory with config assessment + script interactions
-        script-inventory.md          # Script-level analysis: date field interactions, WS calls, global function usage
-        bug-analysis/                # Case studies mapping real bugs to investigation findings
-          case-study-124697.md       # Freshdesk #124697 — postForms time mutation (DRAFT)
-        form-templates/              # Exported XML templates (77 files)
-        global-functions/            # Extracted VV.Form.Global functions (157 .js files + README)
-        web-services/                # Extracted microservice scripts (251 .js files + manifest + README)
-          scripts/                   # Individual script source files
-        schedules/                   # Scheduled service configuration (manifest + README + scripts)
-          scripts/                   # Scheduled-category script source files (~20 .js)
     form-templates/                  # XML template analysis, generator, redesigned DateTest v2
         README.md                    # Template format docs and generator usage
         datetest-v2.xml              # Redesigned DateTest form template
@@ -246,11 +257,11 @@ npm run test:dash:regression                        # Dashboard: grid capture + 
 - `helpers/vv-form.js` — generic VV form helpers: navigation, field verification, value capture, save, URL param navigation
 - `helpers/vv-calendar.js` — calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input, legacy fields
 - `global-setup.js` — auto-login + create saved records via browser UI (per-TZ, cached 1h)
-- `date-handling/cat-*.spec.js` — 16 parameterized spec files (cat-1-calendar-popup, cat-1-legacy-popup, 2, 3, 4-url-params, 4-fillinrelate, 4-reload, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 11-cross-timezone, 12)
-- `date-handling/dash-*.spec.js` — 4 dashboard specs (filter, sort, export, cross-layer)
-- `date-handling/audit-bug1-tz-stripping.spec.js` — Bug #1 TZ stripping audit
+- `specs/date-handling/cat-*.spec.js` — 16 parameterized spec files (cat-1-calendar-popup, cat-1-legacy-popup, 2, 3, 4-url-params, 4-fillinrelate, 4-reload, 5, 6, 7, 8, 8b, 9-gdoc, 9-gfv, 11-cross-timezone, 12)
+- `specs/date-handling/dash-*.spec.js` — 4 dashboard specs (filter, sort, export, cross-layer)
+- `specs/date-handling/audit-bug1-tz-stripping.spec.js` — Bug #1 TZ stripping audit
 
-Full documentation: [`testing/date-handling/README.md`](testing/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
+Full documentation: [`testing/specs/date-handling/README.md`](testing/specs/date-handling/README.md) | [`docs/guides/playwright-testing.md`](docs/guides/playwright-testing.md)
 
 ## Web Services Testing
 
@@ -261,10 +272,10 @@ REST API date handling tests via the `DateTestWSHarness`. Two execution paths:
 
 ```bash
 # Run a WS test directly
-node testing/scripts/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
+node tools/runners/run-ws-test.js --action WS-2 --configs A,D --record-id DateTest-000080
 
 # Simulate cloud TZ
-TZ=UTC node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+TZ=UTC node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 ```
 
 **Command:** `/@-test-ws-date-pw <test-id>` — executes test, generates artifacts (TC spec, run file, summary), updates matrix.
@@ -275,10 +286,11 @@ Full documentation: [`tasks/date-handling/web-services/README.md`](tasks/date-ha
 
 See `tasks/` folder. Each task gets its own subfolder with analysis, test results, and working notes.
 
-| Task                                    | Status      | Description                                                                                               |
-| --------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
-| [date-handling](tasks/date-handling/)   | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Reports, Workflows |
-| [form-templates](tasks/form-templates/) | Active      | VV form template XML analysis, format documentation, and improved template generation                     |
+| Task                                    | Status      | Description                                                                                        |
+| --------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| [date-handling](tasks/date-handling/)   | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards              |
+| [form-templates](tasks/form-templates/) | Active      | VV form template XML analysis, format documentation, and improved template generation              |
+| [wadnr](projects/wadnr/)                | In Progress | WADNR client project: impact analysis, exported artifacts (77 templates, 271 scripts, 157 globals) |
 
 ## Platform Documentation
 
@@ -287,6 +299,23 @@ Architecture and reference docs for the VisualVault platform itself (URL pattern
 - **[Platform Architecture](docs/architecture/visualvault-platform.md)** — URL anatomy, all navigation sections and their paths, Enterprise Tools (Microservices/Scheduled Services/Queries), demo environment GUIDs, how nodeV2 connects to VV
 - **[Form Fields Reference](docs/reference/form-fields.md)** — Calendar field config properties, popup modal behavior, V1/V2 code path, VV.Form console API, known bugs summary
 - **[VV.Form API Reference](docs/reference/vv-form-api.md)** — Full VV object structure: properties, methods, sub-objects (FormPartition, calendarValueService, Global, currentUser, FormsDataService), field definitions, automation patterns
+
+## Tools
+
+`tools/` contains standalone CLI utilities that are not Playwright test specs. Organized by purpose:
+
+- **`export/`** — WADNR environment export orchestrators (scripts, schedules, globals, templates)
+- **`runners/`** — Direct Node.js CLI runners (e.g., `run-ws-test.js` for WS harness invocation)
+- **`audit/`** — Verification and exploration scripts (browser-based checks, format comparisons)
+- **`inventory/`** — Codebase analysis tools (parse exported XMLs, generate field/script inventories)
+- **`generators/`** — Post-test artifact generators (forms, WS, dashboard matrix outputs)
+- **`helpers/`** — Shared non-Playwright helpers (`vv-admin.js`, `vv-sync.js`, `ws-api.js`, `ws-log.js`)
+
+## Projects
+
+`projects/` contains client-specific workspaces with exported artifacts and analysis. Each project has its own `CLAUDE.md` with project-specific instructions.
+
+- **[`wadnr/`](projects/wadnr/)** — WADNR impact analysis: 77 exported form templates, 271 microservice scripts, 157 global functions, schedule configs. Analysis includes field inventories, script-level date interaction reports, and bug case studies mapped to investigation findings.
 
 ## Upstream Sync
 
