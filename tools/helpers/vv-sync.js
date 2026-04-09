@@ -1,7 +1,7 @@
 /**
- * Shared sync, manifest, and README generation for VV admin component exports.
+ * Shared sync, manifest, and README generation for VV admin component extractions.
  *
- * Used by the unified WADNR export framework (export-wadnr.js) and individual
+ * Used by the unified extract framework (extract.js) and individual
  * component scripts. Provides manifest-based change detection and consistent
  * output formatting across all components.
  */

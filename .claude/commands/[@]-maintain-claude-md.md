@@ -62,9 +62,9 @@ Flag missing files as **CRITICAL** — a scope folder without context forces Cla
 
 Check if any CLAUDE.md exists in implementation subfolders where it shouldn't:
 
-- `tools/export/`, `tools/audit/`, `tools/helpers/`, `tools/runners/`, `tools/inventory/`, `tools/generators/`
+- `tools/extract/`, `tools/audit/`, `tools/helpers/`, `tools/runners/`, `tools/inventory/`, `tools/generators/`
 - `testing/specs/`, `testing/helpers/`, `testing/fixtures/`, `testing/pipelines/`, `testing/config/`, `testing/reporters/`
-- `projects/*/exports/`, `projects/*/analysis/`
+- `projects/*/extracts/`, `projects/*/analysis/`
 - `tasks/*/analysis/`, `tasks/*/runs/`, `tasks/*/summaries/`, `tasks/*/test-cases/`
 - `docs/architecture/`, `docs/reference/`, `docs/guides/`, `docs/standards/`
 
@@ -177,10 +177,10 @@ Extract numbers paired with countable nouns from each CLAUDE.md and verify again
 | Pattern in CLAUDE.md          | Verification command                                                                             |
 | ----------------------------- | ------------------------------------------------------------------------------------------------ |
 | "N spec files"                | `ls testing/specs/date-handling/*.spec.js \| wc -l`                                              |
-| "N scripts" (WADNR context)   | `ls projects/wadnr/exports/web-services/scripts/*.js \| wc -l`                                   |
-| "N globals" / "N functions"   | `ls projects/wadnr/exports/global-functions/*.js \| wc -l`                                       |
-| "N templates" (WADNR context) | `ls projects/wadnr/exports/form-templates/*.xml \| wc -l`                                        |
-| "N schedules"                 | `jq '.totalItems' projects/wadnr/exports/schedules/manifest.json`                                |
+| "N scripts" (WADNR context)   | `ls projects/wadnr/extracts/web-services/scripts/*.js \| wc -l`                                  |
+| "N globals" / "N functions"   | `ls projects/wadnr/extracts/global-functions/*.js \| wc -l`                                      |
+| "N templates" (WADNR context) | `ls projects/wadnr/extracts/form-templates/*.xml \| wc -l`                                       |
+| "N schedules"                 | `jq '.totalItems' projects/wadnr/extracts/schedules/manifest.json`                               |
 | "N confirmed bugs"            | count `bug-*.md` + `ws-bug-*.md` + `formdashboard-bug-*.md` excluding `*-fix-recommendations.md` |
 | "N commands"                  | `ls .claude/commands/*.md \| wc -l`                                                              |
 

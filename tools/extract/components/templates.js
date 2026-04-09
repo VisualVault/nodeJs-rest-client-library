@@ -1,11 +1,11 @@
 /**
- * Form Templates component — exports template XMLs from FormTemplateAdmin.
+ * Form Templates component — extracts template XMLs from FormTemplateAdmin.
  *
  * Uses Playwright to navigate FormTemplateAdmin grid, trigger the Export
  * button for each template, and capture the download. Templates whose names
  * start with "z" (case-insensitive) are excluded (typically test/draft items).
  *
- * Supports parallel export via multiple browser pages (CONCURRENCY workers)
+ * Supports parallel extraction via multiple browser pages (CONCURRENCY workers)
  * and content-hash-based incremental sync to skip unchanged templates.
  */
 const path = require('path');
@@ -30,7 +30,7 @@ module.exports = {
      * No REST API exists for template listing — grid is the only source.
      *
      * Carries forward contentHash from previous manifest for incremental sync,
-     * and records the grid page number for each template to speed up parallel export.
+     * and records the grid page number for each template to speed up parallel extraction.
      */
     async fetchMetadata(page, config, opts = {}) {
         const url = vvAdmin.adminUrl(config, 'FormTemplateAdmin');
@@ -114,13 +114,13 @@ module.exports = {
      *
      * @param {import('playwright').Page} page - Original component page (closed during parallel work)
      * @param {object} config - Environment config
-     * @param {Array} itemsToExtract - Templates to export (with gridPage hints)
+     * @param {Array} itemsToExtract - Templates to extract (with gridPage hints)
      * @param {import('playwright').BrowserContext} context - Browser context for spawning worker pages
      * @returns {Map<string, {source: string, contentHash: string}>}
      */
     async extract(page, config, itemsToExtract, context) {
         if (!context) {
-            // Fallback: no context provided, use single-page sequential export
+            // Fallback: no context provided, use single-page sequential extraction
             return this._extractSequential(page, config, itemsToExtract);
         }
 
@@ -130,7 +130,7 @@ module.exports = {
         const total = itemsToExtract.length;
         const workerCount = Math.min(CONCURRENCY, total);
 
-        console.log(`  Parallel export: ${workerCount} workers for ${total} templates`);
+        console.log(`  Parallel extraction: ${workerCount} workers for ${total} templates`);
 
         const self = this;
 
@@ -327,7 +327,7 @@ module.exports = {
     },
 
     /**
-     * Save exported templates as individual .xml files.
+     * Save extracted templates as individual .xml files.
      * Returns { saved, hashes } where hashes is a Map of name -> contentHash.
      */
     save(outputDir, allItems, extracted) {
@@ -352,7 +352,7 @@ module.exports = {
     generateReadme(outputDir, allItems, extractedNames) {
         vvSync.generateReadme(outputDir, {
             title: 'Form Templates',
-            subtitle: `Exported from FormTemplateAdmin`,
+            subtitle: `Extracted from FormTemplateAdmin`,
             items: allItems,
             groupByField: 'category',
             columns: [

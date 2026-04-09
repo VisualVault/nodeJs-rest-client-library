@@ -39,7 +39,7 @@ ahead_behind=$(git rev-list --left-right --count origin/$branch...$branch 2>/dev
 **3. Active projects** — for each `projects/*/`:
 
 - Read `CLAUDE.md` for environment info
-- For each `exports/*/manifest.json`: extract `generatedAt` and item count
+- For each `extracts/*/manifest.json`: extract `generatedAt` and item count
 
 **4. Recent activity:**
 
@@ -164,7 +164,7 @@ In addition to the default project row, include:
 
 **1. Per-component export details:**
 
-For each `exports/*/manifest.json`, extract:
+For each `extracts/*/manifest.json`, extract:
 
 - Component name
 - Item count (`totalItems` or array length)

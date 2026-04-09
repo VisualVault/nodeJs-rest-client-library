@@ -1,13 +1,13 @@
 /**
- * Export WADNR global functions (VV.Form.Global.*) via Playwright.
+ * Extract WADNR global functions (VV.Form.Global.*) via Playwright.
  *
  * Opens an existing WADNR form record in FormViewer to load the Angular SPA,
  * then extracts every VV.Form.Global function's source via .toString() and
  * saves each as an individual .js file.
  *
  * Usage:
- *   node tools/export/export-globals.js [--dry-run] [--headless]
- *   node tools/export/export-globals.js --xcid <guid> --xcdid <guid>
+ *   node tools/extract/extract-globals.js [--dry-run] [--headless]
+ *   node tools/extract/extract-globals.js --xcid <guid> --xcdid <guid>
  */
 const { chromium } = require('@playwright/test');
 const fs = require('fs');
@@ -16,7 +16,7 @@ const path = require('path');
 // --- Config ---
 
 const ENV_JSON_PATH = path.resolve(__dirname, '..', '..', '.env.json');
-const OUTPUT_DIR = path.resolve(__dirname, '..', '..', 'projects', 'wadnr', 'exports', 'global-functions');
+const OUTPUT_DIR = path.resolve(__dirname, '..', '..', 'projects', 'wadnr', 'extracts', 'global-functions');
 
 function loadWadnrConfig() {
     const raw = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));

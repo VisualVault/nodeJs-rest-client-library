@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 /**
- * Unified VV environment export orchestrator.
+ * Unified VV environment extract orchestrator.
  *
  * Extracts and syncs multiple VV admin components from any environment.
  * Each component is a module in ./components/ with a standard interface.
  * Shares a single browser session across components.
  *
  * Usage:
- *   node tools/export/export.js --project wadnr                  # All components for WADNR
- *   node tools/export/export.js --project demo                   # All components for demo env
- *   node tools/export/export.js --project wadnr --component scripts  # Just web services
- *   node tools/export/export.js --output /path/to/exports        # Custom output + env from .env.json active
- *   node tools/export/export.js --list                           # Show available components
- *   node tools/export/export.js --dry-run                        # List what would be extracted
- *   node tools/export/export.js --force                          # Re-extract everything
- *   node tools/export/export.js --headed                         # Show browser
- *   node tools/export/export.js --filter "Lib*"                  # Filter by name
+ *   node tools/extract/extract.js --project wadnr                  # All components for WADNR
+ *   node tools/extract/extract.js --project demo                   # All components for demo env
+ *   node tools/extract/extract.js --project wadnr --component scripts  # Just web services
+ *   node tools/extract/extract.js --output /path/to/extracts      # Custom output + env from .env.json active
+ *   node tools/extract/extract.js --list                           # Show available components
+ *   node tools/extract/extract.js --dry-run                        # List what would be extracted
+ *   node tools/extract/extract.js --force                          # Re-extract everything
+ *   node tools/extract/extract.js --headed                         # Show browser
+ *   node tools/extract/extract.js --filter "Lib*"                  # Filter by name
  */
 const { chromium } = require('@playwright/test');
 const fs = require('fs');
@@ -85,7 +85,7 @@ function resolveProject() {
             process.exit(1);
         }
         return {
-            output: getArg('--output') || path.join(PROJECTS_DIR, PROJECT_NAME.toLowerCase(), 'exports'),
+            output: getArg('--output') || path.join(PROJECTS_DIR, PROJECT_NAME.toLowerCase(), 'extracts'),
             server: match.server,
             customer: match.customer,
         };
@@ -102,7 +102,7 @@ function resolveProject() {
     // Default: use active env from .env.json, output to that project folder
     const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
     return {
-        output: path.join(PROJECTS_DIR, env.activeCustomer.toLowerCase(), 'exports'),
+        output: path.join(PROJECTS_DIR, env.activeCustomer.toLowerCase(), 'extracts'),
         server: env.activeServer,
         customer: env.activeCustomer,
     };
@@ -155,7 +155,7 @@ async function main() {
         await loginPage.close();
 
         // Shared context for cross-component routing
-        const exportContext = {
+        const extractContext = {
             scheduledScriptsDir: path.join(BASE_OUTPUT, 'schedules', 'scripts'),
         };
 
@@ -172,7 +172,7 @@ async function main() {
             const page = await context.newPage();
 
             try {
-                await runComponent(comp, page, config, outputDir, exportContext, context);
+                await runComponent(comp, page, config, outputDir, extractContext, context);
             } catch (err) {
                 console.error(`\n  ERROR in ${compName}: ${err.message}`);
                 const screenshot = path.join(outputDir, '_error-screenshot.png');
@@ -190,7 +190,7 @@ async function main() {
     console.log('All done.');
 }
 
-async function runComponent(comp, page, config, outputDir, exportContext, context) {
+async function runComponent(comp, page, config, outputDir, extractContext, context) {
     const manifestPath = path.join(outputDir, 'manifest.json');
     const filterFn = (item) => vvSync.matchesFilter(item.name || item[Object.keys(item)[0]], FILTER);
 
@@ -265,7 +265,7 @@ async function runComponent(comp, page, config, outputDir, exportContext, contex
             console.log(`  Extracted ${extracted.size}/${changes.toExtract.length}.`);
 
             // Phase 3: Save (routes scheduled scripts to scheduledScriptsDir)
-            const saveResult = comp.save(outputDir, allItems, extracted, exportContext);
+            const saveResult = comp.save(outputDir, allItems, extracted, extractContext);
             const savedCount = typeof saveResult === 'object' ? saveResult.saved : saveResult;
             console.log(`  Saved ${savedCount} files.`);
 
@@ -279,7 +279,7 @@ async function runComponent(comp, page, config, outputDir, exportContext, contex
 
             // Handle deletions — resolve path based on category (check both dirs for scripts)
             for (const s of changes.deleted) {
-                const dirs = isScriptsComp ? [fileDir, exportContext.scheduledScriptsDir] : [fileDir];
+                const dirs = isScriptsComp ? [fileDir, extractContext.scheduledScriptsDir] : [fileDir];
                 for (const dir of dirs) {
                     const fp = path.join(dir, vvSync.sanitizeFilename(s.name) + fileExt);
                     if (fs.existsSync(fp)) {

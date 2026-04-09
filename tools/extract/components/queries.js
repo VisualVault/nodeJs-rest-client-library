@@ -1,5 +1,5 @@
 /**
- * Custom Queries component — exports SQL query definitions from ConnectionQueryAdmin.
+ * Custom Queries component — extracts SQL query definitions from ConnectionQueryAdmin.
  *
  * Queries are nested under Data Connections. The flow:
  * 1. API probe: attempt GET /customquery bare endpoint for definitions

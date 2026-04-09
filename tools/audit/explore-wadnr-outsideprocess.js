@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ENV_JSON_PATH = path.resolve(__dirname, '..', '..', '.env.json');
-const SCREENSHOTS_DIR = path.resolve(__dirname, '..', '..', 'projects', 'wadnr', 'exports', '_exploration');
+const SCREENSHOTS_DIR = path.resolve(__dirname, '..', '..', 'projects', 'wadnr', 'extracts', '_exploration');
 
 function loadWadnrConfig() {
     const raw = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));

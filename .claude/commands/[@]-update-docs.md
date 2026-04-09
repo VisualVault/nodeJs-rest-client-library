@@ -56,7 +56,7 @@ For each change, determine which docs **might** need updating using this mapping
 | `testing/pipelines/` (regression runners)    | `CLAUDE.md` (dev commands), `package.json` (npm scripts)                                                 |
 | `docs/` (new or updated files)               | `docs/README.md` if index needs update                                                                   |
 | `tasks/` (new task folders)                  | `tasks/README.md` (task index table), `CLAUDE.md` (active tasks table)                                   |
-| `projects/` (new project or export updates)  | `CLAUDE.md` (projects section), project's own `CLAUDE.md`                                                |
+| `projects/` (new project or extract updates) | `CLAUDE.md` (projects section), project's own `CLAUDE.md`                                                |
 | `.claude/` (commands, config)                | `CLAUDE.md` if it references commands                                                                    |
 | Config files (eslint, prettier, husky, etc.) | `CHANGELOG.md` (tooling), `docs/guides/dev-setup.md` (code quality section)                              |
 | `app.js`, routes (new endpoints)             | `CLAUDE.md` (server architecture), `Readme-microservices.md`                                             |

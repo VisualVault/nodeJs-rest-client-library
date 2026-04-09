@@ -1,12 +1,12 @@
 /**
- * Export WADNR form template XMLs via Playwright.
+ * Extract WADNR form template XMLs via Playwright.
  *
- * Navigates to FormTemplateAdmin, reads the Telerik RadGrid, and exports
+ * Navigates to FormTemplateAdmin, reads the Telerik RadGrid, and extracts
  * each template whose name does NOT start with "z" (case-insensitive).
- * XMLs are saved to projects/wadnr/exports/form-templates/.
+ * XMLs are saved to projects/wadnr/extracts/form-templates/.
  *
  * Usage:
- *   node tools/export/export-templates.js [--dry-run] [--headless]
+ *   node tools/extract/extract-templates.js [--dry-run] [--headless]
  */
 const { chromium } = require('@playwright/test');
 const fs = require('fs');
@@ -15,7 +15,7 @@ const path = require('path');
 // --- Config ---
 
 const ENV_JSON_PATH = path.resolve(__dirname, '..', '..', '.env.json');
-const OUTPUT_DIR = path.resolve(__dirname, '..', '..', 'projects', 'wadnr', 'exports', 'form-templates');
+const OUTPUT_DIR = path.resolve(__dirname, '..', '..', 'projects', 'wadnr', 'extracts', 'form-templates');
 
 // Grid column indices (discovered from dry run)
 const COL_CATEGORY = 1;
@@ -188,7 +188,7 @@ async function goToNextPage(page, currentPage) {
  * Its onclick contains __doPostBack(target, '') which we extract and call
  * via addScriptTag (to avoid strict mode issues).
  */
-async function exportTemplateByName(page, templateName) {
+async function extractTemplateByName(page, templateName) {
     const filename = sanitizeFilename(templateName) + '.xml';
     const filePath = path.join(OUTPUT_DIR, filename);
 
@@ -357,7 +357,7 @@ async function main() {
         // Each worker logs in (shares cookies), navigates to FormTemplateAdmin,
         // finds its template, exports, re-navigates, repeats.
         const CONCURRENCY = 2; // Fewer workers for reliability on retry
-        console.log(`\n--- Starting parallel exports (${CONCURRENCY} workers) ---\n`);
+        console.log(`\n--- Starting parallel extractions (${CONCURRENCY} workers) ---\n`);
 
         // Split templates into chunks for each worker
         const remaining = toExport.filter((t) => {
@@ -415,7 +415,7 @@ async function main() {
                         continue;
                     }
 
-                    const ok = await exportTemplateByName(workerPage, t.name);
+                    const ok = await extractTemplateByName(workerPage, t.name);
                     if (ok) {
                         success++;
                     } else {

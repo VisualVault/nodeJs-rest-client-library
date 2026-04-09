@@ -90,6 +90,17 @@ https://{env}.visualvault.com/app/{customer}/{database}/FormDataDetails?Mode=Rea
 
 This is an ASP.NET page (not the Angular FormViewer SPA) using Telerik RadGrid for server-side rendering.
 
+### Document Detail (opens a document's properties in a popup)
+
+```
+https://{env}.visualvault.com/app/{customer}/{database}/DocumentDetails?DhID={documentHistoryId}&hidemenu=true
+```
+
+- `DhID` — the document history ID (different from `documentId` — see API response `id` field vs `documentId` field)
+- Opens in a popup window via `VV.OpenWindow()` when clicking a document name in the Document Library grid
+- Contains 11 tabs: Details, Parent, Children, Related, Forms, Projects, ID Card, **Index Fields**, Revisions, History, Security
+- Index Fields tab shows editable date/text/dropdown fields when document is checked out
+
 ---
 
 ## Navigation Map
@@ -845,7 +856,7 @@ The core API `postForms()` takes a template name and resolves it automatically. 
 | FPAN Notice of Decision    |        5        |
 | Forest Practices App/Notif |        5        |
 
-**Exported templates:** 77 of 89 active templates exported to `projects/wadnr/exports/form-templates/` via `tools/export/export-templates.js`. 12 templates consistently failed (server-side export timeout).
+**Exported templates:** 77 of 89 active templates exported to `projects/wadnr/extracts/form-templates/` via `tools/extract/extract-templates.js`. 12 templates consistently failed (server-side export timeout).
 
 ---
 
@@ -928,6 +939,33 @@ The VV REST API write path (`postForms`, `postFormRevision`) stores date strings
 This contrasts with the **Forms browser save path**, where the Angular `getSaveValue()` pipeline applies different transformations per config: Config C stores real UTC (midnight BRT → `T03:00:00`), Config D stores local midnight as-is (`T00:00:00`), and date-only fields in UTC+ timezones store the wrong day (FORM-BUG-7). The mixed timezone storage problem is **exclusively a Forms Angular issue** — the API path is immune.
 
 **Implication**: Developers writing dates via the REST API get consistent, predictable storage regardless of field config. The API is the safer write path for date-critical workflows.
+
+### Document Index Field Date Handling
+
+Document index fields (fieldType 4, "Date Time") behave differently from form calendar fields. Verified 2026-04-09 on vvdemo.
+
+| Behavior                    | Form Fields (`postForms`)                 | Document Index Fields (`putDocumentIndexFields`) |
+| --------------------------- | ----------------------------------------- | ------------------------------------------------ |
+| Date-only input             | Stored as-is                              | Normalized to `T00:00:00` (no Z)                 |
+| API response Z suffix       | Always `Z` (e.g., `2026-03-15T00:00:00Z`) | **Never** — no Z in response                     |
+| Timezone offset input       | Stored as-is (no conversion)              | **Converted to UTC**, Z stripped                 |
+| EU date format (DD/MM/YYYY) | Silently swapped (WS-BUG-2)               | **Correctly parsed**                             |
+| Clearing a value            | Sets to null                              | **Cannot clear** — silent failure                |
+| Configuration flags         | enableTime, ignoreTimezone, useLegacy     | None — single "Date Time" type                   |
+
+Key behaviors:
+
+- **Naive datetimes preserved**: `2026-03-15T14:30:00` → stored and returned as `2026-03-15T14:30:00`
+- **Timezone offsets silently resolved**: `2026-03-15T14:30:00-03:00` → stored as `2026-03-15T17:30:00` (UTC, Z stripped) — creates timezone-ambiguous values (DOC-BUG-1)
+- **UI control**: Telerik RadDateTimePicker, displays in US 12h format (`3/15/2026 2:30 PM`)
+- **Checkout required for UI editing**: datepicker is disabled when document is checked in; API can always write regardless
+- **Built-in document dates** (`createDate`, `modifyDate`, `reviewDate`, `expireDate`) include Z suffix; index field dates do not — inconsistent within the same document
+
+See `tasks/date-handling/document-library/analysis/overview.md` for full investigation and `testing/specs/date-handling/doc-index-field-dates.spec.js` for 17 automated regression tests.
+
+### Auto-Save
+
+The FormViewer localization keys include auto-save strings (`autoSave`, `autoSaveToggle`, `autoSaveInterval`), but **no auto-save implementation exists in the platform**. The save pipeline is always manual (Save button click). `DebouncedSave()` in the form script library calls `window.debouncedSave()` which is customer-injected JavaScript, not platform code. Verified 2026-04-09 by searching the full codebase and localization APIs.
 
 ---
 

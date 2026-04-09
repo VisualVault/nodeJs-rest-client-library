@@ -24,13 +24,13 @@ This repo uses a three-tier Git model (see CLAUDE.md § "Repository Architecture
 
 ### Personal (never push to shared team repo)
 
-| Pattern               | Reason                                                   |
-| --------------------- | -------------------------------------------------------- |
-| `projects/`           | Customer-specific data (exports, analysis, case studies) |
-| `tasks/**/runs/`      | Env-specific execution records (record IDs, timestamps)  |
-| `tasks/**/summaries/` | Personal tracking state                                  |
-| `tasks/**/results.md` | Raw session evidence                                     |
-| `.env.json`           | Machine-specific credentials (already gitignored)        |
+| Pattern               | Reason                                                    |
+| --------------------- | --------------------------------------------------------- |
+| `projects/`           | Customer-specific data (extracts, analysis, case studies) |
+| `tasks/**/runs/`      | Env-specific execution records (record IDs, timestamps)   |
+| `tasks/**/summaries/` | Personal tracking state                                   |
+| `tasks/**/results.md` | Raw session evidence                                      |
+| `.env.json`           | Machine-specific credentials (already gitignored)         |
 
 ### Shared (safe to push to team repo)
 

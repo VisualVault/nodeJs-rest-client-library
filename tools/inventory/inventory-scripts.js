@@ -17,7 +17,7 @@ const fs = require('fs');
 const path = require('path');
 const { XMLParser } = require('fast-xml-parser');
 
-const TEMPLATES_DIR = path.resolve(__dirname, '../../projects/wadnr/exports/form-templates');
+const TEMPLATES_DIR = path.resolve(__dirname, '../../projects/wadnr/extracts/form-templates');
 const OUTPUT_FILE = path.resolve(__dirname, '../../projects/wadnr/analysis/script-inventory.md');
 
 // ─── Config mapping (same as inventory-wadnr-fields.js) ─────────────────────

@@ -4,7 +4,7 @@ Automated regression tests for VisualVault Forms calendar field date-handling be
 
 ## Why This Exists
 
-The VisualVault platform has **7 confirmed date-handling bugs** affecting how calendar fields store and return dates depending on field configuration and user timezone. This test suite:
+The VisualVault platform has **16 confirmed date-handling bugs** across Forms (7), Web Services (6), Dashboards (1), and Document Library (2). This test suite:
 
 - Runs the same scenarios across BRT (UTC-3), IST (UTC+5:30), UTC+0, PST/PDT (UTC-8/-7), and JST (UTC+9) to expose timezone-dependent bugs
 - Covers ~242 test slots across 13 categories (popup, typed input, reload, SetFieldValue, GetFieldValue, round-trip, etc.)
@@ -87,6 +87,7 @@ Shared config:
 | `dash-sort.spec.js`               | DB-4 — dashboard column sort order verification (ascending/descending)                  |
 | `dash-export.spec.js`             | DB-7 — dashboard export verification (Excel, Word, XML vs grid values)                  |
 | `dash-cross-layer.spec.js`        | DB-6 — dashboard vs Forms SPA cross-layer value comparison                              |
+| `doc-index-field-dates.spec.js`   | DOC-BUG-1/2 — document index field date handling (API round-trip, 17 tests)             |
 
 ### External Config
 
