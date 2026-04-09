@@ -52,9 +52,11 @@ https://{env}.visualvault.com/FormViewer/app?hidemenu=true&formid={templateGUID}
 ```
 
 - `formid` — GUID of the Form Template
-- `xcid` — GUID identifying the customer
-- `xcdid` — GUID identifying the database
+- `xcid` — customer identifier (accepts both GUID and alias string, e.g., `EmanuelJofre`)
+- `xcdid` — database identifier (accepts both GUID and alias string, e.g., `Main`)
 - `hidemenu=true` — hides the VV navigation shell (typical for end-user forms)
+
+Note: `xcid`/`xcdid` accept customer/database **alias strings** as well as GUIDs. Using aliases is simpler when building URLs from config. The REST API `getFormTemplates()` response does NOT include `customerId` or `customerDatabaseId` fields, so you cannot obtain GUIDs from template metadata — use `customerAlias`/`databaseAlias` from your config instead. Verified 2026-04-09 on vvdemo.
 
 Opening a template URL creates a **new blank form instance** each time (named sequentially, e.g., `DateTest-000012`).
 
@@ -767,8 +769,8 @@ See `tasks/date-handling/web-services/analysis/overview.md` CB-29 for full evide
 ## Key Concepts & GUIDs
 
 - **`formid`** — identifies a Form Template **definition**. Stable across versions. Used in form viewer URL and FormsAPI template lookup.
-- **`xcid`** — identifies the customer in the VV database.
-- **`xcdid`** — identifies the specific database within the customer.
+- **`xcid`** — identifies the customer (accepts GUID or alias string like `EmanuelJofre`).
+- **`xcdid`** — identifies the database (accepts GUID or alias string like `Main`).
 - **`CcID`** — Connection ID for a Data Connection; used in query URLs.
 - **Revision** — form templates are versioned. Scripts reference a specific revision or "Released" status.
 - **Status:** `Released` = live/published; `Release` = draft/in-progress (UI inconsistency — "Release" means it hasn't been released yet).

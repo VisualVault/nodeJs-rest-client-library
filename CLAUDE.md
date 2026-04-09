@@ -13,7 +13,7 @@ Fork of [VisualVault/nodeJs-rest-client-library](https://github.com/VisualVault/
 nodeV2/
   lib/VVRestApi/VVRestApiNodeJs/   # Node.js microservices server (Express, REST client, auth)
   scripts/                         # VV script examples and templates (see scripts/)
-  tools/                           # Standalone CLI tooling: export, runners, audit, inventory, generators (see tools/)
+  tools/                           # Standalone CLI tooling: export, explore, runners, audit, inventory, generators (see tools/)
   testing/                         # Playwright test infrastructure: specs, helpers, fixtures, pipelines (see testing/)
   tasks/                           # Cross-cutting investigations and analysis (see tasks/)
   projects/                        # Customer workspaces with exported artifacts (see projects/)
@@ -70,6 +70,17 @@ npm run test:pw:report       # Open HTML report
 ## Web Services Testing
 
 REST API date handling tests via the DateTestWSHarness. Run with `node tools/runners/run-ws-test.js --action WS-2`. See `tasks/date-handling/web-services/README.md`.
+
+## Platform Exploration & Version Monitoring
+
+Playwright-based exploration of VV platform structure and version state. See `tools/CLAUDE.md` for details.
+
+```bash
+npm run explore              # Run exploration specs (headless)
+npm run explore:headed       # Headed mode (visible browser)
+npm run version:snapshot     # Capture current platform version state
+npm run version:diff         # Compare two most recent snapshots
+```
 
 ## Active Tasks
 

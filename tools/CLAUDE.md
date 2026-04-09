@@ -4,15 +4,15 @@ Standalone CLI utilities for working with VV environments. Not tied to Playwrigh
 
 ## Subfolders
 
-| Folder        | Purpose                                       | Example usage                                                 |
-| ------------- | --------------------------------------------- | ------------------------------------------------------------- |
-| `export/`     | Extract data from any VV environment          | `node tools/export/export.js --output projects/wadnr/exports` |
-| `runners/`    | Execute workflows, WS harness, debug          | `node tools/runners/run-ws-test.js --action WS-2`             |
-| `audit/`      | Verify platform behaviors in browser          | `node tools/audit/audit-bug5-fake-z.js`                       |
-| `inventory/`  | Analyze exported project data                 | `node tools/inventory/inventory-fields.js`                    |
-| `generators/` | Create structured artifacts from test results | `node tools/generators/generate-artifacts.js`                 |
-| `explore/`    | Platform exploration + version monitoring     | `npm run explore:headed`, `npm run version:snapshot`          |
-| `helpers/`    | Shared libraries used by tools                | `vv-admin.js`, `vv-sync.js`, `ws-api.js`, `vv-explore.js`     |
+| Folder        | Purpose                                       | Example usage                                                                 |
+| ------------- | --------------------------------------------- | ----------------------------------------------------------------------------- |
+| `export/`     | Extract data from any VV environment          | `node tools/export/export.js --output projects/wadnr/exports`                 |
+| `runners/`    | Execute workflows, WS harness, debug          | `node tools/runners/run-ws-test.js --action WS-2`                             |
+| `audit/`      | Verify platform behaviors in browser          | `node tools/audit/audit-bug5-fake-z.js`                                       |
+| `inventory/`  | Analyze exported project data                 | `node tools/inventory/inventory-fields.js`                                    |
+| `generators/` | Create structured artifacts from test results | `node tools/generators/generate-artifacts.js`                                 |
+| `explore/`    | Platform exploration + version monitoring     | `npm run explore:headed`, `npm run version:snapshot`                          |
+| `helpers/`    | Shared libraries used by tools                | `vv-admin.js`, `vv-sync.js`, `ws-api.js`, `vv-explore.js`, `build-context.js` |
 
 ## Explore Commands
 

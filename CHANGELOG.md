@@ -44,11 +44,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `.prettierignore` — excludes `projects/` extracted customer code from formatting
 - `projects/emanueljofre/` — development environment project (42 scripts, 5 schedules, 108 templates)
 - `tasks/export-optimization/` — task tracking export pipeline improvements (parallel, revision tracking, API-first)
+- `tools/explore/` — Playwright-based platform exploration: `platform-discovery.spec.js` (nav structure, admin tools, UI framework), `version-discovery.spec.js` (version API, FormViewer build, service config). Version tracking via `version-snapshot.js` and `version-diff.js`
+- `tools/helpers/vv-explore.js` — reusable exploration utilities (auth, page helpers, response collectors) for explore specs
+- `tools/helpers/build-context.js` — captures test build metadata (FormViewer build, platform version) for regression reporting
+- `npm run explore`, `explore:headed`, `explore:report`, `version:snapshot`, `version:diff`, `version:list` scripts
+- Export optimization: parallel template export (3 Playwright workers, ~3x faster), SHA-256 content-hash tracking in manifest for instant incremental sync, globals multi-template retry with record prioritization (5 attempts, 20s each)
+- `hashField` option in `vv-sync.computeChanges()` for content-hash-based change detection (skips unchanged items without date fields)
+- Per-project `test-assets.md` convention — catalogs platform-side test components (forms, WS, saved records) per environment. Created for `projects/emanueljofre/` and `projects/wadnr/`. Convention documented in `testing/CLAUDE.md` and `projects/CLAUDE.md` scaffolding template
 
 ### Changed
 
 - `.env.json` restructured from flat `environments` map to hierarchical `servers → customers` structure reflecting VV platform architecture. Selectors changed from `activeEnv` to `activeServer` + `activeCustomer`. `env-config.js` and `app.js` resolve the new hierarchy; `loadConfig()` return shape unchanged
 - ESLint config: excluded `lib/VVRestApi/` and `tasks/**/bug-analysis/` from linting (upstream code and captured VV script artifacts with pre-existing errors that blocked lint-staged)
+- ESLint config: added browser globals (`window`, `HTMLElement`, `Window`, `Document`, `NodeFilter`) for `tools/**/*.js` — needed for `page.evaluate()` in explore specs
+- Export globals: fixed API call (`getForms` not `getFormInstances`), `xcid`/`xcdid` from config (was `undefined` from API response). Now works on all environments including EmanuelJofre
+- Export scripts: unified manifest tracks all items (scheduled + non-scheduled). Fixes double-deletion bug from split `computeChanges` calls
+- Export orchestrator: manifest save moved after extraction (enables content-hash persistence), browser context passed to `extract()` for parallel workers
+- Login timeout increased 30s → 60s in `vv-admin.js` for slow VV environments
 
 - Refactored all 7 Forms calendar bug reports (FORM-BUG-1 through FORM-BUG-7) to comply with bug report standard: standalone structure, jargon-free "What Happens," conditions-based "When This Applies," "How to Reproduce" for support audience, Verification summary replacing raw test data, field config appendix, supporting repository notice
 - Refactored all 6 Web Services bug reports (WEBSERVICE-BUG-1 through WEBSERVICE-BUG-6) and FORMDASHBOARD-BUG-1 to comply with bug report standard: same restructuring as Forms bugs, plus tone fixes ("fake"→"incorrect", editorial language removed), non-standard "Impact Analysis" sections eliminated

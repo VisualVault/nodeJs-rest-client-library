@@ -29,6 +29,16 @@ Browser automation for VisualVault platform testing. Everything here is **shared
 3. Use `helpers/vv-form.js` and `helpers/vv-calendar.js` for page interaction
 4. Non-Playwright helpers (admin scraping, sync) live in `tools/helpers/`, not here
 
+## Test Assets
+
+Platform-side test components (forms, web services, saved records) are cataloged per-project:
+
+- [`projects/emanueljofre/test-assets.md`](../projects/emanueljofre/test-assets.md) — development environment (read-write)
+- [`projects/wadnr/test-assets.md`](../projects/wadnr/test-assets.md) — WADNR environment (read-only)
+
+When adding a test harness to any environment, update that project's `test-assets.md`.
+For Playwright-executable config (field IDs, URLs, record definitions): `fixtures/vv-config.js`.
+
 ## Credentials
 
 All tests read credentials from root `.env.json` via `fixtures/env-config.js`. See `.env.example.json` for the format.
