@@ -378,9 +378,21 @@ git push -u origin main
 
 You get: all tools, tests, docs, and platform analysis — ready to use. You add: your own `projects/{customer}/` for each VV environment you work with, your own `.env.json` with credentials, and your own test execution results.
 
+### Current State: Single-Repo Workflow
+
+Until other developers join, `emanueljofre/nodeV2` holds **everything** — shared and personal content together. This is intentional. The directory structure already separates content by type (`tools/` vs `projects/` vs `tasks/`), so no operational change is needed day-to-day. Work normally: improve tools, run tests, export customer data, write analysis — all in this repo.
+
+When the repo is shared with the team:
+
+1. Create a private repo, add it as a second remote
+2. Uncomment the `.gitignore` lines for `/projects/` and `tasks/**/runs/` etc.
+3. The shared repo is instantly clean — the structure ensures no retroactive cleanup is needed
+
+The sharing awareness built into custom commands (`/@-smart-commit-push` remote detection, test command artifact tables) provides guardrails for the transition. They document the boundary now so it's enforced automatically later.
+
 ### .gitignore Note
 
-The `.gitignore` has commented-out lines for `/projects/` and `tasks/**/runs/` etc. These are **documentation for the team repo** — uncomment them only when working directly on `emanueljofre/nodeV2`. In your private workspace, keep them commented so everything is versioned and backed up.
+The `.gitignore` has commented-out lines for `/projects/` and `tasks/**/runs/` etc. These are **documentation for the team repo** — uncomment them only when working directly on `emanueljofre/nodeV2` as a shared repo. While working solo, keep them commented so everything is versioned and backed up.
 
 ## Upstream Sync
 
