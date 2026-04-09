@@ -49,10 +49,14 @@ For each change, determine which docs **might** need updating using this mapping
 | `lib/VVRestApi/` (bug fixes, refactors)      | `CHANGELOG.md`                                                                                           |
 | `package.json` (scripts, deps, tooling)      | `CLAUDE.md` (dev commands), `CHANGELOG.md`, `docs/guides/dev-setup.md` (commands/tooling)                |
 | `scripts/`                                   | `CLAUDE.md` (repo structure if new dirs)                                                                 |
+| `tools/` (new or changed tools)              | `CLAUDE.md` (tools section), `docs/guides/dev-setup.md` (if runner/pipeline paths change)                |
+| `tools/helpers/` (vv-admin, vv-sync, etc.)   | `docs/guides/playwright-testing.md` (key files table), `CLAUDE.md` (tools helpers list)                  |
 | `testing/` (helpers, fixtures, config)       | `docs/guides/dev-setup.md`, `docs/guides/playwright-testing.md`, `testing/specs/date-handling/README.md` |
-| `testing/helpers/` (new or changed helpers)  | `docs/guides/playwright-testing.md` (key files table), `CLAUDE.md` (test infrastructure list)            |
+| `testing/helpers/` (vv-form, vv-calendar)    | `docs/guides/playwright-testing.md` (key files table), `CLAUDE.md` (test infrastructure list)            |
+| `testing/pipelines/` (regression runners)    | `CLAUDE.md` (dev commands), `package.json` (npm scripts)                                                 |
 | `docs/` (new or updated files)               | `docs/README.md` if index needs update                                                                   |
 | `tasks/` (new task folders)                  | `tasks/README.md` (task index table), `CLAUDE.md` (active tasks table)                                   |
+| `projects/` (new project or export updates)  | `CLAUDE.md` (projects section), project's own `CLAUDE.md`                                                |
 | `.claude/` (commands, config)                | `CLAUDE.md` if it references commands                                                                    |
 | Config files (eslint, prettier, husky, etc.) | `CHANGELOG.md` (tooling), `docs/guides/dev-setup.md` (code quality section)                              |
 | `app.js`, routes (new endpoints)             | `CLAUDE.md` (server architecture), `Readme-microservices.md`                                             |

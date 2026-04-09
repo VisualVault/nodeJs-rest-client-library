@@ -65,7 +65,7 @@ Find all `.md` files in the repo (excluding `node_modules/` and `.git/`). For ea
 
 The expected root-level items are:
 
-**Directories**: `.claude/`, `.husky/`, `.playwright/`, `.playwright-cli/`, `docs/`, `lib/`, `node_modules/`, `playwright-report/`, `scripts/`, `tasks/`, `test-results/`, `testing/`
+**Directories**: `.claude/`, `.husky/`, `.playwright/`, `.playwright-cli/`, `docs/`, `lib/`, `node_modules/`, `playwright-report/`, `projects/`, `scripts/`, `tasks/`, `test-results/`, `testing/`, `tools/`
 
 **Files**: `_config.yml`, `.gitattributes`, `.gitignore`, `.npmignore`, `.prettierignore`, `.prettierrc`, `CHANGELOG.md`, `CLAUDE.md`, `eslint.config.js`, `package.json`, `package-lock.json`, `README.md`, `Readme-microservices.md`
 
