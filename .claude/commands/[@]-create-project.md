@@ -76,13 +76,13 @@ Last full export: not yet run.
 
 ```bash
 # Export all components
-node tools/export/export.js --output projects/<name>/exports
+node tools/export/export.js --project <name>
 
 # Export just scripts
-node tools/export/export.js --output projects/<name>/exports --component scripts
+node tools/export/export.js --project <name> --component scripts
 
 # Dry-run
-node tools/export/export.js --output projects/<name>/exports --dry-run
+node tools/export/export.js --project <name> --dry-run
 ```
 ````
 
@@ -124,7 +124,7 @@ projects/<name>/analysis/
 Next steps:
 
 1. Ensure .env.json has the <server>/<customer> credentials
-2. Run: node tools/export/export.js --output projects/<name>/exports --dry-run
+2. Run: node tools/export/export.js --project <name> --dry-run
 3. Review and run without --dry-run to populate exports
 
 ```

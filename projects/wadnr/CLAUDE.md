@@ -33,13 +33,13 @@ Last full export: 2026-04-08.
 
 ```bash
 # Re-sync all exports
-node tools/export/export.js --output projects/wadnr/exports
+node tools/export/export.js --project wadnr
 
 # Sync just scripts
-node tools/export/export.js --output projects/wadnr/exports --component scripts
+node tools/export/export.js --project wadnr --component scripts
 
 # Dry-run (show what changed)
-node tools/export/export.js --output projects/wadnr/exports --dry-run
+node tools/export/export.js --project wadnr --dry-run
 
 # Re-generate field inventory
 node tools/inventory/inventory-fields.js

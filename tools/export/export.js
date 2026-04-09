@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 /**
- * Unified WADNR export orchestrator.
+ * Unified VV environment export orchestrator.
  *
- * Extracts and syncs multiple VV admin components from the WADNR environment.
+ * Extracts and syncs multiple VV admin components from any environment.
  * Each component is a module in ./components/ with a standard interface.
  * Shares a single browser session across components.
  *
  * Usage:
- *   node tools/export/export.js                       # All components
- *   node tools/export/export.js --component scripts   # Just web services
- *   node tools/export/export.js --component schedules # Just scheduled services
- *   node tools/export/export.js --component globals   # Just global functions
- *   node tools/export/export.js --list                # Show available components
- *   node tools/export/export.js --dry-run             # List what would be extracted
- *   node tools/export/export.js --force               # Re-extract everything
- *   node tools/export/export.js --headed              # Show browser
- *   node tools/export/export.js --filter "Lib*"       # Filter by name
+ *   node tools/export/export.js --project wadnr                  # All components for WADNR
+ *   node tools/export/export.js --project demo                   # All components for demo env
+ *   node tools/export/export.js --project wadnr --component scripts  # Just web services
+ *   node tools/export/export.js --output /path/to/exports        # Custom output + env from .env.json active
+ *   node tools/export/export.js --list                           # Show available components
+ *   node tools/export/export.js --dry-run                        # List what would be extracted
+ *   node tools/export/export.js --force                          # Re-extract everything
+ *   node tools/export/export.js --headed                         # Show browser
+ *   node tools/export/export.js --filter "Lib*"                  # Filter by name
  */
 const { chromium } = require('@playwright/test');
 const fs = require('fs');
@@ -46,8 +46,68 @@ function getArg(flag) {
 
 const COMPONENT_NAME = getArg('--component');
 const FILTER = getArg('--filter');
+const PROJECT_NAME = getArg('--project');
 
-const BASE_OUTPUT = getArg('--output') || path.resolve(__dirname, '..', '..', 'projects', 'wadnr', 'exports');
+// Resolve output path and environment from --project or --output
+const PROJECTS_DIR = path.resolve(__dirname, '..', '..', 'projects');
+const ENV_JSON_PATH = path.resolve(__dirname, '..', '..', '.env.json');
+
+/**
+ * Find a customer in .env.json by name (case-insensitive).
+ * Returns { server, customer } with the exact key names from .env.json.
+ */
+function findCustomer(name) {
+    const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
+    const needle = name.toLowerCase();
+    for (const [serverKey, serverObj] of Object.entries(env.servers || {})) {
+        for (const customerKey of Object.keys(serverObj.customers || {})) {
+            if (customerKey.toLowerCase() === needle) {
+                return { server: serverKey, customer: customerKey };
+            }
+        }
+    }
+    return null;
+}
+
+function resolveProject() {
+    if (PROJECT_NAME) {
+        // --project <name>: project name = customer name (case-insensitive)
+        const match = findCustomer(PROJECT_NAME);
+        if (!match) {
+            const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
+            const available = Object.entries(env.servers || {}).flatMap(([s, obj]) =>
+                Object.keys(obj.customers || {}).map((c) => `${s}/${c}`)
+            );
+            console.error(`No customer "${PROJECT_NAME}" found in .env.json`);
+            console.error(`Available: ${available.join(', ')}`);
+            process.exit(1);
+        }
+        return {
+            output: getArg('--output') || path.join(PROJECTS_DIR, PROJECT_NAME.toLowerCase(), 'exports'),
+            server: match.server,
+            customer: match.customer,
+        };
+    }
+    if (getArg('--output')) {
+        // Custom output path — use active env from .env.json
+        const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
+        return {
+            output: getArg('--output'),
+            server: env.activeServer,
+            customer: env.activeCustomer,
+        };
+    }
+    // Default: use active env from .env.json, output to that project folder
+    const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
+    return {
+        output: path.join(PROJECTS_DIR, env.activeCustomer.toLowerCase(), 'exports'),
+        server: env.activeServer,
+        customer: env.activeCustomer,
+    };
+}
+
+const PROJECT = resolveProject();
+const BASE_OUTPUT = PROJECT.output;
 
 // --- Main ---
 
@@ -73,7 +133,7 @@ async function main() {
         componentNames = Object.keys(COMPONENT_REGISTRY);
     }
 
-    const config = vvAdmin.loadEnvConfig('vv5dev', 'WADNR');
+    const config = vvAdmin.loadEnvConfig(PROJECT.server, PROJECT.customer);
     console.log(`Target: ${config.baseUrl} (${config.customerAlias}/${config.databaseAlias})`);
     console.log(`Components: ${componentNames.join(', ')}`);
     console.log(
