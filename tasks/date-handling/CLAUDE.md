@@ -6,15 +6,15 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 
 ## Scope
 
-| Component                     | Status      | Folder                  |
-| ----------------------------- | ----------- | ----------------------- |
-| **Forms — Calendar Fields**   | In Progress | `forms-calendar/`       |
-| **Web Services (REST API)**   | Complete    | `web-services/`         |
-| **Analytic Dashboards**       | Complete    | `dashboards/`           |
-| **VisualVault Reports**       | Not Started | `reports/` (future)     |
-| **Files (document dates)**    | Not Started | `files/` (future)       |
-| **Workflows (date triggers)** | Not Started | `workflows/` (future)   |
-| **Node.js Client Library**    | Not Started | `node-client/` (future) |
+| Component                           | Status      | Folder                  |
+| ----------------------------------- | ----------- | ----------------------- |
+| **Forms — Calendar Fields**         | In Progress | `forms-calendar/`       |
+| **Web Services (REST API)**         | Complete    | `web-services/`         |
+| **Analytic Dashboards**             | Complete    | `dashboards/`           |
+| **VisualVault Reports**             | Not Started | `reports/` (future)     |
+| **Document Library (index fields)** | In Progress | `document-library/`     |
+| **Workflows (date triggers)**       | Not Started | `workflows/` (future)   |
+| **Node.js Client Library**          | Not Started | `node-client/` (future) |
 
 ## Folder Structure
 
@@ -52,6 +52,8 @@ tasks/date-handling/
 | WS-BUG-5   | Time portion silently truncated                       | Medium   | `web-services/analysis/ws-bug-5-time-truncation.md`               |
 | WS-BUG-6   | Date-only fields accept time components               | Medium   | `web-services/analysis/ws-bug-6-no-date-only-enforcement.md`      |
 | DB-BUG-1   | Dashboard format inconsistency                        | Medium   | `dashboards/analysis/formdashboard-bug-1-format-inconsistency.md` |
+| DOC-BUG-1  | Index field: TZ offset converted to UTC, Z stripped   | **High** | `document-library/analysis/overview.md`                           |
+| DOC-BUG-2  | Index field: cannot clear date once set               | Medium   | `document-library/analysis/overview.md`                           |
 
 Each bug has a companion `*-fix-recommendations.md` file. See `analysis/temporal-models.md` for the root cause analysis and `analysis/fix-strategy.md` for the fix roadmap.
 
@@ -63,6 +65,7 @@ See `forms-calendar/matrix.md` for current coverage (~220/246 tests across 13 ca
 
 - **V1 vs V2**: Two init paths gated by `useUpdatedCalendarValueLogic`. All live tests use V1 (default). See `forms-calendar/analysis/overview.md` § V1 vs V2.
 - **Code paths**: SetFieldValue, GetFieldValue, form load, save — documented in `forms-calendar/analysis/overview.md` § Confirmed Code Paths.
+- **Test assets by environment**: [`projects/emanueljofre/test-assets.md`](../../projects/emanueljofre/test-assets.md) (read-write), [`projects/wadnr/test-assets.md`](../../projects/wadnr/test-assets.md) (read-only)
 - **Test forms**: URLs in `testing/fixtures/vv-config.js`. Three forms: template (new each load), DateTest-000080 (BRT-saved), DateTest-000084 (IST-saved).
 - **Field configs**: 8 configs (A-H) × 3 initial-value modes. Field map in `testing/fixtures/vv-config.js` FIELD_MAP. Config details in `forms-calendar/matrix.md`.
 - **Console API**: See `docs/reference/vv-form-api.md` for VV.Form inspection methods.
