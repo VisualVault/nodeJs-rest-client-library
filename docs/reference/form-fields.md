@@ -259,11 +259,12 @@ The database stores no timezone context — there is no suffix distinguishing a 
 
 **Important**: This self-consistency is narrower than "same timezone." DST transitions change the UTC offset within the same named timezone (e.g., EST UTC-5 → EDT UTC-4), so a value saved in winter and loaded in summer shifts by 1 hour even for the same user in the same city. Business travel across timezones and multi-timezone US states (Indiana, Texas, Florida, Tennessee) also break the assumption. Date-only fields do NOT have this property — they are affected by FORM-BUG-7 at the save step, and the incorrect value is then preserved consistently across TZ reloads.
 
-**Cross-TZ form load preserves raw values for ALL configs (confirmed 2026-04-08):** The server returns stored strings as-is regardless of the loading browser's timezone. This extends beyond Config D to all 8 configs:
+**Cross-TZ form load preserves raw values for ALL configs (confirmed 2026-04-08, all 8 configs verified 2026-04-09):** The server returns stored strings as-is regardless of the loading browser's timezone. Verified for all 8 configs (A–H) across BRT→IST:
 
 - **Date-only (A, B, E, F):** Raw string (e.g., `"2026-03-15"`) survives BRT→IST, IST→BRT unchanged. `GetFieldValue()` also returns the preserved value.
-- **DateTime (C, D, G, H):** Raw string (e.g., `"2026-03-15T00:00:00"`) survives cross-TZ load. Config C's `GetFieldValue()` re-interprets the timezone-ambiguous value in the loading TZ's context (structural limitation of storing local time without offset), but the raw is intact.
-- **Key correction:** FORM-BUG-7 fires at **input/save time** (SFV, typed input, preset init), NOT at form load. The `initCalendarValueV1` load path preserves stored strings — it does not re-parse date-only values through `moment().toDate()` on reload. This was confirmed across 6 cross-TZ reload tests (Cat 11) and is consistent with Cat 3 results.
+- **DateTime (C, G, H):** Raw string (e.g., `"2026-03-15T00:00:00"`) survives cross-TZ load. Config C's `GetFieldValue()` re-interprets the timezone-ambiguous value in the loading TZ's context (structural limitation of storing local time without offset), but the raw is intact. Legacy configs G and H return raw from `GetFieldValue()` — `useLegacy=true` short-circuits before any transformation.
+- **DateTime Config D:** Raw string preserved, but **`GetFieldValue()` appends FORM-BUG-5 fake Z** (`"2026-03-15T00:00:00.000Z"`) on cross-TZ load. Config D is the only config where cross-TZ load exposes a deceptive GFV. Config H (same flags + `useLegacy=true`) returns raw without fake Z — confirming `useLegacy=true` immunity holds across timezone boundaries.
+- **Key correction:** FORM-BUG-7 fires at **input/save time** (SFV, typed input, preset init), NOT at form load. The `initCalendarValueV1` load path preserves stored strings — it does not re-parse date-only values through `moment().toDate()` on reload. This was confirmed across 16 cross-TZ reload tests (Cat 11) and is consistent with Cat 3 results.
 
 ### JavaScript `.000` Millisecond Parsing Behavior
 

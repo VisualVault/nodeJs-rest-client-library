@@ -27,7 +27,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `testing/helpers/vv-admin.js` — reusable VV admin page helpers: login, RadGrid pagination, `__doPostBack` triggers, dock panel extraction via AJAX response interception, generic grid column reader (`readGridRows`)
 - `testing/helpers/vv-sync.js` — shared manifest load/save/diff and README generation for all export components
 - `testing/scripts/export-wadnr-globals.js` — extracts all `VV.Form.Global` functions from WADNR FormViewer via runtime introspection (`.toString()`)
-- WADNR artifact exports: 271 web service scripts (`web-services/scripts/`), 157 global function files (`global-functions/`), 21 schedule configs (`schedules/`), cross-linked READMEs
+- WADNR artifact exports: 251 web service scripts (`web-services/scripts/`), 157 global function files (`global-functions/`), 21 schedule configs with ~20 extracted scripts (`schedules/`), cross-linked READMEs
 - Category 13 (Database Verification) test suite: 8 new TC specs + run files + summaries using REST API reads (`run-ws-test.js --action WS-2`) as alternative to direct SQL access. Key finding: API write path (`postForms`) stores dates uniformly — mixed timezone storage is Forms Angular-only
 
 ### Changed

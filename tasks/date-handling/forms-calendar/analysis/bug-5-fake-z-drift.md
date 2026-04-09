@@ -203,6 +203,8 @@ TZ-invariance proof (detailed in Problem in Detail above) independently confirme
 
 **Database persistence confirmed (Cat 13, 2026-04-08):** The drift is not a transient client-side display issue — it persists through the save pipeline to the database. After 1 round-trip in BRT, the API returns `"2026-03-14T21:00:00Z"` for a value set to `"2026-03-15T00:00:00"` (DateTest-001919). After 8 round-trips, the API returns `"2026-03-14T00:00:00Z"` — a full calendar day lost (DateTest-001920). Evidence: `tc-13-after-roundtrip`, `tc-13-multi-roundtrip-db`.
 
+**Cross-TZ load confirms GFV-only scope (Cat 11, 2026-04-09):** BRT-saved Config D record loaded in IST preserves raw value `"2026-03-15T00:00:00"` unchanged, but `GetFieldValue` returns `"2026-03-15T00:00:00.000Z"` (fake Z present). This confirms the bug is in the GFV output path, not the storage or load path. Config H (`useLegacy=true` counterpart) returns raw without fake Z on the same cross-TZ load — `useLegacy=true` immunity holds across timezone boundaries. Evidence: `tc-11-D-save-BRT-load-IST` (FAIL), `tc-11-H-save-BRT-load-IST` (PASS).
+
 This bug report is backed by a supporting test repository containing Playwright automation scripts, per-test results, and raw test data. Access can be requested from the Solution Architecture team.
 
 ---

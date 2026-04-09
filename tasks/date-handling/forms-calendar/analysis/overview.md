@@ -129,18 +129,18 @@ Source: [`../matrix.md`](../matrix.md) | Full evidence: [`../summaries/`](../sum
 | 9. Round-Trip (GFV)       |   20    |    9    |   11   |    0    | **Complete** |
 | 9-GDOC. Round-Trip (GDOC) |    5    |    2    |   0    |    3    | Partial      |
 | 10. Web Service           |   11    |    4    |   5    |    1    | Partial      |
-| 11. Cross-Timezone        |   14    |    0    |   0    |   13    | Pending      |
+| 11. Cross-Timezone        |   18    |   11    |   6    |    1    | 17/18 done   |
 | 12. Edge Cases            |   20    |    5    |   9    |    5    | Partial      |
-| 13. Database              |   10    |    2    |   0    |    8    | Pending      |
-| **TOTAL**                 | **276** | **169** | **72** | **32**  |              |
+| 13. Database              |   10    |    4    |   6    |    0    | **Complete** |
+| **TOTAL**                 | **280** | **184** | **84** | **12**  |              |
 
-**Executed**: 241 of 276 slots (87%). **Failure rate**: 72/241 = 30%.
+**Executed**: 268 of 280 slots (96%). **Failure rate**: 84/268 = 31%.
 
-**Fully complete** (all slots executed): Categories 1, 2, 3, 4, 5, 6, 8B, 9.
+**Fully complete** (all slots executed): Categories 1, 2, 3, 4, 5, 6, 8B, 9, 13. **Near-complete**: Cat 11 (17/18, 1 pending requires DB access).
 
-**Not yet tested**: Category 11 (requires OS-level TZ switching), Category 13 (requires direct SQL access).
+**Not yet tested**: Category 11 report-cross (requires DB access for cross-TZ query verification).
 
-**Timezones tested**: BRT (UTC-3), IST (UTC+5:30), UTC+0. Additional spot checks: PST/PDT (UTC-7), JST (UTC+9) in Category 9.
+**Timezones tested**: BRT (UTC-3), IST (UTC+5:30), UTC+0. Additional spot checks: PST/PDT (UTC-7), JST (UTC+9) in Categories 9, 11, 12.
 
 ---
 
@@ -734,7 +734,7 @@ getCalendarFieldValue(fieldDef, value) {
 
 **Note on Date object double-shift**: Code analysis predicts that `Date` objects undergo two local-midnight conversions in `normalizeCalValue()` (first `toISOString()`, then strip-and-reparse), producing -2 days in IST. This was **never reproduced in live testing** — all live test paths (popup, typed, SetFieldValue with strings) showed -1 day consistently. The -2 day path may only trigger when a `Date` object is directly passed to `SetFieldValue`, which was not tested in isolation.
 
-**V1 load path — cross-TZ reload does NOT corrupt (confirmed 2026-04-08)**: Despite `initCalendarValueV1` using `moment(e).toDate()` in the code path, **cross-TZ form load preserves raw date-only values unchanged**. BRT-saved `"2026-03-15"` loaded in IST retains `"2026-03-15"` (TC-11-A-save-BRT-load-IST PASS). Also confirmed for Configs B (TC-11-B) and E/legacy (TC-11-E). The server returns the stored string as-is, and the form load path stores it without re-parsing through the buggy moment path. **FORM-BUG-7 fires at INPUT/SAVE time** (SFV, typed input, preset init), not at load time. This corrects the earlier `[CODE]` prediction.
+**V1 load path — cross-TZ reload does NOT corrupt (confirmed 2026-04-08, expanded 2026-04-09)**: Despite `initCalendarValueV1` using `moment(e).toDate()` in the code path, **cross-TZ form load preserves raw values unchanged for all 8 configs (A–H)**. BRT-saved records loaded in IST retain their raw values: date-only `"2026-03-15"` (A, B, E, F) and DateTime `"2026-03-15T00:00:00"` (C, D, G, H) all preserved. The server returns the stored string as-is, and the form load path stores it without re-parsing through the buggy moment path. **FORM-BUG-7 fires at INPUT/SAVE time** (SFV, typed input, preset init), not at load time. This corrects the earlier `[CODE]` prediction. **Config D is the only config where cross-TZ load exposes FORM-BUG-5**: `GetFieldValue` returns `"2026-03-15T00:00:00.000Z"` (fake Z) while raw remains correct. All 4 legacy configs (E–H) are immune — `useLegacy=true` bypasses fake Z regardless of loading timezone.
 
 **Round-trip compounding**: In Category 9, FORM-BUG-7 causes -1 day per round-trip on date-only fields in UTC+ (9-B-IST). After 3 round-trips, a date shifts by 3 days. `[LIVE]`
 

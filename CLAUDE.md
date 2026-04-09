@@ -97,9 +97,10 @@ nodeV2/
           case-study-124697.md       # Freshdesk #124697 — postForms time mutation (DRAFT)
         form-templates/              # Exported XML templates (77 files)
         global-functions/            # Extracted VV.Form.Global functions (157 .js files + README)
-        web-services/                # Extracted microservice scripts (271 .js files + manifest + README)
+        web-services/                # Extracted microservice scripts (251 .js files + manifest + README)
           scripts/                   # Individual script source files
-        schedules/                   # Scheduled service configuration (manifest + README)
+        schedules/                   # Scheduled service configuration (manifest + README + scripts)
+          scripts/                   # Scheduled-category script source files (~20 .js)
     form-templates/                  # XML template analysis, generator, redesigned DateTest v2
         README.md                    # Template format docs and generator usage
         datetest-v2.xml              # Redesigned DateTest form template

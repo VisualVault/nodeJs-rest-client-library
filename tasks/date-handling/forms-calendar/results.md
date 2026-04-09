@@ -2053,3 +2053,13 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-08 [TC-13-preset-vs-user-input Run 1](runs/tc-13-preset-vs-user-input-run-1.md) — BRT+IST — FAIL — Preset stores UTC (T03:00), user-input stores local (T00:00)
 - 2026-04-08 [TC-13-after-roundtrip Run 1](runs/tc-13-after-roundtrip-run-1.md) — BRT — FAIL — Bug #5 drift -3h persists to DB after 1 trip (DateTest-001919)
 - 2026-04-08 [TC-13-multi-roundtrip-db Run 1](runs/tc-13-multi-roundtrip-db-run-1.md) — BRT — FAIL — 8 trips = -24h (full day lost) persists to DB (DateTest-001920)
+
+## Session 2026-04-09 (Cat 11 BRT→IST remaining — IST)
+
+**Purpose**: Complete BRT→IST cross-TZ reload coverage — Configs D, F, G, H.
+**Key outcomes**: 3 PASS, 1 FAIL (Config D FORM-BUG-5 fake Z on GFV). All 8 configs now tested for BRT→IST. Generic row 11-save-BRT-load-IST closed.
+
+- 2026-04-09 [TC-11-D-save-BRT-load-IST Run 1](runs/tc-11-D-save-BRT-load-IST-run-1.md) — IST — FAIL — Config D raw preserved; GFV adds FORM-BUG-5 fake Z on cross-TZ load
+- 2026-04-09 [TC-11-F-save-BRT-load-IST Run 1](runs/tc-11-F-save-BRT-load-IST-run-1.md) — IST — PASS — Config F legacy date-only + ignoreTZ immune (same as Config E)
+- 2026-04-09 [TC-11-G-save-BRT-load-IST Run 1](runs/tc-11-G-save-BRT-load-IST-run-1.md) — IST — PASS — Config G legacy DateTime raw preserved; GFV returns raw
+- 2026-04-09 [TC-11-H-save-BRT-load-IST Run 1](runs/tc-11-H-save-BRT-load-IST-run-1.md) — IST — PASS — Config H legacy DateTime + ignoreTZ raw preserved; FORM-BUG-5 bypassed
