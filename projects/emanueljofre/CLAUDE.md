@@ -18,10 +18,10 @@ All data extracted via `tools/export/` from the EmanuelJofre admin panels on vvd
 | ------------------ | ----- | --------------------------- |
 | Web Services       | 36 scripts | `exports/web-services/`     |
 | Scheduled Services | 5 schedules + 6 scripts | `exports/schedules/`        |
-| Global Functions   | — (FormViewer timeout) | `exports/global-functions/` |
+| Global Functions   | 24 functions | `exports/global-functions/` |
 | Form Templates     | 108 templates | `exports/form-templates/`   |
 
-Last export: 2026-04-09. Note: GetSites script skipped (empty source). Globals failed — FormViewer timed out loading template "000" (no VV.Form.Global populated).
+Last export: 2026-04-09. All components successful. Note: GetSites script skipped (empty source).
 
 ## Commands
 
@@ -46,5 +46,6 @@ No analysis files yet. Run exports first, then use:
 ## Related
 
 - This is the primary development/testing environment for platform investigations
-- DateTest forms, saved records, and test field configs all live here
+- **Test assets catalog: [`test-assets.md`](test-assets.md)** — DateTest forms, saved records, WS harness, field map
+- Playwright executable config: `testing/fixtures/vv-config.js`
 - Platform date bugs: `tasks/date-handling/`

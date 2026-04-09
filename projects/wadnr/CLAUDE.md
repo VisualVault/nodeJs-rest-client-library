@@ -50,5 +50,6 @@ node tools/inventory/inventory-scripts.js
 
 ## Related
 
+- **Test assets catalog: [`test-assets.md`](test-assets.md)** — zzzDate Test Harness, zzzJohnDevTest, zzzJohnDevTestWebSvc
 - Platform date bugs: `tasks/date-handling/` (FORM-BUG-1 through 7, WEBSERVICE-BUG-1 through 6, FORMDASHBOARD-BUG-1)
 - Support ticket tracking: Freshdesk #124697 / Jira WADNR-10407

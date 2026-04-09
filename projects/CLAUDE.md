@@ -15,6 +15,7 @@ Each subfolder is a VV customer or environment with exported artifacts and custo
    ```
    projects/{customer}/
      CLAUDE.md              # Project context (server, customer, database, readOnly)
+     test-assets.md         # Platform-side test components (forms, WS, records)
      exports/               # Extracted data from VV admin panels
      analysis/              # Customer-specific impact assessment
    ```
