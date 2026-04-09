@@ -293,6 +293,23 @@ The database stores no timezone context — there is no suffix distinguishing a 
 - **DateTime Config D:** Raw string preserved, but **`GetFieldValue()` appends FORM-BUG-5 fake Z** (`"2026-03-15T00:00:00.000Z"`) on cross-TZ load. Config D is the only config where cross-TZ load exposes a deceptive GFV. Config H (same flags + `useLegacy=true`) returns raw without fake Z — confirming `useLegacy=true` immunity holds across timezone boundaries.
 - **Key correction:** FORM-BUG-7 fires at **input/save time** (SFV, typed input, preset init), NOT at form load. The `initCalendarValueV1` load path preserves stored strings — it does not re-parse date-only values through `moment().toDate()` on reload. This was confirmed across 16 cross-TZ reload tests (Cat 11) and is consistent with Cat 3 results.
 
+### Cross-Environment Bug Behavior (vvdemo vs vv5dev)
+
+All 16 known bugs exist on both VV environments but **manifest differently** due to VV version/Kendo version differences. First cross-environment regression: 2026-04-09 (252 tests, 4 TZ × chromium, vv5dev build 20260130.1). Full analysis planned in `tasks/date-handling/forms-calendar/analysis/cross-environment-comparison.md`.
+
+| Bug                             | vvdemo behavior                                             | vv5dev difference                                                                                                         | Tests affected |
+| ------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| **FORM-BUG-5** (fake Z)         | GetFieldValue appends bare `Z` → raw stored as `T00:00:00`  | GetFieldValue appends `.000Z` → raw stored as `T00:00:00.000Z`                                                            | 24             |
+| **FORM-BUG-5** (drift rate)     | Progressive drift at -(TZ offset)/trip                      | **Amplified**: 10 IST round-trips = +55h shift (BRT 10 trips = -30h)                                                      | 6              |
+| **FORM-BUG-7** (wrong day UTC+) | Affects IST date-only in Cat 5 preset + Cat 7 SFV(Date obj) | **Expanded scope** — also affects Cat 2 typed, Cat 3 reload, Cat 9 round-trip, Cat 11 cross-TZ for Configs A/B/E/F in IST | 14             |
+| **FORM-BUG-6** (empty field)    | Config D empty → `"Invalid Date"`, Config C → RangeError    | Config D IST empty → `"Invalid Date"` where vvdemo returns `""` (TZ-dependent manifestation)                              | 5              |
+| **FORM-BUG-4** (save format)    | Config C stores `T00:00:00` (local midnight, no offset)     | Config C BRT stores `T03:00:00.000Z` (UTC conversion applied + Z suffix)                                                  | 3              |
+| **Preset init** (Cat 5/6)       | Date-only preset stores date string (`"2026-03-01"`)        | IST date-only preset stores full UTC datetime (`"2026-02-28T18:30:00.000Z"`) — offset conversion + Z suffix               | 6              |
+
+**New vv5dev-specific finding**: `getCalendarFieldValue()` throws `RangeError: Invalid time value` on Config C/D fields when populated via URL parameters (`enableQListener`). 8 tests affected (Cat 4 IST + BRT). Does not occur on vvdemo. Pending confirmation as new bug.
+
+**Summary**: 108 of 252 tests behave identically on both environments. The 144 differences break down as: 84 value shifts (bugs manifest differently), 19 infrastructure timeouts (Kendo v2 popup detection — test helper issue, not platform), 32 Cat 4 URL param failures (under investigation), 9 other.
+
 ### JavaScript `.000` Millisecond Parsing Behavior
 
 Chrome/V8 treats ISO datetime strings differently based on whether milliseconds are present:

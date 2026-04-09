@@ -48,10 +48,10 @@ https://vv5dev.visualvault.com/app/CityOfLincoln/Phase2/formdata
 ### Form Viewer (separate app — fills in a form record)
 
 ```
-https://{env}.visualvault.com/FormViewer/app?hidemenu=true&formid={templateGUID}&xcid={customerGUID}&xcdid={databaseGUID}
+https://{env}.visualvault.com/FormViewer/app?hidemenu=true&formid={revisionGUID}&xcid={customerGUID}&xcdid={databaseGUID}
 ```
 
-- `formid` — GUID of the Form Template
+- `formid` — GUID of the Form Template **Revision** (not the template ID). The API returns this as `revisionId`. A template has one released revision at a time; creating a new revision generates a new GUID. Confirmed 2026-04-09: template `6b31453b-...` has revision `ff59bb37-...` — the URL uses the revision GUID.
 - `xcid` — customer identifier (accepts both GUID and alias string, e.g., `EmanuelJofre`)
 - `xcdid` — database identifier (accepts both GUID and alias string, e.g., `Main`)
 - `hidemenu=true` — hides the VV navigation shell (typical for end-user forms)
