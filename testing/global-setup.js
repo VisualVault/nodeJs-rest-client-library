@@ -49,7 +49,10 @@ async function authenticate() {
     await page.getByRole('textbox', { name: 'User Name' }).fill(vvConfig.username);
     await page.getByRole('textbox', { name: 'Password' }).fill(vvConfig.password);
     await page.getByRole('button', { name: 'Log In' }).click();
-    await page.waitForURL('**/FormDataAdmin**', { timeout: 15000 });
+    await page.waitForFunction(
+        () => !document.location.pathname.includes('login') && document.location.pathname !== '/',
+        { timeout: 15000 }
+    );
 
     await context.storageState({ path: AUTH_STATE_PATH });
     await browser.close();

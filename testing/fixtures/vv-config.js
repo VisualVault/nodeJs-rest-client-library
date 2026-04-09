@@ -42,7 +42,11 @@ const CUSTOMER_TEMPLATES = {
             '&formid=ff59bb37-b331-f111-830f-d3ae5cbd0a3d' +
             '&xcid=WADNR' +
             '&xcdid=fpOnline',
-        // targetDateTest: not yet created for WADNR
+        targetDateTest:
+            '/FormViewer/app?hidemenu=true' +
+            '&formid=3f3a0b1a-4834-f111-8310-f323cafecf11' +
+            '&xcid=WADNR' +
+            '&xcdid=fpOnline',
     },
 };
 

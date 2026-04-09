@@ -206,13 +206,16 @@ async function saveFormOnly(page, timeout = 60000) {
     // Write policy guard — extract template ID from the browser and validate before clicking Save.
     // This is the sole chokepoint for all Playwright form saves (saveFormAndReload calls this too).
     const { assertFormWriteAllowed } = require('../fixtures/write-policy');
-    const templateId = await page.evaluate(() =>
-        (
+    const templateId = await page.evaluate(() => {
+        // eslint-disable-next-line no-undef -- runs in browser context via page.evaluate()
+        const urlFormId = new URLSearchParams(window.location.search).get('formid');
+        return (
             VV.Form.formId ||
             (VV.Form.VV && VV.Form.VV.FormPartition && VV.Form.VV.FormPartition.FormId) ||
+            urlFormId ||
             ''
-        ).toLowerCase()
-    );
+        ).toLowerCase();
+    });
     const isNewRecord = await page.evaluate(() => {
         const dataId = VV.Form.DataID || '';
         const formId = (VV.Form.formId || '').toLowerCase();

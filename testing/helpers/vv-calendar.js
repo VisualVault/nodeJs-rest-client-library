@@ -179,8 +179,11 @@ async function selectDateInDateTimePicker(page, year, month, day) {
     const STEP_PX = 240;
     const MAX_ATTEMPTS = 36;
 
+    // Calendar header selector: Kendo v1 uses .k-title, v2 uses button.k-calendar-title
+    const headerSelector = 'kendo-calendar-header .k-title, kendo-calendar-header button.k-calendar-title';
+
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-        const headerText = (await popup.locator('kendo-calendar-header .k-title').textContent()).trim();
+        const headerText = (await popup.locator(headerSelector).first().textContent()).trim();
         if (headerText === targetHeader) break;
 
         // Parse current header to determine scroll direction
@@ -204,7 +207,7 @@ async function selectDateInDateTimePicker(page, year, month, day) {
     }
 
     // Verify we landed on the right month
-    const finalHeader = (await popup.locator('kendo-calendar-header .k-title').textContent()).trim();
+    const finalHeader = (await popup.locator(headerSelector).first().textContent()).trim();
     if (finalHeader !== targetHeader) {
         throw new Error(`DateTime popup navigation failed: expected "${targetHeader}", got "${finalHeader}"`);
     }
@@ -242,7 +245,11 @@ async function selectDateInDateTimePicker(page, year, month, day) {
     // After clicking a day, the popup auto-switches to the Time tab.
     // Default time is 12:00 AM — no interaction needed unless a specific time is required.
     // Wait for the Time tab to become active.
-    await popup.locator('button.k-time-tab.k-state-active').waitFor({ state: 'visible', timeout: 3000 });
+    // Kendo v1: button.k-time-tab.k-state-active; v2: button[title="Time tab"][aria-pressed="true"]
+    await popup
+        .locator('button.k-time-tab.k-state-active, button[title="Time tab"][aria-pressed="true"]')
+        .first()
+        .waitFor({ state: 'visible', timeout: 3000 });
 
     // Click Set to confirm the date+time selection
     const setBtn = popup.locator('button.k-time-accept');
@@ -284,10 +291,23 @@ async function typeDateInField(page, fieldName, dateStr) {
         await input.fill(dateStr);
         await page.keyboard.press('Tab');
     } else {
-        // Kendo spinbutton fields: type each segment individually.
-        // The spinbutton auto-advances to the next segment after each is filled.
+        // Kendo fields: type each segment individually.
+        // vvdemo uses Kendo v1 (role="spinbutton", auto-advances segments).
+        // vv5dev uses Kendo v2 (role="combobox", DateTimePicker may render without time segments).
         await input.click();
-        const parts = dateStr.split(/[/ :]/);
+
+        // Detect whether time segments are rendered by checking the placeholder.
+        const placeholder = (await input.getAttribute('placeholder')) || '';
+        const hasTimeSegments = placeholder.includes('hh') || placeholder.includes('mm');
+
+        // Strip time portions from the input if the field doesn't render time segments.
+        // DateTime fields on newer Kendo (vv5dev) show date-only despite enableTime=true.
+        let effectiveDateStr = dateStr;
+        if (!hasTimeSegments) {
+            effectiveDateStr = dateStr.replace(/\s+\d{1,2}:\d{2}\s*(AM|PM)?$/i, '');
+        }
+
+        const parts = effectiveDateStr.split(/[/ :]/);
         for (const part of parts) {
             await page.keyboard.type(part);
         }
