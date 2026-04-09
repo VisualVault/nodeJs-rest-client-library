@@ -30,6 +30,7 @@ const COMPONENT_REGISTRY = {
     schedules: () => require('./components/schedules'),
     globals: () => require('./components/globals'),
     templates: () => require('./components/templates'),
+    queries: () => require('./components/queries'),
 };
 
 // --- CLI ---
@@ -222,8 +223,16 @@ async function runComponent(comp, page, config, outputDir, exportContext, contex
         const isScriptsComp = comp.name === 'scripts';
         const nonScheduledItems = isScriptsComp ? allItems.filter((i) => i.categoryCode !== 1) : allItems;
 
-        const fileExt = comp.name === 'templates' ? '.xml' : '.js';
-        const fileDir = comp.name === 'templates' ? outputDir : path.join(outputDir, 'scripts');
+        const fileExt = comp.syncOpts?.fileExt || (comp.name === 'templates' ? '.xml' : '.js');
+        const contentSubdir = comp.syncOpts?.contentSubdir;
+        const fileDir =
+            contentSubdir != null
+                ? contentSubdir
+                    ? path.join(outputDir, contentSubdir)
+                    : outputDir
+                : comp.name === 'templates'
+                  ? outputDir
+                  : path.join(outputDir, 'scripts');
 
         // Run computeChanges once with ALL items against the unified manifest.
         // For scripts: fileDir is null because items route to different dirs by category.
@@ -299,7 +308,14 @@ async function runComponent(comp, page, config, outputDir, exportContext, contex
 
         // Generate README with full set of extracted files
         const allExtracted = new Set();
-        const scanDir = comp.name === 'templates' ? outputDir : path.join(outputDir, 'scripts');
+        const scanDir =
+            contentSubdir != null
+                ? contentSubdir
+                    ? path.join(outputDir, contentSubdir)
+                    : outputDir
+                : comp.name === 'templates'
+                  ? outputDir
+                  : path.join(outputDir, 'scripts');
         if (fs.existsSync(scanDir)) {
             nonScheduledItems.forEach((m) => {
                 if (fs.existsSync(path.join(scanDir, vvSync.sanitizeFilename(m.name) + fileExt))) {
