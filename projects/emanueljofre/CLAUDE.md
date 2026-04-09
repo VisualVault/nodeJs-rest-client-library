@@ -18,10 +18,10 @@ All data extracted via `tools/export/` from the EmanuelJofre admin panels on vvd
 | ------------------ | ----- | --------------------------- |
 | Web Services       | 36 scripts | `exports/web-services/`     |
 | Scheduled Services | 5 schedules + 6 scripts | `exports/schedules/`        |
-| Global Functions   | — (no dashboard in this env) | `exports/global-functions/` |
-| Form Templates     | — (run export-templates separately) | `exports/form-templates/`   |
+| Global Functions   | — (FormViewer timeout) | `exports/global-functions/` |
+| Form Templates     | 108 templates | `exports/form-templates/`   |
 
-Last export: 2026-04-09. Note: GetSites script skipped (empty source). Globals failed — this environment has no dashboard link for FormViewer introspection.
+Last export: 2026-04-09. Note: GetSites script skipped (empty source). Globals failed — FormViewer timed out loading template "000" (no VV.Form.Global populated).
 
 ## Commands
 

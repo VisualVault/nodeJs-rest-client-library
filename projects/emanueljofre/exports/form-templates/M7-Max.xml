@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<FormEntity xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<BackgroundColor>#FFFFFFFF</BackgroundColor>
+	<FormTemplateId>ce770fa6-746c-f011-aaac-ebdbf0073050</FormTemplateId>
+	<FormTemplateChId>a693ca5b-706c-f011-aaac-ebdbf0073050</FormTemplateChId>
+	<CreateByUsId>713cea42-6566-f011-aaaa-867feb587a03</CreateByUsId>
+	<ModifyByUsId>713cea42-6566-f011-aaaa-867feb587a03</ModifyByUsId>
+	<CustomerCategoryId>00000000-0000-0000-0000-000000000000</CustomerCategoryId>
+	<Version>4</Version>
+	<FormWidth>800</FormWidth>
+	<FormHeight>1000</FormHeight>
+	<MaximumAttachment>0</MaximumAttachment>
+	<AttachmentRequired>false</AttachmentRequired>
+	<UseWorkflowTaskSecurity>false</UseWorkflowTaskSecurity>
+	<AllowOwner>true</AllowOwner>
+	<AllowEditor>true</AllowEditor>
+	<AllowViewer>true</AllowViewer>
+	<AllowRelatedDocumentAccess>false</AllowRelatedDocumentAccess>
+	<ConfirmationPage />
+	<AttachmentsFolder>/Attachments</AttachmentsFolder>
+	<AttachmentsFolderID>00000000-0000-0000-0000-000000000000</AttachmentsFolderID>
+	<AlwaysShowValidationTooltip>false</AlwaysShowValidationTooltip>
+	<OutsideFormValidationEnabled>false</OutsideFormValidationEnabled>
+	<OutsideProcessID>00000000-0000-0000-0000-000000000000</OutsideProcessID>
+	<ModelID xsi:nil="true" />
+	<FormPages>
+		<FormPage>
+			<PageId>c3f1e981-71e4-0089-7d29-882402b634bb</PageId>
+			<PageNumber>1</PageNumber>
+			<PageName>Page 1</PageName>
+			<FactoryPageName>Page 1</FactoryPageName>
+			<Version>0</Version>
+			<Width>800</Width>
+			<Height>1000</Height>
+			<BackgroundColor>#FFFFFFFF</BackgroundColor>
+			<FormCanvasWidth>0</FormCanvasWidth>
+			<FormCanvasHeight>0</FormCanvasHeight>
+			<ScaleFactor>1</ScaleFactor>
+			<FieldList>
+				<BaseField xsi:type="FieldContainer">
+					<BackgroundColor>0</BackgroundColor>
+					<BackgroundColorString>#00FFFFFF</BackgroundColorString>
+					<ConnectionString />
+					<Container>0</Container>
+					<ContainerId>00000000-0000-0000-0000-000000000000</ContainerId>
+					<ContainerLayoutTopOffset>0</ContainerLayoutTopOffset>
+					<ErrorMessage />
+					<ErrorPIC>~\scripts\error.gif</ErrorPIC>
+					<ExtCcID>00000000-0000-0000-0000-000000000000</ExtCcID>
+					<ExtCqID>00000000-0000-0000-0000-000000000000</ExtCqID>
+					<ExtEnableQuery>false</ExtEnableQuery>
+					<ExternalQuery />
+					<FieldMappings />
+					<FieldToColumnMappingList />
+					<QueryColumnOperatorMappingList />
+					<FieldType>Container</FieldType>
+					<ForeColor>0</ForeColor>
+					<ForegroundColorString>#FF000000</ForegroundColorString>
+					<ID>762d988f-f4c9-e2ff-60d8-041b74fb5bbb</ID>
+					<IsRetired>false</IsRetired>
+					<LayoutLeft>0</LayoutLeft>
+					<LayoutTop>0</LayoutTop>
+					<Name>Container1</Name>
+					<ObjectProperty xsi:nil="true" />
+					<ObjectModel xsi:nil="true" />
+					<PageId>c3f1e981-71e4-0089-7d29-882402b634bb</PageId>
+					<PrimaryKey />
+					<RenderAsReadOnly>false</RenderAsReadOnly>
+					<RenderValidationError>false</RenderValidationError>
+					<RowID />
+					<Section508Compliant>false</Section508Compliant>
+					<SectionID />
+					<SectionIndex>0</SectionIndex>
+					<TabOrder>0</TabOrder>
+					<UseColor>false</UseColor>
+					<ValidationErrorMessage />
+					<ValidationErrorPic>~\scripts\error.gif</ValidationErrorPic>
+					<Value />
+					<Version>1</Version>
+					<ZOrder>1</ZOrder>
+					<IsDataReportingColumn>true</IsDataReportingColumn>
+					<IsPrintableField>true</IsPrintableField>
+					<FormVersion>FormVersion4</FormVersion>
+					<AccessibilityLabel />
+					<AccessibilityLabelType>Attribute</AccessibilityLabelType>
+					<LocalizationStrings />
+					<Index>0</Index>
+					<Width>860</Width>
+					<Height>1000</Height>
+					<Style>0</Style>
+					<ResponsiveFlow>0</ResponsiveFlow>
+					<isCollapsible>false</isCollapsible>
+				</BaseField>
+				<BaseField xsi:type="FieldRectangle">
+					<BackgroundColor>0</BackgroundColor>
+					<BackgroundColorString>#fff0f8ff</BackgroundColorString>
+					<ConnectionString />
+					<Container>0</Container>
+					<ContainerId>762d988f-f4c9-e2ff-60d8-041b74fb5bbb</ContainerId>
+					<ContainerLayoutTopOffset>0</ContainerLayoutTopOffset>
+					<ErrorMessage />
+					<ErrorPIC>~\scripts\error.gif</ErrorPIC>
+					<ExtCcID>00000000-0000-0000-0000-000000000000</ExtCcID>
+					<ExtCqID>00000000-0000-0000-0000-000000000000</ExtCqID>
+					<ExtEnableQuery>false</ExtEnableQuery>
+					<ExternalQuery />
+					<FieldMappings />
+					<FieldToColumnMappingList />
+					<QueryColumnOperatorMappingList />
+					<FieldType>Rectangle</FieldType>
+					<ForeColor>0</ForeColor>
+					<ForegroundColorString>#FF000000</ForegroundColorString>
+					<ID>ba248fea-73bd-c403-1c05-f6d603d1c115</ID>
+					<IsRetired>false</IsRetired>
+					<LayoutLeft>0</LayoutLeft>
+					<LayoutTop>0</LayoutTop>
+					<Name>Rectangle2</Name>
+					<ObjectProperty xsi:nil="true" />
+					<ObjectModel xsi:nil="true" />
+					<PageId>c3f1e981-71e4-0089-7d29-882402b634bb</PageId>
+					<PrimaryKey />
+					<RenderAsReadOnly>false</RenderAsReadOnly>
+					<RenderValidationError>false</RenderValidationError>
+					<RowID />
+					<Section508Compliant>false</Section508Compliant>
+					<SectionID />
+					<SectionIndex>0</SectionIndex>
+					<TabOrder>0</TabOrder>
+					<UseColor>false</UseColor>
+					<ValidationErrorMessage />
+					<ValidationErrorPic>~\scripts\error.gif</ValidationErrorPic>
+					<Value />
+					<Version>1</Version>
+					<ZOrder>2</ZOrder>
+					<IsDataReportingColumn>true</IsDataReportingColumn>
+					<IsPrintableField>true</IsPrintableField>
+					<FormVersion>FormVersion4</FormVersion>
+					<AccessibilityLabel />
+					<AccessibilityLabelType>Attribute</AccessibilityLabelType>
+					<LocalizationStrings />
+					<Width>100</Width>
+					<Height>102</Height>
+					<BorderColorString>#00ffffff</BorderColorString>
+					<BorderThickness>0</BorderThickness>
+					<WidthUsePercent>true</WidthUsePercent>
+					<HeightUsePercent>false</HeightUsePercent>
+				</BaseField>
+				<BaseField xsi:type="FieldLabel">
+					<BackgroundColor>0</BackgroundColor>
+					<BackgroundColorString>#00FFFFFF</BackgroundColorString>
+					<ConnectionString />
+					<Container>0</Container>
+					<ContainerId>762d988f-f4c9-e2ff-60d8-041b74fb5bbb</ContainerId>
+					<ContainerLayoutTopOffset>0</ContainerLayoutTopOffset>
+					<ErrorMessage />
+					<ErrorPIC>~\scripts\error.gif</ErrorPIC>
+					<ExtCcID>00000000-0000-0000-0000-000000000000</ExtCcID>
+					<ExtCqID>00000000-0000-0000-0000-000000000000</ExtCqID>
+					<ExtEnableQuery>false</ExtEnableQuery>
+					<ExternalQuery />
+					<FieldMappings />
+					<FieldToColumnMappingList />
+					<QueryColumnOperatorMappingList />
+					<FieldType>Label</FieldType>
+					<ForeColor>0</ForeColor>
+					<ForegroundColorString>#FF000000</ForegroundColorString>
+					<ID>714350e4-ebe4-4332-618f-941ee361168e</ID>
+					<IsRetired>false</IsRetired>
+					<LayoutLeft>280</LayoutLeft>
+					<LayoutTop>30</LayoutTop>
+					<Name>Label3</Name>
+					<ObjectProperty xsi:nil="true" />
+					<ObjectModel xsi:nil="true" />
+					<PageId>c3f1e981-71e4-0089-7d29-882402b634bb</PageId>
+					<PrimaryKey />
+					<RenderAsReadOnly>false</RenderAsReadOnly>
+					<RenderValidationError>false</RenderValidationError>
+					<RowID />
+					<Section508Compliant>false</Section508Compliant>
+					<SectionID />
+					<SectionIndex>0</SectionIndex>
+					<TabOrder>0</TabOrder>
+					<UseColor>false</UseColor>
+					<ValidationErrorMessage />
+					<ValidationErrorPic>~\scripts\error.gif</ValidationErrorPic>
+					<Value />
+					<Version>1</Version>
+					<ZOrder>3</ZOrder>
+					<IsDataReportingColumn>true</IsDataReportingColumn>
+					<IsPrintableField>true</IsPrintableField>
+					<FormVersion>FormVersion4</FormVersion>
+					<AccessibilityLabel />
+					<AccessibilityLabelType>Attribute</AccessibilityLabelType>
+					<LocalizationStrings />
+					<Align>Left</Align>
+					<AssociatedControlID>00000000-0000-0000-0000-000000000000</AssociatedControlID>
+					<Bold>true</Bold>
+					<EnableQListener>false</EnableQListener>
+					<FontSize>20</FontSize>
+					<LabelWrap>false</LabelWrap>
+					<Text>City Lookup Form</Text>
+					<Width>160</Width>
+				</BaseField>
+				<BaseField xsi:type="FieldDropDownList3">
+					<BackgroundColor>0</BackgroundColor>
+					<BackgroundColorString>#00FFFFFF</BackgroundColorString>
+					<ConnectionString />
+					<Container>0</Container>
+					<ContainerId>762d988f-f4c9-e2ff-60d8-041b74fb5bbb</ContainerId>
+					<ContainerLayoutTopOffset>0</ContainerLayoutTopOffset>
+					<ErrorMessage />
+					<ErrorPIC>~\scripts\error.gif</ErrorPIC>
+					<ExtCcID>00000000-0000-0000-0000-000000000000</ExtCcID>
+					<ExtCqID>00000000-0000-0000-0000-000000000000</ExtCqID>
+					<ExtEnableQuery>false</ExtEnableQuery>
+					<ExternalQuery />
+					<FieldMappings />
+					<FieldToColumnMappingList />
+					<QueryColumnOperatorMappingList />
+					<FieldType>DropDownList</FieldType>
+					<ForeColor>0</ForeColor>
+					<ForegroundColorString>#FF000000</ForegroundColorString>
+					<ID>66ad0814-e054-c1f2-70fc-611f3be0e5b4</ID>
+					<IsRetired>false</IsRetired>
+					<LayoutLeft>160</LayoutLeft>
+					<LayoutTop>170</LayoutTop>
+					<Name>State</Name>
+					<ObjectProperty xsi:nil="true" />
+					<ObjectModel xsi:nil="true" />
+					<PageId>c3f1e981-71e4-0089-7d29-882402b634bb</PageId>
+					<PrimaryKey />
+					<RenderAsReadOnly>false</RenderAsReadOnly>
+					<RenderValidationError>false</RenderValidationError>
+					<RowID />
+					<Section508Compliant>false</Section508Compliant>
+					<SectionID />
+					<SectionIndex>0</SectionIndex>
+					<TabOrder>0</TabOrder>
+					<UseColor>false</UseColor>
+					<ValidationErrorMessage />
+					<ValidationErrorPic>~\scripts\error.gif</ValidationErrorPic>
+					<Value />
+					<Version>3</Version>
+					<ZOrder>1</ZOrder>
+					<IsDataReportingColumn>true</IsDataReportingColumn>
+					<IsPrintableField>true</IsPrintableField>
+					<FormVersion>FormVersion4</FormVersion>
+					<AccessibilityLabel />
+					<AccessibilityLabelType>Attribute</AccessibilityLabelType>
+					<LocalizationStrings />
+					<IsValidatorShowing>false</IsValidatorShowing>
+					<ValidationType>NoValidation</ValidationType>
+					<RelationshipDisplayProperty xsi:nil="true" />
+					<RelationshipId xsi:nil="true" />
+					<CascadedParentListId>00000000-0000-0000-0000-000000000000</CascadedParentListId>
+					<CascadedParentListValue />
+					<CcID>00000001-0000-0000-0000-c0000000f002</CcID>
+					<ChildCascadedList />
+					<CqID>8b2471d6-8652-f011-82eb-8224d1ce1d28</CqID>
+					<CqTextFieldName>fieldState</CqTextFieldName>
+					<CqValueFieldName>fieldState</CqValueFieldName>
+					<DropDownConnectionType>CustomQuery</DropDownConnectionType>
+					<EnableCascadedList>false</EnableCascadedList>
+					<EnableCustomQuery>true</EnableCustomQuery>
+					<EnableFormQuery>false</EnableFormQuery>
+					<EnableQListener>false</EnableQListener>
+					<FillCacheEnabled>true</FillCacheEnabled>
+					<FillCacheTimeout>0.5</FillCacheTimeout>
+					<FillConnectionString />
+					<FillQuery />
+					<FormQueryID />
+					<HasCascadedParentValue>false</HasCascadedParentValue>
+					<IsParentCascadeControl>false</IsParentCascadeControl>
+					<EnableLoadOnDemand>false</EnableLoadOnDemand>
+					<ItemList />
+					<OptionList />
+					<ReportingProperty>Text</ReportingProperty>
+					<ReportingPropertySetting>0</ReportingPropertySetting>
+					<WorkflowConditionsDataProperty>Value</WorkflowConditionsDataProperty>
+					<WorkflowConditionsDataPropertySetting>1</WorkflowConditionsDataPropertySetting>
+					<SelectedIndex>0</SelectedIndex>
+					<SelectedText />
+					<Width>140</Width>
+					<CascadeQueryColumnOperatorMappingList />
+					<CascadeParentProperty>Text</CascadeParentProperty>
+					<DataLookupProperty>Value</DataLookupProperty>
+					<ValidationIconHeight>16</ValidationIconHeight>
+					<ValidationIconWidth>16</ValidationIconWidth>
+				</BaseField>
+				<BaseField xsi:type="FieldLabel">
+					<BackgroundColor>0</BackgroundColor>
+					<BackgroundColorString>#00FFFFFF</BackgroundColorString>
+					<ConnectionString />
+					<Container>0</Container>
+					<ContainerId>762d988f-f4c9-e2ff-60d8-041b74fb5bbb</ContainerId>
+					<ContainerLayoutTopOffset>0</ContainerLayoutTopOffset>
+					<ErrorMessage />
+					<ErrorPIC>~\scripts\error.gif</ErrorPIC>
+					<ExtCcID>00000000-0000-0000-0000-000000000000</ExtCcID>
+					<ExtCqID>00000000-0000-0000-0000-000000000000</ExtCqID>
+					<ExtEnableQuery>false</ExtEnableQuery>
+					<ExternalQuery />
+					<FieldMappings />
+					<FieldToColumnMappingList />
+					<QueryColumnOperatorMappingList />
+					<FieldType>Label</FieldType>
+					<ForeColor>0</ForeColor>
+					<ForegroundColorString>#FF000000</ForegroundColorString>
+					<ID>7ed4a374-7787-110e-1fee-53683d099e32</ID>
+					<IsRetired>false</IsRetired>
+					<LayoutLeft>100</LayoutLeft>
+					<LayoutTop>180</LayoutTop>
+					<Name>StateLabel</Name>
+					<ObjectProperty xsi:nil="true" />
+					<ObjectModel xsi:nil="true" />
+					<PageId>c3f1e981-71e4-0089-7d29-882402b634bb</PageId>
+					<PrimaryKey />
+					<RenderAsReadOnly>false</RenderAsReadOnly>
+					<RenderValidationError>false</RenderValidationError>
+					<RowID />
+					<Section508Compliant>false</Section508Compliant>
+					<SectionID />
+					<SectionIndex>0</SectionIndex>
+					<TabOrder>0</TabOrder>
+					<UseColor>false</UseColor>
+					<ValidationErrorMessage />
+					<ValidationErrorPic>~\scripts\error.gif</ValidationErrorPic>
+					<Value />
+					<Version>1</Version>
+					<ZOrder>1</ZOrder>
+					<IsDataReportingColumn>true</IsDataReportingColumn>
+					<IsPrintableField>true</IsPrintableField>
+					<FormVersion>FormVersion4</FormVersion>
+					<AccessibilityLabel />
+					<AccessibilityLabelType>Attribute</AccessibilityLabelType>
+					<LocalizationStrings />
+					<Align>Left</Align>
+					<AssociatedControlID>00000000-0000-0000-0000-000000000000</AssociatedControlID>
+					<Bold>false</Bold>
+					<EnableQListener>false</EnableQListener>
+					<FontSize>10</FontSize>
+					<LabelWrap>false</LabelWrap>
+					<Text>State</Text>
+					<Width>52</Width>
+				</BaseField>
+				<BaseField xsi:type="FieldDropDownList3">
+					<BackgroundColor>0</BackgroundColor>
+					<BackgroundColorString>#00FFFFFF</BackgroundColorString>
+					<ConnectionString />
+					<Container>0</Container>
+					<ContainerId>762d988f-f4c9-e2ff-60d8-041b74fb5bbb</ContainerId>
+					<ContainerLayoutTopOffset>0</ContainerLayoutTopOffset>
+					<ErrorMessage />
+					<ErrorPIC>~\scripts\error.gif</ErrorPIC>
+					<ExtCcID>00000000-0000-0000-0000-000000000000</ExtCcID>
+					<ExtCqID>00000000-0000-0000-0000-000000000000</ExtCqID>
+					<ExtEnableQuery>false</ExtEnableQuery>
+					<ExternalQuery />
+					<FieldMappings />
+					<FieldToColumnMappingList />
+					<QueryColumnOperatorMappingList />
+					<FieldType>DropDownList</FieldType>
+					<ForeColor>0</ForeColor>
+					<ForegroundColorString>#FF000000</ForegroundColorString>
+					<ID>84e37848-2754-e353-075f-bcab8a02557a</ID>
+					<IsRetired>false</IsRetired>
+					<LayoutLeft>160</LayoutLeft>
+					<LayoutTop>270</LayoutTop>
+					<Name>City</Name>
+					<ObjectProperty xsi:nil="true" />
+					<ObjectModel xsi:nil="true" />
+					<PageId>c3f1e981-71e4-0089-7d29-882402b634bb</PageId>
+					<PrimaryKey />
+					<RenderAsReadOnly>false</RenderAsReadOnly>
+					<RenderValidationError>false</RenderValidationError>
+					<RowID />
+					<Section508Compliant>false</Section508Compliant>
+					<SectionID />
+					<SectionIndex>0</SectionIndex>
+					<TabOrder>0</TabOrder>
+					<UseColor>false</UseColor>
+					<ValidationErrorMessage />
+					<ValidationErrorPic>~\scripts\error.gif</ValidationErrorPic>
+					<Value />
+					<Version>3</Version>
+					<ZOrder>1</ZOrder>
+					<IsDataReportingColumn>true</IsDataReportingColumn>
+					<IsPrintableField>true</IsPrintableField>
+					<FormVersion>FormVersion4</FormVersion>
+					<AccessibilityLabel />
+					<AccessibilityLabelType>Attribute</AccessibilityLabelType>
+					<LocalizationStrings />
+					<IsValidatorShowing>false</IsValidatorShowing>
+					<ValidationType>NoValidation</ValidationType>
+					<RelationshipDisplayProperty xsi:nil="true" />
+					<RelationshipId xsi:nil="true" />
+					<CascadedParentListId>66ad0814-e054-c1f2-70fc-611f3be0e5b4</CascadedParentListId>
+					<CascadedParentListValue />
+					<CcID>00000001-0000-0000-0000-c0000000f002</CcID>
+					<ChildCascadedList />
+					<CqID>5ac3862e-8752-f011-82eb-8224d1ce1d28</CqID>
+					<CqTextFieldName>fieldCity</CqTextFieldName>
+					<CqValueFieldName>fieldCity</CqValueFieldName>
+					<DropDownConnectionType>CustomQuery</DropDownConnectionType>
+					<EnableCascadedList>true</EnableCascadedList>
+					<EnableCustomQuery>false</EnableCustomQuery>
+					<EnableFormQuery>false</EnableFormQuery>
+					<EnableQListener>true</EnableQListener>
+					<FillCacheEnabled>true</FillCacheEnabled>
+					<FillCacheTimeout>0.5</FillCacheTimeout>
+					<FillConnectionString />
+					<FillQuery />
+					<FormQueryID />
+					<HasCascadedParentValue>false</HasCascadedParentValue>
+					<IsParentCascadeControl>false</IsParentCascadeControl>
+					<EnableLoadOnDemand>false</EnableLoadOnDemand>
+					<ItemList />
+					<OptionList />
+					<ReportingProperty>Text</ReportingProperty>
+					<ReportingPropertySetting>0</ReportingPropertySetting>
+					<WorkflowConditionsDataProperty>Value</WorkflowConditionsDataProperty>
+					<WorkflowConditionsDataPropertySetting>1</WorkflowConditionsDataPropertySetting>
+					<SelectedIndex>0</SelectedIndex>
+					<SelectedText />
+					<Width>140</Width>
+					<CascadeQueryColumnOperatorMappingList />
+					<CascadeParentProperty>Text</CascadeParentProperty>
+					<DataLookupProperty>Value</DataLookupProperty>
+					<ValidationIconHeight>16</ValidationIconHeight>
+					<ValidationIconWidth>16</ValidationIconWidth>
+				</BaseField>
+				<BaseField xsi:type="FieldLabel">
+					<BackgroundColor>0</BackgroundColor>
+					<BackgroundColorString>#00FFFFFF</BackgroundColorString>
+					<ConnectionString />
+					<Container>0</Container>
+					<ContainerId>762d988f-f4c9-e2ff-60d8-041b74fb5bbb</ContainerId>
+					<ContainerLayoutTopOffset>0</ContainerLayoutTopOffset>
+					<ErrorMessage />
+					<ErrorPIC>~\scripts\error.gif</ErrorPIC>
+					<ExtCcID>00000000-0000-0000-0000-000000000000</ExtCcID>
+					<ExtCqID>00000000-0000-0000-0000-000000000000</ExtCqID>
+					<ExtEnableQuery>false</ExtEnableQuery>
+					<ExternalQuery />
+					<FieldMappings />
+					<FieldToColumnMappingList />
+					<QueryColumnOperatorMappingList />
+					<FieldType>Label</FieldType>
+					<ForeColor>0</ForeColor>
+					<ForegroundColorString>#FF000000</ForegroundColorString>
+					<ID>5433bac0-98f7-cc89-9585-11369568767c</ID>
+					<IsRetired>false</IsRetired>
+					<LayoutLeft>100</LayoutLeft>
+					<LayoutTop>280</LayoutTop>
+					<Name>CityLabel</Name>
+					<ObjectProperty xsi:nil="true" />
+					<ObjectModel xsi:nil="true" />
+					<PageId>c3f1e981-71e4-0089-7d29-882402b634bb</PageId>
+					<PrimaryKey />
+					<RenderAsReadOnly>false</RenderAsReadOnly>
+					<RenderValidationError>false</RenderValidationError>
+					<RowID />
+					<Section508Compliant>false</Section508Compliant>
+					<SectionID />
+					<SectionIndex>0</SectionIndex>
+					<TabOrder>0</TabOrder>
+					<UseColor>false</UseColor>
+					<ValidationErrorMessage />
+					<ValidationErrorPic>~\scripts\error.gif</ValidationErrorPic>
+					<Value />
+					<Version>1</Version>
+					<ZOrder>1</ZOrder>
+					<IsDataReportingColumn>true</IsDataReportingColumn>
+					<IsPrintableField>true</IsPrintableField>
+					<FormVersion>FormVersion4</FormVersion>
+					<AccessibilityLabel />
+					<AccessibilityLabelType>Attribute</AccessibilityLabelType>
+					<LocalizationStrings />
+					<Align>Left</Align>
+					<AssociatedControlID>00000000-0000-0000-0000-000000000000</AssociatedControlID>
+					<Bold>false</Bold>
+					<EnableQListener>false</EnableQListener>
+					<FontSize>10</FontSize>
+					<LabelWrap>false</LabelWrap>
+					<Text>City</Text>
+					<Width>52</Width>
+				</BaseField>
+				<BaseField xsi:type="FormButton">
+					<BackgroundColor>0</BackgroundColor>
+					<BackgroundColorString>#00FFFFFF</BackgroundColorString>
+					<ConnectionString />
+					<Container>0</Container>
+					<ContainerId>762d988f-f4c9-e2ff-60d8-041b74fb5bbb</ContainerId>
+					<ContainerLayoutTopOffset>0</ContainerLayoutTopOffset>
+					<ErrorMessage />
+					<ErrorPIC>~\scripts\error.gif</ErrorPIC>
+					<ExtCcID>00000000-0000-0000-0000-000000000000</ExtCcID>
+					<ExtCqID>00000000-0000-0000-0000-000000000000</ExtCqID>
+					<ExtEnableQuery>false</ExtEnableQuery>
+					<ExternalQuery />
+					<FieldMappings />
+					<FieldToColumnMappingList />
+					<QueryColumnOperatorMappingList />
+					<FieldType>FormButton</FieldType>
+					<ForeColor>0</ForeColor>
+					<ForegroundColorString>#FF000000</ForegroundColorString>
+					<ID>8dff9b6d-4ebb-1777-cc0e-7746e703f421</ID>
+					<IsRetired>false</IsRetired>
+					<LayoutLeft>100</LayoutLeft>
+					<LayoutTop>420</LayoutTop>
+					<Name>btnSave</Name>
+					<ObjectProperty xsi:nil="true" />
+					<ObjectModel xsi:nil="true" />
+					<PageId>c3f1e981-71e4-0089-7d29-882402b634bb</PageId>
+					<PrimaryKey />
+					<RenderAsReadOnly>false</RenderAsReadOnly>
+					<RenderValidationError>false</RenderValidationError>
+					<RowID />
+					<Section508Compliant>false</Section508Compliant>
+					<SectionID />
+					<SectionIndex>0</SectionIndex>
+					<TabOrder>0</TabOrder>
+					<UseColor>false</UseColor>
+					<ValidationErrorMessage />
+					<ValidationErrorPic>~\scripts\error.gif</ValidationErrorPic>
+					<Value />
+					<Version>1</Version>
+					<ZOrder>1</ZOrder>
+					<IsDataReportingColumn>false</IsDataReportingColumn>
+					<IsPrintableField>true</IsPrintableField>
+					<FormVersion>FormVersion4</FormVersion>
+					<AccessibilityLabel />
+					<AccessibilityLabelType>Attribute</AccessibilityLabelType>
+					<LocalizationStrings />
+					<AssignToWFEnabled>false</AssignToWFEnabled>
+					<CopyFieldValuesFieldList />
+					<EnableCopyFieldValues>false</EnableCopyFieldValues>
+					<EnableEmailLink>false</EnableEmailLink>
+					<EnableFillinRelate>false</EnableFillinRelate>
+					<EnableQListener>false</EnableQListener>
+					<FalseStep>0</FalseStep>
+					<FillinRelateFieldList />
+					<FillinRelateLookupKey>00000000-0000-0000-0000-000000000000</FillinRelateLookupKey>
+					<FillinRelateTemplateId>00000000-0000-0000-0000-000000000000</FillinRelateTemplateId>
+					<FontSize>10</FontSize>
+					<FormSaveEnabled>false</FormSaveEnabled>
+					<Formula />
+					<NewWindowUrl />
+					<OpenNewWindow>false</OpenNewWindow>
+					<OutsideProcesID>00000000-0000-0000-0000-000000000000</OutsideProcesID>
+					<OutsideValidationEnabled>false</OutsideValidationEnabled>
+					<RedirectUrl />
+					<RedirectionEnabled>false</RedirectionEnabled>
+					<RelateForm>true</RelateForm>
+					<RenderAsHyperlink>false</RenderAsHyperlink>
+					<TaskOptionAssignment>0</TaskOptionAssignment>
+					<Text>Save</Text>
+					<TrueStep>0</TrueStep>
+					<ValidationTaskCompletionConfig>0</ValidationTaskCompletionConfig>
+					<WFSequence>0</WFSequence>
+					<WaID>00000000-0000-0000-0000-000000000000</WaID>
+					<Width>75</Width>
+					<Height>28</Height>
+					<WizardStepEnabled>false</WizardStepEnabled>
+					<IsDataReportingColumnHasBeenSet>false</IsDataReportingColumnHasBeenSet>
+				</BaseField>
+			</FieldList>
+			<IsRetired>false</IsRetired>
+		</FormPage>
+	</FormPages>
+	<GroupsHolder>
+		<FormTemplateID>ce770fa6-746c-f011-aaac-ebdbf0073050</FormTemplateID>
+		<GroupCollection />
+		<HasBuiltinGroups>false</HasBuiltinGroups>
+	</GroupsHolder>
+	<TextboxFontSize>10</TextboxFontSize>
+	<PrintAreaWidthOption>0</PrintAreaWidthOption>
+	<PrintAreaWidth>1024</PrintAreaWidth>
+	<PdfPaperSize>1</PdfPaperSize>
+	<PdfPaperSizeWidth>0</PdfPaperSizeWidth>
+	<PdfPaperSizeHeight>0</PdfPaperSizeHeight>
+	<PdfTopMargin>0</PdfTopMargin>
+	<PdfRightMargin>0</PdfRightMargin>
+	<PdfBottomMargin>0</PdfBottomMargin>
+	<PdfLeftMargin>0</PdfLeftMargin>
+	<PdfPageOrientation>Portrait</PdfPageOrientation>
+	<AssimilateLatestFormTemplate>true</AssimilateLatestFormTemplate>
+	<FieldListSaveKey>00000000-0000-0000-0000-000000000000</FieldListSaveKey>
+	<UpdateDocumentRelationshipDocId>false</UpdateDocumentRelationshipDocId>
+	<FormTemplateType>FormTemplate</FormTemplateType>
+	<InheritedFormTemplateType>FormTemplate</InheritedFormTemplateType>
+	<InheritedFormTemplateId>00000000-0000-0000-0000-000000000000</InheritedFormTemplateId>
+	<InheritedFormTemplateRevisionId>00000000-0000-0000-0000-000000000000</InheritedFormTemplateRevisionId>
+	<SaveDateTime>2025-07-29T12:33:58Z</SaveDateTime>
+	<ScriptLibrary>
+		<FormScriptItem>
+			<ScriptItemId>1d8b6820-8d2a-48ae-8630-b79fe278fe02</ScriptItemId>
+			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
+			<Name>FormValidation</Name>
+			<Arguments>ControlName</Arguments>
+			<Script>//pass in ControlName to validate a single item or nothing to validate everything.
+var ErrorReporting = true;
+
+var RunAll = false;
+if (ControlName == null) {
+    RunAll = true;
+}
+
+//State Drop-down must be selected
+if (ControlName == 'State' || RunAll) {
+    if (VV.Form.Global.CentralValidation(VV.Form.GetFieldValue('State'), 'DDSelect') == false) {
+        VV.Form.SetValidationErrorMessageOnField('State', 'Please select a value.');
+        ErrorReporting = false;
+    }
+    else {
+        VV.Form.ClearValidationErrorOnField('State');
+    }
+}
+
+//City Drop-down must be selected
+if (ControlName == 'City' || RunAll) {
+    if (VV.Form.Global.CentralValidation(VV.Form.GetFieldValue('City'), 'DDSelect') == false) {
+        VV.Form.SetValidationErrorMessageOnField('City', 'Please select a value.');
+        ErrorReporting = false;
+    }
+    else {
+        VV.Form.ClearValidationErrorOnField('City');
+    }
+}
+
+return ErrorReporting;</Script>
+			<ScriptItemType>TemplateScriptItem</ScriptItemType>
+			<FormTemplateIdList />
+		</FormScriptItem>
+		<FormScriptItem>
+			<ScriptItemId>7ab59da6-748d-4130-aa14-9c3e856cf1da</ScriptItemId>
+			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
+			<Name>CityDropdown_onBlur</Name>
+			<Arguments>event, control</Arguments>
+			<Script>VV.Form.Template.FormValidation('CityDropdown');</Script>
+			<ScriptItemType>ControlEventScriptItem</ScriptItemType>
+			<FormTemplateIdList />
+		</FormScriptItem>
+		<FormScriptItem>
+			<ScriptItemId>804758b8-47f9-4d7a-b77b-1fabeab514d8</ScriptItemId>
+			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
+			<Name>btnSave_onClick</Name>
+			<Arguments>event, control</Arguments>
+			<Script>if (VV.Form.Template.FormValidation() === true) {
+    var messageData = 'The record has been saved.';
+    var title = 'Save Form';
+
+    VV.Form.DoAjaxFormSave().then(function (resp) {
+        VV.Form.Global.DisplayMessaging(messageData, title);
+    });
+} else {
+    VV.Form.Global.DisplayMessaging(
+        'Please complete all required fields or correct the highlighted errors to save the form.', "Error"
+    );
+}
+</Script>
+			<ScriptItemType>ControlEventScriptItem</ScriptItemType>
+			<FormTemplateIdList />
+		</FormScriptItem>
+		<FormScriptItem>
+			<ScriptItemId>745abd07-356d-4b35-80b6-6942353547a7</ScriptItemId>
+			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
+			<Name>StateDropdown_onBlur</Name>
+			<Arguments>event, control</Arguments>
+			<Script>VV.Form.Template.FormValidation('StateDropdown');</Script>
+			<ScriptItemType>ControlEventScriptItem</ScriptItemType>
+			<FormTemplateIdList />
+		</FormScriptItem>
+	</ScriptLibrary>
+	<ScriptAssignments>
+		<FormScriptAssignment>
+			<ScriptAssignmentId>e679cc77-300c-4a78-8bf8-922df97c6888</ScriptAssignmentId>
+			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
+			<ScriptItemId>7ab59da6-748d-4130-aa14-9c3e856cf1da</ScriptItemId>
+			<ControlId>84e37848-2754-e353-075f-bcab8a02557a</ControlId>
+			<EventId>3</EventId>
+			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
+			<DefinedTemplateRevision>3</DefinedTemplateRevision>
+		</FormScriptAssignment>
+		<FormScriptAssignment>
+			<ScriptAssignmentId>cee63e84-ad18-4f4e-9cca-ab690cf42eda</ScriptAssignmentId>
+			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
+			<ScriptItemId>745abd07-356d-4b35-80b6-6942353547a7</ScriptItemId>
+			<ControlId>66ad0814-e054-c1f2-70fc-611f3be0e5b4</ControlId>
+			<EventId>3</EventId>
+			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
+			<DefinedTemplateRevision>3</DefinedTemplateRevision>
+		</FormScriptAssignment>
+		<FormScriptAssignment>
+			<ScriptAssignmentId>e3a6083b-3f39-4f59-a99c-590205db0608</ScriptAssignmentId>
+			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
+			<ScriptItemId>804758b8-47f9-4d7a-b77b-1fabeab514d8</ScriptItemId>
+			<ControlId>8dff9b6d-4ebb-1777-cc0e-7746e703f421</ControlId>
+			<EventId>4</EventId>
+			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
+			<DefinedTemplateRevision>3</DefinedTemplateRevision>
+		</FormScriptAssignment>
+	</ScriptAssignments>
+	<ImageControlImages />
+	<Groups />
+	<AllPagesRenderAsOne>false</AllPagesRenderAsOne>
+	<ShowPanelMenu>false</ShowPanelMenu>
+	<BrowserContextMenu>true</BrowserContextMenu>
+	<ExternalScriptFile>true</ExternalScriptFile>
+	<ClientSideGroupsAndConditions>false</ClientSideGroupsAndConditions>
+	<HybridGroupsAndConditions>false</HybridGroupsAndConditions>
+	<CombineQueryRequests>false</CombineQueryRequests>
+	<CombineRrcDataGridRequests>false</CombineRrcDataGridRequests>
+	<ShowTabs>true</ShowTabs>
+	<DefaultFormLanguage>en-US</DefaultFormLanguage>
+	<RenderOptimization>true</RenderOptimization>
+	<OriginatorGroups />
+	<OfflineFormEnabled>false</OfflineFormEnabled>
+	<OfflineGroups />
+	<TemplateQueries />
+	<ApplyCultureChanges>false</ApplyCultureChanges>
+	<IgnoreControlAccessibilityTitles>false</IgnoreControlAccessibilityTitles>
+</FormEntity>
