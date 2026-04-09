@@ -317,6 +317,71 @@ Architecture and reference docs for the VisualVault platform itself (URL pattern
 
 - **[`wadnr/`](projects/wadnr/)** — WADNR impact analysis: 77 exported form templates, 271 microservice scripts, 157 global functions, schedule configs. Analysis includes field inventories, script-level date interaction reports, and bug case studies mapped to investigation findings.
 
+## Repository Architecture & Sharing Model
+
+This repo serves as both a **shared team workspace** and a **personal development environment**. The sharing boundary is which Git remote you push to, not which files you track.
+
+### Three-Tier Git Model
+
+```
+VisualVault/nodeJs-rest-client-library    (upstream — read-only, library source)
+        │
+        ▼ fork
+emanueljofre/nodeV2                       (team shared — tools, tests, docs, analysis)
+        │
+        ▼ clone + private remote
+[private repo]                            (personal — everything including projects/)
+```
+
+Every developer commits ALL their work to their **private repo** (full backup, multi-workstation). Shared content flows to `emanueljofre/nodeV2` via PRs.
+
+### What Goes Where
+
+| Directory                         | Shared (team repo)? | Purpose                 | Sharing Criteria                                             |
+| --------------------------------- | ------------------- | ----------------------- | ------------------------------------------------------------ |
+| `lib/`                            | Yes                 | Server code             | Product code — everyone needs it                             |
+| `docs/`                           | Yes                 | Platform documentation  | Platform knowledge — benefits all developers                 |
+| `scripts/`                        | Yes                 | VV script examples      | Reusable patterns — benefits all developers                  |
+| `tools/`                          | Yes                 | Workspace tooling       | General-purpose tools — work for any VV environment          |
+| `testing/`                        | Yes                 | Test infrastructure     | Reusable specs, helpers, fixtures, pipelines                 |
+| `tasks/` analysis                 | Yes                 | Platform-level findings | Bug reports, RCA, fix strategies — true for all environments |
+| `tasks/` matrix, test-cases       | Yes                 | Test methodology        | Reproducible specs — anyone can run them                     |
+| `tasks/` results, runs, summaries | **No**              | Execution records       | Reference environment-specific data (record IDs, timestamps) |
+| `projects/`                       | **No**              | Customer workspaces     | Customer IP — script source, configs, field inventories      |
+| `.env.json`                       | **No**              | Credentials             | Machine-specific secrets                                     |
+
+### Guiding Principles
+
+1. **Shared content must be reproducible.** A bug report in `tasks/` describes the bug, the reproduction steps, and the root cause — it doesn't say "see run-047 line 23." Anyone with a VV environment can verify.
+
+2. **Tools are environment-agnostic.** Export, audit, inventory, and generator tools work for any VV customer, not just WADNR. Hardcoded customer references go in `projects/`, not in `tools/`.
+
+3. **Customer data never reaches the team repo.** Exported scripts, templates, field inventories, schedule configs — all customer IP. Lives in `projects/{customer}/`, committed to the developer's private repo only.
+
+4. **Tasks hold platform knowledge, projects hold customer data.** "FORM-BUG-5 adds a fake Z suffix" → `tasks/` (platform truth). "WADNR has 119 Config B fields exposed to BUG-7" → `projects/wadnr/` (customer-specific assessment).
+
+5. **Raw test evidence is personal, analysis is shared.** `results.md`, `runs/`, and `summaries/` reference specific record IDs and timestamps — they're working notes. The analysis derived from them (bug reports, overview docs) is platform documentation.
+
+6. **Historical records are immutable.** Run files and test-case specs in `tasks/*/runs/` and `tasks/*/test-cases/` document the state at execution time. Don't update paths or data in these files retroactively.
+
+### For New Developers
+
+Clone the team repo, add your private remote:
+
+```bash
+git clone emanueljofre/nodeV2 my-vv-workspace
+cd my-vv-workspace
+git remote rename origin shared
+git remote add origin <your-private-repo-url>
+git push -u origin main
+```
+
+You get: all tools, tests, docs, and platform analysis — ready to use. You add: your own `projects/{customer}/` for each VV environment you work with, your own `.env.json` with credentials, and your own test execution results.
+
+### .gitignore Note
+
+The `.gitignore` has commented-out lines for `/projects/` and `tasks/**/runs/` etc. These are **documentation for the team repo** — uncomment them only when working directly on `emanueljofre/nodeV2`. In your private workspace, keep them commented so everything is versioned and backed up.
+
 ## Upstream Sync
 
 ```bash
