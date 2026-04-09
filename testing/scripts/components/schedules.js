@@ -1,8 +1,9 @@
 /**
  * Scheduled Services component — extracts schedule configuration from scheduleradmin.
  *
- * This is a metadata-only component — no script source extraction needed.
- * Script source lives in outsideprocessadmin (handled by the scripts component).
+ * This is a metadata-only component — no script source extraction needed here.
+ * Script source files are routed to schedules/scripts/ by the scripts component
+ * (which extracts from outsideprocessadmin and splits by categoryCode).
  * Schedules link to scripts via the serviceName field.
  */
 const path = require('path');
@@ -116,7 +117,7 @@ module.exports = {
      * Generate README with cross-links to web service scripts.
      */
     generateReadme(outputDir, items) {
-        const scriptsDir = path.resolve(outputDir, '..', 'web-services', 'scripts');
+        const scriptsDir = path.join(outputDir, 'scripts');
 
         vvSync.generateReadme(outputDir, {
             title: 'WADNR Scheduled Services',
@@ -131,7 +132,7 @@ module.exports = {
                     transform: (item) => {
                         const fn = vvSync.sanitizeFilename(item.serviceName) + '.js';
                         const exists = require('fs').existsSync(path.join(scriptsDir, fn));
-                        return exists ? `[${item.serviceName}](../web-services/scripts/${fn})` : item.serviceName;
+                        return exists ? `[${item.serviceName}](./scripts/${fn})` : item.serviceName;
                     },
                 },
                 { header: 'Recurrence', field: 'recurrence' },

@@ -115,14 +115,20 @@ module.exports = {
     /**
      * Save extracted scripts as individual .js files.
      */
-    save(outputDir, allItems, extracted) {
+    save(outputDir, allItems, extracted, context) {
         const scriptsDir = path.join(outputDir, 'scripts');
         fs.mkdirSync(scriptsDir, { recursive: true });
+        if (context && context.scheduledScriptsDir) {
+            fs.mkdirSync(context.scheduledScriptsDir, { recursive: true });
+        }
         const today = new Date().toISOString().split('T')[0];
         let saved = 0;
 
         for (const [name, data] of extracted) {
             const meta = allItems.find((m) => m.name === name);
+            const isScheduled = meta && meta.categoryCode === 1;
+            const targetDir =
+                isScheduled && context && context.scheduledScriptsDir ? context.scheduledScriptsDir : scriptsDir;
             const fn = vvSync.sanitizeFilename(name) + '.js';
             const hdr = [
                 '/**',
@@ -136,7 +142,7 @@ module.exports = {
             ]
                 .filter((l) => l !== '')
                 .join('\n');
-            fs.writeFileSync(path.join(scriptsDir, fn), hdr + data.source + '\n', 'utf8');
+            fs.writeFileSync(path.join(targetDir, fn), hdr + data.source + '\n', 'utf8');
             saved++;
         }
         return saved;
@@ -146,10 +152,12 @@ module.exports = {
      * Generate README grouped by category.
      */
     generateReadme(outputDir, allItems, extractedNames) {
+        const nonScheduled = allItems.filter((i) => i.categoryCode !== 1);
+        const nonScheduledNames = new Set([...extractedNames].filter((n) => nonScheduled.some((i) => i.name === n)));
         vvSync.generateReadme(outputDir, {
             title: 'WADNR Web Services',
             subtitle: 'Extracted from outsideprocessadmin on vv5dev (WADNR/fpOnline)',
-            items: allItems,
+            items: nonScheduled,
             groupByField: 'category',
             columns: [
                 {
@@ -157,7 +165,7 @@ module.exports = {
                     field: 'name',
                     transform: (item) => {
                         const fn = vvSync.sanitizeFilename(item.name) + '.js';
-                        return extractedNames.has(item.name) ? `[${item.name}](./scripts/${fn})` : item.name;
+                        return nonScheduledNames.has(item.name) ? `[${item.name}](./scripts/${fn})` : item.name;
                     },
                 },
                 {
@@ -170,7 +178,7 @@ module.exports = {
                     field: 'modifyDate',
                     transform: (i) => (i.modifyDate ? i.modifyDate.split('T')[0] : ''),
                 },
-                { header: 'Src', field: '_src', transform: (i) => (extractedNames.has(i.name) ? 'Y' : '-') },
+                { header: 'Src', field: '_src', transform: (i) => (nonScheduledNames.has(i.name) ? 'Y' : '-') },
             ],
         });
     },

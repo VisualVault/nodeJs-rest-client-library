@@ -1,7 +1,8 @@
 {
-    "generatedAt": "2026-04-08T20:33:02.303Z",
+    "generatedAt": "2026-04-09T11:31:39.046Z",
     "environment": "vv5dev/WADNR/fpOnline",
-    "totalScripts": 272,
+    "component": "scripts",
+    "totalItems": 252,
     "scripts": [
         {
             "id": "d5e3ecb3-4fb4-f011-82ff-991bc11c012d",
@@ -90,28 +91,6 @@
             "modifyBy": "fernando.chamorro@visualvault.com",
             "createDate": "2025-04-24T17:27:52.353Z",
             "createBy": "patricio.bonetto@visualvault.com"
-        },
-        {
-            "id": "cd50b454-87a8-f011-82fa-ec61d8777d62",
-            "name": "AGOLPostFponlineDataToAGOLTables",
-            "description": "Extracts the CSV files of the latest updates to fpOnline forms from the  queue  POST to AGOL ",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-02-16T23:33:24.27Z",
-            "modifyBy": "ross.rhone@visualvault.com",
-            "createDate": "2025-10-13T22:54:57.183Z",
-            "createBy": "ross.rhone@visualvault.com"
-        },
-        {
-            "id": "58e0e733-e5a5-f011-82fa-ec61d8777d62",
-            "name": "AGOLSendUpdatedDataToPendingDataForm",
-            "description": "Extracts the data from any form that has been updated in the last in the last 24 hours  ",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-02-13T21:26:41.307Z",
-            "modifyBy": "ross.rhone@visualvault.com",
-            "createDate": "2025-10-10T14:30:23.38Z",
-            "createBy": "ross.rhone@visualvault.com"
         },
         {
             "id": "72c60fa2-58e5-ef11-82c1-fe2ae3bd930b",
@@ -301,28 +280,6 @@
             "createBy": "nicolas.culini@visualvault.com"
         },
         {
-            "id": "d656f00d-c290-ef11-82ae-862bfd7a22f1",
-            "name": "CommunicationLogSendDigest",
-            "description": "Send Digest Emails",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2025-12-10T20:53:40.88Z",
-            "modifyBy": "roobini.krishnandam@visualvault.com",
-            "createDate": "2024-10-22T22:08:24.9Z",
-            "createBy": "brian.davis@visualvault.com"
-        },
-        {
-            "id": "49787d34-7e91-ef11-82b1-b3f8aa6cdd67",
-            "name": "CommunicationLogSendImmediate",
-            "description": "Send Immediate Communication Log Email",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-01-13T21:37:42.793Z",
-            "modifyBy": "roobini.krishnandam@visualvault.com",
-            "createDate": "2024-10-23T20:35:20.77Z",
-            "createBy": "brian.davis@visualvault.com"
-        },
-        {
             "id": "f6d7a5ca-89d7-f011-82fc-876f92e9e3a8",
             "name": "DisablePreviousFPNP",
             "description": "DisablePreviousFPNP",
@@ -419,28 +376,6 @@
             "modifyDate": "2025-02-17T17:54:44.727Z",
             "modifyBy": "john.sevilla@visualvault.com",
             "createDate": "2025-01-31T18:02:39.793Z",
-            "createBy": "john.sevilla@visualvault.com"
-        },
-        {
-            "id": "e267ea38-9cce-ef11-82bf-a0dcc70b93c8",
-            "name": "FeeSCHFinalizePendingTransactions",
-            "description": "FeeSCHFinalizePendingTransactions",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2025-01-09T15:13:46.39Z",
-            "modifyBy": "john.sevilla@visualvault.com",
-            "createDate": "2025-01-09T15:13:46.39Z",
-            "createBy": "john.sevilla@visualvault.com"
-        },
-        {
-            "id": "629d7168-b5ce-ef11-82bd-d3a492f2461d",
-            "name": "FeeSCHInstallmentReminderNotifications",
-            "description": "FeeSCHInstallmentReminderNotifications",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2025-01-09T18:14:47.693Z",
-            "modifyBy": "john.sevilla@visualvault.com",
-            "createDate": "2025-01-09T18:14:47.693Z",
             "createBy": "john.sevilla@visualvault.com"
         },
         {
@@ -750,17 +685,6 @@
             "modifyBy": "zharich.barona@visualvault.com",
             "createDate": "2025-10-08T16:15:16.883Z",
             "createBy": "zharich.barona@visualvault.com"
-        },
-        {
-            "id": "117c39cc-191f-f111-830c-f58dfe96f12b",
-            "name": "fpnpLoadTesting",
-            "description": "fpnpLoadTesting",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-03-13T20:41:25.793Z",
-            "modifyBy": "nicolas.culini@visualvault.com",
-            "createDate": "2026-03-13T20:18:46.963Z",
-            "createBy": "nicolas.culini@visualvault.com"
         },
         {
             "id": "28d24a6c-a1bd-ef11-82be-e0f3be300df7",
@@ -1146,17 +1070,6 @@
             "modifyBy": "sebastian.rolando@visualvault.com",
             "createDate": "2025-09-09T17:35:57.22Z",
             "createBy": "alfredo.scilabra@visualvault.com"
-        },
-        {
-            "id": "fb200cb9-deb7-ef11-82bb-8cdb659f7a98",
-            "name": "LibCreatezActivtyMapGISJSON",
-            "description": "LibCreatezActivtyMapGISJSON",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2024-12-11T18:57:52.107Z",
-            "modifyBy": "ross.rhone@visualvault.com",
-            "createDate": "2024-12-11T16:42:15.277Z",
-            "createBy": "ross.rhone@visualvault.com"
         },
         {
             "id": "56753756-fd1b-f011-82cd-cce61d1869ed",
@@ -2204,28 +2117,6 @@
             "createBy": "ross.rhone@visualvault.com"
         },
         {
-            "id": "9f828435-0556-f011-82de-c164249f95fb",
-            "name": "PostPermitsToDOR",
-            "description": "Post FPAN Permits to DOR  Contains stakeholders  Check communication log for more details ",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-03-10T19:43:54.857Z",
-            "modifyBy": "ross.rhone@visualvault.com",
-            "createDate": "2025-06-30T22:56:10.663Z",
-            "createBy": "ross.rhone@visualvault.com"
-        },
-        {
-            "id": "5199d00f-1e8f-f011-82f5-e43f3109388f",
-            "name": "ReminderExternalReviewerEmailNotification",
-            "description": "ExternalReviewerEmailNotification",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-04-07T16:35:19.26Z",
-            "modifyBy": "federico.cuelho@visualvault.com",
-            "createDate": "2025-09-11T14:46:43.397Z",
-            "createBy": "lucas.herrera@visualvault.com"
-        },
-        {
             "id": "2c9caab9-4e83-f011-82e8-e147d2d9cd9a",
             "name": "RemoveSelectedAmendmentsNOD",
             "description": "RemoveSelectedAmendmentsNOD",
@@ -2270,94 +2161,6 @@
             "createBy": "sebastian.rolando@visualvault.com"
         },
         {
-            "id": "ba88001d-d11e-f011-82d6-afeb582902bd",
-            "name": "SCH_FPNP_NotificationSystem",
-            "description": "SCH_FPNP_NotificationSystem",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-04-07T13:34:51.82Z",
-            "modifyBy": "nicolas.culini@visualvault.com",
-            "createDate": "2025-04-21T16:53:24.65Z",
-            "createBy": "austin.stone@visualvault.com"
-        },
-        {
-            "id": "1a0115e4-3e21-f011-82d7-d7071da8caf0",
-            "name": "SCHExpirationMaintenanceInARP",
-            "description": "SCHExpirationMaintenanceInARP",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-04-08T14:10:07.233Z",
-            "modifyBy": "lucas.herrera@visualvault.com",
-            "createDate": "2025-04-24T19:04:56.923Z",
-            "createBy": "fernando.chamorro@visualvault.com"
-        },
-        {
-            "id": "f83ccd55-df01-f111-8306-d7f19a0f3584",
-            "name": "SCHFPANExpirationClearOfflineFlags",
-            "description": "Expired ARP that have documents flagged for offline will be removed from Box",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-02-04T21:04:47.853Z",
-            "modifyBy": "fernando.chamorro@visualvault.com",
-            "createDate": "2026-02-04T15:41:52.183Z",
-            "createBy": "fernando.chamorro@visualvault.com"
-        },
-        {
-            "id": "77271faf-ba40-f011-82d9-9f5f46d8620b",
-            "name": "SCHGenerateWorkQueueExcelFiles",
-            "description": "SCHGenerateWorkQueueExcelFiles",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-04-07T20:55:35.893Z",
-            "modifyBy": "ross.rhone@visualvault.com",
-            "createDate": "2025-06-03T20:39:07.19Z",
-            "createBy": "austin.stone@visualvault.com"
-        },
-        {
-            "id": "37882db9-d016-f011-82d3-f3203e068116",
-            "name": "SCHHardDeleteReadyRecords",
-            "description": "SCHHardDeleteReadyRecords",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2025-04-11T15:06:32.26Z",
-            "modifyBy": "alfredo.scilabra@visualvault.com",
-            "createDate": "2025-04-11T12:31:07.527Z",
-            "createBy": "alfredo.scilabra@visualvault.com"
-        },
-        {
-            "id": "5c1a60af-f529-f111-832d-e40a64ced594",
-            "name": "SCHRetriggerBoxWorkflow",
-            "description": "Upload file to Box",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-04-03T18:23:07.977Z",
-            "modifyBy": "ross.rhone@visualvault.com",
-            "createDate": "2026-03-27T15:59:11.11Z",
-            "createBy": "ross.rhone@visualvault.com"
-        },
-        {
-            "id": "6c2d9c8a-d016-f011-82d3-f3203e068116",
-            "name": "SCHSoftDeleteStaleRecords",
-            "description": "SCHSoftDeleteStaleRecords",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2025-04-11T12:48:22.493Z",
-            "modifyBy": "alfredo.scilabra@visualvault.com",
-            "createDate": "2025-04-11T12:29:48.4Z",
-            "createBy": "alfredo.scilabra@visualvault.com"
-        },
-        {
-            "id": "5ba7c265-0416-f011-82d3-f3203e068116",
-            "name": "SCHSoftDeleteWarningNotifications",
-            "description": "SCHSoftDeleteWarningNotifications",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2026-03-26T19:10:50.577Z",
-            "modifyBy": "fernando.chamorro@visualvault.com",
-            "createDate": "2025-04-10T12:08:20.6Z",
-            "createBy": "alfredo.scilabra@visualvault.com"
-        },
-        {
             "id": "9df85a0c-fe1e-f011-82d6-afeb582902bd",
             "name": "SearchExistingNotificationProfile",
             "description": "SearchExistingNotificationProfile",
@@ -2366,17 +2169,6 @@
             "modifyDate": "2025-12-12T19:12:29.447Z",
             "modifyBy": "nicolas.culini@visualvault.com",
             "createDate": "2025-04-21T22:15:06.03Z",
-            "createBy": "nicolas.culini@visualvault.com"
-        },
-        {
-            "id": "0a3c0b22-e4c5-f011-8303-9ca0b95120ed",
-            "name": "sendReconciliationReport",
-            "description": "sendReconciliationReport",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2025-12-17T14:05:44.383Z",
-            "modifyBy": "nicolas.culini@visualvault.com",
-            "createDate": "2025-11-20T07:40:39.213Z",
             "createBy": "nicolas.culini@visualvault.com"
         },
         {
@@ -2454,17 +2246,6 @@
             "modifyDate": "2025-05-07T13:20:40.543Z",
             "modifyBy": "moises.savelli@visualvault.com",
             "createDate": "2025-01-14T16:17:32.187Z",
-            "createBy": "john.sevilla@visualvault.com"
-        },
-        {
-            "id": "accd5513-93d2-ef11-82bd-d3a492f2461d",
-            "name": "ShoppingCartSCHDisableStaleCarts",
-            "description": "ShoppingCartSCHDisableStaleCarts",
-            "category": "Scheduled",
-            "categoryCode": 1,
-            "modifyDate": "2025-02-18T17:41:01.807Z",
-            "modifyBy": "john.sevilla@visualvault.com",
-            "createDate": "2025-01-14T16:18:46.957Z",
             "createBy": "john.sevilla@visualvault.com"
         },
         {
