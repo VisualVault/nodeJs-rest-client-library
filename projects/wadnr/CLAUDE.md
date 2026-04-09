@@ -16,7 +16,7 @@ All data extracted via `tools/export/` from the WADNR admin panels on vv5dev.
 
 | Component | Count | Location |
 |-----------|-------|----------|
-| Web Services (Form + Workflow) | 252 scripts | `exports/web-services/` |
+| Web Services (Form + Workflow) | 251 scripts | `exports/web-services/` |
 | Scheduled Services | 21 schedules + 20 scripts | `exports/schedules/` |
 | Global Functions | 157 functions | `exports/global-functions/` |
 | Form Templates | 77 XMLs | `exports/form-templates/` |

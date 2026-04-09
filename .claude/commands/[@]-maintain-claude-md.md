@@ -174,19 +174,19 @@ Extract numbers paired with countable nouns from each CLAUDE.md and verify again
 
 **Known count-to-source mappings:**
 
-| Pattern in CLAUDE.md          | Verification command                                                              |
-| ----------------------------- | --------------------------------------------------------------------------------- |
-| "N spec files"                | `ls testing/specs/date-handling/*.spec.js \| wc -l`                               |
-| "N scripts" (WADNR context)   | `ls projects/wadnr/exports/web-services/scripts/*.js \| wc -l`                    |
-| "N globals" / "N functions"   | `ls projects/wadnr/exports/global-functions/*.js \| wc -l`                        |
-| "N templates" (WADNR context) | `ls projects/wadnr/exports/form-templates/*.xml \| wc -l`                         |
-| "N schedules"                 | `jq '.totalItems' projects/wadnr/exports/schedules/manifest.json`                 |
-| "N confirmed bugs"            | count `bug-*.md` + `ws-bug-*.md` + `formdashboard-bug-*.md` in task analysis dirs |
-| "N commands"                  | `ls .claude/commands/*.md \| wc -l`                                               |
+| Pattern in CLAUDE.md          | Verification command                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| "N spec files"                | `ls testing/specs/date-handling/*.spec.js \| wc -l`                                              |
+| "N scripts" (WADNR context)   | `ls projects/wadnr/exports/web-services/scripts/*.js \| wc -l`                                   |
+| "N globals" / "N functions"   | `ls projects/wadnr/exports/global-functions/*.js \| wc -l`                                       |
+| "N templates" (WADNR context) | `ls projects/wadnr/exports/form-templates/*.xml \| wc -l`                                        |
+| "N schedules"                 | `jq '.totalItems' projects/wadnr/exports/schedules/manifest.json`                                |
+| "N confirmed bugs"            | count `bug-*.md` + `ws-bug-*.md` + `formdashboard-bug-*.md` excluding `*-fix-recommendations.md` |
+| "N commands"                  | `ls .claude/commands/*.md \| wc -l`                                                              |
 
 For other numbers, look for patterns like `\d+ (spec|script|template|bug|global|schedule|field|function|command)` and attempt to verify by finding the corresponding directory or file.
 
-Flag mismatches as **WARNING**: "Claims N items, actually M" with the file and line.
+Flag mismatches as **WARNING**: "Claims N items, actually M" with the file and line. Group related stale counts (e.g., if 4 files all say "271 scripts" and actual is 251, report once with all 4 file locations).
 
 ### 3J. Scope change detection
 
@@ -202,6 +202,10 @@ If structural changes exist, flag as **WARNING**: "N structural changes in {scop
 
 Ignore changes to files inside subdirectories that aren't described by this CLAUDE.md (e.g., changes inside `tasks/date-handling/forms-calendar/runs/` don't affect `tasks/CLAUDE.md`).
 
+**Noise filter:** Ignore changes from the same commit that created or last modified the CLAUDE.md itself. Initial file moves (e.g., from a restructure) that happen in the same commit as CLAUDE.md creation are not "unaddressed changes."
+
+**Shell note:** Use `wc -l | tr -d ' '` for counts instead of `grep -c` in zsh — `grep -c` appends a newline that breaks integer comparisons.
+
 ### 3K. Dev command verification (root CLAUDE.md only)
 
 For the root CLAUDE.md, verify the development commands section is accurate:
@@ -210,7 +214,7 @@ For the root CLAUDE.md, verify the development commands section is accurate:
 
 2. **Extract `node path/file.js` commands** from CLAUDE.md. Verify each file exists on disk. Flag missing as **CRITICAL**.
 
-3. **Check for new `package.json` scripts** not mentioned in CLAUDE.md. Compare `package.json` scripts keys against commands documented in CLAUDE.md. Flag undocumented user-facing scripts as **INFO** (potential gap).
+3. **Check for new `package.json` scripts** not mentioned in CLAUDE.md. Compare `package.json` script names (exact match) against commands documented in CLAUDE.md. Flag undocumented user-facing scripts as **INFO** (potential gap). Internal scripts (`prepare`, `prepublishOnly`) can be ignored.
 
 ---
 

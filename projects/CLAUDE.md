@@ -36,4 +36,4 @@ node tools/inventory/inventory-fields.js  # reads from project exports
 
 | Project | Environment | Description |
 |---------|-------------|-------------|
-| `wadnr/` | vv5dev/WADNR/fpOnline | WA DNR: 77 templates, 271 scripts, 157 globals, 21 schedules |
+| `wadnr/` | vv5dev/WADNR/fpOnline | WA DNR: 77 templates, 251 scripts, 157 globals, 21 schedules |

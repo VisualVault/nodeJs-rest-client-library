@@ -6,7 +6,8 @@ Browser automation for VisualVault platform testing. Everything here is **shared
 
 | Folder                 | Purpose                                                                                             |
 | ---------------------- | --------------------------------------------------------------------------------------------------- |
-| `specs/date-handling/` | 21 parameterized spec files (categories 1-12 + dashboard + audit)                                   |
+| `specs/date-handling/` | Parameterized spec files (categories 1-12 + dashboard + audit)                                      |
+| `web-services/`        | Web service API date-handling specs                                                                 |
 | `helpers/`             | Test-specific page helpers: `vv-form.js` (form automation), `vv-calendar.js` (calendar interaction) |
 | `fixtures/`            | Shared test data and config: `test-data.js`, `vv-config.js`, `env-config.js`, `ws-config.js`        |
 | `pipelines/`           | Regression orchestrators: `run-regression.js`, `run-ws-regression.js`, `run-dash-regression.js`     |
