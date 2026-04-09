@@ -283,6 +283,58 @@ The **Form Templates** page (`/FormTemplateAdmin`) uses Telerik RadGrid — the 
 |  10   | Copy              | `<a>` link (`lnkCopyTemplate`)                                                   |
 |  11   | Modified Date     | e.g., "5/22/2025 12:21 PM"                                                       |
 
+### Template Revision Workflow
+
+Templates follow a release lifecycle: **Released** (live, read-only) → **New Revision** (draft, editable) → **Released** (new version live).
+
+**Creating a new revision:**
+
+1. Click **"New Rev"** (`lnkNewRevision`) on the released row → opens a dock panel
+2. Fill **Revision** (e.g., `"1.2"` — must be unique per template) and **Change Reason** (required on vv5dev)
+3. Click **Save** → grid now shows two rows: released + draft (status: `"Release"`)
+
+**Editing a draft revision:**
+
+1. Click **"View"** (`lnkDesign`) on the draft row — opens the Form Designer in a popup via `VV.OpenWindow()`
+2. Make changes in the designer → **File > Save Template**
+3. Back in FormTemplateAdmin, click **"Release"** (`lnkChangeState`) on the draft row
+
+**Link types on each row:**
+
+| Link ID                 | Text                   | Mechanism                      | Notes                                                      |
+| ----------------------- | ---------------------- | ------------------------------ | ---------------------------------------------------------- |
+| `lnkFormDetail`         | (name)                 | `VV.OpenWindow()` popup        | Opens template detail/preview                              |
+| `lnkDesign`             | "View"                 | `VV.OpenWindow()` popup        | Opens Form Designer (edit if draft, view-only if released) |
+| `lnkChangeState`        | "Released" / "Release" | `__doPostBack` or no-op        | Toggle release state                                       |
+| `lnkNewRevision`        | "New Rev"              | `__doPostBack` → dock panel    | Creates a new draft revision                               |
+| `lnkExportFormTemplate` | "Export"               | `__doPostBack` → file download | Exports template XML                                       |
+| `lnkCopyTemplate`       | "Copy"                 | `__doPostBack`                 | Clones the template                                        |
+
+### Form Designer
+
+The Form Designer is a standalone Angular/Kendo application at:
+
+```
+https://{env}.visualvault.com/FormDesigner/index.html#!/formdesigner?xcid={customerGUID}&xcdid={databaseGUID}&formId={revisionGUID}&hidemenu=true
+```
+
+- `formId` is the **revision GUID** (not the template GUID)
+- Opened via `VV.OpenWindow()` from the FormTemplateAdmin grid — not directly navigable from the VV shell
+- **Left panel:** Controls tree (field names, buttons, containers)
+- **Right panel:** Control Properties — shows field config when a control is selected
+- **Menu bar:** Kendo menubar with File (Save Template, Preview), Edit, View, Field, Container, Page
+- **Save:** File > Save Template (menu item text: `"Save Template"`, in `.k-item.topMenuTopLevel` Kendo menu)
+
+**Key property IDs in the designer** (accessible via `document.getElementById()`):
+
+| Property             | Input ID                  | Type     | Notes                 |
+| -------------------- | ------------------------- | -------- | --------------------- |
+| Name                 | `name` (sometimes absent) | text     | Field name            |
+| Mask                 | `mask`                    | text     | Display format mask   |
+| Enable Time          | `enableTime`              | checkbox | DateTime vs date-only |
+| Ignore Timezones     | `ignoreTimezones`         | checkbox | TZ display behavior   |
+| Enable Initial Value | (in properties panel)     | checkbox | Pre-populate on load  |
+
 ### Export Mechanism
 
 The Export link triggers `__doPostBack(eventTarget, '')` which sends a server-side request to generate the template XML. The server responds with a file download (Content-Disposition attachment). This is an **AJAX partial postback** (UpdatePanel) — the grid refreshes after the download starts.

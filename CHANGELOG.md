@@ -60,6 +60,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 ### Changed
 
+- `testing/helpers/vv-calendar.js` — Kendo v2 (vv5dev) compatibility: popup header selector (`kendo-calendar-header .k-title` → dual selector including `button.k-calendar-title`), time tab active selector (`k-state-active` → `aria-pressed`), typed input adapts to placeholder (strips time segments when field renders date-only despite `enableTime=true`)
+- `testing/helpers/vv-form.js` — `saveFormOnly()` template ID extraction: fallback to URL `formid` query param when `VV.Form.formId` is undefined (vv5dev Kendo v2 doesn't expose this property)
+- `testing/global-setup.js` — auth post-login URL pattern: replaced `waitForURL('**/FormDataAdmin**')` with generic `waitForFunction(!login)` (vv5dev redirects to `VVPortalUI/home`, not `FormDataAdmin`)
+- `testing/fixtures/vv-config.js` — added WADNR `targetDateTest` form URL (revision `3f3a0b1a-4834-f111-8310-f323cafecf11`)
+- VV platform docs: Form Designer URL pattern, template revision lifecycle, Kendo v1/v2 selector mapping, mask auto-population behavior on vv5dev
+
 - `.env.json` restructured from flat `environments` map to hierarchical `servers → customers` structure reflecting VV platform architecture. Selectors changed from `activeEnv` to `activeServer` + `activeCustomer`. `env-config.js` and `app.js` resolve the new hierarchy; `loadConfig()` return shape unchanged
 - ESLint config: excluded `lib/VVRestApi/` and `tasks/**/bug-analysis/` from linting (upstream code and captured VV script artifacts with pre-existing errors that blocked lint-staged)
 - ESLint config: added browser globals (`window`, `HTMLElement`, `Window`, `Document`, `NodeFilter`) for `tools/**/*.js` — needed for `page.evaluate()` in explore specs

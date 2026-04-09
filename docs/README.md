@@ -16,7 +16,7 @@ docs/
 
 ### Architecture
 
-- [visualvault-platform.md](architecture/visualvault-platform.md) — URL structure, navigation map, admin tools, user menu, Enterprise Tools, FormsAPI, authentication, version/build discovery, service architecture, UI framework stack, REST API resources, localization API, FormViewer feature map, document index field date handling, auto-save finding, demo + WADNR environment references
+- [visualvault-platform.md](architecture/visualvault-platform.md) — URL structure, navigation map, admin tools, user menu, Enterprise Tools, FormsAPI, authentication, version/build discovery, service architecture, UI framework stack, REST API resources, localization API, FormViewer feature map, document index field date handling, auto-save finding, demo + WADNR environment references, Form Designer URL/workflow, template revision lifecycle
 
 ### Standards
 
