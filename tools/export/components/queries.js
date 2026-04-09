@@ -399,72 +399,63 @@ async function _probeApi(config) {
 
 /**
  * Discover data connections from the ConnectionsAdmin grid.
- * Returns [{name, connectionId}] where connectionId is the CcID GUID.
+ *
+ * The "Queries" links are lnkDetails postback links — CcID is resolved server-side.
+ * We trigger each postback and extract CcID from the resulting ConnectionQueryAdmin URL.
+ *
+ * @returns {Array<{name: string, connectionId: string}>}
  */
 async function _discoverConnections(page, config) {
     const url = vvAdmin.adminUrl(config, 'ConnectionsAdmin');
     console.log(`  Navigating to: ${url}`);
     await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
-    await page.waitForSelector('.rgMasterTable, #ctl00_ContentBody_DG1_ctl00', { timeout: 30000 });
+    await page.waitForSelector('#ctl00_ContentBody_DG1_ctl00', { timeout: 30000 });
 
-    // Find all connections with their "Queries" links
-    const connections = await page.evaluate(() => {
-        const rows = document.querySelectorAll('.rgMasterTable tbody tr.rgRow, .rgMasterTable tbody tr.rgAltRow');
-        if (rows.length === 0) {
-            // Fallback: try the grid table directly
-            const table = document.querySelector('#ctl00_ContentBody_DG1_ctl00');
-            if (table) {
-                const allRows = table.querySelectorAll('tbody tr');
-                return _extractConnections(allRows);
-            }
-            return [];
+    // Get connection names from the grid (column 1 = Name)
+    const CONN_COLUMNS = [
+        { name: 'connName', index: 1, type: 'text' },
+        { name: 'description', index: 4, type: 'text' },
+    ];
+    const rows = await vvAdmin.readGridRows(page, CONN_COLUMNS);
+
+    // Get "Queries" links (they're lnkDetails links)
+    const detailLinks = await vvAdmin.getGridDetailLinks(page);
+
+    if (detailLinks.length === 0) return [];
+
+    // For each Queries link, trigger postback and capture CcID from redirect URL
+    const connections = [];
+    for (let i = 0; i < detailLinks.length; i++) {
+        const link = detailLinks[i];
+        const connName = rows[i] ? rows[i].connName : link.name;
+
+        // Set up navigation listener before triggering postback
+        const navPromise = page.waitForURL(/ConnectionQueryAdmin/i, { timeout: 15000 }).catch(() => null);
+
+        await page.addScriptTag({
+            content: `__doPostBack('${link.postbackTarget.replace(/'/g, "\\'")}', '');`,
+        });
+
+        await navPromise;
+        const currentUrl = page.url();
+        const ccidMatch = currentUrl.match(/CcID=([a-f0-9-]+)/i);
+
+        if (ccidMatch) {
+            connections.push({
+                name: connName,
+                connectionId: ccidMatch[1],
+            });
+            console.log(`    ${connName} → CcID=${ccidMatch[1]}`);
+        } else {
+            console.log(`    ${connName} → no CcID found (URL: ${currentUrl})`);
         }
-        return _extractConnections(rows);
 
-        function _extractConnections(rowList) {
-            const conns = [];
-            for (const row of rowList) {
-                const cells = Array.from(row.querySelectorAll('td'));
-                // Find a link containing "Queries" text or href containing "ConnectionQueryAdmin"
-                let connectionId = null;
-                let connectionName = '';
-
-                for (const cell of cells) {
-                    const links = cell.querySelectorAll('a');
-                    for (const link of links) {
-                        const href = link.getAttribute('href') || '';
-                        const text = link.textContent.trim();
-
-                        // Extract CcID from href
-                        const ccidMatch = href.match(/CcID=([a-f0-9-]+)/i);
-                        if (ccidMatch) {
-                            connectionId = ccidMatch[1];
-                        }
-
-                        // Connection name is typically the first link or first cell text
-                        if (
-                            !connectionName &&
-                            text &&
-                            !text.toLowerCase().includes('queries') &&
-                            !text.toLowerCase().includes('edit')
-                        ) {
-                            connectionName = text;
-                        }
-                    }
-                }
-
-                // Fallback: get name from first text cell
-                if (!connectionName && cells.length > 0) {
-                    connectionName = cells[0].textContent.trim() || cells[1]?.textContent?.trim() || '';
-                }
-
-                if (connectionId) {
-                    conns.push({ name: connectionName, connectionId });
-                }
-            }
-            return conns;
+        // Navigate back to ConnectionsAdmin for the next link
+        if (i < detailLinks.length - 1) {
+            await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+            await page.waitForSelector('#ctl00_ContentBody_DG1_ctl00', { timeout: 30000 });
         }
-    });
+    }
 
     return connections;
 }
@@ -613,7 +604,7 @@ async function _extractSql(page, editInfo, knownTextareaId) {
 
     // Probe: find any textarea in the response
     // Common patterns: txtQueryText, txtQuery, txtSqlText
-    const probeIds = ['txtQueryText', 'txtQuery', 'txtSqlText', 'txtSQL', 'txtCommandText'];
+    const probeIds = ['txtQueryString', 'txtQueryText', 'txtQuery', 'txtSqlText', 'txtSQL', 'txtCommandText'];
 
     for (const probe of probeIds) {
         const re = new RegExp(`id="[^"]*${probe}"[^>]*>([\\s\\S]*?)</textarea`, 'i');
@@ -626,17 +617,11 @@ async function _extractSql(page, editInfo, knownTextareaId) {
         }
     }
 
-    // Last resort: find ANY textarea in the response with substantial content
-    const anyTextarea = capturedBody.match(/id="([^"]+)"[^>]*>([\s\S]*?)<\/textarea/gi);
-    if (anyTextarea) {
-        for (const match of anyTextarea) {
-            const idMatch = match.match(/id="([^"]+)"/i);
-            const contentMatch = match.match(/>([^]*?)<\/textarea/i);
-            if (contentMatch && contentMatch[1].trim().length > 10) {
-                const source = _decodeHtml(contentMatch[1]);
-                return { source, textareaId: idMatch ? idMatch[1] : null };
-            }
-        }
+    // Last resort: find textarea whose ID contains "dock" (dock panel textarea)
+    const dockTextarea = capturedBody.match(/id="([^"]*dockDetail[^"]*)"[^>]*>([\s\S]*?)<\/textarea/i);
+    if (dockTextarea) {
+        const source = _decodeHtml(dockTextarea[2]);
+        return { source, textareaId: dockTextarea[1] };
     }
 
     return null;
