@@ -94,16 +94,23 @@ This is an ASP.NET page (not the Angular FormViewer SPA) using Telerik RadGrid f
 
 All sections are accessed from the top nav bar within `https://{env}.visualvault.com/app/{customer}/{database}/`:
 
-| Nav Label                 | URL Path                                | Description                                                                                                                                                         |
-| ------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Document Library**      | `/DocumentLibrary`                      | Folder-tree document storage. Left panel = folder tree, right = file list. Has a Recycle Bin.                                                                       |
-| **Form Templates**        | `/FormTemplateAdmin`                    | Admin view to create/manage form schemas. Columns: Category, Template Name, Form Design (View/Edit), Description, Status, Revision, Import, Export, Copy.           |
-| **Form Library**          | `/FormDataAdmin`                        | End-user list of all forms available to fill in. Each row has a "Fill-In" link that opens the FormViewer.                                                           |
-| **Dashboards**            | `/formdata`                             | List of dashboards — one per form template — showing submitted records. Each dashboard is viewable and editable. See [Dashboard Details](#dashboard-details) below. |
-| **Reports**               | Submenu                                 | Report generation. Submenu items vary by customer setup.                                                                                                            |
-| **Process Design Studio** | `/ProcessDesignStudio?access_token=...` | Visual workflow (BPMN-style) designer. Token-authenticated. Separate app.                                                                                           |
-| **Admin Tools**           | Dropdown                                | Users, Groups, Portals, Menus, Dropdown Lists, Site Administration (Locations, Customers, Suppliers)                                                                |
-| **Enterprise Tools**      | Via Control Panel                       | Microservices, Scheduled Services, Data Connections, Data Connection Queries — see below                                                                            |
+| Nav Label                  | URL Path                                             | Description                                                                                                                              |
+| -------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Document Library**       | `/DocumentLibrary`                                   | Folder-tree document storage. Left panel = folder tree, right = file list. Has a Recycle Bin. Breadcrumb: `Documents > Document Library` |
+| **Form Templates**         | `/FormTemplateAdmin`                                 | Admin view to create/manage form schemas. Breadcrumb: `Forms > Form Template Administration`                                             |
+| **Form Library**           | `/FormDataAdmin`                                     | End-user list of all forms available to fill in. Each row has a "Fill-In" link. Breadcrumb: `Forms > Form Library`                       |
+| **Dashboards**             | `/formdata`                                          | List of dashboards showing submitted records. Breadcrumb: `Forms > Form Data Dashboards`. See [Dashboard Details](#dashboard-details)    |
+| **Reports** (submenu)      | —                                                    | Dropdown with sub-items below                                                                                                            |
+| ↳ Analytics Dashboards     | `/Dashboards`                                        | Analytics/BI dashboards (separate from form dashboards). Note: UI label has typo "Dasboards"                                             |
+| ↳ VV Reports               | `/VisualVaultReports`                                | Report generation and viewing                                                                                                            |
+| **Process Design Studio**  | `/ProcessDesignStudio?access_token=...`              | Visual BPMN workflow designer. Separate app. Token is a long encrypted payload regenerated per session                                   |
+| **Admin Tools** (dropdown) | —                                                    | See [Admin Tools](#admin-tools) below                                                                                                    |
+| **Enterprise Tools**       | Via Control Panel                                    | Dropdown with sub-items below. Breadcrumb prefix: `Control Panel > Enterprise Tools`                                                     |
+| ↳ Data Connections         | `/ConnectionsAdmin`                                  | SQL Server connections backing VV databases                                                                                              |
+| ↳ Microservice Library     | `/OutsideProcessAdmin`                               | External service endpoints (nodeV2 scripts appear here)                                                                                  |
+| ↳ Scheduled Services       | `/SchedulerAdmin`                                    | Cron-like automation for registered microservices                                                                                        |
+| ↳ Module Library           | `/ModuleAdmin`                                       | Reusable module/component library                                                                                                        |
+| ↳ Offline Forms            | `/OfflineForms/index.html#!/land?xcid=...&xcdid=...` | Offline form fill-in. Separate AngularJS SPA with its own routing                                                                        |
 
 ---
 
@@ -455,18 +462,44 @@ WHERE DhDocID = 'DateTest-001584'
 
 ## Admin Tools
 
-Accessible from the top nav dropdown:
+Accessible from the "Admin Tools" dropdown in the top nav bar:
 
-| Item                           | Description                                              |
-| ------------------------------ | -------------------------------------------------------- |
-| Users                          | User management — create, edit, assign groups            |
-| Groups                         | Security groups — control access to forms, documents     |
-| Portals                        | Customer-facing portal configuration                     |
-| Menus                          | Custom navigation menus for portals                      |
-| Dropdown Lists                 | Shared dropdown/lookup lists reusable across form fields |
-| Site Administration: Locations | Physical location definitions                            |
-| Site Administration: Customers | Customer entity management                               |
-| Site Administration: Suppliers | Supplier entity management                               |
+| Item                           | URL Path                                     | Description                                              |
+| ------------------------------ | -------------------------------------------- | -------------------------------------------------------- |
+| Users                          | `/UserAdmin`                                 | User management — create, edit, assign groups            |
+| Groups                         | `/GroupAdmin`                                | Security groups — control access to forms, documents     |
+| Portals                        | `/VisualVaultAdmin?SecurityType=PortalAdmin` | Customer-facing portal configuration                     |
+| Menus                          | `/MenuAdmin`                                 | Custom navigation menus for portals                      |
+| Dropdown Lists                 | `/DropDownListAdmin`                         | Shared dropdown/lookup lists reusable across form fields |
+| Email Templates                | `/EmailTemplateAdmin`                        | Email notification templates                             |
+| Site Administration: Locations | `/siteadmin?SecurityType=Location`           | Physical location definitions                            |
+| Site Administration: Customers | `/siteadmin?SecurityType=Customer`           | Customer entity management                               |
+| Site Administration: Suppliers | `/SiteAdmin?SecurityType=Supplier`           | Supplier entity management                               |
+
+Note: Portals uses `/VisualVaultAdmin?SecurityType=PortalAdmin` (not `/PortalAdmin`). Site Admin sections use parameterized `/siteadmin?SecurityType=` URLs.
+
+---
+
+## User Menu
+
+The user menu (top-right, shows the logged-in user's email) provides quick links via ASP.NET postbacks:
+
+| Item            | URL / Mechanism                        | Description                                     |
+| --------------- | -------------------------------------- | ----------------------------------------------- |
+| Searches        | postback `lnkSearches`                 | Saved search management                         |
+| Training        | postback `lnkTraining`                 | Training resources                              |
+| Open Forms      | postback `lnkOpenForms`                | Forms currently open/in-progress                |
+| Email Alerts    | postback `lnkEmailAlerts`              | Notification preferences                        |
+| My Preferences  | `/UserProfile`                         | User profile and settings                       |
+| Control Panel   | `/ControlPanel`                        | Admin control panel (leads to "My Preferences") |
+| Central Admin   | postback `lnkCentralAdmin`             | Cross-customer administration                   |
+| Advanced Search | `/AdvancedSearch?newsearch=true`       | Full-text search across documents and forms     |
+| Saved Searches  | `/UserSearches`                        | Persisted search queries                        |
+| Logout          | `/Login/{customer}/{db}?action=logout` | Session logout                                  |
+
+### Language Support
+
+The UI includes a language selector with: English, Brazil Portuguese, Spanish (Peru), Spanish (Colombia), Chinese (Simplified). Hidden field: `ctl00_CtrlMenu1_ddlLanguagesV5_ClientState`.
 
 ---
 
@@ -494,9 +527,154 @@ The Microservice registered in VV points to `{nodeV2 server URL}/scripts` or `/s
 
 ---
 
+## Version & Build Information
+
+### Version API Endpoint
+
+```
+GET /api/v1/{customer}/{db}/version
+Authorization: Bearer {accessToken}
+```
+
+Returns `VaultVersionInfo` — the core platform version and database schema version:
+
+```json
+{
+    "data": {
+        "dataType": "VaultVersionInfo",
+        "progVersion": "5.1.20210525.1",
+        "dbVersion": "3041",
+        "dbCreateDate": "2021-06-08T13:35:21.493Z",
+        "dbModifiedDate": "2021-06-08T13:35:21.493Z",
+        "progCreateDate": "2021-06-08T13:35:21.493Z",
+        "progModifiedDate": "2021-06-08T13:35:21.493Z",
+        "utcOffset": -3
+    }
+}
+```
+
+- `progVersion` follows the build format `{major}.{minor}.{YYYYMMDD}.{buildNum}` — tracks the **core platform**, not individual services
+- `dbVersion` is the database schema version number (incremented by migrations)
+- `utcOffset` reflects the server's configured UTC offset
+- Verified 2026-04-09 on vvdemo
+
+### FormViewer Build Number
+
+The FormViewer Angular SPA displays its build number in the top-right corner.
+
+| Property     | Value                                              |
+| ------------ | -------------------------------------------------- |
+| DOM selector | `span.app-version`                                 |
+| Text format  | `Build: {YYYYMMDD.N}` (e.g., `Build: 20260304.1`)  |
+| Build format | Matches Azure DevOps naming: `{date}.{buildOfDay}` |
+| Verified     | 2026-04-09 on vvdemo                               |
+
+FormViewer uses Angular content-hashed filenames for its script bundles (e.g., `main-es2015.37f6d018a9cad175a1e6.js`). These hashes change per deploy, providing a secondary deploy detection signal even if the build number text hasn't been updated.
+
+### What's NOT Exposed
+
+The product team notifies deploys with Azure DevOps build names like `FormsAPI.Main.20260408.1`, but **individual service versions are not queryable**. The individual backend services (FormsAPI, DocAPI, WorkflowAPI) reject the main OAuth token and do not expose public version endpoints. The `/version` API only tracks the core platform, and the FormViewer build only tracks the Angular SPA.
+
+### Server Infrastructure Headers
+
+All responses from the main VV app include:
+
+| Header                | Value                | Notes                              |
+| --------------------- | -------------------- | ---------------------------------- |
+| `Server`              | `Microsoft-IIS/10.0` | Windows Server IIS                 |
+| `X-AspNet-Version`    | `4.0.30319`          | .NET Framework 4.x                 |
+| `X-AspNetMvc-Version` | `5.2`                | ASP.NET MVC 5.2 (admin pages only) |
+
+The `/App/` MVC routes include the MVC version header; API routes do not.
+
+---
+
+## UI Framework Stack
+
+The main VV application (non-FormViewer pages) uses a classic ASP.NET WebForms stack with Telerik UI components. Verified on vvdemo 2026-04-09.
+
+### Client-Side Libraries
+
+| Library             | Version      | Role                       |
+| ------------------- | ------------ | -------------------------- |
+| jQuery              | 3.7.1        | DOM manipulation, AJAX     |
+| Kendo UI            | 2020.1.406   | Grid widgets, datepickers  |
+| Telerik RadControls | ASP.NET AJAX | Primary UI component suite |
+| Bootstrap           | CSS only     | Layout and styling         |
+| RequireJS           | present      | JavaScript module loader   |
+
+### Telerik Controls in Use
+
+RadGrid, RadMenu, RadButton, RadComboBox, RadAjaxPanel, RadInput, RadToolBar, RadUploadWindow, RadComboBoxDropDown (9 distinct controls observed).
+
+### Server-Side
+
+- **ASP.NET WebForms** — ViewState present (`__VIEWSTATE` hidden field), `__doPostBack` event system
+- **Auersoft.SessionTimer** v4.0.0.0 — custom session timeout management library
+- **ASP.NET MVC 5.2** — used for some routes (admin pages return `X-AspNetMvc-Version` header)
+
+### UIServices (ASMX Web Services)
+
+The main app loads 5 classic ASP.NET ASMX web services for real-time UI operations:
+
+| Service             | Path                                      | Purpose                       |
+| ------------------- | ----------------------------------------- | ----------------------------- |
+| ContextMenuService  | `/UIServices/ContextMenuService.asmx/js`  | Right-click context menus     |
+| UploadStatusService | `/UIServices/UploadStatusService.asmx/js` | File upload progress tracking |
+| ThreadStatusService | `/UIServices/ThreadStatusService.asmx/js` | Background thread monitoring  |
+| LibraryService      | `/UIServices/LibraryService.asmx/js`      | Document library operations   |
+| FormService         | `/UIServices/FormService.asmx/js`         | Form-related UI operations    |
+
+### Key JavaScript Objects
+
+| Object                   | Properties                   | Purpose                                                             |
+| ------------------------ | ---------------------------- | ------------------------------------------------------------------- |
+| `VV.MasterPage`          | 27 keys                      | Master page config: loading panels, menus, routing, session timeout |
+| `VV.Notifications`       | 9 methods                    | Real-time notification system (show, dismiss, ack)                  |
+| `VV.Entities`            | 3 keys                       | Entity types: Guid, FolderIndexFieldType, getFormFieldType          |
+| `VV.Form`                | 121 keys                     | Form API (also available in FormViewer, different context)          |
+| `window.VaultMaster`     | 4 keys                       | Master message/slider windows, Ajax helpers, JSON helpers           |
+| `window.Auersoft`        | SessionTimer, VisualVault    | Session management namespace                                        |
+| `window.vv.dataServices` | 1 key                        | Data services layer                                                 |
+| `window.VVModules`       | Core, Common, ScriptResource | Module system                                                       |
+| `window.NodeCategory`    | 5 enums                      | None, TopLevelFolder, Folder, DocumentList, Document                |
+
+### Notification Polling
+
+The main app polls `GET /App/{customer}/{db}/Notification` for real-time notifications. This is a standard ASP.NET MVC route (not REST API), returning notification data consumed by `VV.Notifications`.
+
+---
+
+## Service Architecture
+
+The VV platform consists of multiple backend services, each running independently. The core API at `{env}.visualvault.com` acts as the gateway; individual services are discovered via `/configuration/*` endpoints.
+
+### Configuration Discovery
+
+```
+GET /api/v1/{customer}/{db}/configuration/{component}
+```
+
+Returns the service URL and enabled status. Discovered services (vvdemo, 2026-04-09):
+
+| Component        | URL                                                           | Enabled | Tech                     |
+| ---------------- | ------------------------------------------------------------- | ------- | ------------------------ |
+| FormsAPI         | `https://preformsapi.visualvault.com`                         | yes     | .NET                     |
+| DocAPI           | `https://predocumentsapi.visualvault.com`                     | no      | .NET                     |
+| StudioAPI        | `https://dbvvyys8gc.execute-api.us-east-1.amazonaws.com/Api/` | yes     | AWS API Gateway / Lambda |
+| WorkflowAPI      | `https://preworkflow.visualvault.com`                         | yes     | .NET                     |
+| ObjectsAPI       | (not configured)                                              | n/a     | —                        |
+| NotificationsAPI | (not configured)                                              | n/a     | —                        |
+
+### Service Authentication
+
+Each service uses its own authentication mechanism. The main OAuth bearer token (from `/OAuth/Token`) is valid for the core API (`/api/v1/...`) but is **rejected by the individual services** with `401.6 "Your session has expired or is invalid"`. FormsAPI uses JWT tokens obtained via `GET /users/getjwt` on the core API. The auth mechanism for DocAPI and WorkflowAPI has not been verified.
+
+---
+
 ## FormsAPI Service
 
-The FormViewer SPA communicates with a **separate .NET service** (FormsAPI) for form instance persistence. This is distinct from the core VV REST API.
+The FormViewer SPA communicates with a **separate .NET service** (FormsAPI) for form instance persistence. This is distinct from the core VV REST API. See [Service Architecture](#service-architecture) for the full service map and auth details.
 
 | Property       | Value                                                                           |
 | -------------- | ------------------------------------------------------------------------------- |
@@ -567,21 +745,21 @@ The core API `postForms()` takes a template name and resolves it automatically. 
 
 ## Demo Environment Reference
 
-| Item                        | Value                                                   |
-| --------------------------- | ------------------------------------------------------- |
-| Environment                 | `vvdemo`                                                |
-| Customer                    | `EmanuelJofre`                                          |
-| Database                    | `Main`                                                  |
-| Base URL                    | `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/` |
-| Customer GUID (`xcid`)      | `815eb44d-5ec8-eb11-8200-a8333ebd7939`                  |
-| Database GUID (`xcdid`)     | `845eb44d-5ec8-eb11-8200-a8333ebd7939`                  |
-| Form DB connection CcID     | `00000001-0000-0000-0000-c0000000f002`                  |
-| Form templates              | 122 (as of 2026-03)                                     |
-| Microservices registered    | 42                                                      |
-| Scheduled services          | 5                                                       |
-| Dashboards                  | 25                                                      |
-| Custom queries              | 124                                                     |
-| FormViewer build (observed) | `20260304.1` — visible in top-right of FormViewer pages |
+| Item                        | Value                                                             |
+| --------------------------- | ----------------------------------------------------------------- |
+| Environment                 | `vvdemo`                                                          |
+| Customer                    | `EmanuelJofre`                                                    |
+| Database                    | `Main`                                                            |
+| Base URL                    | `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/`           |
+| Customer GUID (`xcid`)      | `815eb44d-5ec8-eb11-8200-a8333ebd7939`                            |
+| Database GUID (`xcdid`)     | `845eb44d-5ec8-eb11-8200-a8333ebd7939`                            |
+| Form DB connection CcID     | `00000001-0000-0000-0000-c0000000f002`                            |
+| Form templates              | 122 (as of 2026-03)                                               |
+| Microservices registered    | 42                                                                |
+| Scheduled services          | 5                                                                 |
+| Dashboards                  | 25                                                                |
+| Custom queries              | 124                                                               |
+| FormViewer build (observed) | `20260304.1` — `span.app-version` in top-right (as of 2026-04-09) |
 
 ### Test Forms (demo environment)
 
@@ -627,33 +805,54 @@ The core API `postForms()` takes a template name and resolves it automatically. 
 
 ## Useful Direct URLs (demo environment)
 
+All under `https://vvdemo.visualvault.com/app/EmanuelJofre/Main/` unless noted.
+
 ```
-# Main portal
-https://vvdemo.visualvault.com/app/EmanuelJofre/Main/
+# Core sections
+/                               # Main portal
+/DocumentLibrary                # Document Library
+/FormTemplateAdmin              # Form Templates (admin)
+/FormDataAdmin                  # Form Library (fill-in list)
+/formdata                       # Form Data Dashboards
+/Dashboards                     # Analytics Dashboards
+/VisualVaultReports             # VV Reports
 
-# Form Templates (admin)
-https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormTemplateAdmin
+# Enterprise Tools
+/OutsideProcessAdmin            # Microservice Library
+/SchedulerAdmin                 # Scheduled Services
+/ConnectionsAdmin               # Data Connections
+/ConnectionQueryAdmin?CcID=00000001-0000-0000-0000-c0000000f002  # Data Connection Queries (form DB)
+/ModuleAdmin                    # Module Library
 
-# Form Library (fill-in list)
-https://vvdemo.visualvault.com/app/EmanuelJofre/Main/FormDataAdmin
+# Admin Tools
+/UserAdmin                      # Users
+/GroupAdmin                     # Groups
+/VisualVaultAdmin?SecurityType=PortalAdmin  # Portals
+/MenuAdmin                      # Menus
+/DropDownListAdmin              # Dropdown Lists
+/EmailTemplateAdmin             # Email Templates
+/siteadmin?SecurityType=Location    # Site Admin: Locations
+/siteadmin?SecurityType=Customer    # Site Admin: Customers
+/SiteAdmin?SecurityType=Supplier    # Site Admin: Suppliers
 
-# Dashboards
-https://vvdemo.visualvault.com/app/EmanuelJofre/Main/formdata
+# User
+/UserProfile                    # My Preferences
+/ControlPanel                   # Control Panel
+/AdvancedSearch?newsearch=true  # Advanced Search
+/UserSearches                   # Saved Searches
+```
 
-# Microservices
-https://vvdemo.visualvault.com/app/EmanuelJofre/Main/outsideprocessadmin
+Separate apps (different URL roots):
 
-# Scheduled Services
-https://vvdemo.visualvault.com/app/EmanuelJofre/Main/scheduleradmin
+```
+# FormViewer (Angular SPA)
+https://vvdemo.visualvault.com/FormViewer/app?hidemenu=true&formid=...&xcid=...&xcdid=...
 
-# Data Connections
-https://vvdemo.visualvault.com/app/EmanuelJofre/Main/ConnectionsAdmin
+# Process Design Studio (token-authenticated)
+https://vvdemo.visualvault.com/ProcessDesignStudio?access_token=...
 
-# Data Connection Queries (form DB)
-https://vvdemo.visualvault.com/app/EmanuelJofre/Main/ConnectionQueryAdmin?CcID=00000001-0000-0000-0000-c0000000f002
-
-# Document Library
-https://vvdemo.visualvault.com/app/EmanuelJofre/Main/DocumentLibrary
+# Offline Forms (AngularJS SPA)
+https://vvdemo.visualvault.com/OfflineForms/index.html#!/land?xcid=...&xcdid=...
 ```
 
 ---
@@ -683,6 +882,47 @@ The VV REST API write path (`postForms`, `postFormRevision`) stores date strings
 This contrasts with the **Forms browser save path**, where the Angular `getSaveValue()` pipeline applies different transformations per config: Config C stores real UTC (midnight BRT → `T03:00:00`), Config D stores local midnight as-is (`T00:00:00`), and date-only fields in UTC+ timezones store the wrong day (FORM-BUG-7). The mixed timezone storage problem is **exclusively a Forms Angular issue** — the API path is immune.
 
 **Implication**: Developers writing dates via the REST API get consistent, predictable storage regardless of field config. The API is the safer write path for date-critical workflows.
+
+---
+
+## REST API Resources
+
+Discovered via `GET /api/v1/{customer}/{db}/{resource}` on vvdemo, 2026-04-09. All require OAuth bearer token.
+
+### Accessible Resources (200)
+
+| Resource            | Items  | Notes                                                                           |
+| ------------------- | ------ | ------------------------------------------------------------------------------- |
+| `/users`            | 19     | User accounts                                                                   |
+| `/groups`           | 5      | Security groups                                                                 |
+| `/sites`            | 1      | Site/location hierarchy (default: "Home")                                       |
+| `/formtemplates`    | 89     | Form template definitions                                                       |
+| `/documents`        | 145    | Document records                                                                |
+| `/folders`          | ?      | Folder hierarchy                                                                |
+| `/outsideprocesses` | 43     | Registered microservices                                                        |
+| `/customquery`      | ?      | Named SQL queries                                                               |
+| `/scripts`          | ?      | Script resources                                                                |
+| `/reports`          | 1      | Report definitions                                                              |
+| `/configuration`    | object | Service configuration (see [Configuration Discovery](#configuration-discovery)) |
+| `/version`          | object | Platform version info (see [Version API Endpoint](#version-api-endpoint))       |
+| `/meta`             | object | API metadata                                                                    |
+| `/indexfields`      | 6      | Document index field definitions                                                |
+| `/securitymembers`  | ?      | Security membership records                                                     |
+| `/files`            | ?      | File resources                                                                  |
+| `/dashboards`       | 0      | Dashboard definitions (empty on demo)                                           |
+
+### Method-Restricted Resources (405)
+
+| Resource     | Status | Notes                                                                      |
+| ------------ | ------ | -------------------------------------------------------------------------- |
+| `/forms`     | 405    | Exists but GET not supported — must access via `/formtemplates/{id}/forms` |
+| `/customers` | 405    | Exists but GET not supported                                               |
+
+### Not Found (404)
+
+These do not exist as top-level REST resources: `documenttemplates`, `scheduledProcess`, `email`, `projects`, `schema`, `notifications`, `workflow`, `workflowinstances`, `processes`, `library`, `databases`, `roles`, `permissions`, `apiapplications`, `dropdownlists`, `menus`, `portals`, `tags`, `audit`, `auditlog`, `sessions`, `tokens`, `search`, `fulltext`, `calendar`, `events`, `widgets`, `exports`, `imports`, `templates`, `revisions`, `histories`.
+
+Note: `scheduledProcess` returns 404 at the top level but may be accessible as a sub-resource. Some of these (e.g., `email`, `projects`) are documented in the client library config.yml but may require different URL patterns.
 
 ---
 
