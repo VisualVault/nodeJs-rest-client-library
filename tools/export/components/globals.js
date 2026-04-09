@@ -7,7 +7,6 @@
  */
 const path = require('path');
 const fs = require('fs');
-const vvAdmin = require('../../helpers/vv-admin');
 const vvSync = require('../../helpers/vv-sync');
 
 module.exports = {
@@ -20,61 +19,67 @@ module.exports = {
      * This IS the extraction — metadata and source come from the same step.
      */
     async fetchMetadata(page, config) {
-        // Discover a form record via the dashboard list
-        const dashUrl = vvAdmin.adminUrl(config, 'formdata');
-        await page.goto(dashUrl, { waitUntil: 'networkidle', timeout: 60000 });
-        await page.waitForSelector('.rgMasterTable', { timeout: 30000 });
+        // Use REST API to find a form template + record, then open FormViewer directly.
+        // This avoids navigating admin dashboards entirely.
+        console.log('  Discovering form templates via API...');
+        const clientLib = require(
+            path.join(__dirname, '..', '..', '..', 'lib', 'VVRestApi', 'VVRestApiNodeJs', 'VVRestApi')
+        );
+        const auth = new clientLib.authorize();
+        auth.readOnly = true;
+        const vv = await auth.getVaultApi(
+            config.clientId,
+            config.clientSecret,
+            config.username,
+            config.password,
+            config.audience,
+            config.baseUrl,
+            config.customerAlias,
+            config.databaseAlias
+        );
 
-        // Find a FormDataDetails link
-        const dashLink = await page.evaluate(() => {
-            const links = document.querySelectorAll('a[href*="FormDataDetails"]');
-            for (const a of links) {
-                if (!a.className.includes('rmLink') || links.length === 1) {
-                    return a.getAttribute('href');
-                }
+        // Get form templates to find xcid/xcdid
+        let formId, xcid, xcdid;
+        try {
+            const templatesRes = await vv.forms.getFormTemplates();
+            const parsed = typeof templatesRes === 'string' ? JSON.parse(templatesRes) : templatesRes;
+            const templates = parsed.data || parsed;
+            if (!Array.isArray(templates) || templates.length === 0) {
+                console.log('  No form templates found via API. Skipping globals.');
+                return [];
             }
-            // Fallback to any FormDataDetails link
-            return links.length > 0 ? links[0].getAttribute('href') : null;
-        });
+            // Use the first template
+            const tmpl = templates[0];
+            formId = tmpl.id || tmpl.revisionId;
+            xcid = tmpl.customerId;
+            xcdid = tmpl.customerDatabaseId;
+            console.log(`  Using template: ${tmpl.name || formId}`);
+        } catch (err) {
+            console.log(`  API error fetching form templates: ${err.message}. Skipping globals.`);
+            return [];
+        }
 
-        if (!dashLink) throw new Error('No dashboard link found');
-        const fullUrl = new URL(dashLink, config.baseUrl).href;
-        await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: 60000 });
-        await page.waitForSelector('.rgMasterTable', { timeout: 30000 });
-
-        // Get a DataID from the first record
-        const record = await page.evaluate(() => {
-            const cb = document.querySelector('.rgMasterTable tbody input[type="checkbox"][dhid]');
-            return cb ? { dataId: cb.getAttribute('dhid') } : null;
-        });
-        if (!record) throw new Error('No records with DataID found');
-
-        // Discover xcid/xcdid
-        const guids = await page.evaluate(() => {
-            const all = document.querySelectorAll('a[href], [onclick]');
-            for (const el of all) {
-                const text = (el.getAttribute('href') || '') + (el.getAttribute('onclick') || '');
-                const xc = text.match(/xcid=([a-f0-9-]+)/i);
-                const xcd = text.match(/xcdid=([a-f0-9-]+)/i);
-                if (xc && xcd) return { xcid: xc[1], xcdid: xcd[1] };
+        // Get a record from that template
+        let dataId;
+        try {
+            const recordsRes = await vv.forms.getFormInstances(formId, { limit: 1 });
+            const parsed = typeof recordsRes === 'string' ? JSON.parse(recordsRes) : recordsRes;
+            const records = parsed.data || parsed;
+            if (Array.isArray(records) && records.length > 0) {
+                dataId = records[0].revisionId || records[0].instanceId || records[0].dataId;
             }
-            const scripts = document.querySelectorAll('script');
-            for (const s of scripts) {
-                const src = s.textContent || '';
-                const xc = src.match(
-                    /xcid['":\s]*=?\s*['"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i
-                );
-                const xcd = src.match(
-                    /xcdid['":\s]*=?\s*['"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i
-                );
-                if (xc && xcd) return { xcid: xc[1], xcdid: xcd[1] };
-            }
-            return null;
-        });
-        if (!guids) throw new Error('Could not discover xcid/xcdid');
+        } catch {
+            // If no records, use the template URL (creates new instance)
+        }
 
-        // Open FormViewer
-        const fvUrl = `${config.baseUrl}/FormViewer/app?DataID=${record.dataId}&hidemenu=true&rOpener=1&xcid=${guids.xcid}&xcdid=${guids.xcdid}`;
+        // Build FormViewer URL — use template URL if no existing record
+        let fvUrl;
+        if (dataId) {
+            fvUrl = `${config.baseUrl}/FormViewer/app?DataID=${dataId}&hidemenu=true&rOpener=1&xcid=${xcid}&xcdid=${xcdid}`;
+        } else {
+            fvUrl = `${config.baseUrl}/FormViewer/app?formid=${formId}&hidemenu=true&xcid=${xcid}&xcdid=${xcdid}`;
+            console.log('  No existing records — loading template (creates new instance)');
+        }
         console.log(`  Opening FormViewer...`);
         await page.goto(fvUrl, { waitUntil: 'networkidle', timeout: 60000 });
         await page.waitForFunction(

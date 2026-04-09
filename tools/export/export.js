@@ -29,6 +29,7 @@ const COMPONENT_REGISTRY = {
     scripts: () => require('./components/scripts'),
     schedules: () => require('./components/schedules'),
     globals: () => require('./components/globals'),
+    templates: () => require('./components/templates'),
 };
 
 // --- CLI ---
@@ -142,7 +143,7 @@ async function main() {
 
     // Launch browser once for all components
     const browser = await chromium.launch({ headless: HEADLESS });
-    const context = await browser.newContext();
+    const context = await browser.newContext({ acceptDownloads: true });
 
     try {
         // Login once
@@ -219,11 +220,19 @@ async function runComponent(comp, page, config, outputDir, exportContext) {
         const nonScheduledItems = isScriptsComp ? allItems.filter((i) => i.categoryCode !== 1) : allItems;
         const scheduledItems = isScriptsComp ? allItems.filter((i) => i.categoryCode === 1) : [];
 
-        const commonOpts = { idField: 'id', dateField: 'modifyDate', fileExt: '.js', force: FORCE, filterFn };
+        const fileExt = comp.name === 'templates' ? '.xml' : '.js';
+        const commonOpts = {
+            idField: comp.syncOpts?.idField || 'id',
+            dateField: comp.syncOpts?.dateField || 'modifyDate',
+            fileExt,
+            force: FORCE,
+            filterFn,
+        };
 
+        const fileDir = comp.name === 'templates' ? outputDir : path.join(outputDir, 'scripts');
         const changes = vvSync.computeChanges(nonScheduledItems, manifest, {
             ...commonOpts,
-            fileDir: path.join(outputDir, 'scripts'),
+            fileDir,
             component: comp.name,
         });
 
@@ -253,7 +262,7 @@ async function runComponent(comp, page, config, outputDir, exportContext) {
 
         // Save manifest — for scripts component, only non-scheduled items
         vvSync.saveManifest(manifestPath, {
-            environment: 'vv5dev/WADNR/fpOnline',
+            environment: `${PROJECT.server}/${PROJECT.customer}`,
             component: comp.name,
             items: nonScheduledItems,
         });
@@ -271,8 +280,8 @@ async function runComponent(comp, page, config, outputDir, exportContext) {
             // Handle deletions — resolve path based on category
             for (const s of changes.deleted) {
                 const isScheduled = isScriptsComp && s.categoryCode === 1;
-                const delDir = isScheduled ? exportContext.scheduledScriptsDir : path.join(outputDir, 'scripts');
-                const fp = path.join(delDir, vvSync.sanitizeFilename(s.name) + '.js');
+                const delDir = isScheduled ? exportContext.scheduledScriptsDir : fileDir;
+                const fp = path.join(delDir, vvSync.sanitizeFilename(s.name) + fileExt);
                 if (fs.existsSync(fp)) {
                     fs.unlinkSync(fp);
                     console.log(`  Removed: ${s.name}`);
@@ -289,10 +298,10 @@ async function runComponent(comp, page, config, outputDir, exportContext) {
 
         // Generate README with full set of extracted files
         const allExtracted = new Set();
-        const scriptsDir = path.join(outputDir, 'scripts');
-        if (fs.existsSync(scriptsDir)) {
+        const scanDir = comp.name === 'templates' ? outputDir : path.join(outputDir, 'scripts');
+        if (fs.existsSync(scanDir)) {
             nonScheduledItems.forEach((m) => {
-                if (fs.existsSync(path.join(scriptsDir, vvSync.sanitizeFilename(m.name) + '.js'))) {
+                if (fs.existsSync(path.join(scanDir, vvSync.sanitizeFilename(m.name) + fileExt))) {
                     allExtracted.add(m.name);
                 }
             });

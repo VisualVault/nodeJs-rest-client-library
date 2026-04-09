@@ -74,12 +74,13 @@ module.exports = {
 
         const targetNames = new Set(itemsToExtract.map((s) => s.name));
         const results = new Map();
+        const skipped = new Set(); // Track scripts that returned empty source
         let pageNum = 0;
 
-        while (pageNum < 30 && results.size < targetNames.size) {
+        while (pageNum < 30 && results.size + skipped.size < targetNames.size) {
             pageNum++;
             const links = await vvAdmin.getGridDetailLinks(page);
-            const needed = links.filter((l) => targetNames.has(l.name) && !results.has(l.name));
+            const needed = links.filter((l) => targetNames.has(l.name) && !results.has(l.name) && !skipped.has(l.name));
             console.log(`  Page ${pageNum}: ${links.length} scripts, ${needed.length} to extract`);
 
             for (const link of needed) {
@@ -97,16 +98,22 @@ module.exports = {
                     results.set(link.name, data);
                     process.stdout.write(` OK (${(data.source.length / 1024).toFixed(1)} KB)\n`);
                 } else {
-                    process.stdout.write(` SKIP\n`);
+                    skipped.add(link.name);
+                    process.stdout.write(` SKIP (empty source)\n`);
                 }
             }
 
-            if (results.size >= targetNames.size) break;
+            if (results.size + skipped.size >= targetNames.size) break;
+            if (needed.length === 0 && pageNum > 1) break; // No new scripts on this page
             const advanced = await vvAdmin.goToNextGridPage(page, pageNum, 'outsideprocessadmin');
             if (!advanced) {
                 console.log('  No more pages.');
                 break;
             }
+        }
+
+        if (skipped.size > 0) {
+            console.log(`  Skipped ${skipped.size} scripts (empty source): ${[...skipped].join(', ')}`);
         }
 
         return results;
