@@ -390,22 +390,63 @@ When the repo is shared with the team:
 
 The sharing awareness built into custom commands (`/@-smart-commit-push` remote detection, test command artifact tables) provides guardrails for the transition. They document the boundary now so it's enforced automatically later.
 
-### CLAUDE.md Placement Convention
+### CLAUDE.md Convention
 
 Every folder that represents a **distinct scope** gets its own `CLAUDE.md`. This gives Claude Code immediate context when working in that area.
 
-**Create a CLAUDE.md for:**
+**Placement — create a CLAUDE.md for:**
 
 - Top-level topic folders (`tools/`, `testing/`, `tasks/`, `projects/`, `docs/`, `scripts/`)
 - Individual tasks (`tasks/{task-name}/`)
 - Individual projects (`projects/{customer}/`)
 
-**Do NOT create CLAUDE.md for:**
+**Placement — do NOT create CLAUDE.md for:**
 
 - Implementation subfolders (`tools/export/`, `tools/audit/`, `testing/fixtures/`, etc.) — described by the parent's CLAUDE.md
 - Data directories (`projects/wadnr/exports/`, `tasks/*/runs/`) — no context needed beyond the parent
 
 **When creating a new scope folder**, always create its CLAUDE.md with: what this area is, how it's organized, key conventions, and relationship to other areas.
+
+#### Content Standard: CLAUDE.md Is a Map, Not a Textbook
+
+CLAUDE.md files are loaded into context automatically. Every line costs tokens. The goal is **just enough context to know where to go and what the rules are** — not to contain everything about the area.
+
+**What belongs in a CLAUDE.md:**
+
+| Content type         | Example                                       | Why it helps                     |
+| -------------------- | --------------------------------------------- | -------------------------------- |
+| Identity             | "What this area is" (1-2 sentences)           | Orients the session immediately  |
+| Structure            | Subfolder table with purpose                  | Know where to look without `ls`  |
+| Principles and rules | Sharing model, conventions, constraints       | Guides decisions without asking  |
+| Quick reference      | Dev commands, common operations               | Copy-paste without searching     |
+| Pointers             | "For bug details, see `analysis/overview.md`" | Directs to deeper info on demand |
+
+**What does NOT belong in a CLAUDE.md:**
+
+| Content type                    | Where it belongs instead                              | Why it hurts                                     |
+| ------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
+| Detailed file inventories       | `ls`, `glob`                                          | Stale the moment a file is added/removed         |
+| Code snippets and line numbers  | The source file itself, or analysis docs              | Goes stale constantly, bloats context            |
+| Config file contents            | The config file (`.env.example.json`, `vv-config.js`) | Duplicates what `cat` provides in 1 command      |
+| Full bug descriptions           | `tasks/*/analysis/bug-*.md`                           | Belongs in the analysis doc, link from CLAUDE.md |
+| Per-test progress counts        | `matrix.md`, `test-data.js`                           | Changes every session, derivable in 1 command    |
+| API tables and type definitions | The source code or reference docs                     | Duplicates what the code already says            |
+| Historical narratives           | `CHANGELOG.md`, git log, analysis docs                | Not actionable context                           |
+
+**Pruning rules:**
+
+1. **One-command rule.** If the info can be derived with a single `ls`, `grep`, `cat`, or `git log` — don't store it. Link to the source instead.
+2. **No duplication.** If it exists in an analysis doc, reference doc, or config file — link, don't copy. Information should live in exactly one place.
+3. **Stale test.** If the info would go stale when a file is added, a test runs, or a line number changes — it doesn't belong.
+4. **Compress on completion.** When a task completes, replace detailed progress with a summary + link to the final analysis.
+
+**Size targets:**
+
+| Tier         | Scope                               | Target                                         |
+| ------------ | ----------------------------------- | ---------------------------------------------- |
+| Root         | Entire repo                         | ~150 lines                                     |
+| Scope        | `tools/`, `testing/`, `docs/`, etc. | ~30-60 lines                                   |
+| Task/Project | Active workstream                   | Flexible, but apply pruning rules aggressively |
 
 ### .gitignore Note
 
