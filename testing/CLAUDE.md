@@ -1,0 +1,33 @@
+# Testing — Playwright Test Infrastructure
+
+Browser automation for VisualVault platform testing. Everything here is **shared** — any developer can run these tests against their own VV environment.
+
+## Structure
+
+| Folder                 | Purpose                                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------------------- |
+| `specs/date-handling/` | 21 parameterized spec files (categories 1-12 + dashboard + audit)                                   |
+| `helpers/`             | Test-specific page helpers: `vv-form.js` (form automation), `vv-calendar.js` (calendar interaction) |
+| `fixtures/`            | Shared test data and config: `test-data.js`, `vv-config.js`, `env-config.js`, `ws-config.js`        |
+| `pipelines/`           | Regression orchestrators: `run-regression.js`, `run-ws-regression.js`, `run-dash-regression.js`     |
+| `config/`              | Auth state (gitignored), TZ configs (committed), saved records (gitignored)                         |
+| `reporters/`           | Custom Playwright reporter for regression artifact generation                                       |
+
+## How It Works
+
+1. `playwright.config.js` defines a TZ x browser matrix (4 TZ x 3 browsers = 12 projects)
+2. `global-setup.js` logs into VV and creates saved records (per-TZ, cached 1h)
+3. Specs in `specs/date-handling/` use `test.skip()` to self-filter by TZ project
+4. Specs import from `fixtures/` (data) and `helpers/` (page interaction)
+5. Pipelines orchestrate: run specs -> collect results -> call `tools/generators/` for artifacts
+
+## Adding New Tests
+
+1. Add test case entries to `fixtures/test-data.js` (data-driven)
+2. Create or extend a spec file in `specs/date-handling/`
+3. Use `helpers/vv-form.js` and `helpers/vv-calendar.js` for page interaction
+4. Non-Playwright helpers (admin scraping, sync) live in `tools/helpers/`, not here
+
+## Credentials
+
+All tests read credentials from root `.env.json` via `fixtures/env-config.js`. See `.env.example.json` for the format.

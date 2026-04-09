@@ -390,6 +390,23 @@ When the repo is shared with the team:
 
 The sharing awareness built into custom commands (`/@-smart-commit-push` remote detection, test command artifact tables) provides guardrails for the transition. They document the boundary now so it's enforced automatically later.
 
+### CLAUDE.md Placement Convention
+
+Every folder that represents a **distinct scope** gets its own `CLAUDE.md`. This gives Claude Code immediate context when working in that area.
+
+**Create a CLAUDE.md for:**
+
+- Top-level topic folders (`tools/`, `testing/`, `tasks/`, `projects/`, `docs/`, `scripts/`)
+- Individual tasks (`tasks/{task-name}/`)
+- Individual projects (`projects/{customer}/`)
+
+**Do NOT create CLAUDE.md for:**
+
+- Implementation subfolders (`tools/export/`, `tools/audit/`, `testing/fixtures/`, etc.) — described by the parent's CLAUDE.md
+- Data directories (`projects/wadnr/exports/`, `tasks/*/runs/`) — no context needed beyond the parent
+
+**When creating a new scope folder**, always create its CLAUDE.md with: what this area is, how it's organized, key conventions, and relationship to other areas.
+
 ### .gitignore Note
 
 The `.gitignore` has commented-out lines for `/projects/` and `tasks/**/runs/` etc. These are **documentation for the team repo** — uncomment them only when working directly on `emanueljofre/nodeV2` as a shared repo. While working solo, keep them commented so everything is versioned and backed up.
