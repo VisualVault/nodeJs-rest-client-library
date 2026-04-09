@@ -16,12 +16,12 @@ All data extracted via `tools/export/` from the EmanuelJofre admin panels on vvd
 
 | Component          | Count | Location                    |
 | ------------------ | ----- | --------------------------- |
-| Web Services       | —     | `exports/web-services/`     |
-| Scheduled Services | —     | `exports/schedules/`        |
-| Global Functions   | —     | `exports/global-functions/` |
-| Form Templates     | —     | `exports/form-templates/`   |
+| Web Services       | 36 scripts | `exports/web-services/`     |
+| Scheduled Services | 5 schedules + 6 scripts | `exports/schedules/`        |
+| Global Functions   | — (no dashboard in this env) | `exports/global-functions/` |
+| Form Templates     | — (run export-templates separately) | `exports/form-templates/`   |
 
-Last full export: not yet run.
+Last export: 2026-04-09. Note: GetSites script skipped (empty source). Globals failed — this environment has no dashboard link for FormViewer introspection.
 
 ## Commands
 

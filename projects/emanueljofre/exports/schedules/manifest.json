@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-04-09T14:21:33.696Z",
+  "environment": "vv5dev/WADNR/fpOnline",
+  "component": "schedules",
+  "totalItems": 5,
+  "schedules": [
+    {
+      "name": "test",
+      "enabled": false,
+      "runState": "Idle",
+      "lastRunDate": "Not Run Yet",
+      "recurrence": "Recurrence Not Enabled",
+      "nextRunDate": "12/13/2021 2:53 PM",
+      "serviceName": "scheduleTest"
+    },
+    {
+      "name": "Test Communication Max",
+      "enabled": false,
+      "runState": "Idle",
+      "lastRunDate": "Not Run Yet",
+      "recurrence": "Every 365 Days",
+      "nextRunDate": "7/31/2025 5:39 AM",
+      "serviceName": "Test Communication Max"
+    },
+    {
+      "name": "test2",
+      "enabled": false,
+      "runState": "Idle",
+      "lastRunDate": "Not Run Yet",
+      "recurrence": "Every 2 Minutes",
+      "nextRunDate": "12/13/2021 3:24 PM",
+      "serviceName": "scheduleTest"
+    },
+    {
+      "name": "test3",
+      "enabled": false,
+      "runState": "Idle",
+      "lastRunDate": "12/13/2021 3:25 PM",
+      "recurrence": "Every 2 Minutes",
+      "nextRunDate": "12/13/2021 3:30 PM",
+      "serviceName": "scheduleTest"
+    },
+    {
+      "name": "updateForms",
+      "enabled": false,
+      "runState": "Idle",
+      "lastRunDate": "Not Run Yet",
+      "recurrence": "Recurrence Not Enabled",
+      "nextRunDate": "7/6/2022 12:00 AM",
+      "serviceName": "updateForms"
+    }
+  ]
+}
