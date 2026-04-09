@@ -808,3 +808,18 @@ This prevents orphan browser processes. In **batch mode**, close the browser onc
 - **No Findings or Key Finding section in TC files.** TC files are test procedures, not analytical records. Observations about whether the matrix prediction was right or wrong, which bugs were confirmed, and what sibling rows imply belong exclusively in run files (Phase 5A). The title encodes the behavioral finding; Fail Conditions encode the risk reasoning. Do not add any other analytical sections to TC files.
 - **Screenshots go to `testing/config/screenshots/`** — never committed to git.
 - **Auth state files (`testing/config/auth-state*.json`) are never committed** — they contain session cookies.
+
+## Artifact Sharing
+
+This command produces both shared and personal artifacts. See CLAUDE.md § "Repository Architecture & Sharing Model" for principles.
+
+| Artifact          | Path                                             | Shared? | Reason                         |
+| ----------------- | ------------------------------------------------ | ------- | ------------------------------ |
+| Test-data entry   | `testing/fixtures/test-data.js`                  | Yes     | Reusable test methodology      |
+| TC spec           | `tasks/date-handling/forms-calendar/test-cases/` | Yes     | Reproducible specification     |
+| Matrix update     | `tasks/date-handling/forms-calendar/matrix.md`   | Yes     | Methodology + coverage tracker |
+| Run file          | `tasks/date-handling/forms-calendar/runs/`       | **No**  | Env-specific execution record  |
+| Summary           | `tasks/date-handling/forms-calendar/summaries/`  | **No**  | Personal tracking state        |
+| Results.md append | `tasks/date-handling/forms-calendar/results.md`  | **No**  | Raw session evidence           |
+
+When committing after a test run, stage shared and personal artifacts separately. Personal artifacts should only be pushed to your private remote.

@@ -540,3 +540,17 @@ Append a one-line entry to the current session in `dashboards/results.md`:
 4. **No TZ suffix in IDs**: Dashboard tests don't use TZ suffixes (server-rendered, TZ irrelevant). Exception: DB-8 which tests TZ independence explicitly.
 5. **Cross-reference existing data**: Before creating new records, check forms-calendar and web-services results for records with known stored values.
 6. **Artifact paths**: All artifacts live under `tasks/date-handling/dashboards/` (test-cases/, runs/, summaries/).
+
+## Artifact Sharing
+
+This command produces both shared and personal artifacts. See CLAUDE.md § "Repository Architecture & Sharing Model" for principles.
+
+| Artifact          | Path                                         | Shared? | Reason                         |
+| ----------------- | -------------------------------------------- | ------- | ------------------------------ |
+| TC spec           | `tasks/date-handling/dashboards/test-cases/` | Yes     | Reproducible specification     |
+| Matrix update     | `tasks/date-handling/dashboards/matrix.md`   | Yes     | Methodology + coverage tracker |
+| Run file          | `tasks/date-handling/dashboards/runs/`       | **No**  | Env-specific execution record  |
+| Summary           | `tasks/date-handling/dashboards/summaries/`  | **No**  | Personal tracking state        |
+| Results.md append | `tasks/date-handling/dashboards/results.md`  | **No**  | Raw session evidence           |
+
+When committing after a test run, stage shared and personal artifacts separately. Personal artifacts should only be pushed to your private remote.

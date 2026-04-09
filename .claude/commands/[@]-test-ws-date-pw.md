@@ -327,3 +327,17 @@ When multiple test IDs are provided:
 - **TZ is always explicit** — never assume. Verify via `serverTimezone` in response.
 - **Debug mode raw data** goes in run files only, not in TC specs or summaries.
 - **Cross-reference Forms results** for WS-2: compare API return against known `getValueObjectValue()` values from `forms-calendar/results.md`.
+
+## Artifact Sharing
+
+This command produces both shared and personal artifacts. See CLAUDE.md § "Repository Architecture & Sharing Model" for principles.
+
+| Artifact          | Path                                           | Shared? | Reason                         |
+| ----------------- | ---------------------------------------------- | ------- | ------------------------------ |
+| TC spec           | `tasks/date-handling/web-services/test-cases/` | Yes     | Reproducible specification     |
+| Matrix update     | `tasks/date-handling/web-services/matrix.md`   | Yes     | Methodology + coverage tracker |
+| Run file          | `tasks/date-handling/web-services/runs/`       | **No**  | Env-specific execution record  |
+| Summary           | `tasks/date-handling/web-services/summaries/`  | **No**  | Personal tracking state        |
+| Results.md append | `tasks/date-handling/web-services/results.md`  | **No**  | Raw session evidence           |
+
+When committing after a test run, stage shared and personal artifacts separately. Personal artifacts should only be pushed to your private remote.
