@@ -30,6 +30,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - WADNR artifact exports: 251 web service scripts (`web-services/scripts/`), 157 global function files (`global-functions/`), 21 schedule configs with ~20 extracted scripts (`schedules/`), cross-linked READMEs
 - Category 13 (Database Verification) test suite: 8 new TC specs + run files + summaries using REST API reads (`run-ws-test.js --action WS-2`) as alternative to direct SQL access. Key finding: API write path (`postForms`) stores dates uniformly — mixed timezone storage is Forms Angular-only
 
+- **Repo restructure**: `testing/scripts/` → `tools/` (by purpose: export, runners, audit, inventory, generators, helpers) + `testing/pipelines/`. Specs → `testing/specs/date-handling/`. WADNR data → `projects/wadnr/`. New top-level: `tools/`, `projects/`
+- Export orchestrator: `--project` flag resolves customer from `.env.json` (case-insensitive). No `project.json` needed — project name = customer name
+- Templates component added to export orchestrator (4th component: scripts, schedules, globals, templates)
+- Scripts export: pagination fix — SKIPped scripts tracked separately, no infinite retry loop
+- Globals export: REST API-based discovery replaces dashboard UI navigation (3 page navigations eliminated)
+- CLAUDE.md content standard with placement convention, size targets, pruning rules
+- Scope-level CLAUDE.md files for all 7 topic folders (tools, testing, tasks, projects, docs, scripts, form-templates)
+- `/@-status` command — session briefing (git state, tasks, projects, test results, health)
+- `/@-create-project` and `/@-create-task` — scaffolding with standard structure + CLAUDE.md
+- `/@-maintain-claude-md` — audit + fix CLAUDE.md files (11 checks: bloat, gaps, drift, counts)
+- Sharing awareness in `/@-smart-commit-push` (personal vs shared classification, remote-aware push)
+- `.prettierignore` — excludes `projects/` extracted customer code from formatting
+- `projects/emanueljofre/` — development environment project (42 scripts, 5 schedules, 108 templates)
+- `tasks/export-optimization/` — task tracking export pipeline improvements (parallel, revision tracking, API-first)
+
 ### Changed
 
 - `.env.json` restructured from flat `environments` map to hierarchical `servers → customers` structure reflecting VV platform architecture. Selectors changed from `activeEnv` to `activeServer` + `activeCustomer`. `env-config.js` and `app.js` resolve the new hierarchy; `loadConfig()` return shape unchanged
