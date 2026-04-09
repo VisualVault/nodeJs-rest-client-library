@@ -277,7 +277,7 @@
 	<SaveDateTime>2023-11-16T13:24:23Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>f1b06bcc-0fc3-42ae-a6c5-6c3cf2dd1b34</ScriptItemId>
+			<ScriptItemId>ee9ea220-43f9-4a8e-a098-a27aa9049ef4</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Form_onEventsEnd</Name>
 			<Arguments>event</Arguments>
@@ -288,9 +288,9 @@
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>1d8cfbbb-1372-4449-95bd-50d090558540</ScriptAssignmentId>
+			<ScriptAssignmentId>3ec1cc52-f9fb-4dfc-98e6-c65cf88fc3d9</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>f1b06bcc-0fc3-42ae-a6c5-6c3cf2dd1b34</ScriptItemId>
+			<ScriptItemId>ee9ea220-43f9-4a8e-a098-a27aa9049ef4</ScriptItemId>
 			<ControlId>00000001-0000-0000-0000-e0000000f010</ControlId>
 			<EventId>15</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

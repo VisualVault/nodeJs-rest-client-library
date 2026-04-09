@@ -423,7 +423,7 @@
 	<SaveDateTime>2025-04-24T12:28:13Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>be78842a-4f99-4e7d-bb52-4488714a9626</ScriptItemId>
+			<ScriptItemId>0f411dd1-9166-49d9-b527-feeff02569b8</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>FormValidation</Name>
 			<Arguments>ControlName</Arguments>
@@ -451,7 +451,7 @@ return ErrorReporting;</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>092586a1-ba42-4cff-83d4-39624ee2e903</ScriptItemId>
+			<ScriptItemId>3a1faf81-8b34-42ce-a04e-132fc8f617aa</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>RepeatingRowControl1_onRowSave</Name>
 			<Arguments>event, control, rowData</Arguments>
@@ -464,9 +464,9 @@ console.log(control);</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>02dd5b4b-6e2a-4a15-bda5-041c0b55488d</ScriptAssignmentId>
+			<ScriptAssignmentId>6591eac6-4ce1-47fa-b7da-a71beecef23d</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>092586a1-ba42-4cff-83d4-39624ee2e903</ScriptItemId>
+			<ScriptItemId>3a1faf81-8b34-42ce-a04e-132fc8f617aa</ScriptItemId>
 			<ControlId>1a143c29-a6d2-2846-8702-cc7e0dde801c</ControlId>
 			<EventId>6</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

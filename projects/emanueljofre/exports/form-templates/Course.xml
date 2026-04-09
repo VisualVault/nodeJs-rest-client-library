@@ -665,7 +665,7 @@
 	<SaveDateTime>2023-10-11T20:02:07Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>d74fed32-44ee-474e-b47a-a98d9c49d4a7</ScriptItemId>
+			<ScriptItemId>210dfd16-c40c-485c-b8f6-9701259fe973</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>FillInAndRelate</Name>
 			<Arguments />
@@ -692,7 +692,7 @@ VV.Form.Global.FillinAndRelateForm(templateId, fieldMappings);</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>fcd15bd5-4587-4da6-b82c-e01c5533e007</ScriptItemId>
+			<ScriptItemId>c56a1ef2-5ba7-4ab8-a6d8-b870604db865</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnNewProfessor_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -703,9 +703,9 @@ VV.Form.Global.FillinAndRelateForm(templateId, fieldMappings);</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>a2697d0a-df8e-41a7-9870-f81bdc51b19b</ScriptAssignmentId>
+			<ScriptAssignmentId>879c58f5-55e3-4b2c-a955-7079c04b35e0</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>fcd15bd5-4587-4da6-b82c-e01c5533e007</ScriptItemId>
+			<ScriptItemId>c56a1ef2-5ba7-4ab8-a6d8-b870604db865</ScriptItemId>
 			<ControlId>65542688-1da6-4fab-c7c7-e671425896e5</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

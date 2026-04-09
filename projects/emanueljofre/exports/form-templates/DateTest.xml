@@ -2170,7 +2170,7 @@
 	<SaveDateTime>2026-04-08T14:04:42Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>0919aac3-8164-407b-bc0b-0a7d0f4051bc</ScriptItemId>
+			<ScriptItemId>212d28cb-0cb2-4413-a780-bd8a269993aa</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>CallWS</Name>
 			<Arguments />
@@ -2251,7 +2251,7 @@ $.when(CallServerSide()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>3da490b6-557f-4f5e-a19b-0f19dbe78102</ScriptItemId>
+			<ScriptItemId>e836fc2a-56d9-48af-8491-c32df4f72d5a</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnCallWS_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2260,7 +2260,7 @@ $.when(CallServerSide()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>436a7ad1-7f07-492e-affc-d5cb8df2b323</ScriptItemId>
+			<ScriptItemId>c9f75985-146f-4b3c-97fb-039705900454</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnSave_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2271,18 +2271,18 @@ $.when(CallServerSide()).always(function (resp) {
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>cefecd86-5d38-48c4-877d-ff604d08e209</ScriptAssignmentId>
+			<ScriptAssignmentId>df0c2c15-2b7e-4ca6-9a1f-27cbe3d7afb8</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>436a7ad1-7f07-492e-affc-d5cb8df2b323</ScriptItemId>
+			<ScriptItemId>c9f75985-146f-4b3c-97fb-039705900454</ScriptItemId>
 			<ControlId>b5d06a65-4842-40ef-b3b8-9183eda1e9cd</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>a1621e3a-de52-48bf-a414-f3f83e09f517</ScriptAssignmentId>
+			<ScriptAssignmentId>c38afd95-b6db-43fc-9802-c079ba739998</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>3da490b6-557f-4f5e-a19b-0f19dbe78102</ScriptItemId>
+			<ScriptItemId>e836fc2a-56d9-48af-8491-c32df4f72d5a</ScriptItemId>
 			<ControlId>5b743edd-34bf-4a48-a297-597feadc9cc1</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

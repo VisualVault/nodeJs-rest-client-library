@@ -200,7 +200,7 @@
 	<SaveDateTime>2021-06-24T15:35:47Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>9be94af2-5f93-4379-9195-1e342334ef19</ScriptItemId>
+			<ScriptItemId>8f2735f8-6cb7-4950-a857-7dcc0db3f614</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Save</Name>
 			<Arguments />
@@ -283,7 +283,7 @@ $.when(ProcessFunction()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>e3772f5c-8bf1-4155-9943-27042c305c97</ScriptItemId>
+			<ScriptItemId>dd6c5d98-b82e-4a70-9ed3-5259f8293ca6</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Btn_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -295,9 +295,9 @@ VV.Form.Template.Save();</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>b1291cf9-5cdf-402b-b823-4b333630af0f</ScriptAssignmentId>
+			<ScriptAssignmentId>e85c8be5-3349-4d29-9bb9-7a9b9e943670</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>e3772f5c-8bf1-4155-9943-27042c305c97</ScriptItemId>
+			<ScriptItemId>dd6c5d98-b82e-4a70-9ed3-5259f8293ca6</ScriptItemId>
 			<ControlId>65dfa82f-7903-b7e1-60be-7ab4de33110d</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

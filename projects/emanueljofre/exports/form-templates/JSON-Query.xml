@@ -560,7 +560,7 @@
 	<SaveDateTime>2023-01-04T20:56:28Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>f89d519f-5671-4765-a935-b1b62ff9a907</ScriptItemId>
+			<ScriptItemId>117678e8-e956-46b6-8466-8b708c52cdf3</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Search_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -580,9 +580,9 @@ VV.Form.SetFieldValue('JSONString', JSONString, true);</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>97b3b89a-bf02-41a4-a0c7-148c033532aa</ScriptAssignmentId>
+			<ScriptAssignmentId>4791219e-2cd3-483a-aedb-2885e93e7dd2</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>f89d519f-5671-4765-a935-b1b62ff9a907</ScriptItemId>
+			<ScriptItemId>117678e8-e956-46b6-8466-8b708c52cdf3</ScriptItemId>
 			<ControlId>4dfce62f-7656-aaa1-46c1-e5bf75bf1cb6</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

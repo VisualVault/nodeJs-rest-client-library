@@ -2170,7 +2170,7 @@
 	<SaveDateTime>2026-04-08T14:11:40Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>0bdaf2e2-40e8-4d6a-aafc-811fb86bbd1a</ScriptItemId>
+			<ScriptItemId>b5d6b08c-110e-4b9a-9471-7753df092ebd</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnSave_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2179,7 +2179,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>59909a1a-4b2a-43ee-a67d-5fd5566ee527</ScriptItemId>
+			<ScriptItemId>b88725fe-36ba-410f-893a-4c1c519815bc</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnCallWS_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2190,18 +2190,18 @@
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>9c42cca4-1fd1-44a4-85b8-f7f5945ad0d7</ScriptAssignmentId>
+			<ScriptAssignmentId>cbd901bf-455a-4472-94a5-273f5f908123</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>0bdaf2e2-40e8-4d6a-aafc-811fb86bbd1a</ScriptItemId>
+			<ScriptItemId>b5d6b08c-110e-4b9a-9471-7753df092ebd</ScriptItemId>
 			<ControlId>b5d06a65-4842-40ef-b3b8-9183eda1e9cd</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>95889a0b-8ee0-4479-8585-0b89597b9737</ScriptAssignmentId>
+			<ScriptAssignmentId>75555d30-8c05-40ae-b94c-e106fa30203f</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>59909a1a-4b2a-43ee-a67d-5fd5566ee527</ScriptItemId>
+			<ScriptItemId>b88725fe-36ba-410f-893a-4c1c519815bc</ScriptItemId>
 			<ControlId>5b743edd-34bf-4a48-a297-597feadc9cc1</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

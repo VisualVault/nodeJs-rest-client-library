@@ -380,7 +380,7 @@
 	<SaveDateTime>2021-07-01T14:02:56Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>b24a52eb-1ea4-4127-b1b4-2eec712881e5</ScriptItemId>
+			<ScriptItemId>d5cb5c8e-b08a-4bab-96bf-e8582a34d429</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>isFormUnique</Name>
 			<Arguments />
@@ -462,7 +462,7 @@ $.when(ProcessFunction()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>885b298e-e605-4baf-8a8d-95306c4f73da</ScriptItemId>
+			<ScriptItemId>e1892e2d-f480-40c8-b597-f643a9a991db</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>VerifyBtn_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -474,9 +474,9 @@ VV.Form.Template.isFormUnique();</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>2a3f7ac4-54ff-442d-abf2-ea9793d12133</ScriptAssignmentId>
+			<ScriptAssignmentId>4c42364c-6fcd-4bd6-8b0c-8fcfc42c1754</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>885b298e-e605-4baf-8a8d-95306c4f73da</ScriptItemId>
+			<ScriptItemId>e1892e2d-f480-40c8-b597-f643a9a991db</ScriptItemId>
 			<ControlId>a201deff-bcd8-9e69-a6b7-b14f1cc871bc</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

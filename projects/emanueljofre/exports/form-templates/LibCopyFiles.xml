@@ -454,7 +454,7 @@
 	<SaveDateTime>2021-11-29T18:07:35Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>c4ddbef0-952e-41da-840a-d415443b9f58</ScriptItemId>
+			<ScriptItemId>b7e2733d-8a80-4217-97dc-b966dc11b232</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>CallToLibCopyFiles</Name>
 			<Arguments />
@@ -531,7 +531,7 @@ $.when(
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>93046fdb-c4cd-4c07-92b6-4f23b64a8ad0</ScriptItemId>
+			<ScriptItemId>0eb3bf0c-80de-4a0c-bc9d-8ac9bcc0a2bc</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnCopy_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -542,9 +542,9 @@ $.when(
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>eb7756aa-df9e-4345-b88a-148f8ba740fe</ScriptAssignmentId>
+			<ScriptAssignmentId>f4f3c672-0a73-452d-babc-3dcd0e10fd21</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>93046fdb-c4cd-4c07-92b6-4f23b64a8ad0</ScriptItemId>
+			<ScriptItemId>0eb3bf0c-80de-4a0c-bc9d-8ac9bcc0a2bc</ScriptItemId>
 			<ControlId>e889278b-52c2-447f-53ec-002925e3c351</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

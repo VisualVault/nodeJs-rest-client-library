@@ -680,7 +680,7 @@
 	<SaveDateTime>2024-02-06T18:29:56Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>7965a3f5-c776-4c6f-ae96-b4b052889600</ScriptItemId>
+			<ScriptItemId>617b6eae-3d96-4de7-888a-1aad30caada9</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>CaptchaModal</Name>
 			<Arguments />
@@ -696,7 +696,7 @@ return (
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>ab380d36-dff2-43b5-b13b-955cc8bcac45</ScriptItemId>
+			<ScriptItemId>d811e984-a0a6-414d-92cd-0a701107e86c</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>CallToValidateCaptcha</Name>
 			<Arguments />
@@ -785,7 +785,7 @@ if (token) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>0fbd68b3-be9a-436e-99aa-911206b35561</ScriptItemId>
+			<ScriptItemId>e8e37768-47a9-48c5-af52-1d32f06b7c53</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnSubmit_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -800,7 +800,7 @@ VV.Form.Global.MessageModal(false, 'Required Validation', VV.Form.Template.Captc
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>cbbe8b61-3af5-45d6-afe2-0fda970936a5</ScriptItemId>
+			<ScriptItemId>425f4f2f-0c18-43f4-85aa-f99fe92f12b4</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Form_onLoad</Name>
 			<Arguments>event</Arguments>
@@ -812,18 +812,18 @@ VV.Form.Global.MessageModal(true);</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>dce24185-3958-42c4-bec4-5e933e86b0a2</ScriptAssignmentId>
+			<ScriptAssignmentId>07417d23-5775-4b9e-90af-8053d02dee05</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>0fbd68b3-be9a-436e-99aa-911206b35561</ScriptItemId>
+			<ScriptItemId>e8e37768-47a9-48c5-af52-1d32f06b7c53</ScriptItemId>
 			<ControlId>235ade3b-00f0-c553-f10b-733ecc03ee5a</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>3</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>314cf26f-9f04-4be5-aa79-e25066b0d2a1</ScriptAssignmentId>
+			<ScriptAssignmentId>f6b49111-2ffb-4a36-ad1f-ed89d7fd0220</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>cbbe8b61-3af5-45d6-afe2-0fda970936a5</ScriptItemId>
+			<ScriptItemId>425f4f2f-0c18-43f4-85aa-f99fe92f12b4</ScriptItemId>
 			<ControlId>00000001-0000-0000-0000-e0000000f010</ControlId>
 			<EventId>10</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

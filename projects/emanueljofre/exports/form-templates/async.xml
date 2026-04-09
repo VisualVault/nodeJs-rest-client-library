@@ -533,7 +533,7 @@
 	<SaveDateTime>2026-01-19T15:54:20Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>d8b04e3e-7d41-41f7-a883-6b40e012e563</ScriptItemId>
+			<ScriptItemId>5e0d2bb7-b3ec-4394-83bc-1acea7728623</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>MicroserviceName</Name>
 			<Arguments />
@@ -566,7 +566,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>698600f5-12f3-4e65-b211-a4cd7ca756df</ScriptItemId>
+			<ScriptItemId>142b577c-dc38-4322-9f06-0b5515787b08</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>old</Name>
 			<Arguments />
@@ -651,7 +651,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>21943479-0854-4680-b898-2783cd9390a3</ScriptItemId>
+			<ScriptItemId>2cc75853-d8ad-44de-ba11-3615dee933eb</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>DataField7_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -660,7 +660,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>b0bb4774-9501-483d-b977-4218cdd800b3</ScriptItemId>
+			<ScriptItemId>70f77cf8-4688-4440-b12d-4caf348ec87e</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>DataField5_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -674,18 +674,18 @@
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>cf88df16-c85f-4101-8f75-b12ebaccb8e3</ScriptAssignmentId>
+			<ScriptAssignmentId>c46019fa-0f41-4cd0-a248-0cfbafb7d301</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>21943479-0854-4680-b898-2783cd9390a3</ScriptItemId>
+			<ScriptItemId>2cc75853-d8ad-44de-ba11-3615dee933eb</ScriptItemId>
 			<ControlId>4290e433-b097-2fe5-7fd4-6f617f188522</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>3</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>60495d35-7fd3-4245-b02f-b3b01275c77e</ScriptAssignmentId>
+			<ScriptAssignmentId>7003e2a3-0d9a-48b5-9c8b-3e4049fc9f4c</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>b0bb4774-9501-483d-b977-4218cdd800b3</ScriptItemId>
+			<ScriptItemId>70f77cf8-4688-4440-b12d-4caf348ec87e</ScriptItemId>
 			<ControlId>3706684f-5324-988e-ccd7-182740cd4567</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

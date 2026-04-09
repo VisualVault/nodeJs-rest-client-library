@@ -533,7 +533,7 @@
 	<SaveDateTime>2023-06-20T19:34:18Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>f2f1c2cc-bc62-4f07-9d5a-a6363d8778ba</ScriptItemId>
+			<ScriptItemId>f36c510d-06e9-41ab-b27f-13cc4f58a2af</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>CallToWebService</Name>
 			<Arguments />
@@ -577,7 +577,7 @@ fetch(url, options)
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>57622944-c88f-491b-80a1-ac6b6140b0a6</ScriptItemId>
+			<ScriptItemId>ab5c4dc2-32fb-4635-a472-3a567bcdfba8</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>CallWSOLD</Name>
 			<Arguments />
@@ -651,7 +651,7 @@ $.when(CallServerSide())
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>3b8eb610-fbcd-4bae-b58c-d0a6fc437de1</ScriptItemId>
+			<ScriptItemId>073ebae9-bb7a-4cf9-aa05-02e50e714a6e</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnOLD_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -660,7 +660,7 @@ $.when(CallServerSide())
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>d8d753e6-406b-44cc-bff7-f2232cd5130c</ScriptItemId>
+			<ScriptItemId>ef4f119e-7f9c-4ad5-875d-7ab95179abc4</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnSave_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -671,18 +671,18 @@ $.when(CallServerSide())
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>b775cf6b-01b6-4e34-92f3-d9b32e0ccddf</ScriptAssignmentId>
+			<ScriptAssignmentId>3eea1f63-712c-4804-9f4e-5ad78664f6f4</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>3b8eb610-fbcd-4bae-b58c-d0a6fc437de1</ScriptItemId>
+			<ScriptItemId>073ebae9-bb7a-4cf9-aa05-02e50e714a6e</ScriptItemId>
 			<ControlId>0df939fe-5e23-356f-1c02-b73a7a1c636e</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>52f44166-310b-4a3d-835d-63a9be6f5314</ScriptAssignmentId>
+			<ScriptAssignmentId>cae041c9-2965-4844-93f9-3011a515da8c</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>d8d753e6-406b-44cc-bff7-f2232cd5130c</ScriptItemId>
+			<ScriptItemId>ef4f119e-7f9c-4ad5-875d-7ab95179abc4</ScriptItemId>
 			<ControlId>6dcb3be8-975c-33e6-f640-a7265dcd7089</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

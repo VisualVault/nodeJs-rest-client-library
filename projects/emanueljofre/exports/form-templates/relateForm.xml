@@ -342,7 +342,7 @@
 	<SaveDateTime>2021-06-30T14:20:47Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>cfac837e-6a9b-4627-a879-8b2b25a10997</ScriptItemId>
+			<ScriptItemId>bc2df42c-7a57-4dd5-8f6c-00c92bd14ff0</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>relateForm</Name>
 			<Arguments />
@@ -429,7 +429,7 @@ $.when(ProcessFunction()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>a66a1eac-eb57-4f09-acc3-d126bb1d766b</ScriptItemId>
+			<ScriptItemId>70c6fada-b25d-4447-b09d-e0e5aa79942c</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>RelateBtn_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -441,9 +441,9 @@ VV.Form.Template.relateForm();</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>ad85c383-7cf2-4f69-be7d-4c9eb9deac36</ScriptAssignmentId>
+			<ScriptAssignmentId>d0239ec4-0233-4844-813b-b567ac7b46f1</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>a66a1eac-eb57-4f09-acc3-d126bb1d766b</ScriptItemId>
+			<ScriptItemId>70c6fada-b25d-4447-b09d-e0e5aa79942c</ScriptItemId>
 			<ControlId>427be8a6-1d48-f371-8d77-eb8d5df3574f</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

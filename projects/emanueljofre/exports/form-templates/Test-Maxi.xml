@@ -200,7 +200,7 @@
 	<SaveDateTime>2021-09-30T15:51:42Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>9a919316-9da5-4e3d-adc4-a8b922f1874e</ScriptItemId>
+			<ScriptItemId>80538bf7-9f14-4be1-a16a-16c83c8cc9e1</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnHola_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -211,9 +211,9 @@
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>0dfdaac0-9b28-477f-ae9f-7d9513510281</ScriptAssignmentId>
+			<ScriptAssignmentId>c7bec7d0-c710-4184-ab45-5504519f3075</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>9a919316-9da5-4e3d-adc4-a8b922f1874e</ScriptItemId>
+			<ScriptItemId>80538bf7-9f14-4be1-a16a-16c83c8cc9e1</ScriptItemId>
 			<ControlId>21f433cc-5816-029a-67f2-1be25fb25a36</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

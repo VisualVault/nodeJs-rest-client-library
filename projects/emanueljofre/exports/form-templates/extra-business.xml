@@ -595,7 +595,7 @@
 	<SaveDateTime>2025-07-09T14:56:24Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>1957260d-4593-45b8-821d-bd58adc5db5d</ScriptItemId>
+			<ScriptItemId>248b7aba-1e11-4b08-a8ae-24da814a58c4</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>FormValidation</Name>
 			<Arguments>ControlName</Arguments>
@@ -623,7 +623,7 @@ return ErrorReporting;</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>b4618bfc-d565-4abe-b6e7-785e89f96ad6</ScriptItemId>
+			<ScriptItemId>1d3f44fc-c384-4dbd-83f6-5683f1f64efc</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnAddEmployee_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -646,9 +646,9 @@ return ErrorReporting;</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>bf228a74-1534-4ee0-a488-2bb36f6a36a8</ScriptAssignmentId>
+			<ScriptAssignmentId>c3ee9b7a-dcd0-4338-8b6a-2def6048475a</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>b4618bfc-d565-4abe-b6e7-785e89f96ad6</ScriptItemId>
+			<ScriptItemId>1d3f44fc-c384-4dbd-83f6-5683f1f64efc</ScriptItemId>
 			<ControlId>464e9210-49e7-0a4d-5441-a53c7efe5c55</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

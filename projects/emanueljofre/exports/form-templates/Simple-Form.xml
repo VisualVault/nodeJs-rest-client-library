@@ -327,7 +327,7 @@
 	<SaveDateTime>2021-12-03T12:09:15Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>1996bd10-c5d8-427c-84c0-8ec276faa956</ScriptItemId>
+			<ScriptItemId>14cafba0-f2f3-43d0-bb83-e86f0e5146e4</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnSave_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -340,9 +340,9 @@ window.opener.VV.Form.ReloadRepeatingRowControl('RRC3');
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>52c896d5-322d-425b-a425-920c5e14c1e5</ScriptAssignmentId>
+			<ScriptAssignmentId>757167ed-0b31-4fc1-8392-7bbcffed34d6</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>1996bd10-c5d8-427c-84c0-8ec276faa956</ScriptItemId>
+			<ScriptItemId>14cafba0-f2f3-43d0-bb83-e86f0e5146e4</ScriptItemId>
 			<ControlId>63c3c65a-c065-3dc4-9027-9685a4189ade</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

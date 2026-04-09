@@ -571,7 +571,7 @@
 	<SaveDateTime>2025-08-01T11:49:13Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>c7571a4b-9730-4b05-984d-4f0fcd769eab</ScriptItemId>
+			<ScriptItemId>7c37121b-6d71-4fe6-b735-a19016251d29</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>CallPracticeMicroservice</Name>
 			<Arguments />
@@ -652,7 +652,7 @@ $.when(CallServerSide())
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>93306c38-4de0-4fe8-93e6-054254d00045</ScriptItemId>
+			<ScriptItemId>b1579d81-cbee-4a86-83d8-a979e0e00e6b</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnProcess_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -663,9 +663,9 @@ $.when(CallServerSide())
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>f207a6c4-d414-4e4e-9cf1-73e3cb183f2b</ScriptAssignmentId>
+			<ScriptAssignmentId>d627d724-d623-48b1-8cbe-ac064fcb1e40</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>93306c38-4de0-4fe8-93e6-054254d00045</ScriptItemId>
+			<ScriptItemId>b1579d81-cbee-4a86-83d8-a979e0e00e6b</ScriptItemId>
 			<ControlId>9f21b171-cb07-0eb9-83a9-6e06568a6a48</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

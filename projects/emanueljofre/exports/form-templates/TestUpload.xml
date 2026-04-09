@@ -269,7 +269,7 @@
 	<SaveDateTime>2021-06-25T17:37:54Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>e6939ef8-995d-4e9a-85ad-2d53c6ed9a9f</ScriptItemId>
+			<ScriptItemId>d5057611-38ca-4fea-a187-6d1b3da64465</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Call</Name>
 			<Arguments />
@@ -358,7 +358,7 @@ $.when(ProcessFunction()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>4b3f4ca2-2dcc-41b1-b63d-d449e386ce26</ScriptItemId>
+			<ScriptItemId>e7a65fa9-ebe7-46cb-a7ed-a870c77f7023</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>DataField1_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -369,9 +369,9 @@ $.when(ProcessFunction()).always(function (resp) {
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>48530b71-6e7b-4215-a4e5-990bf53cb2a2</ScriptAssignmentId>
+			<ScriptAssignmentId>3fb4ad43-e199-4f78-849f-fe2be9afa282</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>4b3f4ca2-2dcc-41b1-b63d-d449e386ce26</ScriptItemId>
+			<ScriptItemId>e7a65fa9-ebe7-46cb-a7ed-a870c77f7023</ScriptItemId>
 			<ControlId>03c2ae05-b3b5-e493-22fe-fe331a2af539</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

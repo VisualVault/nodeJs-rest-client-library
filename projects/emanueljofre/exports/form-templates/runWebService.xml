@@ -327,7 +327,7 @@
 	<SaveDateTime>2021-07-01T19:47:42Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>08cba85c-ec3a-4849-952d-e35abecd03c6</ScriptItemId>
+			<ScriptItemId>14850684-33b9-40de-a664-d89d40e3dd63</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>IsUniqueCall</Name>
 			<Arguments />
@@ -409,7 +409,7 @@ $.when(ProcessFunction()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>112c8ed2-2663-487c-b108-bcc9a990e04e</ScriptItemId>
+			<ScriptItemId>19abdb72-58a4-47e0-b392-a799f0ee11aa</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>VerifyBtn_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -420,9 +420,9 @@ $.when(ProcessFunction()).always(function (resp) {
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>e07b1e72-226d-4bc0-b49d-e30c86854eb8</ScriptAssignmentId>
+			<ScriptAssignmentId>2f462ba0-b6d2-4f14-8a18-d693c8bb2222</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>112c8ed2-2663-487c-b108-bcc9a990e04e</ScriptItemId>
+			<ScriptItemId>19abdb72-58a4-47e0-b392-a799f0ee11aa</ScriptItemId>
 			<ControlId>beacc555-255f-f3f6-1cb0-cb44ead80073</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

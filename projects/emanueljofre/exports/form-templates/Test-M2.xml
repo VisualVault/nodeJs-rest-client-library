@@ -2351,7 +2351,7 @@
 	<SaveDateTime>2025-06-19T22:23:11Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>fb89939f-ada1-45ea-a9ad-ab4d06b3328a</ScriptItemId>
+			<ScriptItemId>ed54c876-e82a-4292-8c5a-2987d5420f0a</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnSend_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2360,7 +2360,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>97d1da8c-963a-4934-b410-98c32da470ac</ScriptItemId>
+			<ScriptItemId>ed22d3af-34ac-439e-b248-7865a5369770</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnSendStep2_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2371,25 +2371,25 @@
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>b80298f2-2452-449f-8193-aec52394d572</ScriptAssignmentId>
+			<ScriptAssignmentId>5870c02c-4373-4032-b185-3217e9fbae56</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>fb89939f-ada1-45ea-a9ad-ab4d06b3328a</ScriptItemId>
+			<ScriptItemId>ed54c876-e82a-4292-8c5a-2987d5420f0a</ScriptItemId>
 			<ControlId>65177df0-29f3-f067-1917-d4a944149ffe</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>2</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>d4f336dc-d067-4a10-a751-19eda7bb1eda</ScriptAssignmentId>
+			<ScriptAssignmentId>73de4e02-d7ec-4bfa-89af-c7102bbc08e2</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>97d1da8c-963a-4934-b410-98c32da470ac</ScriptItemId>
+			<ScriptItemId>ed22d3af-34ac-439e-b248-7865a5369770</ScriptItemId>
 			<ControlId>27b623e7-fcad-c37f-27d3-9114bc14f930</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>2</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>f9bf4ee7-3721-4e34-9f16-5db7e52c8b06</ScriptAssignmentId>
+			<ScriptAssignmentId>b5752223-784a-4c41-8fef-ea390e771ba3</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
 			<ScriptItemId>09b1fbec-18f9-9acb-d337-fc8db6e5e814</ScriptItemId>
 			<ControlId>5a8334ad-acd2-72e4-d478-235bfbfc9deb</ControlId>

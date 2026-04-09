@@ -200,7 +200,7 @@
 	<SaveDateTime>2025-06-23T19:53:43Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>d8db1191-4fcf-462f-b49f-a0160da56ce0</ScriptItemId>
+			<ScriptItemId>537ae385-5d57-4236-9b81-3106741acbe2</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>DataField1_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -211,9 +211,9 @@
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>3b40ed23-d1b6-4f76-b407-b4ed6e9ba93c</ScriptAssignmentId>
+			<ScriptAssignmentId>4cbc1f76-54ec-4e7a-8ee6-d5afe47ea5f1</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>d8db1191-4fcf-462f-b49f-a0160da56ce0</ScriptItemId>
+			<ScriptItemId>537ae385-5d57-4236-9b81-3106741acbe2</ScriptItemId>
 			<ControlId>65d37de5-aadf-250b-8c2a-4428dff7abb5</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

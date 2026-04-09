@@ -200,7 +200,7 @@
 	<SaveDateTime>2022-09-12T14:53:58Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>f43ee62d-0d1e-403e-84d3-f7564ee9213b</ScriptItemId>
+			<ScriptItemId>0eaaa85c-0e4a-462a-ae7a-d0ee3f5a9199</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>CallWS</Name>
 			<Arguments />
@@ -286,7 +286,7 @@ $.when(CallServerSide())
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>abf44a67-52f4-4740-accb-c8b1575b7733</ScriptItemId>
+			<ScriptItemId>3f8e7c73-50c1-4a94-8a4a-8d6e882e0eb7</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnCallWS_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -297,9 +297,9 @@ $.when(CallServerSide())
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>2e6eb3cf-1138-4fe4-bb31-5e3971a58538</ScriptAssignmentId>
+			<ScriptAssignmentId>398126cd-6d54-4171-a93d-19acd4f9b502</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>abf44a67-52f4-4740-accb-c8b1575b7733</ScriptItemId>
+			<ScriptItemId>3f8e7c73-50c1-4a94-8a4a-8d6e882e0eb7</ScriptItemId>
 			<ControlId>974a7343-617c-ed6d-319b-e131a08b1b44</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

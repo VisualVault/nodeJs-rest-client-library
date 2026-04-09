@@ -1123,7 +1123,7 @@
 	<SaveDateTime>2021-12-14T11:10:53Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>87148859-63ca-464c-a0e5-2e5573e5daa9</ScriptItemId>
+			<ScriptItemId>c857eb5a-898c-44c4-a5b1-821a01a439cb</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>postNewRevision</Name>
 			<Arguments />
@@ -1206,7 +1206,7 @@ $.when(ProcessFunction()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>f3bd7dcf-a8ea-4447-806e-3162905f417c</ScriptItemId>
+			<ScriptItemId>dd89b816-cc24-4a3f-ac78-33b0cb1bc669</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>getFormData</Name>
 			<Arguments />
@@ -1297,7 +1297,7 @@ $.when(CallServerSide())
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>6e691f5b-a823-462f-8bd2-2ad8f32bfc3d</ScriptItemId>
+			<ScriptItemId>4c5d8413-35be-426a-802b-7a76671b4318</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>newForm</Name>
 			<Arguments />
@@ -1380,7 +1380,7 @@ $.when(ProcessFunction()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>a9725f6d-bf11-4b71-aef2-42d9f9ba9423</ScriptItemId>
+			<ScriptItemId>4468ed73-af59-4fd1-b658-8bd52f237f03</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>NewPostBtn_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -1389,7 +1389,7 @@ $.when(ProcessFunction()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>293fc140-e083-48ac-b0cc-e6981746f4ea</ScriptItemId>
+			<ScriptItemId>848f5d05-d1f0-428f-a928-8dbb17df09dc</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>GetData_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -1398,7 +1398,7 @@ $.when(ProcessFunction()).always(function (resp) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>99bd68e8-c982-4651-a46f-68a3aa276878</ScriptItemId>
+			<ScriptItemId>98736b32-f596-4fd7-bc63-84eeae2de112</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>UpdateBtn_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -1409,27 +1409,27 @@ $.when(ProcessFunction()).always(function (resp) {
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>2e5fb3b1-6e0e-4853-832c-10af3e02cd44</ScriptAssignmentId>
+			<ScriptAssignmentId>8d501472-e15e-4d8b-a843-377f4dcf3954</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>293fc140-e083-48ac-b0cc-e6981746f4ea</ScriptItemId>
+			<ScriptItemId>848f5d05-d1f0-428f-a928-8dbb17df09dc</ScriptItemId>
 			<ControlId>4a05e539-d8c5-0c14-b86f-631ac4fd6845</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>3</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>0e17289b-acf4-4f2c-8b8b-651f94301f39</ScriptAssignmentId>
+			<ScriptAssignmentId>427da372-5174-447d-90ce-5ca74b706c9a</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>99bd68e8-c982-4651-a46f-68a3aa276878</ScriptItemId>
+			<ScriptItemId>98736b32-f596-4fd7-bc63-84eeae2de112</ScriptItemId>
 			<ControlId>20c33aaf-90d6-d71b-694d-af192a35f035</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>3</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>9ccd8630-0a03-443f-bba8-056441dfd114</ScriptAssignmentId>
+			<ScriptAssignmentId>cc995388-7c9e-47ad-8415-b0dcab6ece59</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>a9725f6d-bf11-4b71-aef2-42d9f9ba9423</ScriptItemId>
+			<ScriptItemId>4468ed73-af59-4fd1-b658-8bd52f237f03</ScriptItemId>
 			<ControlId>9ed1da6d-77ab-c05b-95f5-c233fe05567a</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

@@ -523,7 +523,7 @@
 	<SaveDateTime>2021-06-25T19:09:49Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>c55cc6f9-7e88-4c2e-94c0-ab745408e642</ScriptItemId>
+			<ScriptItemId>3c5641b5-8e49-41b1-8980-83ab87b2ca71</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>WebServiceCall</Name>
 			<Arguments />
@@ -611,7 +611,7 @@ console.log("resp", resp);
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>d8c6ae98-bd57-42df-b946-1eca7d3160b3</ScriptItemId>
+			<ScriptItemId>be0954ff-6045-4827-9826-4819f0fd28b0</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Check_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -623,9 +623,9 @@ VV.Form.Template.WebServiceCall();</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>1ea376fe-3a42-4ef2-a71f-63afd28441cd</ScriptAssignmentId>
+			<ScriptAssignmentId>99c17190-f921-4232-a0ab-5f291244cb46</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>d8c6ae98-bd57-42df-b946-1eca7d3160b3</ScriptItemId>
+			<ScriptItemId>be0954ff-6045-4827-9826-4819f0fd28b0</ScriptItemId>
 			<ControlId>69d54cd6-e4cd-c1f7-95d4-19d6eb532ab1</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

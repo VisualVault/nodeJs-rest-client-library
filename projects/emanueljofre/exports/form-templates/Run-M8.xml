@@ -200,7 +200,7 @@
 	<SaveDateTime>2025-07-01T13:45:20Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>0d30ec62-a0f6-416e-a568-44d6b500a724</ScriptItemId>
+			<ScriptItemId>0678b49e-f765-40c8-a58a-573ec866f4b0</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>TestM8</Name>
 			<Arguments />
@@ -280,7 +280,7 @@ $.when(CallServerSide())
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>b597ff57-b03b-4b74-9882-2e62fb5e067b</ScriptItemId>
+			<ScriptItemId>75175485-b28d-4e67-ae12-f9cf16ae261a</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnRunM8_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -292,9 +292,9 @@ $.when(CallServerSide())
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>3684a057-f8ee-422b-9bd9-e49c61172dfc</ScriptAssignmentId>
+			<ScriptAssignmentId>97fe4834-621e-4b84-b1c6-290b38fd7563</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>b597ff57-b03b-4b74-9882-2e62fb5e067b</ScriptItemId>
+			<ScriptItemId>75175485-b28d-4e67-ae12-f9cf16ae261a</ScriptItemId>
 			<ControlId>3cbc9399-55f9-35e5-f2d0-4e6b559fe6aa</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

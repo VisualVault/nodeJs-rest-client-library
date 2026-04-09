@@ -637,7 +637,7 @@
 	<SaveDateTime>2021-11-16T13:27:50Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>8e53e6ef-23b4-4efa-9272-28e0285aafcb</ScriptItemId>
+			<ScriptItemId>f6429f9a-45e4-41ff-a99c-e174b460457f</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>mayusculas</Name>
 			<Arguments>texto, field</Arguments>
@@ -649,7 +649,7 @@ return texto</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>1a14d0ad-6fb9-414f-b0f1-40f1f972277c</ScriptItemId>
+			<ScriptItemId>c2e60b57-936e-4609-8ca7-2fb851a80ba5</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>FormValidation</Name>
 			<Arguments>ControlName</Arguments>
@@ -700,7 +700,7 @@ if (ErrorReporting == false) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>9027935a-117f-464b-808e-cdfc050ff796</ScriptItemId>
+			<ScriptItemId>42ca13c3-de94-4550-a1a0-fd622196e636</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnSave_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -715,7 +715,7 @@ if (formIsValid) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>6a6b8492-f1a6-453a-988a-5e4ac9c090df</ScriptItemId>
+			<ScriptItemId>b3ae744c-d6c9-4da9-a17a-b31f847f2437</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>listado_onChange</Name>
 			<Arguments>event, control</Arguments>
@@ -724,7 +724,7 @@ if (formIsValid) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>86a40aa5-27ce-4d97-8d9e-e471936addef</ScriptItemId>
+			<ScriptItemId>3d24f110-4adc-401d-9e7f-40224580c86c</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>textbox_onBlur</Name>
 			<Arguments>event, control</Arguments>
@@ -735,27 +735,27 @@ if (formIsValid) {
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>6a1b5186-7dc4-46fc-a328-87594bdbc8ea</ScriptAssignmentId>
+			<ScriptAssignmentId>29e10442-2651-46c1-b506-542f35cafd79</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>6a6b8492-f1a6-453a-988a-5e4ac9c090df</ScriptItemId>
+			<ScriptItemId>b3ae744c-d6c9-4da9-a17a-b31f847f2437</ScriptItemId>
 			<ControlId>89c0b3c6-bd20-36ba-83cf-4f66fbe41f23</ControlId>
 			<EventId>1</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>b42763fa-67f6-49ca-b1b2-d5f7e565ca3d</ScriptAssignmentId>
+			<ScriptAssignmentId>6c993b43-0881-490c-8e03-4ea51ca7a2a4</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>86a40aa5-27ce-4d97-8d9e-e471936addef</ScriptItemId>
+			<ScriptItemId>3d24f110-4adc-401d-9e7f-40224580c86c</ScriptItemId>
 			<ControlId>924a1624-8e08-dffa-50f5-8e348ea8b40e</ControlId>
 			<EventId>3</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>1835769b-34b2-4f4e-ba25-07f2c5446a11</ScriptAssignmentId>
+			<ScriptAssignmentId>e0b88f4f-3f0f-4e32-a6c4-8d7f00d4a3e1</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>9027935a-117f-464b-808e-cdfc050ff796</ScriptItemId>
+			<ScriptItemId>42ca13c3-de94-4550-a1a0-fd622196e636</ScriptItemId>
 			<ControlId>572285d7-2526-448a-2c47-d9739efb99e5</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

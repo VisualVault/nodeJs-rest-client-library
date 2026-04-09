@@ -1357,7 +1357,7 @@
 	<SaveDateTime>2024-03-22T14:27:32Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>2b9d2060-0406-4810-ba3a-9126963765c6</ScriptItemId>
+			<ScriptItemId>699c242a-c798-45ea-910f-7fd553b476cb</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>CreateNewRecord</Name>
 			<Arguments />
@@ -1437,7 +1437,7 @@ $.when(CallServerSide())
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>864ed3df-b393-42e9-8c00-6646bf15d68b</ScriptItemId>
+			<ScriptItemId>97a3f677-1ed6-4604-a3b2-d24d03473222</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>newRecord_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -1448,9 +1448,9 @@ $.when(CallServerSide())
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>ff1de2ac-aa08-4cc2-9e03-d2d4f6f1dd11</ScriptAssignmentId>
+			<ScriptAssignmentId>caa3e59d-0cab-42aa-bb58-5a185a63d49f</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>864ed3df-b393-42e9-8c00-6646bf15d68b</ScriptItemId>
+			<ScriptItemId>97a3f677-1ed6-4604-a3b2-d24d03473222</ScriptItemId>
 			<ControlId>d7e97a5d-2feb-1183-f7fc-c386ea18bed4</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

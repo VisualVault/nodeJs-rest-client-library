@@ -640,7 +640,7 @@
 	<SaveDateTime>2024-02-09T15:32:47Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>4a8b8cea-627d-4a2f-a513-6f742ff04cfa</ScriptItemId>
+			<ScriptItemId>46aeb5b7-5fe0-41b1-a7e5-3994b8dfc1fb</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Tab1_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -649,7 +649,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>968f2fab-677a-44a6-b795-67f74efc8d12</ScriptItemId>
+			<ScriptItemId>72c81c8e-a3c9-4a98-a064-57495e0cb0b3</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Tab2_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -660,18 +660,18 @@
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>643a1c90-c993-46be-a609-eb7019406193</ScriptAssignmentId>
+			<ScriptAssignmentId>d3fa1192-e875-43d3-a2e6-e07376c0f34b</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>968f2fab-677a-44a6-b795-67f74efc8d12</ScriptItemId>
+			<ScriptItemId>72c81c8e-a3c9-4a98-a064-57495e0cb0b3</ScriptItemId>
 			<ControlId>df4d85f0-833a-cbf9-1cb3-d373e3905b11</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>1a73f37c-607e-4d14-95dc-9c212c47e56c</ScriptAssignmentId>
+			<ScriptAssignmentId>cca9acbe-8634-4375-b4fb-289c75e3561a</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>4a8b8cea-627d-4a2f-a513-6f742ff04cfa</ScriptItemId>
+			<ScriptItemId>46aeb5b7-5fe0-41b1-a7e5-3994b8dfc1fb</ScriptItemId>
 			<ControlId>03e51677-bae6-dec7-b8dd-30c91dda6068</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
