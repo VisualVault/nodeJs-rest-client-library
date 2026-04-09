@@ -1,1 +1,54 @@
+# ── Upstream file protection guard ──────────────────────────────────────────
+# Blocks commits that modify protected lib/ files unless UPSTREAM_OK=1 is set.
+# Allowlisted paths (locally maintained) are defined in .husky/upstream-allowlist.
+
+ALLOWLIST_FILE="$(dirname "$0")/upstream-allowlist"
+STAGED_LIB_FILES=$(git diff --cached --name-only -- 'lib/VVRestApi/')
+
+if [ -n "$STAGED_LIB_FILES" ]; then
+  BLOCKED=""
+
+  for file in $STAGED_LIB_FILES; do
+    allowed=false
+
+    if [ -f "$ALLOWLIST_FILE" ]; then
+      while IFS= read -r pattern || [ -n "$pattern" ]; do
+        # Skip comments and blank lines
+        case "$pattern" in
+          \#*|"") continue ;;
+        esac
+        # Directory pattern (ends with /) — prefix match
+        case "$pattern" in
+          */) [ "${file#$pattern}" != "$file" ] && allowed=true ;;
+          *)  [ "$file" = "$pattern" ] && allowed=true ;;
+        esac
+      done < "$ALLOWLIST_FILE"
+    fi
+
+    if [ "$allowed" = false ]; then
+      BLOCKED="$BLOCKED\n  $file"
+    fi
+  done
+
+  if [ -n "$BLOCKED" ]; then
+    if [ "${UPSTREAM_OK:-0}" != "1" ]; then
+      echo ""
+      echo "⛔ UPSTREAM GUARD: Protected lib/ files are staged for commit:"
+      echo -e "$BLOCKED"
+      echo ""
+      echo "These files are upstream-sourced. Modifications affect test fidelity"
+      echo "(local server must replicate production VV behavior)."
+      echo ""
+      echo "To proceed, confirm with:  UPSTREAM_OK=1 git commit ..."
+      echo "To update the allowlist:   .husky/upstream-allowlist"
+      echo ""
+      exit 1
+    else
+      echo "⚠️  UPSTREAM_OK=1 set — allowing commit to protected lib/ files:"
+      echo -e "$BLOCKED"
+    fi
+  fi
+fi
+
+# ── Lint staged files ──────────────────────────────────────────────────────
 npx lint-staged

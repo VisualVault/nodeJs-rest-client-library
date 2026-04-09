@@ -1,0 +1,5 @@
+# Files/dirs in lib/ that are locally maintained
+# and can be committed without UPSTREAM_OK=1.
+# One path per line. Directories end with /.
+# All other lib/VVRestApi/ files are protected.
+lib/VVRestApi/VVRestApiNodeJs/routes/

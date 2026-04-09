@@ -61,3 +61,10 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# Upstream-tracked files
+# lib/VVRestApi/ is forked from VisualVault/nodeJs-rest-client-library.
+# This annotation marks upstream-sourced files for tooling visibility.
+###############################################################################
+lib/VVRestApi/** upstream-tracked

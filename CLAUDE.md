@@ -199,10 +199,26 @@ Every folder that represents a **distinct scope** gets its own `CLAUDE.md`. This
 
 **Size targets:** Root ~200 lines (includes Write Safety) | Scope folders ~30-80 lines | Tasks/Projects flexible but aggressively pruned.
 
-## Upstream Sync
+## Upstream Sync & Protection
+
+`lib/VVRestApi/` is sourced from upstream with intentional local enhancements (write-policy guards, options plumbing). **Modifications affect test fidelity** — the local server must replicate production VV behavior for WS and scheduled process testing.
+
+### Protection layers
+
+1. **Pre-commit guard** (`.husky/pre-commit`) — blocks commits to `lib/` files unless on the allowlist or `UPSTREAM_OK=1` is set
+2. **Allowlist** (`.husky/upstream-allowlist`) — declares which `lib/` paths are locally maintained (currently: `routes/`)
+3. **CI drift report** (`.github/workflows/upstream-guard.yml`) — reports `lib/` divergence from upstream on PRs (informational, non-blocking)
+4. **Gitattributes** — `lib/VVRestApi/**` marked `upstream-tracked` for tooling visibility
+
+### Rules
+
+- **Never modify `lib/` files without explicit user approval.** This mirrors the Write Safety rules for customer environments.
+- To commit a protected file: `UPSTREAM_OK=1 git commit ...`
+- To permanently allow a path: add it to `.husky/upstream-allowlist`
+
+### Sync commands
 
 ```bash
-# Fetch latest from VisualVault upstream
 git fetch upstream
 git merge upstream/master
 ```

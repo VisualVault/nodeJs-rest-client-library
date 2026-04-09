@@ -22,12 +22,12 @@ npm install
 
 These are installed automatically with `npm install` and enforced on every commit via Husky + lint-staged:
 
-| Tool            | Config File         | What It Does                                    |
-| --------------- | ------------------- | ----------------------------------------------- |
-| **ESLint**      | `eslint.config.js`  | Flat config, CommonJS, integrated with Prettier |
-| **Prettier**    | `.prettierrc`       | Single quotes, 4-space indent, 120 print width  |
-| **Husky**       | `.husky/pre-commit` | Runs `lint-staged` before each commit           |
-| **lint-staged** | `package.json`      | ESLint fix + Prettier on staged `.js` files     |
+| Tool            | Config File         | What It Does                                           |
+| --------------- | ------------------- | ------------------------------------------------------ |
+| **ESLint**      | `eslint.config.js`  | Flat config, CommonJS, integrated with Prettier        |
+| **Prettier**    | `.prettierrc`       | Single quotes, 4-space indent, 120 print width         |
+| **Husky**       | `.husky/pre-commit` | Upstream file guard + `lint-staged` before each commit |
+| **lint-staged** | `package.json`      | ESLint fix + Prettier on staged `.js` files            |
 
 Manual commands:
 

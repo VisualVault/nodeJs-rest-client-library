@@ -2,7 +2,7 @@
 
 How data flows through the nodeV2 server when executing form scripts and scheduled scripts. Based on analysis of the upstream `VisualVault/nodeJs-rest-client-library` code.
 
-> **Note:** The `lib/` directory is stock upstream with zero local modifications.
+> **Note:** The `lib/` directory is sourced from [upstream](https://github.com/VisualVault/nodeJs-rest-client-library) with intentional local enhancements (write-policy guards, options plumbing, route wiring). See the root `CLAUDE.md` "Upstream Sync & Protection" section for modification rules.
 
 ---
 

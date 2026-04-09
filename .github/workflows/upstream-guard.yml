@@ -1,0 +1,46 @@
+name: Upstream File Guard
+
+on:
+  pull_request:
+    paths:
+      - 'lib/**'
+
+jobs:
+  upstream-drift-report:
+    name: Report lib/ drift from upstream
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/VisualVault/nodeJs-rest-client-library.git || true
+          git fetch upstream master
+
+      - name: Generate drift report
+        run: |
+          echo "## Upstream Drift Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Comparing \`lib/\` against \`upstream/master\`." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          DIFF_OUTPUT=$(git diff --stat upstream/master -- lib/ 2>/dev/null || echo "Unable to diff against upstream/master")
+
+          if [ -z "$DIFF_OUTPUT" ]; then
+            echo "✅ No drift detected — \`lib/\` matches upstream." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "| File | Changes |" >> "$GITHUB_STEP_SUMMARY"
+            echo "|------|---------|" >> "$GITHUB_STEP_SUMMARY"
+
+            git diff --numstat upstream/master -- lib/ 2>/dev/null | while read -r added deleted file; do
+              echo "| \`$file\` | +$added / -$deleted |" >> "$GITHUB_STEP_SUMMARY"
+            done
+
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "⚠️ Review these changes to ensure they are intentional local enhancements." >> "$GITHUB_STEP_SUMMARY"
+            echo "Protected files require \`UPSTREAM_OK=1\` to commit locally." >> "$GITHUB_STEP_SUMMARY"
+          fi
