@@ -1,7 +1,7 @@
 # TC-8B-A-UTC0 — Summary
 
 **Spec**: [tc-8B-A-UTC0.md](../test-cases/tc-8B-A-UTC0.md)
-**Current status**: PASS — last run 2026-04-03 (UTC0, Chromium)
+**Current status**: PASS — last run 2026-04-09 (UTC0, Chromium)
 **Bug surface**: none — Bug #7 absent at UTC+0
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ   | Outcome | File                                   |
 | --- | ---------- | ---- | ------- | -------------------------------------- |
 | 1   | 2026-04-03 | UTC0 | PASS    | [run-1](../runs/tc-8B-A-UTC0-run-1.md) |
+| 2   | 2026-04-09 | UTC0 | PASS    | [run-2](../runs/tc-8B-A-UTC0-run-2.md) |
 
 ## Current Interpretation
 
-Date-only GDOC at UTC+0 trivially correct. Completes Config A 3-TZ spectrum (BRT PASS, IST FAIL Bug #7, UTC0 PASS).
+Run 2 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

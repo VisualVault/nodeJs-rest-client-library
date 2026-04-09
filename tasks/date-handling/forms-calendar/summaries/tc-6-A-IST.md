@@ -1,7 +1,7 @@
 # TC-6-A-IST — Summary
 
 **Spec**: [tc-6-A-IST.md](../test-cases/tc-6-A-IST.md)
-**Current status**: PASS — last run 2026-04-03 (IST, Firefox)
+**Current status**: PASS — last run 2026-04-09 (IST, Chromium)
 **Bug surface**: none — Current Date is the only fully correct initialization path
 
 ## Run History
@@ -10,10 +10,11 @@
 | --- | ---------- | --- | ------- | ------------------------------------ |
 | 1   | 2026-04-01 | IST | PASS    | [run-1](../runs/tc-6-A-IST-run-1.md) |
 | 2   | 2026-04-03 | IST | PASS    | [run-2](../runs/tc-6-A-IST-run-2.md) |
+| 3   | 2026-04-09 | IST | PASS    | [run-3](../runs/tc-6-A-IST-run-3.md) |
 
 ## Current Interpretation
 
-Run 2 (2026-04-03, Firefox): PASS. Cross-browser verification in progress.
+Run 3 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

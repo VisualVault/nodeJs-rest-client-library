@@ -1,7 +1,7 @@
 # TC-4-H-z-BRT — Summary
 
 **Spec**: [tc-4-H-z-BRT.md](../test-cases/tc-4-H-z-BRT.md)
-**Current status**: PASS — last run 2026-04-08 (BRT, Chromium)
+**Current status**: FAIL — last run 2026-04-09 (BRT, Chromium)
 **Bug surface**: Bug #1
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                   |
 | --- | ---------- | --- | ------- | -------------------------------------- |
 | 1   | 2026-04-08 | BRT | PASS    | [run-1](../runs/tc-4-H-z-BRT-run-1.md) |
+| 2   | 2026-04-09 | BRT | FAIL    | [run-2](../runs/tc-4-H-z-BRT-run-2.md) |
 
 ## Current Interpretation
 
-Passes in Chromium — cross-browser consistency confirmed.
+Run 2 (2026-04-09, Chromium): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

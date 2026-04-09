@@ -1,7 +1,7 @@
 # TC-8-B — Summary
 
 **Spec**: [tc-8-B.md](../test-cases/tc-8-B.md)
-**Current status**: PASS — last run 2026-04-03 (BRT, Firefox)
+**Current status**: PASS — last run 2026-04-09 (BRT, Chromium)
 **Bug surface**: none
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                             |
 | --- | ---------- | --- | ------- | -------------------------------- |
 | 1   | 2026-04-03 | BRT | PASS    | [run-1](../runs/tc-8-B-run-1.md) |
+| 2   | 2026-04-09 | BRT | PASS    | [run-2](../runs/tc-8-B-run-2.md) |
 
 ## Current Interpretation
 
-Passes in Firefox — cross-browser consistency confirmed.
+Run 2 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

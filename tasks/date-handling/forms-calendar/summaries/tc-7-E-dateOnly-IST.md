@@ -1,7 +1,7 @@
 # TC-7-E-dateOnly-IST — Summary
 
 **Spec**: [tc-7-E-dateOnly-IST.md](../test-cases/tc-7-E-dateOnly-IST.md)
-**Current status**: FAIL-1 — last run 2026-04-03 (IST)
+**Current status**: FAIL — last run 2026-04-09 (IST, Chromium)
 **Bug surface**: Bug #7 — date-only SetFieldValue stores previous day in UTC+
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                          |
 | --- | ---------- | --- | ------- | --------------------------------------------- |
 | 1   | 2026-04-03 | IST | FAIL-1  | [run-1](../runs/tc-7-E-dateOnly-IST-run-1.md) |
+| 2   | 2026-04-09 | IST | FAIL    | [run-2](../runs/tc-7-E-dateOnly-IST-run-2.md) |
 
 ## Current Interpretation
 
-Bug #7 confirmed for legacy Config E in IST. `useLegacy=true` has no effect on the `normalizeCalValue()` → `getSaveValue()` path for date-only fields — the bug fires identically to Config A. The `useLegacy` flag only affects the `getCalendarFieldValue()` output path (GFV), not the input/store path (SFV).
+Run 2 (2026-04-09, Chromium): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

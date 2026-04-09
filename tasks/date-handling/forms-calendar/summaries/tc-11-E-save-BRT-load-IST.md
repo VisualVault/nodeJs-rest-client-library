@@ -1,7 +1,7 @@
 # TC-11-E-save-BRT-load-IST — Summary
 
 **Spec**: [tc-11-E-save-BRT-load-IST.md](../test-cases/tc-11-E-save-BRT-load-IST.md)
-**Current status**: PASS — last run 2026-04-08 (IST, Playwright CLI)
+**Current status**: FAIL — last run 2026-04-09 (IST, Chromium)
 **Bug surface**: none — legacy date-only also immune
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                                |
 | --- | ---------- | --- | ------- | --------------------------------------------------- |
 | 1   | 2026-04-08 | IST | PASS    | [run-1](../runs/tc-11-E-save-BRT-load-IST-run-1.md) |
+| 2   | 2026-04-09 | IST | FAIL    | [run-2](../runs/tc-11-E-save-BRT-load-IST-run-2.md) |
 
 ## Current Interpretation
 
-Same as 11-A. Legacy date-only (Config E, useLegacy=true) also survives cross-TZ load. FORM-BUG-7 fires at input time only, not load time. All date-only configs (A, B, E) confirmed immune to load-time corruption.
+Run 2 (2026-04-09, Chromium): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

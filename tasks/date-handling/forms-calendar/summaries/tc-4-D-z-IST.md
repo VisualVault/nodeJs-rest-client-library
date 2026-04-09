@@ -1,7 +1,7 @@
 # TC-4-D-z-IST — Summary
 
 **Spec**: [tc-4-D-z-IST.md](../test-cases/tc-4-D-z-IST.md)
-**Current status**: PASS — last run 2026-04-08 (IST, Chromium)
+**Current status**: FAIL — last run 2026-04-09 (IST, Chromium)
 **Bug surface**: Bug #1, Bug #5
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                   |
 | --- | ---------- | --- | ------- | -------------------------------------- |
 | 1   | 2026-04-08 | IST | PASS    | [run-1](../runs/tc-4-D-z-IST-run-1.md) |
+| 2   | 2026-04-09 | IST | FAIL    | [run-2](../runs/tc-4-D-z-IST-run-2.md) |
 
 ## Current Interpretation
 
-Passes in Chromium — cross-browser consistency confirmed.
+Run 2 (2026-04-09, Chromium): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

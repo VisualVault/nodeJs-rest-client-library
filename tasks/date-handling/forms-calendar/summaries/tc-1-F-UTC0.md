@@ -1,7 +1,7 @@
 # TC-1-F-UTC0 — Summary
 
 **Spec**: [tc-1-F-UTC0.md](../test-cases/tc-1-F-UTC0.md)
-**Current status**: FAIL-1 — last run 2026-03-31 (UTC+0)
+**Current status**: FAIL — last run 2026-04-09 (UTC0, Chromium)
 **Bug surface**: Legacy format — stores UTC datetime instead of date-only; ignoreTZ no-op confirmed; date correct at UTC+0
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ    | Outcome | File                                  |
 | --- | ---------- | ----- | ------- | ------------------------------------- |
 | 1   | 2026-03-31 | UTC+0 | FAIL-1  | [run-1](../runs/tc-1-F-UTC0-run-1.md) |
+| 2   | 2026-04-09 | UTC0  | FAIL    | [run-2](../runs/tc-1-F-UTC0-run-2.md) |
 
 ## Current Interpretation
 
-Config F (date-only, ignoreTZ=true, useLegacy=true) at UTC+0 stores `"2026-03-15T00:00:00.000Z"` — identical to Config E (tc-1-E-UTC0). The `ignoreTimezone=true` flag has no effect on legacy popup storage, consistent with all prior findings across BRT and IST. This is the final Category 1 test — all 20 calendar popup slots are now complete. The legacy format bug (raw `toISOString()` storage) is confirmed universal across all configs and timezones.
+Run 2 (2026-04-09, Chromium): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

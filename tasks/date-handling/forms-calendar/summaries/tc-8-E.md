@@ -1,7 +1,7 @@
 # TC-8-E — Summary
 
 **Spec**: [tc-8-E.md](../test-cases/tc-8-E.md)
-**Current status**: PASS — last run 2026-04-03 (BRT, Chromium)
+**Current status**: PASS — last run 2026-04-09 (BRT, Chromium)
 **Bug surface**: none — legacy date-only returns raw unchanged
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                             |
 | --- | ---------- | --- | ------- | -------------------------------- |
 | 1   | 2026-04-03 | BRT | PASS    | [run-1](../runs/tc-8-E-run-1.md) |
+| 2   | 2026-04-09 | BRT | PASS    | [run-2](../runs/tc-8-E-run-2.md) |
 
 ## Current Interpretation
 
-Legacy date-only Config E GFV returns raw string unchanged. Identical to non-legacy Config A. The `useLegacy` flag is inert for date-only GFV.
+Run 2 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

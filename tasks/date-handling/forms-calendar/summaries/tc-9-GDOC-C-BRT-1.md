@@ -1,7 +1,7 @@
 # TC-9-GDOC-C-BRT-1 — Summary
 
 **Spec**: [tc-9-GDOC-C-BRT-1.md](../test-cases/tc-9-GDOC-C-BRT-1.md)
-**Current status**: PASS — last run 2026-04-08 (BRT)
+**Current status**: PASS — last run 2026-04-09 (BRT, Chromium)
 **Bug surface**: none — control/passing scenario
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                        |
 | --- | ---------- | --- | ------- | ------------------------------------------- |
 | 1   | 2026-04-08 | BRT | PASS    | [run-1](../runs/tc-9-GDOC-C-BRT-1-run-1.md) |
+| 2   | 2026-04-09 | BRT | PASS    | [run-2](../runs/tc-9-GDOC-C-BRT-1-run-2.md) |
 
 ## Current Interpretation
 
-GDOC round-trip on Config C is trivially stable — GDOC `.toISOString()` produces the same real UTC as `GetFieldValue()` for Config C. Both paths are mathematically equivalent for `ignoreTimezone=false` configs. No bugs apply. Completes GDOC round-trip characterization for non-IST scenarios.
+Run 2 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

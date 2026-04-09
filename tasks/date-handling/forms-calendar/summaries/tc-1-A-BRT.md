@@ -1,7 +1,7 @@
 # TC-1-A-BRT — Summary
 
 **Spec**: [tc-1-A-BRT.md](../test-cases/tc-1-A-BRT.md)
-**Current status**: PASS — last run 2026-04-03 (BRT, Firefox)
+**Current status**: FAIL — last run 2026-04-09 (BRT, Chromium)
 **Bug surface**: none — BRT is UTC-3, no shift on date-only fields
 
 ## Run History
@@ -14,10 +14,11 @@
 | 4   | 2026-04-01  | BRT | PASS    | [run-4](../runs/tc-1-A-BRT-run-4.md) |
 | 5   | 2026-04-03  | BRT | PASS    | [run-5](../runs/tc-1-A-BRT-run-5.md) |
 | 6   | 2026-04-03  | BRT | PASS    | [run-6](../runs/tc-1-A-BRT-run-6.md) |
+| 7   | 2026-04-09  | BRT | FAIL    | [run-7](../runs/tc-1-A-BRT-run-7.md) |
 
 ## Current Interpretation
 
-Run 6 (2026-04-03, Firefox): PASS. Cross-browser verification in progress.
+Run 7 (2026-04-09, Chromium): FAIL. Cross-browser verification in progress.
 
 ## Next Action
 

@@ -1,7 +1,7 @@
 # TC-6-F-IST — Summary
 
 **Spec**: [tc-6-F-IST.md](../test-cases/tc-6-F-IST.md)
-**Current status**: PASS — last run 2026-04-03 (IST, Firefox)
+**Current status**: PASS — last run 2026-04-09 (IST, Chromium)
 **Bug surface**: none — both ignoreTZ and useLegacy inert on current date path
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                 |
 | --- | ---------- | --- | ------- | ------------------------------------ |
 | 1   | 2026-04-03 | IST | PASS    | [run-1](../runs/tc-6-F-IST-run-1.md) |
+| 2   | 2026-04-09 | IST | PASS    | [run-2](../runs/tc-6-F-IST-run-2.md) |
 
 ## Current Interpretation
 
-Config F legacy Current Date correct in IST. Same as 6-E-IST — `ignoreTZ=true` adds nothing on top of `useLegacy=true`, and neither flag affects the `new Date()` init path. All date-only Current Date fields (A, B, E, F) pass in IST.
+Run 2 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

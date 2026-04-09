@@ -2063,3 +2063,278 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-09 [TC-11-F-save-BRT-load-IST Run 1](runs/tc-11-F-save-BRT-load-IST-run-1.md) — IST — PASS — Config F legacy date-only + ignoreTZ immune (same as Config E)
 - 2026-04-09 [TC-11-G-save-BRT-load-IST Run 1](runs/tc-11-G-save-BRT-load-IST-run-1.md) — IST — PASS — Config G legacy DateTime raw preserved; GFV returns raw
 - 2026-04-09 [TC-11-H-save-BRT-load-IST Run 1](runs/tc-11-H-save-BRT-load-IST-run-1.md) — IST — PASS — Config H legacy DateTime + ignoreTZ raw preserved; FORM-BUG-5 bypassed
+
+## Session 2026-04-09 (Chromium regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Chromium.
+**Key outcomes**: 143 tests documented.
+
+- 2026-04-09 [TC-1-A-BRT Run 7](runs/tc-1-A-BRT-run-7.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-1-B-BRT Run 4](runs/tc-1-B-BRT-run-4.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-1-C-BRT Run 3](runs/tc-1-C-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #4
+- 2026-04-09 [TC-1-D-BRT Run 3](runs/tc-1-D-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-1-E-BRT Run 3](runs/tc-1-E-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-1-F-BRT Run 3](runs/tc-1-F-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-1-G-BRT Run 3](runs/tc-1-G-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-1-H-BRT Run 3](runs/tc-1-H-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-11-H-BRT-roundtrip Run 2](runs/tc-11-H-BRT-roundtrip-run-2.md) — BRT — PASS — Chromium confirms Config H Cross-Timezone stores correctly
+- 2026-04-09 [TC-11-save-IST-load-BRT Run 2](runs/tc-11-save-IST-load-BRT-run-2.md) — BRT — PASS — Chromium confirms Config A Cross-Timezone stores correctly
+- 2026-04-09 [TC-11-roundtrip-cross Run 2](runs/tc-11-roundtrip-cross-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-11-D-concurrent-IST-edit Run 2](runs/tc-11-D-concurrent-IST-edit-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-11-concurrent-edit Run 2](runs/tc-11-concurrent-edit-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-near-midnight-1 Run 2](runs/tc-12-near-midnight-1-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-near-midnight-2 Run 2](runs/tc-12-near-midnight-2-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-dst-transition Run 2](runs/tc-12-dst-transition-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-year-boundary Run 2](runs/tc-12-year-boundary-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-leap-day Run 2](runs/tc-12-leap-day-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-empty-value Run 2](runs/tc-12-empty-value-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #6
+- 2026-04-09 [TC-12-invalid-string Run 2](runs/tc-12-invalid-string-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #6
+- 2026-04-09 [TC-12-far-future Run 2](runs/tc-12-far-future-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-pre-epoch Run 2](runs/tc-12-pre-epoch-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-null-input Run 2](runs/tc-12-null-input-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #6
+- 2026-04-09 [TC-12-empty-Config-A Run 2](runs/tc-12-empty-Config-A-run-2.md) — BRT — PASS — Chromium confirms Config A Edge Cases stores correctly
+- 2026-04-09 [TC-12-empty-Config-C Run 2](runs/tc-12-empty-Config-C-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #6
+- 2026-04-09 [TC-12-config-C-near-midnight Run 2](runs/tc-12-config-C-near-midnight-run-2.md) — BRT — PASS — Chromium confirms Config C Edge Cases stores correctly
+- 2026-04-09 [TC-2-A-BRT Run 4](runs/tc-2-A-BRT-run-4.md) — BRT — PASS — Chromium confirms Config A Typed Input stores correctly
+- 2026-04-09 [TC-2-B-BRT Run 3](runs/tc-2-B-BRT-run-3.md) — BRT — PASS — Chromium confirms Config B Typed Input stores correctly
+- 2026-04-09 [TC-2-C-BRT Run 3](runs/tc-2-C-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #4
+- 2026-04-09 [TC-2-D-BRT Run 3](runs/tc-2-D-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-2-E-BRT Run 3](runs/tc-2-E-BRT-run-3.md) — BRT — PASS — Chromium confirms Config E Typed Input stores correctly
+- 2026-04-09 [TC-2-F-BRT Run 3](runs/tc-2-F-BRT-run-3.md) — BRT — PASS — Chromium confirms Config F Typed Input stores correctly
+- 2026-04-09 [TC-2-G-BRT Run 3](runs/tc-2-G-BRT-run-3.md) — BRT — PASS — Chromium confirms Config G Typed Input stores correctly
+- 2026-04-09 [TC-2-H-BRT Run 3](runs/tc-2-H-BRT-run-3.md) — BRT — PASS — Chromium confirms Config H Typed Input stores correctly
+- 2026-04-09 [TC-3-A-BRT-BRT Run 6](runs/tc-3-A-BRT-BRT-run-6.md) — BRT — PASS — Chromium confirms Config A Server Reload stores correctly
+- 2026-04-09 [TC-3-B-BRT-BRT Run 3](runs/tc-3-B-BRT-BRT-run-3.md) — BRT — PASS — Chromium confirms Config B Server Reload stores correctly
+- 2026-04-09 [TC-3-A-IST-BRT Run 3](runs/tc-3-A-IST-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-3-B-IST-BRT Run 3](runs/tc-3-B-IST-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-3-C-BRT-BRT Run 5](runs/tc-3-C-BRT-BRT-run-5.md) — BRT — FAIL — Chromium confirms known bug — Bug #4
+- 2026-04-09 [TC-3-D-BRT-BRT Run 5](runs/tc-3-D-BRT-BRT-run-5.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-3-D-IST-BRT Run 3](runs/tc-3-D-IST-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-3-G-BRT-BRT Run 3](runs/tc-3-G-BRT-BRT-run-3.md) — BRT — PASS — Chromium confirms Config G Server Reload stores correctly
+- 2026-04-09 [TC-3-E-BRT-BRT Run 3](runs/tc-3-E-BRT-BRT-run-3.md) — BRT — PASS — Chromium confirms Config E Server Reload stores correctly
+- 2026-04-09 [TC-3-F-BRT-BRT Run 3](runs/tc-3-F-BRT-BRT-run-3.md) — BRT — PASS — Chromium confirms Config F Server Reload stores correctly
+- 2026-04-09 [TC-3-H-BRT-BRT Run 3](runs/tc-3-H-BRT-BRT-run-3.md) — BRT — PASS — Chromium confirms Config H Server Reload stores correctly
+- 2026-04-09 [TC-3-C-IST-BRT Run 3](runs/tc-3-C-IST-BRT-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #1, Bug #4
+- 2026-04-09 [TC-4-FAR-DD-BRT Run 2](runs/tc-4-FAR-DD-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5, Bug #1
+- 2026-04-09 [TC-4-FAR-AA-BRT Run 2](runs/tc-4-FAR-AA-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-FAR-DC-BRT Run 2](runs/tc-4-FAR-DC-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-4-FAR-CD-BRT Run 2](runs/tc-4-FAR-CD-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-FAR-CA-BRT Run 2](runs/tc-4-FAR-CA-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-A-isoT-BRT-reload Run 2](runs/tc-4-A-isoT-BRT-reload-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-D-z-BRT-reload Run 2](runs/tc-4-D-z-BRT-reload-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #1, Bug #5
+- 2026-04-09 [TC-4-FAR-DD-BRT-reload Run 2](runs/tc-4-FAR-DD-BRT-reload-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5, Bug #1
+- 2026-04-09 [TC-4-A-isoT-BRT Run 2](runs/tc-4-A-isoT-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-A-iso-BRT Run 2](runs/tc-4-A-iso-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-A-isoZ-BRT Run 2](runs/tc-4-A-isoZ-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-A-us-BRT Run 2](runs/tc-4-A-us-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-B-isoT-BRT Run 2](runs/tc-4-B-isoT-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-C-z-BRT Run 2](runs/tc-4-C-z-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #1
+- 2026-04-09 [TC-4-C-noz-BRT Run 2](runs/tc-4-C-noz-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-D-z-BRT Run 2](runs/tc-4-D-z-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #1, Bug #5
+- 2026-04-09 [TC-4-D-noz-BRT Run 2](runs/tc-4-D-noz-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-4-D-midnight-z-BRT Run 2](runs/tc-4-D-midnight-z-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #1, Bug #5
+- 2026-04-09 [TC-4-E-isoT-BRT Run 2](runs/tc-4-E-isoT-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-F-isoT-BRT Run 2](runs/tc-4-F-isoT-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-G-z-BRT Run 2](runs/tc-4-G-z-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #1
+- 2026-04-09 [TC-4-H-z-BRT Run 2](runs/tc-4-H-z-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #1
+- 2026-04-09 [TC-5-B-BRT Run 2](runs/tc-5-B-BRT-run-2.md) — BRT — PASS — Chromium confirms Config B Preset Date stores correctly
+- 2026-04-09 [TC-5-C-BRT Run 2](runs/tc-5-C-BRT-run-2.md) — BRT — PASS — Chromium confirms Config C Preset Date stores correctly
+- 2026-04-09 [TC-5-D-BRT Run 2](runs/tc-5-D-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-5-E-BRT Run 2](runs/tc-5-E-BRT-run-2.md) — BRT — PASS — Chromium confirms Config E Preset Date stores correctly
+- 2026-04-09 [TC-5-F-BRT Run 2](runs/tc-5-F-BRT-run-2.md) — BRT — PASS — Chromium confirms Config F Preset Date stores correctly
+- 2026-04-09 [TC-5-G-BRT Run 2](runs/tc-5-G-BRT-run-2.md) — BRT — PASS — Chromium confirms Config G Preset Date stores correctly
+- 2026-04-09 [TC-5-H-BRT Run 2](runs/tc-5-H-BRT-run-2.md) — BRT — PASS — Chromium confirms Config H Preset Date stores correctly
+- 2026-04-09 [TC-6-B-BRT Run 2](runs/tc-6-B-BRT-run-2.md) — BRT — PASS — Chromium confirms Config B Current Date stores correctly
+- 2026-04-09 [TC-6-C-BRT Run 2](runs/tc-6-C-BRT-run-2.md) — BRT — PASS — Chromium confirms Config C Current Date stores correctly
+- 2026-04-09 [TC-6-D-BRT Run 2](runs/tc-6-D-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-6-E-BRT Run 2](runs/tc-6-E-BRT-run-2.md) — BRT — PASS — Chromium confirms Config E Current Date stores correctly
+- 2026-04-09 [TC-6-F-BRT Run 2](runs/tc-6-F-BRT-run-2.md) — BRT — PASS — Chromium confirms Config F Current Date stores correctly
+- 2026-04-09 [TC-6-G-BRT Run 2](runs/tc-6-G-BRT-run-2.md) — BRT — PASS — Chromium confirms Config G Current Date stores correctly
+- 2026-04-09 [TC-6-H-BRT Run 2](runs/tc-6-H-BRT-run-2.md) — BRT — PASS — Chromium confirms Config H Current Date stores correctly
+- 2026-04-09 [TC-7-D-dateObj Run 2](runs/tc-7-D-dateObj-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-D-isoZ Run 2](runs/tc-7-D-isoZ-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-D-isoNoZ Run 2](runs/tc-7-D-isoNoZ-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-D-dateOnly Run 2](runs/tc-7-D-dateOnly-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-D-usFormat Run 2](runs/tc-7-D-usFormat-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-D-usFormatTime Run 2](runs/tc-7-D-usFormatTime-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-D-epoch Run 2](runs/tc-7-D-epoch-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-C-isoZ Run 2](runs/tc-7-C-isoZ-run-2.md) — BRT — PASS — Chromium confirms Config C SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-C-isoNoZ Run 2](runs/tc-7-C-isoNoZ-run-2.md) — BRT — PASS — Chromium confirms Config C SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-C-dateOnly Run 2](runs/tc-7-C-dateOnly-run-2.md) — BRT — PASS — Chromium confirms Config C SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-C-dateObj Run 2](runs/tc-7-C-dateObj-run-2.md) — BRT — PASS — Chromium confirms Config C SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-C-usFormat Run 2](runs/tc-7-C-usFormat-run-2.md) — BRT — PASS — Chromium confirms Config C SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-C-usFormatTime Run 2](runs/tc-7-C-usFormatTime-run-2.md) — BRT — PASS — Chromium confirms Config C SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-C-epoch Run 2](runs/tc-7-C-epoch-run-2.md) — BRT — PASS — Chromium confirms Config C SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-A-dateOnly Run 2](runs/tc-7-A-dateOnly-run-2.md) — BRT — PASS — Chromium confirms Config A SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-A-isoZ Run 2](runs/tc-7-A-isoZ-run-2.md) — BRT — PASS — Chromium confirms Config A SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-A-dateObj-BRT Run 2](runs/tc-7-A-dateObj-BRT-run-2.md) — BRT — PASS — Chromium confirms Config A SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-A-isoNoZ Run 2](runs/tc-7-A-isoNoZ-run-2.md) — BRT — PASS — Chromium confirms Config A SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-A-usFormat Run 2](runs/tc-7-A-usFormat-run-2.md) — BRT — PASS — Chromium confirms Config A SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-A-usFormatTime Run 2](runs/tc-7-A-usFormatTime-run-2.md) — BRT — PASS — Chromium confirms Config A SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-A-epoch Run 2](runs/tc-7-A-epoch-run-2.md) — BRT — PASS — Chromium confirms Config A SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-B-dateOnly-BRT Run 2](runs/tc-7-B-dateOnly-BRT-run-2.md) — BRT — PASS — Chromium confirms Config B SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-B-isoZ-BRT Run 2](runs/tc-7-B-isoZ-BRT-run-2.md) — BRT — PASS — Chromium confirms Config B SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-B-dateObj-BRT Run 2](runs/tc-7-B-dateObj-BRT-run-2.md) — BRT — PASS — Chromium confirms Config B SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-E-dateOnly-BRT Run 2](runs/tc-7-E-dateOnly-BRT-run-2.md) — BRT — PASS — Chromium confirms Config E SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-G-isoNoZ-BRT Run 2](runs/tc-7-G-isoNoZ-BRT-run-2.md) — BRT — PASS — Chromium confirms Config G SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-G-isoZ-BRT Run 2](runs/tc-7-G-isoZ-BRT-run-2.md) — BRT — PASS — Chromium confirms Config G SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-H-isoNoZ-BRT Run 2](runs/tc-7-H-isoNoZ-BRT-run-2.md) — BRT — PASS — Chromium confirms Config H SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-H-isoZ-BRT Run 2](runs/tc-7-H-isoZ-BRT-run-2.md) — BRT — PASS — Chromium confirms Config H SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-7-H-dateObj-BRT Run 2](runs/tc-7-H-dateObj-BRT-run-2.md) — BRT — PASS — Chromium confirms Config H SetFieldValue Formats stores correctly
+- 2026-04-09 [TC-8-A-empty Run 3](runs/tc-8-A-empty-run-3.md) — BRT — PASS — Chromium confirms Config A GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-C-empty Run 3](runs/tc-8-C-empty-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #6
+- 2026-04-09 [TC-8-H-BRT Run 3](runs/tc-8-H-BRT-run-3.md) — BRT — PASS — Chromium confirms Config H GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-A Run 2](runs/tc-8-A-run-2.md) — BRT — PASS — Chromium confirms Config A GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-C-BRT Run 2](runs/tc-8-C-BRT-run-2.md) — BRT — PASS — Chromium confirms Config C GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-D-BRT Run 2](runs/tc-8-D-BRT-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-8-D-empty Run 2](runs/tc-8-D-empty-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #6
+- 2026-04-09 [TC-8-B Run 2](runs/tc-8-B-run-2.md) — BRT — PASS — Chromium confirms Config B GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-H-empty Run 3](runs/tc-8-H-empty-run-3.md) — BRT — PASS — Chromium confirms Config H GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-E Run 2](runs/tc-8-E-run-2.md) — BRT — PASS — Chromium confirms Config E GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-F Run 2](runs/tc-8-F-run-2.md) — BRT — PASS — Chromium confirms Config F GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-G-BRT Run 2](runs/tc-8-G-BRT-run-2.md) — BRT — PASS — Chromium confirms Config G GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8B-D-BRT Run 3](runs/tc-8B-D-BRT-run-3.md) — BRT — PASS — Chromium confirms Config D GetDateObject Return stores correctly
+- 2026-04-09 [TC-8B-D-empty Run 3](runs/tc-8B-D-empty-run-3.md) — BRT — PASS — Chromium confirms Config D GetDateObject Return stores correctly
+- 2026-04-09 [TC-8B-A-BRT Run 2](runs/tc-8B-A-BRT-run-2.md) — BRT — PASS — Chromium confirms Config A GetDateObject Return stores correctly
+- 2026-04-09 [TC-8B-C-BRT Run 2](runs/tc-8B-C-BRT-run-2.md) — BRT — PASS — Chromium confirms Config C GetDateObject Return stores correctly
+- 2026-04-09 [TC-8B-A-empty Run 2](runs/tc-8B-A-empty-run-2.md) — BRT — PASS — Chromium confirms Config A GetDateObject Return stores correctly
+- 2026-04-09 [TC-8B-E-BRT Run 2](runs/tc-8B-E-BRT-run-2.md) — BRT — PASS — Chromium confirms Config E GetDateObject Return stores correctly
+- 2026-04-09 [TC-8B-H-BRT Run 2](runs/tc-8B-H-BRT-run-2.md) — BRT — PASS — Chromium confirms Config H GetDateObject Return stores correctly
+- 2026-04-09 [TC-9-GDOC-D-BRT-1 Run 3](runs/tc-9-GDOC-D-BRT-1-run-3.md) — BRT — PASS — Chromium confirms Config D GDOC Round-Trip stores correctly
+- 2026-04-09 [TC-9-GDOC-A-BRT-1 Run 2](runs/tc-9-GDOC-A-BRT-1-run-2.md) — BRT — PASS — Chromium confirms Config A GDOC Round-Trip stores correctly
+- 2026-04-09 [TC-9-GDOC-C-BRT-1 Run 2](runs/tc-9-GDOC-C-BRT-1-run-2.md) — BRT — PASS — Chromium confirms Config C GDOC Round-Trip stores correctly
+- 2026-04-09 [TC-9-H-BRT-1 Run 3](runs/tc-9-H-BRT-1-run-3.md) — BRT — PASS — Chromium confirms Config H GFV Round-Trip stores correctly
+- 2026-04-09 [TC-9-C-BRT-1 Run 3](runs/tc-9-C-BRT-1-run-3.md) — BRT — PASS — Chromium confirms Config C GFV Round-Trip stores correctly
+- 2026-04-09 [TC-9-D-BRT-1 Run 3](runs/tc-9-D-BRT-1-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-9-D-BRT-8 Run 3](runs/tc-9-D-BRT-8-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-9-D-BRT-10 Run 3](runs/tc-9-D-BRT-10-run-3.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-9-A-any Run 2](runs/tc-9-A-any-run-2.md) — BRT — PASS — Chromium confirms Config A GFV Round-Trip stores correctly
+- 2026-04-09 [TC-9-B-any Run 2](runs/tc-9-B-any-run-2.md) — BRT — PASS — Chromium confirms Config B GFV Round-Trip stores correctly
+- 2026-04-09 [TC-9-D-BRT-3 Run 2](runs/tc-9-D-BRT-3-run-2.md) — BRT — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-9-G-BRT-1 Run 2](runs/tc-9-G-BRT-1-run-2.md) — BRT — PASS — Chromium confirms Config G GFV Round-Trip stores correctly
+
+## Session 2026-04-09 (Chromium regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Chromium.
+**Key outcomes**: 4 tests documented.
+
+- 2026-04-09 [TC-11-load-PST Run 2](runs/tc-11-load-PST-run-2.md) — PST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-dst-US-PST Run 2](runs/tc-12-dst-US-PST-run-2.md) — PST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-5-A-PST Run 2](runs/tc-5-A-PST-run-2.md) — PST — PASS — Chromium confirms Config A Preset Date stores correctly
+- 2026-04-09 [TC-9-D-PST-1 Run 2](runs/tc-9-D-PST-1-run-2.md) — PST — FAIL — Chromium confirms known bug — Bug #5
+
+## Session 2026-04-09 (Chromium regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Chromium.
+**Key outcomes**: 15 tests documented.
+
+- 2026-04-09 [TC-1-A-UTC0 Run 3](runs/tc-1-A-UTC0-run-3.md) — UTC0 — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-1-D-UTC0 Run 3](runs/tc-1-D-UTC0-run-3.md) — UTC0 — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-1-E-UTC0 Run 2](runs/tc-1-E-UTC0-run-2.md) — UTC0 — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-1-F-UTC0 Run 2](runs/tc-1-F-UTC0-run-2.md) — UTC0 — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-11-load-UTC0 Run 2](runs/tc-11-load-UTC0-run-2.md) — UTC0 — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-12-utc-0-control Run 3](runs/tc-12-utc-0-control-run-3.md) — UTC0 — PASS — Chromium confirms Config D Edge Cases stores correctly
+- 2026-04-09 [TC-5-A-UTC0 Run 2](runs/tc-5-A-UTC0-run-2.md) — UTC0 — PASS — Chromium confirms Config A Preset Date stores correctly
+- 2026-04-09 [TC-5-C-UTC0 Run 2](runs/tc-5-C-UTC0-run-2.md) — UTC0 — PASS — Chromium confirms Config C Preset Date stores correctly
+- 2026-04-09 [TC-5-D-UTC0 Run 2](runs/tc-5-D-UTC0-run-2.md) — UTC0 — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-6-A-UTC0 Run 2](runs/tc-6-A-UTC0-run-2.md) — UTC0 — PASS — Chromium confirms Config A Current Date stores correctly
+- 2026-04-09 [TC-8-C-UTC0 Run 2](runs/tc-8-C-UTC0-run-2.md) — UTC0 — PASS — Chromium confirms Config C GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-D-UTC0 Run 2](runs/tc-8-D-UTC0-run-2.md) — UTC0 — PASS — Chromium confirms Config D GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8B-A-UTC0 Run 2](runs/tc-8B-A-UTC0-run-2.md) — UTC0 — PASS — Chromium confirms Config A GetDateObject Return stores correctly
+- 2026-04-09 [TC-8B-D-UTC0 Run 2](runs/tc-8B-D-UTC0-run-2.md) — UTC0 — PASS — Chromium confirms Config D GetDateObject Return stores correctly
+- 2026-04-09 [TC-9-D-UTC0 Run 2](runs/tc-9-D-UTC0-run-2.md) — UTC0 — FAIL — Chromium confirms known bug — Bug #5
+
+## Session 2026-04-09 (Chromium regression)
+
+**Purpose**: Cross-browser regression verification — all test cases in Chromium.
+**Key outcomes**: 89 tests documented.
+
+- 2026-04-09 [TC-1-C-IST Run 3](runs/tc-1-C-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #4
+- 2026-04-09 [TC-1-A-IST Run 3](runs/tc-1-A-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-1-B-IST Run 3](runs/tc-1-B-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-1-D-IST Run 3](runs/tc-1-D-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-1-F-IST Run 2](runs/tc-1-F-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-1-E-IST Run 2](runs/tc-1-E-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-1-G-IST Run 2](runs/tc-1-G-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-1-H-IST Run 2](runs/tc-1-H-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #2
+- 2026-04-09 [TC-11-A-save-BRT-load-IST Run 2](runs/tc-11-A-save-BRT-load-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-11-B-save-BRT-load-IST Run 2](runs/tc-11-B-save-BRT-load-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-11-C-save-BRT-load-IST Run 2](runs/tc-11-C-save-BRT-load-IST-run-2.md) — IST — PASS — Chromium confirms Config C Cross-Timezone stores correctly
+- 2026-04-09 [TC-11-E-save-BRT-load-IST Run 2](runs/tc-11-E-save-BRT-load-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-11-D-save-BRT-load-IST Run 2](runs/tc-11-D-save-BRT-load-IST-run-2.md) — IST — PASS — Chromium confirms Config D Cross-Timezone stores correctly
+- 2026-04-09 [TC-11-F-save-BRT-load-IST Run 2](runs/tc-11-F-save-BRT-load-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-11-G-save-BRT-load-IST Run 2](runs/tc-11-G-save-BRT-load-IST-run-2.md) — IST — PASS — Chromium confirms Config G Cross-Timezone stores correctly
+- 2026-04-09 [TC-11-H-save-BRT-load-IST Run 2](runs/tc-11-H-save-BRT-load-IST-run-2.md) — IST — PASS — Chromium confirms Config H Cross-Timezone stores correctly
+- 2026-04-09 [TC-12-near-midnight-1-IST Run 3](runs/tc-12-near-midnight-1-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-near-midnight-2-IST Run 3](runs/tc-12-near-midnight-2-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-year-boundary-IST Run 3](runs/tc-12-year-boundary-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-12-leap-day-IST Run 3](runs/tc-12-leap-day-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-2-A-IST Run 3](runs/tc-2-A-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-2-B-IST Run 3](runs/tc-2-B-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-2-C-IST Run 3](runs/tc-2-C-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #4
+- 2026-04-09 [TC-2-D-IST Run 3](runs/tc-2-D-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-2-E-IST Run 3](runs/tc-2-E-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-2-F-IST Run 3](runs/tc-2-F-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-2-G-IST Run 3](runs/tc-2-G-IST-run-3.md) — IST — PASS — Chromium confirms Config G Typed Input stores correctly
+- 2026-04-09 [TC-2-H-IST Run 3](runs/tc-2-H-IST-run-3.md) — IST — PASS — Chromium confirms Config H Typed Input stores correctly
+- 2026-04-09 [TC-3-B-BRT-IST Run 3](runs/tc-3-B-BRT-IST-run-3.md) — IST — PASS — Chromium confirms Config B Server Reload stores correctly
+- 2026-04-09 [TC-3-C-BRT-IST Run 3](runs/tc-3-C-BRT-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #1, Bug #4
+- 2026-04-09 [TC-3-D-BRT-IST Run 5](runs/tc-3-D-BRT-IST-run-5.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-3-A-BRT-IST Run 4](runs/tc-3-A-BRT-IST-run-4.md) — IST — PASS — Chromium confirms Config A Server Reload stores correctly
+- 2026-04-09 [TC-3-E-BRT-IST Run 3](runs/tc-3-E-BRT-IST-run-3.md) — IST — PASS — Chromium confirms Config E Server Reload stores correctly
+- 2026-04-09 [TC-3-H-BRT-IST Run 3](runs/tc-3-H-BRT-IST-run-3.md) — IST — PASS — Chromium confirms Config H Server Reload stores correctly
+- 2026-04-09 [TC-4-FAR-DD-IST Run 2](runs/tc-4-FAR-DD-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #5, Bug #1
+- 2026-04-09 [TC-4-FAR-AA-IST Run 2](runs/tc-4-FAR-AA-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-4-FAR-DC-IST Run 2](runs/tc-4-FAR-DC-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-4-FAR-CA-IST Run 2](runs/tc-4-FAR-CA-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-A-isoT-IST Run 2](runs/tc-4-A-isoT-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-A-iso-IST Run 2](runs/tc-4-A-iso-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-A-isoZ-IST Run 2](runs/tc-4-A-isoZ-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-A-us-IST Run 2](runs/tc-4-A-us-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-B-isoT-IST Run 2](runs/tc-4-B-isoT-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-C-z-IST Run 2](runs/tc-4-C-z-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #1
+- 2026-04-09 [TC-4-C-noz-IST Run 2](runs/tc-4-C-noz-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-D-z-IST Run 2](runs/tc-4-D-z-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #1, Bug #5
+- 2026-04-09 [TC-4-D-noz-IST Run 2](runs/tc-4-D-noz-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-4-D-midnight-z-IST Run 2](runs/tc-4-D-midnight-z-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #1, Bug #5
+- 2026-04-09 [TC-4-E-isoT-IST Run 2](runs/tc-4-E-isoT-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-4-G-z-IST Run 2](runs/tc-4-G-z-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #1
+- 2026-04-09 [TC-4-H-z-IST Run 2](runs/tc-4-H-z-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #1
+- 2026-04-09 [TC-5-A-IST Run 3](runs/tc-5-A-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-5-D-IST Run 3](runs/tc-5-D-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-5-B-IST Run 2](runs/tc-5-B-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-5-C-IST Run 2](runs/tc-5-C-IST-run-2.md) — IST — PASS — Chromium confirms Config C Preset Date stores correctly
+- 2026-04-09 [TC-5-E-IST Run 2](runs/tc-5-E-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-5-F-IST Run 2](runs/tc-5-F-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-6-A-IST Run 3](runs/tc-6-A-IST-run-3.md) — IST — PASS — Chromium confirms Config A Current Date stores correctly
+- 2026-04-09 [TC-6-D-IST Run 3](runs/tc-6-D-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-6-B-IST Run 2](runs/tc-6-B-IST-run-2.md) — IST — PASS — Chromium confirms Config B Current Date stores correctly
+- 2026-04-09 [TC-6-C-IST Run 2](runs/tc-6-C-IST-run-2.md) — IST — PASS — Chromium confirms Config C Current Date stores correctly
+- 2026-04-09 [TC-6-E-IST Run 2](runs/tc-6-E-IST-run-2.md) — IST — PASS — Chromium confirms Config E Current Date stores correctly
+- 2026-04-09 [TC-6-F-IST Run 2](runs/tc-6-F-IST-run-2.md) — IST — PASS — Chromium confirms Config F Current Date stores correctly
+- 2026-04-09 [TC-7-A-dateOnly-IST Run 2](runs/tc-7-A-dateOnly-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-7-A-dateObj-IST Run 2](runs/tc-7-A-dateObj-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-7-D-dateObj-IST Run 3](runs/tc-7-D-dateObj-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-D-isoZ-IST Run 3](runs/tc-7-D-isoZ-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-D-isoNoZ-IST Run 3](runs/tc-7-D-isoNoZ-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-7-B-dateOnly-IST Run 2](runs/tc-7-B-dateOnly-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-7-B-dateObj-IST Run 2](runs/tc-7-B-dateObj-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-7-E-dateOnly-IST Run 2](runs/tc-7-E-dateOnly-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-7-F-dateOnly-IST Run 2](runs/tc-7-F-dateOnly-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-8-C-IST Run 2](runs/tc-8-C-IST-run-2.md) — IST — PASS — Chromium confirms Config C GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-D-IST Run 2](runs/tc-8-D-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-8-D-empty-IST Run 3](runs/tc-8-D-empty-IST-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #6
+- 2026-04-09 [TC-8-H-IST Run 2](runs/tc-8-H-IST-run-2.md) — IST — PASS — Chromium confirms Config H GetFieldValue Return stores correctly
+- 2026-04-09 [TC-8-V2 Run 2](runs/tc-8-V2-run-2.md) — IST — FAIL — Chromium confirms known bug — assertion mismatch
+- 2026-04-09 [TC-8B-D-IST Run 3](runs/tc-8B-D-IST-run-3.md) — IST — PASS — Chromium confirms Config D GetDateObject Return stores correctly
+- 2026-04-09 [TC-8B-A-IST Run 2](runs/tc-8B-A-IST-run-2.md) — IST — PASS — Chromium confirms Config A GetDateObject Return stores correctly
+- 2026-04-09 [TC-8B-C-IST Run 2](runs/tc-8B-C-IST-run-2.md) — IST — PASS — Chromium confirms Config C GetDateObject Return stores correctly
+- 2026-04-09 [TC-9-GDOC-D-IST-1 Run 3](runs/tc-9-GDOC-D-IST-1-run-3.md) — IST — PASS — Chromium confirms Config D GDOC Round-Trip stores correctly
+- 2026-04-09 [TC-9-GDOC-A-IST-1 Run 2](runs/tc-9-GDOC-A-IST-1-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+- 2026-04-09 [TC-9-D-IST-1 Run 3](runs/tc-9-D-IST-1-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-9-D-IST-5 Run 3](runs/tc-9-D-IST-5-run-3.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-9-C-IST-1 Run 2](runs/tc-9-C-IST-1-run-2.md) — IST — PASS — Chromium confirms Config C GFV Round-Trip stores correctly
+- 2026-04-09 [TC-9-H-IST-1 Run 3](runs/tc-9-H-IST-1-run-3.md) — IST — PASS — Chromium confirms Config H GFV Round-Trip stores correctly
+- 2026-04-09 [TC-9-D-IST-8 Run 2](runs/tc-9-D-IST-8-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-9-D-IST-10 Run 2](runs/tc-9-D-IST-10-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #5
+- 2026-04-09 [TC-9-B-IST Run 2](runs/tc-9-B-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7

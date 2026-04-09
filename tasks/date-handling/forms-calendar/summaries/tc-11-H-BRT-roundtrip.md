@@ -1,7 +1,7 @@
 # TC-11-H-BRT-roundtrip — Summary
 
 **Spec**: [tc-11-H-BRT-roundtrip.md](../test-cases/tc-11-H-BRT-roundtrip.md)
-**Current status**: PASS — last run 2026-04-08 (BRT)
+**Current status**: PASS — last run 2026-04-09 (BRT, Chromium)
 **Bug surface**: none — control/passing scenario (confirms useLegacy=true immunity)
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                            |
 | --- | ---------- | --- | ------- | ----------------------------------------------- |
 | 1   | 2026-04-08 | BRT | PASS    | [run-1](../runs/tc-11-H-BRT-roundtrip-run-1.md) |
+| 2   | 2026-04-09 | BRT | PASS    | [run-2](../runs/tc-11-H-BRT-roundtrip-run-2.md) |
 
 ## Current Interpretation
 
-Config H (`useLegacy=true`) shows zero drift after 3 GFV round-trips in BRT. The legacy code path returns raw stored values without transformation, making SFV(GFV()) an identity operation. This confirms `useLegacy=true` as a viable mitigation for FORM-BUG-5 in production cross-timezone scenarios where Config D fields experience progressive drift.
+Run 2 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

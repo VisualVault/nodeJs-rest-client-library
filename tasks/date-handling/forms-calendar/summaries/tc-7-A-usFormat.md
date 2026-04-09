@@ -1,7 +1,7 @@
 # TC-7-A-usFormat — Summary
 
 **Spec**: [tc-7-A-usFormat.md](../test-cases/tc-7-A-usFormat.md)
-**Current status**: PASS — last run 2026-04-03 (BRT)
+**Current status**: PASS — last run 2026-04-09 (BRT, Chromium)
 **Bug surface**: none — BRT control for US date format input
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                      |
 | --- | ---------- | --- | ------- | ----------------------------------------- |
 | 1   | 2026-04-03 | BRT | PASS    | [run-1](../runs/tc-7-A-usFormat-run-1.md) |
+| 2   | 2026-04-09 | BRT | PASS    | [run-2](../runs/tc-7-A-usFormat-run-2.md) |
 
 ## Current Interpretation
 
-US format `"03/15/2026"` is the native VV display format. Parsed correctly by `moment()` as local midnight. Stores `"2026-03-15"` in BRT. Would trigger Bug #7 in UTC+ timezones.
+Run 2 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

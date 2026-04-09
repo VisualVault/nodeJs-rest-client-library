@@ -1,7 +1,7 @@
 # TC-3-A-BRT-BRT — Summary
 
 **Spec**: [tc-3-A-BRT-BRT.md](../test-cases/tc-3-A-BRT-BRT.md)
-**Current status**: PASS — last run 2026-04-03 (BRT, Firefox)
+**Current status**: PASS — last run 2026-04-09 (BRT, Chromium)
 **Bug surface**: none — control/passing scenario
 
 ## Run History
@@ -13,10 +13,11 @@
 | 3   | 2026-03-31 | BRT | PASS    | [run-3](../runs/tc-3-A-BRT-BRT-run-3.md) |
 | 4   | 2026-04-01 | BRT | PASS    | [run-4](../runs/tc-3-A-BRT-BRT-run-4.md) |
 | 5   | 2026-04-03 | BRT | PASS    | [run-5](../runs/tc-3-A-BRT-BRT-run-5.md) |
+| 6   | 2026-04-09 | BRT | PASS    | [run-6](../runs/tc-3-A-BRT-BRT-run-6.md) |
 
 ## Current Interpretation
 
-Run 5 (2026-04-03, Firefox): PASS. Cross-browser verification in progress.
+Run 6 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 

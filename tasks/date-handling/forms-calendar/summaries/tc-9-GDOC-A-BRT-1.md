@@ -1,7 +1,7 @@
 # TC-9-GDOC-A-BRT-1 — Summary
 
 **Spec**: [tc-9-GDOC-A-BRT-1.md](../test-cases/tc-9-GDOC-A-BRT-1.md)
-**Current status**: PASS — last run 2026-04-08 (BRT)
+**Current status**: PASS — last run 2026-04-09 (BRT, Chromium)
 **Bug surface**: none — control/passing scenario
 
 ## Run History
@@ -9,10 +9,11 @@
 | Run | Date       | TZ  | Outcome | File                                        |
 | --- | ---------- | --- | ------- | ------------------------------------------- |
 | 1   | 2026-04-08 | BRT | PASS    | [run-1](../runs/tc-9-GDOC-A-BRT-1-run-1.md) |
+| 2   | 2026-04-09 | BRT | PASS    | [run-2](../runs/tc-9-GDOC-A-BRT-1-run-2.md) |
 
 ## Current Interpretation
 
-GDOC round-trip is safe for Config A (date-only) in BRT. Real UTC from `.toISOString()` is correctly parsed by `normalizeCalValue` back to the same local date. No FORM-BUG-7 because BRT (UTC-3) midnight falls on the same UTC day. IST sibling (`9-GDOC-A-IST-1`) is expected to fail due to FORM-BUG-7 on the SFV path.
+Run 2 (2026-04-09, Chromium): PASS. Cross-browser verification in progress.
 
 ## Next Action
 
