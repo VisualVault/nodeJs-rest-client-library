@@ -45,4 +45,4 @@ Same 8 configs as emanueljofre DateTest. Each config = unique `enableTime` × `i
 - **Read-only constraint**: WADNR is a near-production environment. No changes to forms or scripts — test by invoking existing assets only.
 - **zzzDate Test Harness** was created 2026-04-06 specifically for this investigation. It replicates the emanueljofre DateTest field layout so the same test methodology applies.
 - **Exported XMLs**: `tools/explore/zzzDate-Test-Harness.xml` and `tools/explore/zzzJohnDevTest.xml` (not committed — re-export with the exploration script if needed).
-- The form template export for this project (`exports/form-templates/`) does not include zzz-prefixed forms. They were created after the last bulk export.
+- The form template export for this project (`extracts/form-templates/`) does not include zzz-prefixed forms. They were created after the last bulk extraction.

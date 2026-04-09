@@ -8,20 +8,22 @@
 | Customer | WADNR |
 | Database | fpOnline |
 | Base URL | https://vv5dev.visualvault.com |
-| Read-Only | Yes (enforced in `.env.json` — no write operations) |
+| Read-Only | Yes (enforced in `.env.json`) |
+| Write Policy | **allowlist** — writes ONLY to forms/WS listed in `.env.json` `writePolicy` |
 
-## Exports
+## Extracts
 
-All data extracted via `tools/export/` from the WADNR admin panels on vv5dev.
+All data extracted via `tools/extract/` from the WADNR admin panels on vv5dev.
 
 | Component | Count | Location |
 |-----------|-------|----------|
-| Web Services (Form + Workflow) | 251 scripts | `exports/web-services/` |
-| Scheduled Services | 21 schedules + 20 scripts | `exports/schedules/` |
-| Global Functions | 157 functions | `exports/global-functions/` |
-| Form Templates | 77 XMLs | `exports/form-templates/` |
+| Web Services (Form + Workflow) | 251 scripts | `extracts/web-services/` |
+| Scheduled Services | 21 schedules + 20 scripts | `extracts/schedules/` |
+| Global Functions | 157 functions | `extracts/global-functions/` |
+| Form Templates | 77 XMLs | `extracts/form-templates/` |
+| Custom Queries | 447 queries (11 main + 436 form DB) | `extracts/custom-queries/` |
 
-Last full export: 2026-04-08.
+Last full extraction: 2026-04-08.
 
 ## Analysis
 
@@ -32,14 +34,14 @@ Last full export: 2026-04-08.
 ## Commands
 
 ```bash
-# Re-sync all exports
-node tools/export/export.js --project wadnr
+# Re-sync all extracts
+node tools/extract/extract.js --project wadnr
 
 # Sync just scripts
-node tools/export/export.js --project wadnr --component scripts
+node tools/extract/extract.js --project wadnr --component scripts
 
 # Dry-run (show what changed)
-node tools/export/export.js --project wadnr --dry-run
+node tools/extract/extract.js --project wadnr --dry-run
 
 # Re-generate field inventory
 node tools/inventory/inventory-fields.js
@@ -47,6 +49,22 @@ node tools/inventory/inventory-fields.js
 # Re-generate script inventory
 node tools/inventory/inventory-scripts.js
 ```
+
+## Write Safety — RESTRICTED ENVIRONMENT
+
+WADNR is a **near-production client environment**. Write operations are governed by the `writePolicy` allowlist in `.env.json`.
+
+**Currently allowed writes:**
+- Form: `zzzDate Test Harness` (template `ff59bb37-b331-f111-830f-d3ae5cbd0a3d`) — create and update
+- Web Service: `zzzJohnDevTestWebSvc` (script 203)
+
+**Everything else is blocked.** Do not:
+- Create records on any non-zzz form
+- Invoke any non-zzz web service
+- Modify document index fields or library items
+- Add new entries to the WADNR `writePolicy` without explicit user approval
+
+See root `CLAUDE.md` § "Write Safety" for the full policy and enforcement architecture.
 
 ## Related
 

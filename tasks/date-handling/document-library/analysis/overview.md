@@ -144,9 +144,20 @@ Documents have built-in date fields (separate from index fields):
 
 Note: built-in dates INCLUDE the Z suffix (UTC). Index field dates do NOT. This is inconsistent within the same document.
 
-## Next Steps
+## Automated Regression Tests
 
-1. **UI save round-trip test** — Check in the document (or create fresh), edit date via UI datepicker, save, read back via API. Verify what format the UI sends.
+**17 tests** in `testing/specs/date-handling/doc-index-field-dates.spec.js`:
+
+- Format normalization (6 tests): ISO date-only, US, EU, naive datetime, US 12h, US 24h
+- DOC-BUG-1 (7 tests): Z stripped, BRT offset, IST offset, midnight BRT, midnight UTC, late night UTC+, early morning date shift
+- DOC-BUG-2 (2 tests): empty string, null-like values
+- Z suffix comparison (1 test): index fields vs forms API
+- Built-in dates (1 test): document system dates include Z
+
+Run: `npx playwright test --config=testing/playwright.config.js --project=BRT-chromium testing/specs/date-handling/doc-index-field-dates.spec.js`
+
+## Open Items
+
+1. **UI save round-trip** — Editing requires: Check Out → Index Fields tab → edit RadDateTimePicker → Save. The document checkout flow changes the ASP.NET postback page state. RadDateTimePicker sends Telerik internal format (`YYYY-MM-DD-HH-mm-ss`) in postback. Needs manual testing or a dedicated Playwright helper for document checkout flow.
 2. **WADNR impact** — WADNR scripts use `putDocumentIndexFields()` with date values. Check if they write with timezone offsets (DOC-BUG-1 risk).
-3. **Cross-timezone UI test** — View the same document from BRT and IST browsers. Does the displayed date change? (It shouldn't if stored as naive datetime, but might if the server applies timezone logic.)
-4. **Playwright regression spec** — Create automated tests for the document date data pipeline.
+3. **Cross-timezone UI test** — View the same document from BRT and IST browsers. Does the displayed date change?

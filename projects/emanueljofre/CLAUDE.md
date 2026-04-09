@@ -9,36 +9,38 @@
 | Database  | Main                                     |
 | Base URL  | https://vvdemo.visualvault.com           |
 | Read-Only | No                                       |
+| Write Policy | `unrestricted` — development sandbox, all writes allowed |
 
-## Exports
+## Extracts
 
-All data extracted via `tools/export/` from the EmanuelJofre admin panels on vvdemo.
+All data extracted via `tools/extract/` from the EmanuelJofre admin panels on vvdemo.
 
 | Component          | Count | Location                    |
 | ------------------ | ----- | --------------------------- |
-| Web Services       | 36 scripts | `exports/web-services/`     |
-| Scheduled Services | 5 schedules + 6 scripts | `exports/schedules/`        |
-| Global Functions   | 24 functions | `exports/global-functions/` |
-| Form Templates     | 108 templates | `exports/form-templates/`   |
+| Web Services       | 36 scripts | `extracts/web-services/`     |
+| Scheduled Services | 5 schedules + 6 scripts | `extracts/schedules/`        |
+| Global Functions   | 24 functions | `extracts/global-functions/` |
+| Form Templates     | 108 templates | `extracts/form-templates/`   |
+| Custom Queries     | 130 queries (4 main + 126 form DB) | `extracts/custom-queries/` |
 
-Last export: 2026-04-09. All components successful. Note: GetSites script skipped (empty source).
+Last extraction: 2026-04-09. All components successful. Note: GetSites script skipped (empty source).
 
 ## Commands
 
 ```bash
-# Export all components
-node tools/export/export.js --project emanueljofre
+# Extract all components
+node tools/extract/extract.js --project emanueljofre
 
-# Export just scripts
-node tools/export/export.js --project emanueljofre --component scripts
+# Extract just scripts
+node tools/extract/extract.js --project emanueljofre --component scripts
 
 # Dry-run
-node tools/export/export.js --project emanueljofre --dry-run
+node tools/extract/extract.js --project emanueljofre --dry-run
 ```
 
 ## Analysis
 
-No analysis files yet. Run exports first, then use:
+No analysis files yet. Run extractions first, then use:
 
 - `node tools/inventory/inventory-fields.js` for field inventory
 - `node tools/inventory/inventory-scripts.js` for script inventory
