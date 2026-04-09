@@ -3,7 +3,7 @@
 Playwright API tests for VisualVault REST API date handling. Tests use the Node.js client library to create, read, and update form records via the API, verifying date integrity across field configurations and timezones.
 
 > Task documentation: [tasks/date-handling/web-services/](../../tasks/date-handling/web-services/)
-> Forms comparison: [testing/date-handling/](../date-handling/)
+> Forms comparison: [testing/specs/date-handling/](../specs/date-handling/)
 
 ## Structure
 
@@ -36,7 +36,7 @@ npx playwright test testing/web-services/ --project=BRT-chromium
 
 - `testing/fixtures/ws-config.js` — API constants, form template ID, reuses FIELD_MAP from vv-config.js
 - `testing/fixtures/ws-test-data.js` — Test case definitions (data-driven, same pattern as test-data.js)
-- `testing/helpers/ws-api.js` — API helper functions: authenticate, create/read/update forms, capture values
+- `tools/helpers/ws-api.js` — API helper functions: authenticate, create/read/update forms, capture values
 
 ## Key Differences from Forms Tests
 

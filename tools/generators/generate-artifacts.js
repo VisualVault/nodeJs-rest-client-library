@@ -10,7 +10,7 @@
  *   - Session index (append) in tasks/date-handling/forms-calendar/results.md
  *
  * Usage:
- *   node testing/scripts/generate-artifacts.js [--input path/to/results.json] [--artifacts-only | --dry-run]
+ *   node tools/generators/generate-artifacts.js [--input path/to/results.json] [--artifacts-only | --dry-run]
  */
 const fs = require('fs');
 const path = require('path');
@@ -41,7 +41,7 @@ function main() {
 
     if (!fs.existsSync(inputPath)) {
         console.error(`Results file not found: ${inputPath}`);
-        console.error('Run tests first: node testing/scripts/run-regression.js --browser firefox');
+        console.error('Run tests first: node testing/pipelines/run-regression.js --browser firefox');
         process.exit(1);
     }
 

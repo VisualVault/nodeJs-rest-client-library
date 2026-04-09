@@ -12,7 +12,7 @@
  * 5. Round-trip compounding in IST: verify cumulative day loss
  * 6. Year/month boundary: verify boundary crossing
  *
- * Usage: node testing/scripts/audit-bug7-wrong-day.js
+ * Usage: node tools/audit/audit-bug7-wrong-day.js
  */
 const { chromium } = require('@playwright/test');
 const { AUTH_STATE_PATH } = require('../../testing/fixtures/vv-config');

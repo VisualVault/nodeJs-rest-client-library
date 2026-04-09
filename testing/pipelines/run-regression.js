@@ -5,12 +5,12 @@
  * Orchestrates: npx playwright test → regression-reporter.js → generate-artifacts.js
  *
  * Usage:
- *   node testing/scripts/run-regression.js --browser firefox
- *   node testing/scripts/run-regression.js --project 'BRT-firefox'
- *   node testing/scripts/run-regression.js --browser chromium --tz IST
- *   node testing/scripts/run-regression.js --artifacts-only          # artifacts from last results only
- *   node testing/scripts/run-regression.js --skip-artifacts    # run tests only
- *   node testing/scripts/run-regression.js --headed            # visible browser
+ *   node testing/pipelines/run-regression.js --browser firefox
+ *   node testing/pipelines/run-regression.js --project 'BRT-firefox'
+ *   node testing/pipelines/run-regression.js --browser chromium --tz IST
+ *   node testing/pipelines/run-regression.js --artifacts-only          # artifacts from last results only
+ *   node testing/pipelines/run-regression.js --skip-artifacts    # run tests only
+ *   node testing/pipelines/run-regression.js --headed            # visible browser
  *
  * npm script: npm run test:pw:regression -- --browser firefox
  */
@@ -52,9 +52,9 @@ function main() {
         if (!project) {
             console.error('Error: specify --browser, --tz, or --project to select which tests to run.');
             console.error('Examples:');
-            console.error('  node testing/scripts/run-regression.js --browser firefox');
-            console.error('  node testing/scripts/run-regression.js --project BRT-chromium');
-            console.error('  node testing/scripts/run-regression.js --browser webkit --tz IST');
+            console.error('  node testing/pipelines/run-regression.js --browser firefox');
+            console.error('  node testing/pipelines/run-regression.js --project BRT-chromium');
+            console.error('  node testing/pipelines/run-regression.js --browser webkit --tz IST');
             process.exit(1);
         }
 

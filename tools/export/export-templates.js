@@ -3,10 +3,10 @@
  *
  * Navigates to FormTemplateAdmin, reads the Telerik RadGrid, and exports
  * each template whose name does NOT start with "z" (case-insensitive).
- * XMLs are saved to tasks/date-handling/wadnr-impact/form-templates/.
+ * XMLs are saved to projects/wadnr/exports/form-templates/.
  *
  * Usage:
- *   node testing/scripts/export-wadnr-templates.js [--dry-run] [--headless]
+ *   node tools/export/export-templates.js [--dry-run] [--headless]
  */
 const { chromium } = require('@playwright/test');
 const fs = require('fs');

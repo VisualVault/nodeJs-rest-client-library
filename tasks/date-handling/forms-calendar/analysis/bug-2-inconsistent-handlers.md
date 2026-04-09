@@ -67,7 +67,7 @@ The format difference translates to an actual data difference in the SQL Server 
 This bug report is backed by a supporting test repository containing Playwright automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ```bash
-npx playwright test testing/date-handling/cat-1-legacy-popup.spec.js --project=BRT-chromium
+npx playwright test testing/specs/date-handling/cat-1-legacy-popup.spec.js --project=BRT-chromium
 ```
 
 ---

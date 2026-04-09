@@ -7,15 +7,15 @@
  * Shares a single browser session across components.
  *
  * Usage:
- *   node testing/scripts/export-wadnr.js                       # All components
- *   node testing/scripts/export-wadnr.js --component scripts   # Just web services
- *   node testing/scripts/export-wadnr.js --component schedules # Just scheduled services
- *   node testing/scripts/export-wadnr.js --component globals   # Just global functions
- *   node testing/scripts/export-wadnr.js --list                # Show available components
- *   node testing/scripts/export-wadnr.js --dry-run             # List what would be extracted
- *   node testing/scripts/export-wadnr.js --force               # Re-extract everything
- *   node testing/scripts/export-wadnr.js --headed              # Show browser
- *   node testing/scripts/export-wadnr.js --filter "Lib*"       # Filter by name
+ *   node tools/export/export.js                       # All components
+ *   node tools/export/export.js --component scripts   # Just web services
+ *   node tools/export/export.js --component schedules # Just scheduled services
+ *   node tools/export/export.js --component globals   # Just global functions
+ *   node tools/export/export.js --list                # Show available components
+ *   node tools/export/export.js --dry-run             # List what would be extracted
+ *   node tools/export/export.js --force               # Re-extract everything
+ *   node tools/export/export.js --headed              # Show browser
+ *   node tools/export/export.js --filter "Lib*"       # Filter by name
  */
 const { chromium } = require('@playwright/test');
 const fs = require('fs');

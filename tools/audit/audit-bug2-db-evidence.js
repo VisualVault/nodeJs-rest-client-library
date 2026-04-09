@@ -12,7 +12,7 @@
  *   Record A (popup):  Field12 = 2026-03-15 03:00:00.000  (BRT midnight in UTC)
  *   Record B (typed):  Field12 = 2026-03-15 00:00:00.000  (midnight, tz-ambiguous)
  *
- * Usage: node testing/scripts/audit-bug2-db-evidence.js
+ * Usage: node tools/audit/audit-bug2-db-evidence.js
  */
 const { chromium } = require('@playwright/test');
 const { AUTH_STATE_PATH, FIELD_MAP } = require('../../testing/fixtures/vv-config');

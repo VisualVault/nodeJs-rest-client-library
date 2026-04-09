@@ -15,7 +15,7 @@
  * Logs warnings if actual differs from Expected (potential regression).
  *
  * Usage:
- *   node testing/scripts/generate-ws-artifacts.js [--input path] [--dry-run]
+ *   node tools/generators/generate-ws-artifacts.js [--input path] [--dry-run]
  */
 const fs = require('fs');
 const path = require('path');
@@ -43,7 +43,7 @@ function main() {
 
     if (!fs.existsSync(inputPath)) {
         console.error(`Results file not found: ${inputPath}`);
-        console.error('Run tests first: node testing/scripts/run-ws-regression.js --tz BRT');
+        console.error('Run tests first: node testing/pipelines/run-ws-regression.js --tz BRT');
         process.exit(1);
     }
 

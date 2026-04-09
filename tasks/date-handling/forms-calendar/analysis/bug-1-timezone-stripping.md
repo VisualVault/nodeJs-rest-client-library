@@ -78,7 +78,7 @@ The FormViewer's calendar initialization has two versions. **V1** is the default
 This bug report is backed by a supporting test repository containing Playwright automation scripts, additional per-bug analysis documents, raw test data, and test case specifications. Access can be requested from the Solution Architecture team.
 
 ```bash
-npx playwright test testing/date-handling/audit-bug1-tz-stripping.spec.js --project=IST-chromium
+npx playwright test testing/specs/date-handling/audit-bug1-tz-stripping.spec.js --project=IST-chromium
 ```
 
 ---

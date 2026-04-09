@@ -5,7 +5,7 @@
  * Captures grid structure, date values, and compares across timezones.
  *
  * Usage:
- *   node testing/scripts/explore-dashboard.js [--tz BRT|IST|UTC0] [--record DateTest-NNNNNN] [--all]
+ *   node tools/audit/explore-dashboard.js [--tz BRT|IST|UTC0] [--record DateTest-NNNNNN] [--all]
  *
  * Options:
  *   --tz       Browser timezone (default: BRT). Affects nothing for server-rendered grid,

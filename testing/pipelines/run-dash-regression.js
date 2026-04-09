@@ -9,11 +9,11 @@
  * Dashboards are server-rendered — browser TZ is irrelevant.
  *
  * Usage:
- *   node testing/scripts/run-dash-regression.js
- *   node testing/scripts/run-dash-regression.js --category DB-1
- *   node testing/scripts/run-dash-regression.js --artifacts-only
- *   node testing/scripts/run-dash-regression.js --skip-artifacts
- *   node testing/scripts/run-dash-regression.js --headed
+ *   node testing/pipelines/run-dash-regression.js
+ *   node testing/pipelines/run-dash-regression.js --category DB-1
+ *   node testing/pipelines/run-dash-regression.js --artifacts-only
+ *   node testing/pipelines/run-dash-regression.js --skip-artifacts
+ *   node testing/pipelines/run-dash-regression.js --headed
  *
  * npm script: npm run test:dash:regression
  */

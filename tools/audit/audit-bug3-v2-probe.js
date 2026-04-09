@@ -11,7 +11,7 @@
  * 3. If V2 activates, compares stored values with V1 to detect Bug #3 effects
  * 4. Also verifies the code claim by reading parseDateString behavior
  *
- * Usage: node testing/scripts/audit-bug3-v2-probe.js
+ * Usage: node tools/audit/audit-bug3-v2-probe.js
  */
 const { chromium } = require('@playwright/test');
 const { AUTH_STATE_PATH, FIELD_MAP } = require('../../testing/fixtures/vv-config');

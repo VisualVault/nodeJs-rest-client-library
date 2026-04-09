@@ -11,7 +11,7 @@
  *   - Session index (append) in tasks/date-handling/dashboards/results.md
  *
  * Usage:
- *   node testing/scripts/generate-dash-artifacts.js [--input path] [--category DB-N] [--dry-run]
+ *   node tools/generators/generate-dash-artifacts.js [--input path] [--category DB-N] [--dry-run]
  */
 const fs = require('fs');
 const path = require('path');
@@ -57,7 +57,7 @@ function main() {
 
     if (!fs.existsSync(inputPath)) {
         console.error(`Results file not found: ${inputPath}`);
-        console.error('Run tests first: node testing/scripts/run-dash-regression.js');
+        console.error('Run tests first: node testing/pipelines/run-dash-regression.js');
         process.exit(1);
     }
 

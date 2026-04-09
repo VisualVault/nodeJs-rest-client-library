@@ -7,11 +7,11 @@
  * results and generates artifacts (run files, summaries, matrix updates).
  *
  * Usage:
- *   node testing/scripts/run-ws-regression.js --tz BRT
- *   node testing/scripts/run-ws-regression.js --action WS-1
- *   node testing/scripts/run-ws-regression.js --action WS-1 --tz IST
- *   node testing/scripts/run-ws-regression.js --artifacts-only
- *   node testing/scripts/run-ws-regression.js --skip-artifacts --tz BRT
+ *   node testing/pipelines/run-ws-regression.js --tz BRT
+ *   node testing/pipelines/run-ws-regression.js --action WS-1
+ *   node testing/pipelines/run-ws-regression.js --action WS-1 --tz IST
+ *   node testing/pipelines/run-ws-regression.js --artifacts-only
+ *   node testing/pipelines/run-ws-regression.js --skip-artifacts --tz BRT
  *
  * npm script: npm run test:ws:regression -- --tz BRT
  */

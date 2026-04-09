@@ -8,7 +8,7 @@
  *
  * Also runs Config A (non-legacy) as a control.
  *
- * Usage: node testing/scripts/explore-legacy-popup.js
+ * Usage: node tools/audit/audit-bug2-legacy-popup.js
  */
 const { chromium } = require('@playwright/test');
 const { AUTH_STATE_PATH, FIELD_MAP } = require('../../testing/fixtures/vv-config');

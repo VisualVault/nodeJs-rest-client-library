@@ -6,8 +6,8 @@
  * saves each as an individual .js file.
  *
  * Usage:
- *   node testing/scripts/export-wadnr-globals.js [--dry-run] [--headless]
- *   node testing/scripts/export-wadnr-globals.js --xcid <guid> --xcdid <guid>
+ *   node tools/export/export-globals.js [--dry-run] [--headless]
+ *   node tools/export/export-globals.js --xcid <guid> --xcdid <guid>
  */
 const { chromium } = require('@playwright/test');
 const fs = require('fs');

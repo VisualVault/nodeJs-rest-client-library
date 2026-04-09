@@ -7,10 +7,10 @@
  * against calendar field configurations to identify FORM-BUG-5 exposure.
  *
  * Usage:
- *   node testing/scripts/inventory-wadnr-scripts.js
+ *   node tools/inventory/inventory-scripts.js
  *
  * Output:
- *   tasks/date-handling/wadnr-impact/script-inventory.md
+ *   projects/wadnr/analysis/script-inventory.md
  */
 
 const fs = require('fs');

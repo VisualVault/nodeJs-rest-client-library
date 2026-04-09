@@ -13,7 +13,7 @@ REST API date handling investigation. Tests how dates are sent, stored, and retu
 | `scripts/templates/webservice-pattern.js`           | Clean VV web service template (reference)                      |
 | `scripts/form-scripts/ws-harness-button.js`         | Client-side form button script to call the harness             |
 | `scripts/templates/web-service-call-pattern.js`     | Generic VV web service call pattern (reference)                |
-| `testing/scripts/run-ws-test.js`                    | Direct Node.js CLI runner (auth + harness invocation)          |
+| `tools/runners/run-ws-test.js`                      | Direct Node.js CLI runner (auth + harness invocation)          |
 | `test-cases/`                                       | Individual TC spec files                                       |
 | `runs/`                                             | Immutable execution records                                    |
 | `summaries/`                                        | Per-TC status files                                            |
@@ -33,7 +33,7 @@ REST API date handling investigation. Tests how dates are sent, stored, and retu
 **Quick smoke test:**
 
 ```bash
-node testing/scripts/run-ws-test.js --action WS-2 --configs A --record-id DateTest-000080
+node tools/runners/run-ws-test.js --action WS-2 --configs A --record-id DateTest-000080
 ```
 
 If this prints a JSON response with `"status": "Success"`, the runner is working.
@@ -101,19 +101,19 @@ Calls the harness directly in Node.js — no server, no VV Microservice, no brow
 
 ```bash
 # Basic usage
-node testing/scripts/run-ws-test.js --action WS-1 --configs A,D --input-date 2026-03-15
+node tools/runners/run-ws-test.js --action WS-1 --configs A,D --input-date 2026-03-15
 
 # Read existing record
-node testing/scripts/run-ws-test.js --action WS-2 --configs ALL --record-id DateTest-000080
+node tools/runners/run-ws-test.js --action WS-2 --configs ALL --record-id DateTest-000080
 
 # With debug (includes raw API response in output)
-node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15 --debug
+node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15 --debug
 
 # With VS Code debugger
-node --inspect-brk testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+node --inspect-brk tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 
 # Simulate cloud TZ
-TZ=UTC node testing/scripts/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
+TZ=UTC node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15
 ```
 
 **Credentials**: Reads from the root `.env.json` via `testing/fixtures/env-config.js`. See `.env.example.json` for the schema.

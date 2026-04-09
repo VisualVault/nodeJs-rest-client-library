@@ -10,7 +10,7 @@
  * 3. End-to-end: type a date in Config C, capture raw + GFV values
  * 4. Cross-config comparison: C (affected) vs D (Bug #5) vs G (legacy) vs A (date-only)
  *
- * Usage: node testing/scripts/audit-bug4-save-format.js
+ * Usage: node tools/audit/audit-bug4-save-format.js
  */
 const { chromium } = require('@playwright/test');
 const { AUTH_STATE_PATH, FIELD_MAP } = require('../../testing/fixtures/vv-config');

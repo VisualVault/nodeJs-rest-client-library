@@ -340,7 +340,7 @@ User-defined helper functions loaded from the site-level script library. These a
 
 ### WADNR Environment (fpOnline)
 
-Global functions discovered from WADNR template XML analysis (77 templates, 3560 scripts). Implementations are site-level — not in template XML. Full usage counts in [`wadnr-impact/script-inventory.md`](../../projects/wadnr/analysis/script-inventory.md).
+Global functions discovered from WADNR template XML analysis (77 templates, 3560 scripts). Implementations are site-level — not in template XML. Full usage counts in [`script-inventory.md`](../../projects/wadnr/analysis/script-inventory.md).
 
 **Date-related** (implementations unknown — flagged for investigation):
 

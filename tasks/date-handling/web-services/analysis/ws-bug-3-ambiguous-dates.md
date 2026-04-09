@@ -59,11 +59,11 @@ The scope is narrower than WEBSERVICE-BUG-2 because only days 1–12 are affecte
 
 ```bash
 # Create a record with an ambiguous DD/MM date
-node testing/scripts/run-ws-test.js \
+node tools/runners/run-ws-test.js \
   --action WS-1 --configs A --input-date "05/03/2026"
 
 # Read back the stored value
-node testing/scripts/run-ws-test.js \
+node tools/runners/run-ws-test.js \
   --action WS-2 --configs A --record-id <record-name>
 # → datafield7 = "2026-05-03T00:00:00Z"  (May 3, not March 5)
 ```

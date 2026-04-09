@@ -7,10 +7,10 @@
  * heuristics, and generates a markdown inventory document.
  *
  * Usage:
- *   node testing/scripts/inventory-wadnr-fields.js
+ *   node tools/inventory/inventory-fields.js
  *
  * Output:
- *   tasks/date-handling/wadnr-impact/field-inventory.md
+ *   projects/wadnr/analysis/field-inventory.md
  */
 
 const fs = require('fs');

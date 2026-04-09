@@ -11,7 +11,7 @@
  * 3. Truthiness verification (the core developer impact)
  * 4. GDOC workaround (GetDateObjectFromCalendar returns undefined for empty)
  *
- * Usage: node testing/scripts/audit-bug6-empty-fields.js
+ * Usage: node tools/audit/audit-bug6-empty-fields.js
  */
 const { chromium } = require('@playwright/test');
 const { AUTH_STATE_PATH } = require('../../testing/fixtures/vv-config');

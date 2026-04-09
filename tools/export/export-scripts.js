@@ -4,7 +4,7 @@
  * Backward-compatible wrapper — delegates to export-wadnr.js --component scripts.
  *
  * Usage:
- *   node testing/scripts/export-wadnr-scripts.js [--dry-run] [--force] [--headed] [--filter "Lib*"]
+ *   node tools/export/export-scripts.js [--dry-run] [--force] [--headed] [--filter "Lib*"]
  */
 const { execFileSync } = require('child_process');
 const path = require('path');

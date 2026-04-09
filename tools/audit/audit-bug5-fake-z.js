@@ -11,7 +11,7 @@
  * 4. Cross-config comparison — D (fake Z) vs C (real UTC) vs H (passthrough)
  * 5. Year boundary edge case — Jan 1 midnight drift crosses into previous year
  *
- * Usage: node testing/scripts/audit-bug5-fake-z.js
+ * Usage: node tools/audit/audit-bug5-fake-z.js
  */
 const { chromium } = require('@playwright/test');
 const { AUTH_STATE_PATH } = require('../../testing/fixtures/vv-config');

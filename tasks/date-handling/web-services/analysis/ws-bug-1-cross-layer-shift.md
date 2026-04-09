@@ -65,7 +65,7 @@ Permanent data corruption on first save. Affects every API-created record with d
 Using the test harness:
 
 ```bash
-node testing/scripts/run-ws-test.js \
+node tools/runners/run-ws-test.js \
   --action WS-1 --configs D --input-date "2026-03-15T14:30:00"
 ```
 
@@ -76,7 +76,7 @@ Note the record name from the output (e.g., DateTest-001566).
 ### 2. Read Back via API — Confirm the Value Was Stored Correctly
 
 ```bash
-node testing/scripts/run-ws-test.js \
+node tools/runners/run-ws-test.js \
   --action WS-2 --configs D --record-id DateTest-001566
 ```
 

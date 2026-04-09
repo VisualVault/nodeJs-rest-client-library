@@ -66,12 +66,12 @@ The scope is broad (affects any date-only field written through multiple paths) 
 
 ```bash
 # 1. Create record with date-only string
-node testing/scripts/run-ws-test.js \
+node tools/runners/run-ws-test.js \
   --action WS-1 --configs A --input-date "2026-03-15"
 # → DB stores: 2026-03-15 00:00:00.000 (midnight)
 
 # 2. Create another record with datetime string (same field type, same date)
-node testing/scripts/run-ws-test.js \
+node tools/runners/run-ws-test.js \
   --action WS-1 --configs A --input-date "2026-03-15T14:30:00"
 # → DB stores: 2026-03-15 14:30:00.000 (2:30 PM — no enforcement)
 
@@ -84,7 +84,7 @@ node testing/scripts/run-ws-test.js \
 
 ```bash
 # Exact equality — only matches midnight records
-node testing/scripts/run-ws-test.js \
+node tools/runners/run-ws-test.js \
   --action WS-8 --configs A
 # OData: [Field7] eq '2026-03-15'
 # → Matches record 1 (midnight), misses record 2 (14:30)

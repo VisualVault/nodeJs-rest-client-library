@@ -6,7 +6,7 @@
  * Field7 (Config A), Field5 (Config D), Field6 (Config C), Field13 (Config H).
  *
  * Usage:
- *   node testing/scripts/verify-format-mismatch.js
+ *   node tools/audit/verify-format-mismatch.js
  */
 const { chromium } = require('@playwright/test');
 const path = require('path');
