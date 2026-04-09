@@ -77,6 +77,7 @@ function computeChanges(allItems, manifest, opts = {}) {
     const {
         idField = 'id',
         dateField = null,
+        hashField = null,
         fileDir = null,
         fileExt = '.js',
         force = false,
@@ -120,8 +121,11 @@ function computeChanges(allItems, manifest, opts = {}) {
         } else if (dateField && existing[dateField] !== item[dateField]) {
             toExtract.push(item);
             modified++;
+        } else if (!dateField && hashField && existing[hashField] && existing[hashField] === item[hashField]) {
+            // Hash match — content unchanged, skip extraction
+            unchanged++;
         } else if (!dateField) {
-            // No date field = always refresh (metadata-only components like schedules)
+            // No date field and no hash match = re-extract
             toExtract.push(item);
             modified++;
         } else {

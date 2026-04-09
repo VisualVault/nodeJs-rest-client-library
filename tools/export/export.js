@@ -171,7 +171,7 @@ async function main() {
             const page = await context.newPage();
 
             try {
-                await runComponent(comp, page, config, outputDir, exportContext);
+                await runComponent(comp, page, config, outputDir, exportContext, context);
             } catch (err) {
                 console.error(`\n  ERROR in ${compName}: ${err.message}`);
                 const screenshot = path.join(outputDir, '_error-screenshot.png');
@@ -189,13 +189,13 @@ async function main() {
     console.log('All done.');
 }
 
-async function runComponent(comp, page, config, outputDir, exportContext) {
+async function runComponent(comp, page, config, outputDir, exportContext, context) {
     const manifestPath = path.join(outputDir, 'manifest.json');
     const filterFn = (item) => vvSync.matchesFilter(item.name || item[Object.keys(item)[0]], FILTER);
 
-    // Phase 1: Fetch metadata
+    // Phase 1: Fetch metadata (pass manifestPath for hash carry-forward)
     console.log('\n  Phase 1: Fetching metadata...');
-    const allItems = await comp.fetchMetadata(page, config);
+    const allItems = await comp.fetchMetadata(page, config, { manifestPath });
     console.log(`  Found ${allItems.length} items.`);
 
     if (DRY_RUN && !comp.extract) {
@@ -214,41 +214,30 @@ async function runComponent(comp, page, config, outputDir, exportContext) {
     if (comp.extract) {
         const manifest = vvSync.loadManifest(manifestPath);
 
-        // For the scripts component, split items by category so scheduled scripts
-        // are tracked in schedules/scripts/ and the rest in web-services/scripts/
+        // For the scripts component, items are routed by category:
+        //   categoryCode !== 1 → web-services/scripts/
+        //   categoryCode === 1 → schedules/scripts/
+        // Change detection runs ONCE against the full manifest to avoid
+        // double-counting deletions, then toExtract/deleted are split by category.
         const isScriptsComp = comp.name === 'scripts';
         const nonScheduledItems = isScriptsComp ? allItems.filter((i) => i.categoryCode !== 1) : allItems;
-        const scheduledItems = isScriptsComp ? allItems.filter((i) => i.categoryCode === 1) : [];
 
         const fileExt = comp.name === 'templates' ? '.xml' : '.js';
-        const commonOpts = {
+        const fileDir = comp.name === 'templates' ? outputDir : path.join(outputDir, 'scripts');
+
+        // Run computeChanges once with ALL items against the unified manifest.
+        // For scripts: fileDir is null because items route to different dirs by category.
+        // Date-based detection still works — only manually-deleted files need --force.
+        const changes = vvSync.computeChanges(allItems, manifest, {
             idField: comp.syncOpts?.idField || 'id',
             dateField: comp.syncOpts?.dateField || 'modifyDate',
+            hashField: comp.syncOpts?.hashField || null,
             fileExt,
             force: FORCE,
             filterFn,
-        };
-
-        const fileDir = comp.name === 'templates' ? outputDir : path.join(outputDir, 'scripts');
-        const changes = vvSync.computeChanges(nonScheduledItems, manifest, {
-            ...commonOpts,
-            fileDir,
+            fileDir: isScriptsComp ? null : fileDir,
             component: comp.name,
         });
-
-        // Compute changes for scheduled scripts separately (different output dir)
-        if (scheduledItems.length > 0) {
-            const schChanges = vvSync.computeChanges(scheduledItems, manifest, {
-                ...commonOpts,
-                fileDir: exportContext.scheduledScriptsDir,
-                component: comp.name,
-            });
-            changes.toExtract.push(...schChanges.toExtract);
-            changes.added += schChanges.added;
-            changes.modified += schChanges.modified;
-            changes.unchanged += schChanges.unchanged;
-            changes.deleted.push(...schChanges.deleted);
-        }
 
         console.log(
             `  Sync: +${changes.added} new, ~${changes.modified} changed, =${changes.unchanged} same, -${changes.deleted.length} deleted`
@@ -260,31 +249,35 @@ async function runComponent(comp, page, config, outputDir, exportContext) {
             return;
         }
 
-        // Save manifest — for scripts component, only non-scheduled items
-        vvSync.saveManifest(manifestPath, {
-            environment: `${PROJECT.server}/${PROJECT.customer}`,
-            component: comp.name,
-            items: nonScheduledItems,
-        });
-
         if (changes.toExtract.length > 0) {
-            // Phase 2: Extract
+            // Phase 2: Extract (pass browser context for parallel workers)
             console.log(`\n  Phase 2: Extracting ${changes.toExtract.length} items...`);
-            const extracted = await comp.extract(page, config, changes.toExtract);
+            const extracted = await comp.extract(page, config, changes.toExtract, context);
             console.log(`  Extracted ${extracted.size}/${changes.toExtract.length}.`);
 
             // Phase 3: Save (routes scheduled scripts to scheduledScriptsDir)
-            const saved = comp.save(outputDir, allItems, extracted, exportContext);
-            console.log(`  Saved ${saved} files.`);
+            const saveResult = comp.save(outputDir, allItems, extracted, exportContext);
+            const savedCount = typeof saveResult === 'object' ? saveResult.saved : saveResult;
+            console.log(`  Saved ${savedCount} files.`);
 
-            // Handle deletions — resolve path based on category
+            // Merge content hashes from extraction into allItems for manifest
+            if (typeof saveResult === 'object' && saveResult.hashes) {
+                for (const item of allItems) {
+                    const hash = saveResult.hashes.get(item.name || item[comp.syncOpts?.idField || 'id']);
+                    if (hash) item.contentHash = hash;
+                }
+            }
+
+            // Handle deletions — resolve path based on category (check both dirs for scripts)
             for (const s of changes.deleted) {
-                const isScheduled = isScriptsComp && s.categoryCode === 1;
-                const delDir = isScheduled ? exportContext.scheduledScriptsDir : fileDir;
-                const fp = path.join(delDir, vvSync.sanitizeFilename(s.name) + fileExt);
-                if (fs.existsSync(fp)) {
-                    fs.unlinkSync(fp);
-                    console.log(`  Removed: ${s.name}`);
+                const dirs = isScriptsComp ? [fileDir, exportContext.scheduledScriptsDir] : [fileDir];
+                for (const dir of dirs) {
+                    const fp = path.join(dir, vvSync.sanitizeFilename(s.name) + fileExt);
+                    if (fs.existsSync(fp)) {
+                        fs.unlinkSync(fp);
+                        console.log(`  Removed: ${s.name}`);
+                        break;
+                    }
                 }
             }
 
@@ -295,6 +288,14 @@ async function runComponent(comp, page, config, outputDir, exportContext) {
         } else {
             console.log('  All up to date.');
         }
+
+        // Save manifest AFTER extraction so content hashes are included.
+        // For scripts: save ALL items (scheduled + non-scheduled) so both are tracked.
+        vvSync.saveManifest(manifestPath, {
+            environment: `${PROJECT.server}/${PROJECT.customer}`,
+            component: comp.name,
+            items: allItems,
+        });
 
         // Generate README with full set of extracted files
         const allExtracted = new Set();

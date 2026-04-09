@@ -42,7 +42,7 @@ function loadEnvConfig(serverName, customerName) {
  * Login to a VV environment via the browser login form.
  */
 async function login(page, config) {
-    await page.goto(config.baseUrl, { waitUntil: 'networkidle', timeout: 30000 });
+    await page.goto(config.baseUrl, { waitUntil: 'networkidle', timeout: 60000 });
     if (page.url().includes('/app/') || page.url().includes('/VVPortalUI/')) return;
     await page.getByRole('textbox', { name: 'User Name' }).fill(config.username);
     await page.getByRole('textbox', { name: 'Password' }).fill(config.password);
