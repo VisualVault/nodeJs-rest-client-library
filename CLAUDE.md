@@ -75,11 +75,12 @@ REST API date handling tests via the DateTestWSHarness. Run with `node tools/run
 
 See `tasks/` folder. Each task gets its own subfolder with analysis, test results, and working notes.
 
-| Task                                    | Status      | Description                                                                             |
-| --------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
-| [date-handling](tasks/date-handling/)   | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards   |
-| [form-templates](tasks/form-templates/) | Active      | VV form template XML analysis, format documentation, and improved template generation   |
-| [wadnr](projects/wadnr/)                | In Progress | WADNR client project: impact analysis, exported artifacts (templates, scripts, globals) |
+| Task                                              | Status      | Description                                                                           |
+| ------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------- |
+| [date-handling](tasks/date-handling/)             | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards |
+| [form-templates](tasks/form-templates/)           | Active      | VV form template XML analysis, format documentation, and improved template generation |
+| [export-optimization](tasks/export-optimization/) | Active      | Export pipeline speed: parallel extraction, revision tracking, API-first              |
+| [wadnr](projects/wadnr/)                          | In Progress | WADNR client project: impact analysis, exported artifacts                             |
 
 ## Repository Architecture & Sharing Model
 
