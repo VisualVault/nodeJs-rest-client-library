@@ -137,23 +137,26 @@ Flag as **WARNING**.
 
 ### 3F. Duplicated content
 
-For each CLAUDE.md, check if substantial content (>5 lines) appears identically in another CLAUDE.md or in a README.md in the same directory.
+Two checks:
 
-Flag as **WARNING** with the duplicate location.
+1. **CLAUDE.md vs README.md in same directory**: If both exist, compare section headings (`## Heading`). Overlapping headings suggest duplicated content. Read overlapping sections and confirm.
+2. **Root CLAUDE.md vs scope CLAUDE.md**: For each scope CLAUDE.md, check if the root CLAUDE.md has a section covering the same topic in detail (beyond a 1-line pointer). If so, the detail should live in only one place.
+
+Flag as **WARNING** with the overlapping sections and which file is authoritative.
 
 ### 3G. Broken pointers
 
-For each relative link or file reference in a CLAUDE.md (patterns: `[text](path)`, backtick paths like `` `path/to/file` ``), verify the target exists:
+For each relative link or file reference in a CLAUDE.md (patterns: `[text](path)`, backtick paths), verify the target exists. Strip `#anchor` suffixes before checking — anchor validity can't be verified from the filesystem.
 
 ```bash
-# Extract links and verify
-grep -oP '\[.*?\]\(((?!http)[^)]+)\)' file | while read link; do
-  target=$(echo "$link" | grep -oP '\(([^)]+)\)' | tr -d '()')
-  [ -e "resolved/$target" ] || echo "BROKEN: $target"
+# Extract markdown links and verify (macOS-compatible)
+grep -oE '\[.*\]\([^)]+\)' file | grep -oE '\([^)]+\)' | tr -d '()' | grep -v '^http' | while read target; do
+  target_file=$(echo "$target" | sed 's/#.*//')
+  [ -z "$target_file" ] || [ -e "$target_file" ] || echo "BROKEN: $target"
 done
 ```
 
-Flag broken links as **CRITICAL**.
+Flag broken file links as **CRITICAL**. Anchor-only links (`#section`) are skipped (can't verify).
 
 ### 3H. Structure drift
 
@@ -164,6 +167,50 @@ For each CLAUDE.md that contains a subfolder structure table, verify the listed 
 ```
 
 Flag missing directories as **CRITICAL** (misleading structure). Flag unlisted directories as **INFO** (structure table may need updating).
+
+### 3I. Hardcoded count verification
+
+Extract numbers paired with countable nouns from each CLAUDE.md and verify against the filesystem:
+
+**Known count-to-source mappings:**
+
+| Pattern in CLAUDE.md          | Verification command                                                              |
+| ----------------------------- | --------------------------------------------------------------------------------- |
+| "N spec files"                | `ls testing/specs/date-handling/*.spec.js \| wc -l`                               |
+| "N scripts" (WADNR context)   | `ls projects/wadnr/exports/web-services/scripts/*.js \| wc -l`                    |
+| "N globals" / "N functions"   | `ls projects/wadnr/exports/global-functions/*.js \| wc -l`                        |
+| "N templates" (WADNR context) | `ls projects/wadnr/exports/form-templates/*.xml \| wc -l`                         |
+| "N schedules"                 | `jq '.totalItems' projects/wadnr/exports/schedules/manifest.json`                 |
+| "N confirmed bugs"            | count `bug-*.md` + `ws-bug-*.md` + `formdashboard-bug-*.md` in task analysis dirs |
+| "N commands"                  | `ls .claude/commands/*.md \| wc -l`                                               |
+
+For other numbers, look for patterns like `\d+ (spec|script|template|bug|global|schedule|field|function|command)` and attempt to verify by finding the corresponding directory or file.
+
+Flag mismatches as **WARNING**: "Claims N items, actually M" with the file and line.
+
+### 3J. Scope change detection
+
+For each CLAUDE.md, check if its scope directory has had **structural changes** (new files added, files deleted, files renamed) since the CLAUDE.md was last updated:
+
+```bash
+claude_md_date=$(git log -1 --format='%aI' -- "$scope/CLAUDE.md")
+# Find structural changes in scope since CLAUDE.md was last modified
+git log --since="$claude_md_date" --diff-filter=ADR --name-only --format="" -- "$scope/" | sort -u | grep -v 'CLAUDE.md'
+```
+
+If structural changes exist, flag as **WARNING**: "N structural changes in {scope}/ since CLAUDE.md was last updated" and list them so the maintainer knows what to address.
+
+Ignore changes to files inside subdirectories that aren't described by this CLAUDE.md (e.g., changes inside `tasks/date-handling/forms-calendar/runs/` don't affect `tasks/CLAUDE.md`).
+
+### 3K. Dev command verification (root CLAUDE.md only)
+
+For the root CLAUDE.md, verify the development commands section is accurate:
+
+1. **Extract `npm run` commands** from the CLAUDE.md dev commands section. For each, check it exists in `package.json` scripts. Flag missing as **CRITICAL** (broken doc).
+
+2. **Extract `node path/file.js` commands** from CLAUDE.md. Verify each file exists on disk. Flag missing as **CRITICAL**.
+
+3. **Check for new `package.json` scripts** not mentioned in CLAUDE.md. Compare `package.json` scripts keys against commands documented in CLAUDE.md. Flag undocumented user-facing scripts as **INFO** (potential gap).
 
 ---
 
@@ -180,12 +227,14 @@ Generate a consolidated report grouped by file, then by severity:
 - WARNING: 3 code blocks >5 lines (lines 45-62, 148-165, 270-285)
 - WARNING: 12 file inventory lines in repo structure tree
 - WARNING: Progress counts detected (line 87: "~220 of ~246 test cases")
+- WARNING: Claims "21 spec files", actual count is 23
 - INFO: .env.json structure block could be replaced with pointer to .env.example.json
+- INFO: npm script "test:pw:pst" in package.json not documented in dev commands
 
 ### tools/CLAUDE.md (Scope — 32 lines, target ~30-60)
 
-- OK: within size target
-- OK: no anti-patterns detected
+- OK: within size target, no anti-patterns
+- INFO: 2 structural changes since last update (new-tool.js added, old-probe.js deleted)
 
 ### tasks/date-handling/CLAUDE.md (Task — 812 lines, target <400)
 
@@ -199,11 +248,11 @@ Generate a consolidated report grouped by file, then by severity:
 
 ## Summary
 
-| Severity | Count |
-|----------|-------|
-| CRITICAL | 3 |
-| WARNING | 18 |
-| INFO | 5 |
+| Severity | Count | Category |
+|----------|-------|----------|
+| CRITICAL | 3 | size (2), broken pointer (1) |
+| WARNING | 18 | bloat (10), stale counts (3), duplication (3), drift (2) |
+| INFO | 5 | gaps (3), optimization (2) |
 ```
 
 If `--audit-only`, stop here. Otherwise proceed to Phase 5.
@@ -225,18 +274,22 @@ For each finding, apply fixes in this order:
 
 ### 5B. Apply fixes by category
 
-| Finding                 | Fix                                                                  |
-| ----------------------- | -------------------------------------------------------------------- |
-| Over size target        | Apply 5C-5G reductions, re-measure                                   |
-| File inventory          | Replace with `ls <dir>` note or subfolder-only table                 |
-| Code snippet (>5 lines) | Replace with pointer: "See `path/to/file`"                           |
-| Line number references  | Remove line numbers, keep the function/concept reference             |
-| Progress counts         | Replace with pointer: "See `matrix.md` for current status"           |
-| Config contents         | Replace with pointer: "See `.env.example.json` for structure"        |
-| Duplicated content      | Keep in the authoritative location, replace the other with a pointer |
-| Broken pointers         | Fix the path or remove the dead link                                 |
-| Structure drift         | Update the structure table to match reality                          |
-| Missing CLAUDE.md       | Create one following the tier template                               |
+| Finding                   | Fix                                                                  |
+| ------------------------- | -------------------------------------------------------------------- |
+| Over size target          | Apply 5C-5G reductions, re-measure                                   |
+| File inventory            | Replace with `ls <dir>` note or subfolder-only table                 |
+| Code snippet (>5 lines)   | Replace with pointer: "See `path/to/file`"                           |
+| Line number references    | Remove line numbers, keep the function/concept reference             |
+| Progress counts           | Replace with pointer: "See `matrix.md` for current status"           |
+| Config contents           | Replace with pointer: "See `.env.example.json` for structure"        |
+| Duplicated content        | Keep in the authoritative location, replace the other with a pointer |
+| Broken pointers           | Fix the path or remove the dead link                                 |
+| Structure drift           | Update the structure table to match reality                          |
+| Missing CLAUDE.md         | Create one following the tier template                               |
+| Stale count               | Update the number to match current filesystem count                  |
+| Scope changes unaddressed | Update CLAUDE.md structure/description to reflect new/removed files  |
+| Missing dev command       | Add the command to dev commands section, or remove broken reference  |
+| New undocumented script   | Add to dev commands if user-facing; ignore if internal               |
 
 ### 5C. Root CLAUDE.md — specific reductions
 
