@@ -6,7 +6,8 @@ Read-write: **No** — enforced in `.env.json`. Test assets can be invoked but n
 
 | Name | Template ID | Purpose | Configs | Notes |
 |------|-------------|---------|---------|-------|
-| zzzDate Test Harness | `ff59bb37-b331-f111-830f-d3ae5cbd0a3d` | Full date config coverage — mirrors emanueljofre DateTest | A-H × 3 modes (26 fields) | Rev 1, Released 2026-04-06. Field map identical to `testing/fixtures/vv-config.js` FIELD_MAP |
+| zzzDate Test Harness | `ff59bb37-b331-f111-830f-d3ae5cbd0a3d` | Full date config coverage — mirrors emanueljofre DateTest | A-H × 3 modes (26 fields) | Rev 1.2, Released 2026-04-09. Masks cleared (vv5dev auto-populated `MM/dd/yyyy` on all fields during import). Field map identical to `testing/fixtures/vv-config.js` FIELD_MAP |
+| zzzTarget Date Test Harness | `3f3a0b1a-4834-f111-8310-f323cafecf11` | URL parameter tests (Category 4) — all fields have `enableQListener=true` | A-H × 3 modes (26 fields) | Rev 1.1, Released 2026-04-09. Mirrors zzzDate Test Harness with enableQListener. Masks cleared. URL in `vv-config.js` |
 | zzzJohnDevTest | `c65ba3fe-5629-f111-aaf0-adc8a29b13e2` | Isolate Config D bug (FORM-BUG-5) | D only (1 field: `test2`) | Rev 1.0.18, Released 2026-03-26. Created by John Sevilla for Freshdesk #124697 |
 
 ### zzzDate Test Harness — Field Map
