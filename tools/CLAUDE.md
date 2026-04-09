@@ -11,7 +11,19 @@ Standalone CLI utilities for working with VV environments. Not tied to Playwrigh
 | `audit/`      | Verify platform behaviors in browser          | `node tools/audit/audit-bug5-fake-z.js`                       |
 | `inventory/`  | Analyze exported project data                 | `node tools/inventory/inventory-fields.js`                    |
 | `generators/` | Create structured artifacts from test results | `node tools/generators/generate-artifacts.js`                 |
-| `helpers/`    | Shared libraries used by tools                | `vv-admin.js`, `vv-sync.js`, `ws-api.js`, `ws-log.js`         |
+| `explore/`    | Platform exploration + version monitoring     | `npm run explore:headed`, `npm run version:snapshot`          |
+| `helpers/`    | Shared libraries used by tools                | `vv-admin.js`, `vv-sync.js`, `ws-api.js`, `vv-explore.js`     |
+
+## Explore Commands
+
+```bash
+npm run explore              # Run exploration specs (headless)
+npm run explore:headed       # Run with visible browser
+npm run explore:report       # Open HTML report with artifacts
+npm run version:snapshot     # Capture current platform version state
+npm run version:diff         # Compare two most recent snapshots
+npm run version:list         # List available snapshots
+```
 
 ## Conventions
 

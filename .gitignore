@@ -179,6 +179,9 @@ testing/test-results/
 testing/playwright-report/
 testing/tmp/
 
+# Exploration snapshots (environment-specific data)
+tools/explore/snapshots/
+
 # Large generated files
 tasks/date-handling/forms-calendar/main.js
 

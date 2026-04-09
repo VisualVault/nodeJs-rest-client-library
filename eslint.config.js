@@ -61,6 +61,11 @@ module.exports = [
             globals: {
                 VV: 'readonly',
                 document: 'readonly',
+                window: 'readonly',
+                HTMLElement: 'readonly',
+                Window: 'readonly',
+                Document: 'readonly',
+                NodeFilter: 'readonly',
             },
         },
     },
