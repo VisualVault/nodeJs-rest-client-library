@@ -560,20 +560,33 @@ Returns `VaultVersionInfo` — the core platform version and database schema ver
 
 ### FormViewer Build Number
 
-The FormViewer Angular SPA displays its build number in the top-right corner.
+The FormViewer Angular SPA exposes build info via a **static JSON file** — no authentication or browser needed:
 
-| Property     | Value                                              |
-| ------------ | -------------------------------------------------- |
-| DOM selector | `span.app-version`                                 |
-| Text format  | `Build: {YYYYMMDD.N}` (e.g., `Build: 20260304.1`)  |
-| Build format | Matches Azure DevOps naming: `{date}.{buildOfDay}` |
-| Verified     | 2026-04-09 on vvdemo                               |
+```
+GET /FormViewer/assets/build.json     (no auth required)
+→ { "build": 20260304.1, "code": "v0.5.1" }
 
-FormViewer uses Angular content-hashed filenames for its script bundles (e.g., `main-es2015.37f6d018a9cad175a1e6.js`). These hashes change per deploy, providing a secondary deploy detection signal even if the build number text hasn't been updated.
+GET /FormViewer/assets/config.json    (no auth required)
+→ { "production": false, "formsApiUrl": "...", "socketsUrl": "...", "audience": "...", ... }
+```
+
+| Property         | Value                              | Source                                           |
+| ---------------- | ---------------------------------- | ------------------------------------------------ |
+| Build number     | `20260304.1`                       | `build.json` → `build` field                     |
+| Code version     | `v0.5.1`                           | `build.json` → `code` field (semver)             |
+| DOM display      | `Build: 20260304.1`                | `span.app-version` in top-right corner           |
+| Environment mode | `production: false`                | `config.json` (false = pre-production on vvdemo) |
+| Sockets URL      | `sockets-pre.visualvault.com`      | `config.json` → `socketsUrl`                     |
+| JWT audience     | `e98f5a306fed4a279a2837dee47751b6` | `config.json` → `audience`                       |
+| Verified         | 2026-04-09 on vvdemo               |                                                  |
+
+`config.json` also reveals all backend service URLs, matching the `/configuration/*` API endpoints but without authentication.
+
+FormViewer uses Angular content-hashed filenames for its script bundles (e.g., `main-es2015.37f6d018a9cad175a1e6.js`). These hashes change per deploy, providing a secondary deploy detection signal.
 
 ### What's NOT Exposed
 
-The product team notifies deploys with Azure DevOps build names like `FormsAPI.Main.20260408.1`, but **individual service versions are not queryable**. The individual backend services (FormsAPI, DocAPI, WorkflowAPI) reject the main OAuth token and do not expose public version endpoints. The `/version` API only tracks the core platform, and the FormViewer build only tracks the Angular SPA.
+The product team notifies deploys with Azure DevOps build names like `FormsAPI.Main.20260408.1`, but **individual service versions are not queryable**. The individual services (FormsAPI, DocAPI, WorkflowAPI) authenticate via JWT (not OAuth) and return `x-stackifyid` headers (APM tracking) but no version endpoints. The `/version` API only tracks the core platform, and `build.json` only tracks the FormViewer SPA.
 
 ### Server Infrastructure Headers
 
@@ -666,9 +679,40 @@ Returns the service URL and enabled status. Discovered services (vvdemo, 2026-04
 | ObjectsAPI       | (not configured)                                              | n/a     | —                        |
 | NotificationsAPI | (not configured)                                              | n/a     | —                        |
 
+### Sockets Service
+
+Real-time notifications use a WebSocket/SignalR service:
+
+| Property | Value                                            |
+| -------- | ------------------------------------------------ |
+| URL      | `https://sockets-pre.visualvault.com`            |
+| Protocol | SignalR (`/notify/negotiate?negotiateVersion=1`) |
+| Server   | `nginx/1.18.0 (Ubuntu)`                          |
+| Auth     | Bearer JWT (same as FormsAPI)                    |
+
 ### Service Authentication
 
-Each service uses its own authentication mechanism. The main OAuth bearer token (from `/OAuth/Token`) is valid for the core API (`/api/v1/...`) but is **rejected by the individual services** with `401.6 "Your session has expired or is invalid"`. FormsAPI uses JWT tokens obtained via `GET /users/getjwt` on the core API. The auth mechanism for DocAPI and WorkflowAPI has not been verified.
+The main OAuth bearer token (from `/OAuth/Token`) is valid for the **core API only** (`/api/v1/...`). Individual services require a **JWT token** obtained via the core API:
+
+```
+GET /api/v1/{customer}/{db}/users/getjwt?audience={audience}
+Authorization: Bearer {oauthToken}
+→ { "data": { "token": "..." } }
+```
+
+The `audience` parameter comes from `config.json` (`e98f5a306fed4a279a2837dee47751b6` on vvdemo). The returned JWT works for FormsAPI, DocAPI, and WorkflowAPI. Without it, these services return `401.6 "Your session has expired or is invalid"`.
+
+### APM / Monitoring
+
+All .NET backend services (FormsAPI, DocAPI, WorkflowAPI) include a Stackify APM header:
+
+```
+x-stackifyid: V2|{requestGuid}|C100221|CD{instanceId}
+```
+
+- `C100221` — Stackify customer ID (VV's account)
+- `CD23`/`CD24` — alternating deployment instance IDs (load-balanced, 2 instances observed)
+- The request GUID changes per call; the C and CD values are stable per deployment
 
 ---
 
@@ -905,7 +949,7 @@ Discovered via `GET /api/v1/{customer}/{db}/{resource}` on vvdemo, 2026-04-09. A
 | `/reports`          | 1      | Report definitions                                                              |
 | `/configuration`    | object | Service configuration (see [Configuration Discovery](#configuration-discovery)) |
 | `/version`          | object | Platform version info (see [Version API Endpoint](#version-api-endpoint))       |
-| `/meta`             | object | API metadata                                                                    |
+| `/meta`             | object | Lists all 91 data types (entity/control names) in the platform schema           |
 | `/indexfields`      | 6      | Document index field definitions                                                |
 | `/securitymembers`  | ?      | Security membership records                                                     |
 | `/files`            | ?      | File resources                                                                  |
@@ -923,6 +967,94 @@ Discovered via `GET /api/v1/{customer}/{db}/{resource}` on vvdemo, 2026-04-09. A
 These do not exist as top-level REST resources: `documenttemplates`, `scheduledProcess`, `email`, `projects`, `schema`, `notifications`, `workflow`, `workflowinstances`, `processes`, `library`, `databases`, `roles`, `permissions`, `apiapplications`, `dropdownlists`, `menus`, `portals`, `tags`, `audit`, `auditlog`, `sessions`, `tokens`, `search`, `fulltext`, `calendar`, `events`, `widgets`, `exports`, `imports`, `templates`, `revisions`, `histories`.
 
 Note: `scheduledProcess` returns 404 at the top level but may be accessible as a sub-resource. Some of these (e.g., `email`, `projects`) are documented in the client library config.yml but may require different URL patterns.
+
+### Undocumented Endpoints (discovered via FormViewer network intercept)
+
+These endpoints are called by the FormViewer SPA during page load. They are not in the client library config.yml but work with OAuth bearer tokens.
+
+| Method | Endpoint                                                  | Purpose                                                   |
+| ------ | --------------------------------------------------------- | --------------------------------------------------------- |
+| GET    | `/formdesigner/outsideprocesses`                          | Microservices filtered for form designer context          |
+| GET    | `/Workflow/FormTemplate?name={name}`                      | Workflow configuration for a form template                |
+| GET    | `/Workflow/GetTaskForUser?id={formTemplateId}`            | Workflow tasks assigned to current user for a form        |
+| GET    | `/FormInstance/{templateDefId}/forms`                     | Form instances (alternate to `/formtemplates/{id}/forms`) |
+| GET    | `/users/signatures`                                       | Current user's signature data                             |
+| POST   | `/formentity/{templateDefId}/evaluateGroupsAndConditions` | Evaluate group visibility and conditions for a form       |
+
+---
+
+## Localization API
+
+The platform provides a localization/i18n API at `/api/v1/resource/`. Used by FormViewer and the main app for UI string translation.
+
+### Language List
+
+```
+GET /api/v1/resource/language
+```
+
+Returns all supported languages. As of 2026-04-09:
+
+| Pkey | Language           | Code      |
+| ---- | ------------------ | --------- |
+| 1    | English            | `en-US`   |
+| 2    | Portuguese         | `pt-BR`   |
+| 3    | Simplified Chinese | `zh-HANS` |
+| 4    | Spanish - Peru     | `es-PE`   |
+| 5    | Spanish - Colombia | `es-CO`   |
+
+### Localization Dictionaries
+
+```
+GET /api/v1/resource/localization?lang={lang}&area={area}
+```
+
+Returns key-value dictionary of UI strings for a given area.
+
+| Area            | en-US Keys | Other Languages | Content                                                         |
+| --------------- | ---------- | --------------- | --------------------------------------------------------------- |
+| `Common`        | 561        | 554             | Shared strings: workflows, projects, security, documents, email |
+| `NewFormViewer` | 497        | 442             | Full Angular FormViewer UI                                      |
+| `FormViewer`    | 35         | —               | Legacy FormViewer (error messages only)                         |
+| `UserProfile`   | 10         | —               | Culture, language, default customer, rows-per-page              |
+| `ControlPanel`  | 1          | —               | Minimal                                                         |
+
+Translation gap: en-US has 55 more `NewFormViewer` keys and 7 more `Common` keys than pt-BR/es-PE/es-CO/zh-HANS — untranslated features.
+
+### Script Localization
+
+```
+GET /api/v1/resource/scriptLocalization?lang={lang}&templateId={templateRevisionId}&formChId={templateDefId}
+```
+
+Returns per-form-template script localizations. Requires both template IDs.
+
+---
+
+## FormViewer Feature Map
+
+Derived from the 497 `NewFormViewer` localization keys. This represents the **complete feature set** of the current FormViewer Angular SPA. Verified 2026-04-09 on vvdemo.
+
+| Feature Area               | Capabilities                                                                                                                                                   |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Workflow**               | Complete task, route to users/groups, approve/reject, task due dates, assignments, return to originator/sequence/user, workflow history, continue/end workflow |
+| **Documents**              | Archive, delete, download, email, share, upload files, related documents, recycle bin, ID card creation, document actions                                      |
+| **Projects**               | Add/relate/modify related projects, project security, folder security, copy contents from project                                                              |
+| **Offline Forms**          | Full offline workflow: download templates, sync forms/documents/data rows, online/offline login, refresh                                                       |
+| **Signature**              | Canvas signature capture, profile signatures, password-protected stamps, save to profile                                                                       |
+| **Export**                 | Excel, Word, XML, PDF, form dashboard export, page range selection                                                                                             |
+| **Form Locking**           | Lock/unlock forms, request unlock, auto-unlock timer with countdown, keep locked, send message to lock holder                                                  |
+| **Repeating Row Controls** | Data grids within forms, add/save/cancel rows, column properties (visibility in exports/prints)                                                                |
+| **Barcode**                | Barcode generation, image types, validation                                                                                                                    |
+| **Auto-Save**              | Toggle on/off, configurable interval in minutes                                                                                                                |
+| **Batch Print**            | Print multiple forms, print preview                                                                                                                            |
+| **Query Filters**          | Form field tokens, common tokens for dashboard filtering                                                                                                       |
+| **Revisions**              | Change log, revision history                                                                                                                                   |
+| **Related Forms**          | Assign/modify related forms between templates                                                                                                                  |
+| **File Upload**            | Drag-and-drop, file type validation, max/min size, image dimension validation, ID card mode                                                                    |
+| **Search**                 | Full text search (can be disabled), insert/delete rows                                                                                                         |
+| **Stale Form Detection**   | "Save Anyway" option when form data has changed externally                                                                                                     |
+| **Navigation**             | Multi-page forms with page navigation, goto page                                                                                                               |
 
 ---
 

@@ -14,16 +14,28 @@
 const fs = require('fs');
 const path = require('path');
 
+const BUILD_CONTEXT_PATH = path.join(__dirname, '..', 'config', 'build-context.json');
+
 class RegressionReporter {
     constructor(options = {}) {
         this.results = [];
         this.outputDir = options.outputDir || path.join(__dirname, '..', 'tmp');
         this.startTime = null;
+        this.buildContext = null;
     }
 
     onBegin(config, suite) {
         this.startTime = new Date().toISOString();
         fs.mkdirSync(this.outputDir, { recursive: true });
+
+        // Load build context captured by global-setup
+        try {
+            if (fs.existsSync(BUILD_CONTEXT_PATH)) {
+                this.buildContext = JSON.parse(fs.readFileSync(BUILD_CONTEXT_PATH, 'utf8'));
+            }
+        } catch {
+            // Non-fatal — report works without build context
+        }
     }
 
     onTestEnd(test, result) {
@@ -84,6 +96,7 @@ class RegressionReporter {
             completed: new Date().toISOString(),
             duration: result.duration,
             status: result.status,
+            buildContext: this.buildContext,
             summary: {
                 total: this.results.length,
                 passed: this.results.filter((r) => r.status === 'passed').length,

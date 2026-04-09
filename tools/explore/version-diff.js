@@ -119,32 +119,54 @@ function diff(before, after) {
         unchanged.push(`FormViewer build: ${after.formViewer?.buildNumber}`);
     }
 
-    // FormViewer script hashes
+    // FormViewer code version
+    if (before.formViewer?.codeVersion !== after.formViewer?.codeVersion) {
+        changes.push({
+            component: 'FormViewer',
+            field: 'codeVersion',
+            before: before.formViewer?.codeVersion,
+            after: after.formViewer?.codeVersion,
+        });
+    } else if (after.formViewer?.codeVersion) {
+        unchanged.push(`FormViewer code: ${after.formViewer?.codeVersion}`);
+    }
+
+    // Data type count (schema changes)
+    if (before.platform?.dataTypeCount !== after.platform?.dataTypeCount) {
+        changes.push({
+            component: 'Platform',
+            field: 'dataTypeCount',
+            before: String(before.platform?.dataTypeCount),
+            after: String(after.platform?.dataTypeCount),
+        });
+    }
+
+    // FormViewer script hashes (legacy snapshots only)
     const beforeScripts = new Set(before.formViewer?.scriptFiles || []);
     const afterScripts = new Set(after.formViewer?.scriptFiles || []);
-    const addedScripts = [...afterScripts].filter((s) => !beforeScripts.has(s));
-    const removedScripts = [...beforeScripts].filter((s) => !afterScripts.has(s));
 
-    if (addedScripts.length > 0 || removedScripts.length > 0) {
-        // Extract just the hash portion for cleaner diff
-        const getBase = (filename) => filename.replace(/\.[a-f0-9]{12,}\.js$/, '.js');
-        const beforeMap = {};
-        const afterMap = {};
-        for (const s of beforeScripts) beforeMap[getBase(s)] = s;
-        for (const s of afterScripts) afterMap[getBase(s)] = s;
+    if (beforeScripts.size > 0 || afterScripts.size > 0) {
+        const addedScripts = [...afterScripts].filter((s) => !beforeScripts.has(s));
+        const removedScripts = [...beforeScripts].filter((s) => !afterScripts.has(s));
 
-        for (const base of new Set([...Object.keys(beforeMap), ...Object.keys(afterMap)])) {
-            if (beforeMap[base] !== afterMap[base]) {
-                changes.push({
-                    component: 'FormViewer',
-                    field: `script:${base}`,
-                    before: beforeMap[base] || '(new)',
-                    after: afterMap[base] || '(removed)',
-                });
+        if (addedScripts.length > 0 || removedScripts.length > 0) {
+            const getBase = (filename) => filename.replace(/\.[a-f0-9]{12,}\.js$/, '.js');
+            const beforeMap = {};
+            const afterMap = {};
+            for (const s of beforeScripts) beforeMap[getBase(s)] = s;
+            for (const s of afterScripts) afterMap[getBase(s)] = s;
+
+            for (const base of new Set([...Object.keys(beforeMap), ...Object.keys(afterMap)])) {
+                if (beforeMap[base] !== afterMap[base]) {
+                    changes.push({
+                        component: 'FormViewer',
+                        field: `script:${base}`,
+                        before: beforeMap[base] || '(new)',
+                        after: afterMap[base] || '(removed)',
+                    });
+                }
             }
         }
-    } else {
-        unchanged.push(`FormViewer scripts: ${afterScripts.size} files (unchanged)`);
     }
 
     // Server headers

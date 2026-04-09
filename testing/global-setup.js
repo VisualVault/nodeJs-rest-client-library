@@ -19,8 +19,10 @@ const path = require('path');
 const { vvConfig, AUTH_STATE_PATH, FORM_TEMPLATE_URL, RECORD_DEFINITIONS } = require('./fixtures/vv-config');
 const { gotoAndWaitForVVForm, setFieldValue, saveFormOnly } = require('./helpers/vv-form');
 const { selectDateViaPopup, typeDateInField } = require('./helpers/vv-calendar');
+const { captureBuildContext } = require('../tools/helpers/build-context');
 
 const SAVED_RECORDS_PATH = path.join(__dirname, 'config', 'saved-records.json');
+const BUILD_CONTEXT_PATH = path.join(__dirname, 'config', 'build-context.json');
 const BASE_URL = vvConfig.baseUrl;
 const CACHE_MAX_AGE_MS = 3600_000; // 1 hour
 
@@ -118,7 +120,22 @@ async function createRecords() {
     fs.writeFileSync(SAVED_RECORDS_PATH, JSON.stringify(records, null, 4));
 }
 
+/**
+ * Capture platform build context for test traceability.
+ * Saved to testing/config/build-context.json — read by regression reporter.
+ */
+async function captureBuild() {
+    if (isCacheFresh(BUILD_CONTEXT_PATH)) return;
+
+    try {
+        const ctx = await captureBuildContext(vvConfig);
+        fs.writeFileSync(BUILD_CONTEXT_PATH, JSON.stringify(ctx, null, 2));
+    } catch (e) {
+        console.warn('[global-setup] Build context capture failed:', e.message);
+    }
+}
+
 module.exports = async function globalSetup() {
-    await authenticate();
+    await Promise.all([authenticate(), captureBuild()]);
     await createRecords();
 };

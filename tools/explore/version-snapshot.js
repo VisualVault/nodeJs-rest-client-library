@@ -6,12 +6,14 @@
  * and saves a timestamped JSON snapshot. Run before/after deploy notifications
  * to track what changed.
  *
- * Data sources:
+ * Data sources (all HTTP — no browser needed):
  *   1. /api/v1/{customer}/{db}/version  — core platform version, DB version
  *   2. /configuration/* endpoints       — service URLs for FormsAPI, DocAPI, etc.
- *   3. FormViewer DOM                   — build number (span.app-version)
- *   4. FormViewer script URLs           — content hashes that change per deploy
- *   5. HTTP response headers            — IIS, ASP.NET, MVC versions
+ *   3. /FormViewer/assets/build.json    — FormViewer build number + code version (static file)
+ *   4. /FormViewer/assets/config.json   — service URL map, env mode, sockets config
+ *   5. FormsAPI /FormSettings via JWT   — Stackify APM IDs (deployment markers)
+ *   6. /api/v1/{customer}/{db}/meta     — data type count (schema change detection)
+ *   7. HTTP response headers            — IIS, ASP.NET versions
  *
  * Usage:
  *   node tools/explore/version-snapshot.js              # save snapshot
@@ -20,7 +22,6 @@
  *
  * Output: tools/explore/snapshots/version-{env}-{YYYYMMDD-HHmmss}.json
  */
-const { chromium } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
 const { loadConfig } = require('../../testing/fixtures/env-config');
@@ -36,15 +37,6 @@ const BASE_URL = config.baseUrl;
 const CUSTOMER = config.customerAlias;
 const DATABASE = config.databaseAlias;
 const ENV_NAME = config.instance.replace('/', '-'); // e.g., "vvdemo-EmanuelJofre"
-
-// FormViewer URL for build number capture (DateTest form on vvdemo — adjust GUIDs for other envs)
-const FORMVIEWER_URL =
-    `${BASE_URL}/FormViewer/app?hidemenu=true` +
-    '&formid=6be0265c-152a-f111-ba23-0afff212cc87' +
-    '&xcid=815eb44d-5ec8-eb11-8200-a8333ebd7939' +
-    '&xcdid=845eb44d-5ec8-eb11-8200-a8333ebd7939';
-
-const AUTH_STATE_PATH = path.join(__dirname, '..', '..', 'testing', 'config', 'auth-state-pw.json');
 
 // --- OAuth ---
 
@@ -105,60 +97,73 @@ async function captureServerHeaders(token) {
     return headers;
 }
 
-// --- Browser probes (Playwright needed) ---
+// --- FormViewer static files (no browser needed!) ---
 
-async function captureFormViewerInfo() {
-    // Check if auth state exists
-    if (!fs.existsSync(AUTH_STATE_PATH)) {
-        return { error: 'No auth state — run npm run explore first to authenticate' };
-    }
-
-    let browser;
+async function captureFormViewerBuild() {
     try {
-        browser = await chromium.launch();
-        const context = await browser.newContext({ storageState: AUTH_STATE_PATH });
-        const page = await context.newPage();
+        const buildResp = await fetch(`${BASE_URL}/FormViewer/assets/build.json`);
+        if (!buildResp.ok) return { error: `build.json: ${buildResp.status}` };
+        return await buildResp.json();
+    } catch (e) {
+        return { error: e.message };
+    }
+}
 
-        await page.goto(FORMVIEWER_URL, { waitUntil: 'networkidle', timeout: 60000 });
+async function captureFormViewerConfig() {
+    try {
+        const configResp = await fetch(`${BASE_URL}/FormViewer/assets/config.json`);
+        if (!configResp.ok) return { error: `config.json: ${configResp.status}` };
+        return await configResp.json();
+    } catch (e) {
+        return { error: e.message };
+    }
+}
 
-        // Wait for VV to load (partial is fine)
-        await page.waitForFunction(() => typeof VV !== 'undefined', { timeout: 30000 }).catch(() => {});
+// --- FormsAPI probe (requires JWT) ---
 
-        // Capture build number
-        const buildInfo = await page.evaluate(() => {
-            const el = document.querySelector('span.app-version');
-            const buildText = el ? el.textContent.trim() : null;
-            const buildMatch = buildText ? buildText.match(/(\d{8}\.\d+)/) : null;
-            return {
-                buildText,
-                buildNumber: buildMatch ? buildMatch[1] : null,
-            };
+async function captureFormsApiInfo(token) {
+    try {
+        // Get JWT for FormsAPI auth
+        const jwtResp = await fetch(`${BASE_URL}/api/v1/${CUSTOMER}/${DATABASE}/users/getjwt`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!jwtResp.ok) return { error: `getjwt: ${jwtResp.status}` };
+        const jwt = (await jwtResp.json()).data.token;
+
+        // Hit FormsAPI to capture Stackify ID and other headers
+        const fvConfig = await captureFormViewerConfig();
+        const formsApiUrl = fvConfig.formsApiUrl || 'https://preformsapi.visualvault.com/api/v1';
+        const resp = await fetch(`${formsApiUrl}/FormSettings`, {
+            headers: { Authorization: 'Bearer ' + jwt },
         });
 
-        // Capture script hashes (Angular content-hashed filenames)
-        const scriptHashes = await page.evaluate(() => {
-            return [...document.querySelectorAll('script[src]')]
-                .map((s) => s.src)
-                .filter((s) => s.includes('/FormViewer/'))
-                .map((s) => {
-                    const filename = s.split('/').pop().split('?')[0];
-                    return filename;
-                });
-        });
-
-        // Capture page title (contains form record ID)
-        const title = await page.title();
-
-        await browser.close();
+        const headers = {};
+        for (const [name, value] of resp.headers) {
+            headers[name] = value;
+        }
 
         return {
-            buildNumber: buildInfo.buildNumber,
-            buildText: buildInfo.buildText,
-            scriptFiles: scriptHashes,
-            pageTitle: title,
+            stackifyId: headers['x-stackifyid'] || null,
+            headers,
+            formSettings: resp.ok ? await resp.json() : null,
         };
     } catch (e) {
-        if (browser) await browser.close();
+        return { error: e.message };
+    }
+}
+
+// --- /meta endpoint ---
+
+async function captureApiMeta(token) {
+    try {
+        const resp = await fetch(`${BASE_URL}/api/v1/${CUSTOMER}/${DATABASE}/meta`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!resp.ok) return { error: `${resp.status}` };
+        const json = await resp.json();
+        const dataTypes = json.data?.dataTypes || [];
+        return { dataTypeCount: dataTypes.length, dataTypes };
+    } catch (e) {
         return { error: e.message };
     }
 }
@@ -170,20 +175,25 @@ async function main() {
     console.log(`\nCapturing version snapshot for ${config.instance}...`);
     console.log(`Environment: ${BASE_URL}\n`);
 
-    // API probes (parallel)
+    // All probes run via HTTP — no browser needed
     const token = await getToken();
-    console.log('  [1/4] API version endpoint...');
-    const [apiVersion, configEndpoints, serverHeaders] = await Promise.all([
+
+    console.log('  [1/6] API version endpoint...');
+    console.log('  [2/6] Configuration endpoints...');
+    console.log('  [3/6] Server headers...');
+    console.log('  [4/6] FormViewer build.json + config.json...');
+    console.log('  [5/6] FormsAPI probe (JWT + Stackify)...');
+    console.log('  [6/6] API meta endpoint...');
+
+    const [apiVersion, configEndpoints, serverHeaders, fvBuild, fvConfig, formsApiInfo, apiMeta] = await Promise.all([
         captureApiVersion(token),
         captureConfigEndpoints(token),
         captureServerHeaders(token),
+        captureFormViewerBuild(),
+        captureFormViewerConfig(),
+        captureFormsApiInfo(token),
+        captureApiMeta(token),
     ]);
-    console.log('  [2/4] Configuration endpoints...');
-    console.log('  [3/4] Server headers...');
-
-    // Browser probe
-    console.log('  [4/4] FormViewer build number (browser)...');
-    const formViewer = await captureFormViewerInfo();
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
@@ -205,13 +215,23 @@ async function main() {
             progCreateDate: apiVersion.progCreateDate || null,
             progModifiedDate: apiVersion.progModifiedDate || null,
             utcOffset: apiVersion.utcOffset ?? null,
+            dataTypeCount: apiMeta.dataTypeCount || null,
             raw: apiVersion,
         },
         formViewer: {
-            buildNumber: formViewer.buildNumber || null,
-            buildText: formViewer.buildText || null,
-            scriptFiles: formViewer.scriptFiles || [],
-            error: formViewer.error || null,
+            buildNumber: fvBuild.build ? String(fvBuild.build) : null,
+            codeVersion: fvBuild.code || null,
+            raw: fvBuild,
+        },
+        formViewerConfig: {
+            production: fvConfig.production ?? null,
+            enableSockets: fvConfig.enableSockets ?? null,
+            socketsUrl: fvConfig.socketsUrl || null,
+            audience: fvConfig.audience || null,
+        },
+        formsApi: {
+            stackifyId: formsApiInfo.stackifyId || null,
+            formSettings: formsApiInfo.formSettings?.data || null,
         },
         services: {},
         server: serverHeaders,
@@ -241,20 +261,17 @@ async function main() {
     console.log(`  Platform version:    ${snapshot.platform.progVersion || '(unknown)'}`);
     console.log(`  DB version:          ${snapshot.platform.dbVersion || '(unknown)'}`);
     console.log(`  FormViewer build:    ${snapshot.formViewer.buildNumber || '(unknown)'}`);
+    console.log(`  FormViewer code:     ${snapshot.formViewer.codeVersion || '(unknown)'}`);
     console.log(`  Server:              ${snapshot.server.server || '(unknown)'}`);
     console.log(`  ASP.NET:             ${snapshot.server['x-aspnet-version'] || '(unknown)'}`);
+    console.log(`  FormsAPI Stackify:   ${snapshot.formsApi.stackifyId || '(unknown)'}`);
+    console.log(`  API data types:      ${snapshot.platform.dataTypeCount || '(unknown)'}`);
+    console.log(`  Environment mode:    ${snapshot.formViewerConfig.production ? 'production' : 'non-production'}`);
     console.log();
     console.log('  Services:');
     for (const [name, svc] of Object.entries(snapshot.services)) {
         const status = svc.isEnabled === true ? 'enabled' : svc.isEnabled === false ? 'disabled' : 'n/a';
         console.log(`    ${name.padEnd(18)} ${(svc.url || '(not configured)').padEnd(50)} [${status}]`);
-    }
-    if (snapshot.formViewer.scriptFiles.length > 0) {
-        console.log();
-        console.log('  FormViewer scripts (content hashes):');
-        for (const file of snapshot.formViewer.scriptFiles) {
-            console.log(`    ${file}`);
-        }
     }
     console.log(`${'─'.repeat(60)}`);
     console.log(`  Captured in ${elapsed}s`);
