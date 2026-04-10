@@ -10,3 +10,4 @@ Session index for forms-calendar test executions on WADNR. Run files in `runs/`.
 **Key outcomes**: 116/116 PASS (BRT-Chromium). All results identical to EmanuelJofre baseline. All 7 FORM-BUGs confirmed platform-level.
 
 - 2026-04-10 [Full Run](runs/wadnr-full-run-2026-04-10.md) — BRT-Chromium — 116P/0F — Layer 2 regression, all categories
+- 2026-04-10 [Audit: Kendo Version](runs/audit-kendo-version-wadnr-2026-04-10.md) — BRT-Chromium — 7P/9F — Cat 15 v2 data capture (kendo global absent, DOM selectors differ, VV pipeline identical)

@@ -23,6 +23,18 @@ Last run: 2026-04-10 | BRT-Chromium only | 116P / 0F | Run: [wadnr-full-run-2026
 | Audit — Bug 1 TZ Stripping | audit-bug1 | 19 | 19 | parseDateString, V1/V2 paths |
 | **Total** | | **116** | **116** | |
 
+## Cross-Environment Differential (Cat 14–16)
+
+| Category | Slots | Status | Notes |
+|----------|:-----:|--------|-------|
+| 14 — Mask Impact | 13 | PENDING | Requires mask modification on EmanuelJofre DateTest |
+| 15 — Kendo Widget Compare | 8 | PARTIAL | WADNR v2 data captured; vvdemo v1 TBD |
+| 16 — Server TZ Form Save | 6 | PENDING | After Cat 14–15 |
+
+**Audit run (2026-04-10)**: [audit-kendo-version-wadnr-2026-04-10.md](runs/audit-kendo-version-wadnr-2026-04-10.md) — Key findings: `kendo` global absent on v2, DOM selectors differ, VV value pipeline identical.
+
+**Natural mask comparison**: Field3 (`mask="MM/dd/yyyy"`) vs Field7 (no mask) — both Config A on WADNR test harness.
+
 ## Coverage Gaps
 
 - **IST/UTC timezones**: Not run. Only BRT executed in this session.
@@ -30,6 +42,8 @@ Last run: 2026-04-10 | BRT-Chromium only | 116P / 0F | Run: [wadnr-full-run-2026
 - **Cat 3 cross-TZ**: No WADNR saved records — Cat 3 IST↔BRT not possible yet.
 - **Cat 5/6 A, D**: Preset/current date not tested for these configs.
 - **Cat 10**: Web service input — not implemented in spec suite.
+- **Cat 14 Mask Impact**: 8 WADNR DateTime fields at risk (date-only mask on DateTime config).
+- **Cat 15 vvdemo side**: Need to run audit on EmanuelJofre for comparison.
 
 ## Comparison to EmanuelJofre Baseline
 
