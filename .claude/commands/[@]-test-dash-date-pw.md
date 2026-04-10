@@ -555,7 +555,7 @@ Append a one-line entry to the current session in `dashboards/results.md`:
 4. **Expected = correct behavior**: TC spec Expected Results always show what the system _should_ do, not what a buggy system produces.
 5. **No TZ suffix in IDs**: Dashboard tests don't use TZ suffixes (server-rendered, TZ irrelevant). Exception: DB-8 which tests TZ independence explicitly.
 6. **Cross-reference existing data**: Before creating new records, check forms-calendar and web-services results for records with known stored values.
-7. **Artifact paths**: All artifacts live under `tasks/date-handling/dashboards/` (test-cases/, runs/, summaries/).
+7. **Artifact paths**: TC specs in `tasks/date-handling/dashboards/test-cases/`. Execution output (runs, summaries, status) in `projects/{customer}/testing/date-handling/dashboards/`.
 
 ## Artifact Sharing
 

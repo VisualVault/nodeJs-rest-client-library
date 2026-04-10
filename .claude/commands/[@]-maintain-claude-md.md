@@ -65,7 +65,8 @@ Check if any CLAUDE.md exists in implementation subfolders where it shouldn't:
 - `tools/extract/`, `tools/audit/`, `tools/helpers/`, `tools/runners/`, `tools/inventory/`, `tools/generators/`
 - `testing/specs/`, `testing/helpers/`, `testing/fixtures/`, `testing/pipelines/`, `testing/config/`, `testing/reporters/`
 - `projects/*/extracts/`, `projects/*/analysis/`
-- `tasks/*/analysis/`, `tasks/*/runs/`, `tasks/*/summaries/`, `tasks/*/test-cases/`
+- `tasks/*/analysis/`, `tasks/*/test-cases/`
+- `projects/*/testing/`, `projects/*/extracts/`
 - `docs/architecture/`, `docs/reference/`, `docs/guides/`, `docs/standards/`
 
 Flag as **WARNING** — content should be in the parent's CLAUDE.md instead.
@@ -200,7 +201,7 @@ git log --since="$claude_md_date" --diff-filter=ADR --name-only --format="" -- "
 
 If structural changes exist, flag as **WARNING**: "N structural changes in {scope}/ since CLAUDE.md was last updated" and list them so the maintainer knows what to address.
 
-Ignore changes to files inside subdirectories that aren't described by this CLAUDE.md (e.g., changes inside `tasks/date-handling/forms-calendar/runs/` don't affect `tasks/CLAUDE.md`).
+Ignore changes to files inside subdirectories that aren't described by this CLAUDE.md (e.g., changes inside `projects/emanueljofre/testing/` don't affect `tasks/CLAUDE.md`).
 
 **Noise filter:** Ignore changes from the same commit that created or last modified the CLAUDE.md itself. Initial file moves (e.g., from a restructure) that happen in the same commit as CLAUDE.md creation are not "unaddressed changes."
 
