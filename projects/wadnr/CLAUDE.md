@@ -71,7 +71,7 @@ See root `CLAUDE.md` § "Write Safety" for the full policy and enforcement archi
 
 ## WS Date Test Validation (2026-04-10)
 
-Full WS date-handling test suite (10 categories, 140/148 slots) executed against WADNR. All 6 WS bugs + FORM-BUG-7 confirmed as platform-level — results identical to EmanuelJofre. Run file: `tasks/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md`.
+All 6 WS bugs + FORM-BUG-7 confirmed as platform-level — results identical to EmanuelJofre. See `tasks/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md` for full results.
 
 Runner requires `--template-name "zzzDate Test Harness"` (form name differs from EmanuelJofre's "DateTest"). Write policy uses name-based resolution at runtime.
 

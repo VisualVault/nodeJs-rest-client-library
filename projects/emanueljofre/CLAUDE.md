@@ -23,7 +23,7 @@ All data extracted via `tools/extract/` from the EmanuelJofre admin panels on vv
 | Scheduled Services | 5 schedules + 6 scripts | `extracts/schedules/`        |
 | Global Functions   | 24 functions | `extracts/global-functions/` |
 | Form Templates     | 108 templates | `extracts/form-templates/`   |
-| Custom Queries     | 130 queries (4 main + 126 form DB) | `extracts/custom-queries/` |
+| Custom Queries     | 130 queries | `extracts/custom-queries/` |
 
 Last extraction: 2026-04-09. All components successful. Note: GetSites script skipped (empty source).
 
