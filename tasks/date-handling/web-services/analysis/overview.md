@@ -8,6 +8,8 @@
 
 **Results**: 116 PASS / 32 FAIL across 148 formal test slots. All 32 failures map to one of the 6 catalogued issues below. (WS-10A additionally includes 7 forminstance/ comparison rows — all PASS — documented in the matrix but not counted as separate test slots.)
 
+**Cross-environment validation (2026-04-10)**: All 10 categories re-executed against WADNR (vv5dev / fpOnline) using `zzzDate Test Harness`. API-only categories (WS-1/2/3/5/6/7/8/9) and browser verification (WS-4) produce identical results. All 6 bugs confirmed as platform-level defects, not environment-specific. FORM-BUG-7 also confirmed via IST browser record on WADNR. See `runs/wadnr-full-run-2026-04-10.md`.
+
 ---
 
 ## 2. Scope
@@ -94,6 +96,8 @@ Six distinct findings identified — 3 bugs (software defects), 2 design flaws (
 
 **Who is affected**: Every VV customer using `postForms` to write datetime fields, where any user outside UTC+0 opens the record in Forms.
 
+**Cross-environment**: Confirmed on WADNR (vv5dev) 2026-04-10 — BRT: -3h shift, IST: +5:30h shift, identical to EmanuelJofre (vvdemo).
+
 ---
 
 ### WEBSERVICE-BUG-2 — Silent Data Loss for DD/MM/YYYY Formats
@@ -119,6 +123,8 @@ Six distinct findings identified — 3 bugs (software defects), 2 design flaws (
 **Workaround**: Always send dates in ISO 8601 (`"YYYY-MM-DD"`) or US format (`"MM/DD/YYYY"`). Never use locale-specific formatting for API input.
 
 **Who is affected**: Developers in Latin America, Europe, and other regions that use DD/MM/YYYY as the standard date format.
+
+**Cross-environment**: Confirmed on WADNR (vv5dev) 2026-04-10 — `"15/03/2026"` → null, identical to EmanuelJofre.
 
 ---
 

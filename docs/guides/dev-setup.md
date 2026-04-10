@@ -243,6 +243,15 @@ node --inspect-brk tools/runners/run-ws-test.js --action WS-1 --configs A --inpu
 
 The runner authenticates with VV, builds the ffCollection, calls the harness, and prints the JSON result. No local server needed.
 
+For **non-EmanuelJofre environments** where the form template has a different name, use `--template-name`:
+
+```bash
+# WADNR example (form is "zzzDate Test Harness", not "DateTest")
+node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15 --template-name "zzzDate Test Harness"
+```
+
+The runner also resolves `writePolicy.forms[].name` entries to API GUIDs at startup, so `.env.json` can use human-readable form names instead of environment-specific template IDs.
+
 ### 5.3 Browser Path Setup (Optional — for WS-4 or production-path validation)
 
 This path calls the harness through VV's Microservice routing, like a real production form button would. Only needed for WS-4 (API→Forms cross-layer) or to validate the full production path.

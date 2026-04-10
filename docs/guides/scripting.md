@@ -145,6 +145,12 @@ This means **API return values do not match Forms `getValueObjectValue()` format
 
 Unset or empty date fields return `null` in API responses (not `""` or `"Invalid Date"`). This differs from Forms `GetFieldValue()` which returns `"Invalid Date"` for empty Config D fields (FORM-BUG-6).
 
+### getForms() Parameters
+
+**`expand: true` is required to include form field data.** Without it, `getForms()` returns only the record's `dataType` — no field values (`dataField7`, `dataField5`, etc.) are included. This is the most common cause of "all fields are null" when querying records.
+
+**`sort` parameter**: The VV API's OData sort does not reliably support `DESC`. Passing `sort: 'createDate DESC'` causes a SQL syntax error (`Incorrect syntax near the keyword 'ASC'`) on vv5dev. Use OData `$orderby` via query params or filter client-side instead. Verified 2026-04-10.
+
 ### Expanded Record Metadata
 
 When `expand: true` is set in `getForms()`, the response includes system metadata alongside field values:
@@ -269,6 +275,8 @@ The VV Node.js client can create records through the **FormsAPI** (`/forminstanc
 - FormsAPI must be enabled on the VV environment (checked via `/configuration/formsapi`)
 - JWT authentication (auto-negotiated by `getVaultApi()`)
 - Template **revision ID** (not the template ID or form definition GUID)
+
+**Important**: The FormsAPI runs on a **separate domain** from the core API. Requests go to `https://preformsapi.visualvault.com/api/v1/forminstance` (not the environment's base URL). The client library handles this routing automatically via the `/configuration/formsapi` endpoint response. This means URL-based guards (like the write policy in `common.js`) cannot match FormsAPI requests by template GUID — the URL path is just `/api/v1/forminstance` with no template identifier. Verified 2026-04-10 on vv5dev.
 
 ### Usage
 

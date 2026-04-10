@@ -12,6 +12,7 @@ Browser automation for VisualVault platform testing. Everything here is **shared
 | `fixtures/`            | Shared test data and config: `test-data.js`, `vv-config.js`, `env-config.js`, `ws-config.js`        |
 | `pipelines/`           | Regression orchestrators: `run-regression.js`, `run-ws-regression.js`, `run-dash-regression.js`     |
 | `config/`              | Auth state (gitignored), TZ configs (committed), saved records (gitignored)                         |
+| `scripts/`             | Standalone Playwright scripts for one-off browser tasks (IST record creation, WS-4 verification)    |
 | `reporters/`           | Custom Playwright reporter for regression artifact generation                                       |
 
 ## How It Works

@@ -60,6 +60,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 - **Environment profile tool** (`tools/explore/environment-profile.js`): consolidates platform version, service configuration (behavioral toggles, FormSettings limits), and front-end library stack into `projects/{customer}/environment.json`. HTTP-only mode (~3s) captures platform, FormViewer, infrastructure, and per-service config. Browser mode (`--with-browser`, ~12s) adds admin app libraries (jQuery, Kendo, Telerik, Angular, Telerik controls, Kendo widgets, CSS frameworks, ASP.NET indicators) and FormViewer SPA detection (Kendo v1/v2 variant via input role, VV.Form properties). Shared HTTP probes extracted to `tools/helpers/vv-probes.js`; browser probes in `tools/helpers/vv-browser-probes.js`. npm scripts: `env:profile`, `env:profile:browser`
 - `tools/helpers/vv-admin.js` — added `findCustomer()`, `listCustomers()`, `getActiveCustomer()` for shared project/customer resolution from `.env.json`
+- WS test harness: `TemplateName` parameter (`scripts/server-scripts/webservice-test-harness.js`) — overrides default `'DateTest'` form name for cross-environment testing. Runner `--template-name` flag (`tools/runners/run-ws-test.js`). Fallback preserves backward compatibility
+- Write policy name-based resolution in `run-ws-test.js` — after auth, resolves `writePolicy.forms[].name` to API template GUIDs via `getFormTemplateIdByName()`, injecting into the live policy object. Enables `.env.json` to use human-readable form names instead of environment-specific GUIDs. No `lib/` changes required
+- `testing/scripts/wadnr-ws-browser-verify.js` — standalone Playwright script for WADNR WS-4 browser verification (BRT + IST) and IST record creation
+- Cross-environment WS date test validation: all 10 categories (140/148 slots) executed against WADNR (vv5dev). All 6 WS bugs confirmed as platform-level. Run file: `tasks/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md`
 
 ### Changed
 

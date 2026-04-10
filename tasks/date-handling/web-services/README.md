@@ -38,6 +38,16 @@ node tools/runners/run-ws-test.js --action WS-2 --configs A --record-id DateTest
 
 If this prints a JSON response with `"status": "Success"`, the runner is working.
 
+**WADNR environment** (form is named differently — use `--template-name`):
+
+```bash
+# Create a test record in WADNR
+node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15 --template-name "zzzDate Test Harness"
+
+# Read back a record
+node tools/runners/run-ws-test.js --action WS-2 --configs A --record-id <record-id> --template-name "zzzDate Test Harness"
+```
+
 ### Prerequisites (Browser Path — form button tests)
 
 Only needed for WS-4 (API→Forms cross-layer) or to validate the full production path.

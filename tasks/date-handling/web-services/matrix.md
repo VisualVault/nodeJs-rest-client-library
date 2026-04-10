@@ -3,7 +3,9 @@
 Authoritative permutation tracker for the web services date-handling investigation.
 API analysis → `analysis/overview.md` | Test evidence → `results.md` | Harness → `webservice-test-harness.js`
 
-Last updated: 2026-04-06 | Total slots: 148 | Done: 148 (116P/32F) | **COMPLETE**
+Last updated: 2026-04-10 | Total slots: 148 | Done: 148 (116P/32F) | **COMPLETE**
+
+> **Cross-environment validation**: All 10 categories re-executed against WADNR (vv5dev) on 2026-04-10. Results identical to EmanuelJofre (vvdemo) — all 6 bugs confirmed as platform-level, not environment-specific. See `runs/wadnr-full-run-2026-04-10.md`.
 
 ---
 
