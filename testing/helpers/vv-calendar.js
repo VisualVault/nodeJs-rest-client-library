@@ -95,9 +95,13 @@ async function selectDateInDatePicker(page, year, month, day) {
     // Click the target month in the scrollable month list via page.evaluate().
     // Using DOM-level click avoids Playwright's actionability checks which fail in
     // WebKit when form elements overlap the popup due to z-index stacking differences.
+    // Kendo v1: <li> elements are inside [role="grid"]. Kendo v2: <li> elements are in
+    // kendo-calendar-navigation (a sibling of the grid). Both selectors are needed.
     await page.evaluate(
         ({ monthAbbr }) => {
-            const listItems = document.querySelectorAll('[role="grid"] li, .uib-datepicker-popup li');
+            const listItems = document.querySelectorAll(
+                '[role="grid"] li, kendo-calendar-navigation li, .uib-datepicker-popup li'
+            );
             for (const li of listItems) {
                 if (li.textContent.trim() === monthAbbr) {
                     li.scrollIntoView();

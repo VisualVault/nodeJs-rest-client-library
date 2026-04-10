@@ -63,14 +63,17 @@ VV environments run different Kendo UI versions. The calendar field rendering di
 
 **Automation selectors that work on both versions:**
 
-| Element                  | Cross-version selector                                                            |
-| ------------------------ | --------------------------------------------------------------------------------- |
-| Toggle button            | `[aria-label="Toggle calendar"], [aria-label="Toggle popup"]`                     |
-| Calendar header text     | `kendo-calendar-header .k-title, kendo-calendar-header button.k-calendar-title`   |
-| Time tab active          | `button.k-time-tab.k-state-active, button[title="Time tab"][aria-pressed="true"]` |
-| Set button               | `button.k-time-accept` (same on both)                                             |
-| Virtualization container | `kendo-virtualization` (same on both)                                             |
-| Day cells                | `td[role="gridcell"]` (same on both)                                              |
+| Element                  | Cross-version selector                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Toggle button            | `[aria-label="Toggle calendar"], [aria-label="Toggle popup"]`                                                            |
+| Calendar header text     | `kendo-calendar-header .k-title, kendo-calendar-header button.k-calendar-title`                                          |
+| Time tab active          | `button.k-time-tab.k-state-active, button[title="Time tab"][aria-pressed="true"]`                                        |
+| Set button               | `button.k-time-accept` (same on both)                                                                                    |
+| Virtualization container | `kendo-virtualization` (same on both)                                                                                    |
+| Day cells                | `td[role="gridcell"]` (same on both)                                                                                     |
+| Day grid                 | `[role="grid"]` (same on both — `<table>` element)                                                                       |
+| Day grid tbodies         | `[role="grid"] tbody` (same on both, tbodies have `role="rowgroup"`)                                                     |
+| Month list items         | `[role="grid"] li, kendo-calendar-navigation li` (v1: `li` inside grid; v2: `li` in `kendo-calendar-navigation` sibling) |
 
 ### Popup Modal Behavior
 
@@ -308,7 +311,7 @@ All 16 known bugs exist on both VV environments but **manifest differently** due
 
 **New vv5dev-specific finding**: `getCalendarFieldValue()` throws `RangeError: Invalid time value` on Config C/D fields when populated via URL parameters (`enableQListener`). 8 tests affected (Cat 4 IST + BRT). Does not occur on vvdemo. Pending confirmation as new bug.
 
-**Summary**: 108 of 252 tests behave identically on both environments. The 144 differences break down as: 84 value shifts (bugs manifest differently), 19 infrastructure timeouts (Kendo v2 popup detection — test helper issue, not platform), 32 Cat 4 URL param failures (under investigation), 9 other.
+**Summary**: 108 of 252 tests behave identically on both environments. The 144 differences break down as: 84 value shifts (bugs manifest differently), ~~19 infrastructure timeouts (Kendo v2 popup detection — test helper issue, not platform)~~ **Fixed 2026-04-10**: month list selector in `selectDateInDatePicker()` updated to include `kendo-calendar-navigation li` (v2 moved `<li>` items outside `[role="grid"]`), 32 Cat 4 URL param failures (under investigation), 9 other.
 
 ### JavaScript `.000` Millisecond Parsing Behavior
 
