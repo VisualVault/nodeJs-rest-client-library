@@ -8,6 +8,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 ## [Unreleased]
 
+### Changed
+
+- **Artifact routing restructure**: Execution artifacts (runs, summaries, results.md, status.md) moved from `tasks/` to `projects/{customer}/testing/{task}/{component}/`. Tasks now hold only platform methodology (matrix, test-cases, analysis). Matrix files stripped of results columns — per-env tracking in `status.md`. Generalized principle: "Is this artifact true regardless of customer/environment?" determines routing. All test commands, sharing rules, and CLAUDE.md files updated.
+
 ### Added
 
 - Custom Queries extract component (`tools/extract/components/queries.js`) — API-first probe with Playwright fallback, parallel SQL extraction via dock panel response interception, hash-based incremental sync, connection discovery from ConnectionsAdmin grid

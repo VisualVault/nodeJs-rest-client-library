@@ -47,6 +47,18 @@ No analysis files yet. Run extractions first, then use:
 - `node tools/inventory/inventory-fields.js` for field inventory
 - `node tools/inventory/inventory-scripts.js` for script inventory
 
+## Testing
+
+Execution data for all date-handling test components lives in `testing/date-handling/`:
+
+| Component      | Status file                                       |
+| -------------- | ------------------------------------------------- |
+| Dashboards     | `testing/date-handling/dashboards/status.md`      |
+| Web Services   | `testing/date-handling/web-services/status.md`    |
+| Forms Calendar | `testing/date-handling/forms-calendar/status.md`  |
+
+Each component has `runs/` (immutable execution records) and `summaries/` (per-TC tracking).
+
 ## Related
 
 - This is the primary development/testing environment for platform investigations

@@ -73,13 +73,13 @@ See root `CLAUDE.md` § "Write Safety" for the full policy and enforcement archi
 
 ### Web Services
 
-All 6 WS bugs + FORM-BUG-7 confirmed as platform-level — results identical to EmanuelJofre. See `tasks/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md` for full results.
+All 6 WS bugs + FORM-BUG-7 confirmed as platform-level — results identical to EmanuelJofre. See `testing/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md` for full results.
 
 Runner requires `--template-name "zzzDate Test Harness"` (form name differs from EmanuelJofre's "DateTest"). Write policy uses name-based resolution at runtime.
 
 ### Dashboards
 
-27 PASS / 8 FAIL / 9 BLOCKED across 44 slots. All tested categories match EmanuelJofre. DB-5 (filter) BLOCKED — filter toolbar not enabled on new dashboard. DB-3 D-H BLOCKED — no IST browser data. See `tasks/date-handling/dashboards/runs/wadnr-full-run-2026-04-10.md`.
+27 PASS / 8 FAIL / 9 BLOCKED across 44 slots. All tested categories match EmanuelJofre. DB-5 (filter) BLOCKED — filter toolbar not enabled on new dashboard. DB-3 D-H BLOCKED — no IST browser data. See `testing/date-handling/dashboards/runs/wadnr-full-run-2026-04-10.md`.
 
 ## Related
 
