@@ -58,7 +58,7 @@ WADNR is a **near-production client environment**. Write operations are governed
 
 **Currently allowed writes:**
 - Form: `zzzDate Test Harness` (template `ff59bb37-b331-f111-830f-d3ae5cbd0a3d`) — create and update
-- Form: `zzzTarget Date Test Harness` (template `3f3a0b1a-4834-f111-8310-f323cafecf11`) — used by Category 4 URL param tests (note: not yet in `.env.json` allowlist — add if write tests are needed)
+- Form: `zzzTarget Date Test Harness` (template `3f3a0b1a-4834-f111-8310-f323cafecf11`) — Category 4 URL param tests (read-only — no form record writes needed, only URL param capture). Template updated to v1.2 (2026-04-10) with `enableQListener=true` on all fields
 - Web Service: `zzzJohnDevTestWebSvc` (script 203)
 
 **Everything else is blocked.** Do not:
