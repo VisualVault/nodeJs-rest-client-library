@@ -85,7 +85,7 @@ Execution data for date-handling test components lives in `testing/date-handling
 
 ### Web Services
 
-All 6 WS bugs + FORM-BUG-7 confirmed as platform-level — results identical to EmanuelJofre. See `testing/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md` for full results.
+148/148 complete — all 6 WS bugs + FORM-BUG-7 + CB-29 confirmed as platform-level. Results identical to EmanuelJofre. WS-10 forminstance/ initially blocked by write policy (URL lacks template GUID); resolved via body-based template matching in `common.js`. See runs: [`wadnr-full-run`](testing/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md), [`ws-10-unblock`](testing/date-handling/web-services/runs/ws-10-forminstance-unblock-2026-04-10.md).
 
 Runner requires `--template-name "zzzDate Test Harness"` (form name differs from EmanuelJofre's "DateTest"). Write policy uses name-based resolution at runtime.
 
