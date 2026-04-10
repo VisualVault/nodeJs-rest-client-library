@@ -69,7 +69,7 @@ module.exports.main = async function (ffCollection, vvClient, response) {
 
     /* ------------------------- Configurable Variables ------------------------- */
 
-    const FORM_TEMPLATE_NAME = 'DateTest';
+    let FORM_TEMPLATE_NAME = 'DateTest';
     const ROUND_TRIP_CYCLES = 2;
 
     // Field configuration map — mirrors testing/fixtures/vv-config.js (lines 48-113)
@@ -1183,6 +1183,8 @@ module.exports.main = async function (ffCollection, vvClient, response) {
         const recordID = getFieldValueByName('RecordID', true);
         const inputDate = getFieldValueByName('InputDate', true);
         const debug = getFieldValueByName('Debug', true).toLowerCase() === 'true';
+        const templateNameParam = getFieldValueByName('TemplateName', true);
+        if (templateNameParam) FORM_TEMPLATE_NAME = templateNameParam;
 
         if (output.errors.length > 0) {
             throw new Error();

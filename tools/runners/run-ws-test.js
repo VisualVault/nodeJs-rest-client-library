@@ -41,6 +41,9 @@ function parseArgs() {
             case '--input-formats':
                 parsed.inputFormats = args[++i];
                 break;
+            case '--template-name':
+                parsed.templateName = args[++i];
+                break;
             case '--debug':
                 parsed.debug = true;
                 break;
@@ -54,6 +57,7 @@ Options:
   --record-id <name>         Record instance name (for WS-2, WS-3).
   --input-date <date>        Date string to write (for WS-1, WS-3).
   --input-formats <fmts>     Format keys (for WS-5).
+  --template-name <name>     Form template name (default: "DateTest").
   --debug                    Include raw API responses in output.
   --help                     Show this help.
 
@@ -131,6 +135,25 @@ async function main() {
         process.exit(1);
     }
 
+    // Resolve write policy form names to API GUIDs so the HTTP-layer guard
+    // in common.js can match them in URLs. This keeps .env.json name-based
+    // (no need to know environment-specific GUIDs) while the guard works unchanged.
+    const policy = vvClient._httpHelper._writePolicy;
+    if (policy && policy.mode === 'allowlist' && policy.forms) {
+        for (const form of policy.forms) {
+            if (form.name) {
+                try {
+                    const resp = await vvClient.forms.getFormTemplateIdByName(form.name);
+                    if (resp.templateIdGuid) {
+                        form.templateId = resp.templateIdGuid;
+                    }
+                } catch (err) {
+                    console.warn(`Warning: could not resolve template ID for "${form.name}": ${err.message}`);
+                }
+            }
+        }
+    }
+
     console.log('Authenticated. Running harness...\n');
 
     // Build ffCollection
@@ -140,6 +163,7 @@ async function main() {
         { name: 'RecordID', value: args.recordId || '' },
         { name: 'InputDate', value: args.inputDate || '' },
         { name: 'InputFormats', value: args.inputFormats || '' },
+        { name: 'TemplateName', value: args.templateName || '' },
         { name: 'Debug', value: args.debug ? 'true' : 'false' },
     ];
     const ffCollection = new clientLibrary.forms.formFieldCollection(fields);
