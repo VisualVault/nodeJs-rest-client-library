@@ -41,6 +41,14 @@ Same 8 configs as emanueljofre DateTest. Each config = unique `enableTime` × `i
 | zzzmoi-test | General testing |
 | zzzShoppingCartAddRemoveItemsRoss | Shopping cart test |
 
+## Dashboards
+
+| Name | ReportID | Purpose | Notes |
+|------|----------|---------|-------|
+| zzzDate Test Harness | `09c84a6b-de34-f111-8333-99973bb0d2ea` | Dashboard date display testing (DB-1 through DB-8) | Created 2026-04-10. 136 records. Filter toolbar not yet enabled (blocks DB-5). |
+
+Dashboard URL: `https://vv5dev.visualvault.com/app/WADNR/fpOnline/FormDataDetails?Mode=ReadOnly&ReportID=09c84a6b-de34-f111-8333-99973bb0d2ea`
+
 ## Notes
 
 - **Read-only constraint**: WADNR is a near-production environment. No changes to forms or scripts — test by invoking existing assets only.

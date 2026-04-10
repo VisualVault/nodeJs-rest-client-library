@@ -69,11 +69,17 @@ WADNR is a **near-production client environment**. Write operations are governed
 
 See root `CLAUDE.md` § "Write Safety" for the full policy and enforcement architecture.
 
-## WS Date Test Validation (2026-04-10)
+## Date Test Validations (2026-04-10)
+
+### Web Services
 
 All 6 WS bugs + FORM-BUG-7 confirmed as platform-level — results identical to EmanuelJofre. See `tasks/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md` for full results.
 
 Runner requires `--template-name "zzzDate Test Harness"` (form name differs from EmanuelJofre's "DateTest"). Write policy uses name-based resolution at runtime.
+
+### Dashboards
+
+27 PASS / 8 FAIL / 9 BLOCKED across 44 slots. All tested categories match EmanuelJofre. DB-5 (filter) BLOCKED — filter toolbar not enabled on new dashboard. DB-3 D-H BLOCKED — no IST browser data. See `tasks/date-handling/dashboards/runs/wadnr-full-run-2026-04-10.md`.
 
 ## Related
 

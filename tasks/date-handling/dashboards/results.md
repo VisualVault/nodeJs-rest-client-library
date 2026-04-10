@@ -2,7 +2,23 @@
 
 Live test evidence for the dashboard date display investigation.
 
-Last updated: 2026-04-02
+Last updated: 2026-04-10
+
+---
+
+## WADNR Cross-Environment Validation — 2026-04-10
+
+**Environment**: vv5dev / WADNR / fpOnline | **Dashboard**: zzzDate Test Harness (ReportID: `09c84a6b-de34-f111-8333-99973bb0d2ea`)
+
+- 2026-04-10 [WADNR Full Run](runs/wadnr-full-run-2026-04-10.md) — 27 PASS / 8 FAIL / 9 BLOCKED — all tested categories match EmanuelJofre platform behavior
+- DB-8 TZ Independence: PASS (0 mismatches BRT/IST/UTC)
+- DB-1 Display Format: 8/8 PASS
+- DB-2 Date Accuracy: 8/8 PASS
+- DB-3 Wrong Date: 3/8 PASS, 5 BLOCKED (no IST browser data for D-H)
+- DB-4 Column Sort: 4/4 PASS
+- DB-5 Filter: 4/4 BLOCKED (filter not enabled on dashboard)
+- DB-6 Cross-Layer: 8/8 FAIL (same pattern: FAIL-1 format, FAIL-2 time shift for C/G)
+- DB-7 Export: 3/3 PASS (Excel, Word, XML)
 
 ---
 
