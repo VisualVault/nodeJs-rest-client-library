@@ -10,12 +10,12 @@
 const { assertApiWriteAllowed } = require('../fixtures/write-policy');
 
 async function guardedPut(request, url, options) {
-    assertApiWriteAllowed('PUT', url);
+    assertApiWriteAllowed('PUT', url, options?.data);
     return request.put(url, options);
 }
 
 async function guardedPost(request, url, options) {
-    assertApiWriteAllowed('POST', url);
+    assertApiWriteAllowed('POST', url, options?.data);
     return request.post(url, options);
 }
 

@@ -147,6 +147,9 @@ async function main() {
                     if (resp.templateIdGuid) {
                         form.templateId = resp.templateIdGuid;
                     }
+                    if (resp.templateRevisionIdGuid) {
+                        form.revisionId = resp.templateRevisionIdGuid;
+                    }
                 } catch (err) {
                     console.warn(`Warning: could not resolve template ID for "${form.name}": ${err.message}`);
                 }

@@ -34,10 +34,12 @@ const FIELD_MAP = {
     H: { field: 'Field13', enableTime: true, ignoreTimezone: true, useLegacy: true },
 };
 
-// VV environment constants (vvdemo EmanuelJofre/Main)
-const XCID = '815eb44d-5ec8-eb11-8200-a8333ebd7939';
-const XCDID = '845eb44d-5ec8-eb11-8200-a8333ebd7939';
-const BASE_URL = 'https://vvdemo.visualvault.com';
+// Load VV environment from .env.json (supports any customer)
+const { loadConfig } = require('../../testing/fixtures/env-config');
+const _envConfig = loadConfig();
+const XCID = _envConfig.customerAlias;
+const XCDID = _envConfig.databaseAlias;
+const BASE_URL = _envConfig.baseUrl;
 
 function parseArgs() {
     const args = process.argv.slice(2);

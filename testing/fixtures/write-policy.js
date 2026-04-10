@@ -124,9 +124,10 @@ function assertFormWriteAllowed(templateId, operation = 'create') {
  *
  * @param {string} method - HTTP method (PUT, POST, DELETE)
  * @param {string} url - full or partial request URL
+ * @param {object} [body] - request body (used for forminstance/ where templateId is in the payload, not the URL)
  * @throws {Error} if the write is blocked by policy
  */
-function assertApiWriteAllowed(method, url) {
+function assertApiWriteAllowed(method, url, body) {
     if (process.env.VV_FORCE_WRITE) {
         logWrite('api', method, url, true, 'VV_FORCE_WRITE override');
         return;
@@ -155,6 +156,28 @@ function assertApiWriteAllowed(method, url) {
     for (const form of forms) {
         if (normalizedUrl.includes(form.templateId.toLowerCase())) {
             logWrite('api', method, url, true, `allowlist match: ${form.name || form.templateId}`);
+            return;
+        }
+    }
+
+    // Check forminstance/ body — template GUID is in the payload, not the URL.
+    // body.formTemplateId may be a revision ID (from FormsApi.postForm), so also
+    // match against forms[].revisionId which the runner resolves at startup.
+    if (normalizedUrl.includes('/forminstance') && body && body.formTemplateId) {
+        const bodyTemplateId = body.formTemplateId.toLowerCase();
+        const formMatch = forms.find(
+            (f) =>
+                f.templateId.toLowerCase() === bodyTemplateId ||
+                (f.revisionId && f.revisionId.toLowerCase() === bodyTemplateId)
+        );
+        if (formMatch) {
+            logWrite(
+                'api',
+                method,
+                url,
+                true,
+                `forminstance allowlist match: ${formMatch.name || formMatch.templateId}`
+            );
             return;
         }
     }
