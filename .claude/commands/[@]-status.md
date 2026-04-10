@@ -32,9 +32,11 @@ ahead_behind=$(git rev-list --left-right --count origin/$branch...$branch 2>/dev
 
 **2. Active tasks** — for each `tasks/*/CLAUDE.md`:
 
-- Read the Scope table to get component statuses
-- Read the "Next Steps" section (last ~5 lines of the section)
-- For execution coverage: read `projects/*/testing/{task}/status.md` (rollup files). These have per-component pass/fail/pending totals. Aggregate across projects if multiple exist.
+- Read the **Scope table** to get component statuses
+- Read the **"Next Steps"** section (last ~5 lines of the section)
+- Read the **remaining-work section** (if present) — may be titled "What Has NOT Been Tested", "Known Gaps", "Remaining Work", "Open Items", or similar. Match by intent: it lists what is not yet done.
+- For **per-project progress**: read `projects/*/testing/{task}/status.md` (rollup files). Rollup tables are self-describing — use whatever columns they have (could be Slots/Executed/PASS/FAIL for testing tasks, or Milestone/Done/Remaining for dev tasks, etc.). When multiple projects have rollup data for the same task, keep them **separate** — do NOT aggregate.
+- For **blockers/context**: read the `## Notes` section from each project's rollup `status.md` — these explain WHY things are blocked, pending, or constrained.
 
 **3. Active projects** — for each `projects/*/`:
 
@@ -64,7 +66,7 @@ done
 
 ### Output Format
 
-```markdown
+````markdown
 ## Status — {YYYY-MM-DD}
 
 ### Git
@@ -76,11 +78,47 @@ done
 
 ### Active Tasks
 
-| Task           | Components                 | Coverage     | Next Step                  |
-| -------------- | -------------------------- | ------------ | -------------------------- |
-| date-handling  | Forms: {N}/{M} ({P}P/{F}F) | WS: complete | {first next step}          |
-|                | Dashboards: complete       |              |                            |
-| form-templates | Active                     | —            | {next step from CLAUDE.md} |
+For each task, check how many projects have rollup files (`projects/*/testing/{task}/status.md`).
+
+**Single or no project rollup** — compact row in a summary table:
+
+| Task           | Status | Next Step                  |
+| -------------- | ------ | -------------------------- |
+| form-templates | Active | {next step from CLAUDE.md} |
+
+**Multiple project rollups** — per-task sub-section with one row per project. Column headers come from the rollup Summary table's Component column (not hardcoded).
+
+Cell format — **adapt to the rollup table's columns**, don't assume testing semantics:
+
+- If the rollup has **numeric progress columns** (e.g., Slots/Executed, Total/Done): show `{done}/{total}` with key metrics in parens. Include any non-zero "problem" columns (Blocked, Pending, Failed, etc.) as qualifiers: `140/148 (140P/0F, 8 blocked)`.
+- If a component shows **Status = Complete** and all work is done with no blocks: `Complete` + key metric summary.
+- If the rollup has **only status keywords** (e.g., Done, In Progress, Blocked): show the keyword directly.
+- **Not Started**: show as-is.
+- Include the total column from the rollup if numeric.
+
+#### {Task Name} Progress
+
+| Project    | {Component1} ({col info}) | {Component2} ({col info}) | ... | Total        |
+| ---------- | ------------------------- | ------------------------- | --- | ------------ |
+| {project1} | {adapted from rollup}     | Complete ({metrics})      | ... | {done}/{tot} |
+| {project2} | Not Started               | {adapted from rollup}     | ... | {done}/{tot} |
+
+**Blockers & gaps** — surface from two sources. Omit this section entirely if nothing to report.
+
+Source 1: `## Notes` from each project's rollup `status.md` — one bullet per project with non-trivial blockers, constraints, or environment issues. Cite the specific reason.
+
+Source 2: The **remaining-work section** from `tasks/{task}/CLAUDE.md` (may be titled "What Has NOT Been Tested", "Known Gaps", "Remaining Work", etc.) — one bullet, compact comma-separated list.
+
+```markdown
+**Blockers:**
+
+- {Project}: {reason from Notes — e.g., "DB-5 filter toolbar not enabled; Forms Calendar not yet executed"}
+
+**Remaining:** {comma-separated list from task CLAUDE.md remaining-work section}
+```
+````
+
+**Next:** {first next step from task CLAUDE.md}
 
 ### Active Projects
 
@@ -102,7 +140,8 @@ done
 
 {CLAUDE.md size summary — only flag files over target}
 {Uncommitted changes warning if any}
-```
+
+````
 
 ---
 
@@ -110,11 +149,11 @@ done
 
 In addition to the default task row, include:
 
-**1. Per-project execution status:**
+**1. Per-project progress:**
 
-For each `projects/*/testing/{task}/status.md` (rollup files), extract the Summary table. Show one section per project.
+For each `projects/*/testing/{task}/status.md` (rollup files), extract the Summary table as-is. Show one section per project. Also extract the `## Notes` section.
 
-**2. "What Has NOT Been Tested" section** — read verbatim from the task's CLAUDE.md
+**2. Remaining-work section** — read verbatim from the task's CLAUDE.md (may be titled "What Has NOT Been Tested", "Known Gaps", "Remaining Work", etc.)
 
 **3. "Next Steps" section** — read verbatim from the task's CLAUDE.md
 
@@ -122,26 +161,25 @@ For each `projects/*/testing/{task}/status.md` (rollup files), extract the Summa
 
 ```bash
 git log --oneline -5 -- tasks/{name}/
-```
+````
 
 ### Output format for deep view:
 
 ```markdown
 ## Task: {name} — Deep View
 
-### Execution Status
+### Per-Project Progress
 
-**EmanuelJofre (vvdemo)** — from `projects/emanueljofre/testing/{task}/status.md`
-| Component | Slots | Executed | PASS | FAIL | Pending | Status |
-{rows from rollup Summary table}
+For each project with a rollup file, show its Summary table with the original columns (they vary by task type). Include the Notes section as blockquote if non-empty.
 
-**WADNR (vv5dev)** — from `projects/wadnr/testing/{task}/status.md`
-| Component | Slots | Executed | PASS | FAIL | Pending | Status |
-{rows from rollup Summary table}
+**{Project} ({env})** — from `projects/{project}/testing/{task}/status.md`
+{Summary table as-is from rollup — preserve original columns}
 
-### Not Yet Tested
+> {Notes section, if present}
 
-{verbatim from CLAUDE.md}
+### Remaining
+
+{verbatim from task CLAUDE.md remaining-work section — whatever its title is}
 
 ### Next Steps
 

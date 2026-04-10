@@ -9,6 +9,8 @@ Total slots: 242
 
 > **Note**: Results columns in the tables below are a historical snapshot from the EmanuelJofre (vvdemo) baseline. Live status tracking is in per-project `status.md` files.
 
+**Cross-environment validation**: WADNR (vv5dev) — 116/116 PASS on BRT-Chromium (2026-04-10). All results identical to EmanuelJofre baseline. See `projects/wadnr/testing/date-handling/forms-calendar/status.md`.
+
 ---
 
 ## ID Convention

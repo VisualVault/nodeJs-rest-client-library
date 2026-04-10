@@ -93,6 +93,10 @@ Runner requires `--template-name "zzzDate Test Harness"` (form name differs from
 
 27 PASS / 8 FAIL / 9 BLOCKED across 44 slots. All tested categories match EmanuelJofre. DB-5 (filter) BLOCKED — filter toolbar not enabled on new dashboard. DB-3 D-H BLOCKED — no IST browser data. See `testing/date-handling/dashboards/runs/wadnr-full-run-2026-04-10.md`.
 
+### Forms Calendar
+
+116 PASS / 0 FAIL — BRT-Chromium only (2026-04-10). All 116 tests identical to EmanuelJofre baseline. Covers Categories 1-9, 11-12, and Bug 1 audit spec. IST/UTC timezones and Firefox/WebKit not yet run. Cat 3 cross-TZ requires WADNR saved records. See `testing/date-handling/forms-calendar/status.md`.
+
 ## Related
 
 - **Test assets catalog: [`test-assets.md`](test-assets.md)** — zzzDate Test Harness, zzzJohnDevTest, zzzJohnDevTestWebSvc
