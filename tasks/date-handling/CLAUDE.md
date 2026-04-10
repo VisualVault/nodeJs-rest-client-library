@@ -60,7 +60,7 @@ Each bug has a companion `*-fix-recommendations.md` file. See `analysis/temporal
 
 ## Forms Calendar Fields (Current Focus)
 
-See `forms-calendar/matrix.md` for current coverage (~220/246 tests across 13 categories, 7 bugs confirmed).
+See `forms-calendar/matrix.md` for current coverage status.
 
 ### Key Context
 

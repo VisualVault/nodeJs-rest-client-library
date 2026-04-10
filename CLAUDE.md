@@ -110,6 +110,9 @@ npm run test:pw              # All projects (4 TZ x 3 browsers)
 npm run test:pw:brt          # BRT -- all browsers
 npm run test:pw:headed       # Headed mode (visible browser)
 npm run test:pw:report       # Open HTML report
+npm run test:pw:regression   # Regression pipeline (run + generate artifacts)
+npm run test:ws:regression   # WS regression pipeline
+npm run test:dash:regression # Dashboard regression pipeline
 ```
 
 ## Web Services Testing

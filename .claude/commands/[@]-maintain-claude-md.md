@@ -5,7 +5,7 @@ description: Audit and maintain all CLAUDE.md files for health, accuracy, and st
 
 # CLAUDE.md Maintenance
 
-Audit all CLAUDE.md files in the repo against the content standard defined in the root CLAUDE.md § "CLAUDE.md Convention". Detect bloat, staleness, misplacement, duplicated content, and standard violations. Then apply fixes — relocating content to where it belongs before removing it from CLAUDE.md files.
+Audit all CLAUDE.md files in the repo against the content standard defined in the root CLAUDE.md (§ Principles: "Documentation as map" + "Documentation hygiene", § Rules > "CLAUDE.md Standards"). Detect bloat, staleness, misplacement, duplicated content, and standard violations. Then apply fixes — relocating content to where it belongs before removing it from CLAUDE.md files.
 
 **Two modes:**
 
@@ -78,11 +78,11 @@ For each CLAUDE.md, check line count against the tier target:
 
 | Tier         | Target       | Warning at | Critical at |
 | ------------ | ------------ | ---------- | ----------- |
-| Root         | ~150 lines   | >200       | >300        |
+| Root         | ~200 lines   | >250       | >350        |
 | Scope        | ~30-60 lines | >80        | >120        |
 | Task/Project | flexible     | >200       | >400        |
 
-Flag over-target files with severity level and the delta (e.g., "Root CLAUDE.md: 410 lines, target ~150, +260 over").
+Flag over-target files with severity level and the delta (e.g., "Root CLAUDE.md: 410 lines, target ~200, +210 over").
 
 ---
 
@@ -225,7 +225,7 @@ Generate a consolidated report grouped by file, then by severity:
 ```
 ## CLAUDE.md Health Report
 
-### /CLAUDE.md (Root — 410 lines, target ~150)
+### /CLAUDE.md (Root — 410 lines, target ~200)
 
 - CRITICAL: 260 lines over target
 - WARNING: 3 code blocks >5 lines (lines 45-62, 148-165, 270-285)
@@ -297,7 +297,7 @@ For each finding, apply fixes in this order:
 
 ### 5C. Root CLAUDE.md — specific reductions
 
-When trimming the root CLAUDE.md toward ~150 lines:
+When trimming the root CLAUDE.md toward ~200 lines:
 
 1. **Repo structure tree**: Replace detailed file listings with scope-folder-only tree. Each scope folder gets one line + its CLAUDE.md handles the rest.
 2. **Section details**: Replace multi-paragraph sections (Playwright testing, WS testing, authentication) with 1-2 sentence summary + pointer to the scope CLAUDE.md or doc that covers it.
@@ -348,7 +348,7 @@ Report final state:
 
 | File | Before | After | Target | Status |
 |------|--------|-------|--------|--------|
-| /CLAUDE.md | 410 | 148 | ~150 | OK |
+| /CLAUDE.md | 410 | 195 | ~200 | OK |
 | tasks/date-handling/CLAUDE.md | 812 | 185 | <400 | OK |
 | tools/CLAUDE.md | 32 | 32 | ~30-60 | OK |
 ...
