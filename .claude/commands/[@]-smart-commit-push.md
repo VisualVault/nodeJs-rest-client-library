@@ -24,17 +24,14 @@ This repo uses a three-tier Git model (see CLAUDE.md § "Repository Architecture
 
 ### Personal (never push to shared team repo)
 
-| Pattern               | Reason                                                    |
-| --------------------- | --------------------------------------------------------- |
-| `projects/`           | Customer-specific data (extracts, analysis, case studies) |
-| `tasks/**/runs/`      | Env-specific execution records (record IDs, timestamps)   |
-| `tasks/**/summaries/` | Personal tracking state                                   |
-| `tasks/**/results.md` | Raw session evidence                                      |
-| `.env.json`           | Machine-specific credentials (already gitignored)         |
+| Pattern     | Reason                                                |
+| ----------- | ----------------------------------------------------- |
+| `projects/` | Customer/env-bound data (extracts, testing, analysis) |
+| `.env.json` | Machine-specific credentials (already gitignored)     |
 
 ### Shared (safe to push to team repo)
 
-Everything else: `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `tasks/**/analysis/`, `tasks/**/matrix.md`, `tasks/**/test-cases/`, config files, CLAUDE.md.
+Everything else: `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `tasks/` (analysis, matrix, test-cases), config files, CLAUDE.md.
 
 ### Push Behavior
 

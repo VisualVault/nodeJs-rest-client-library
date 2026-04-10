@@ -1,23 +1,29 @@
 # Tasks — Cross-Cutting Investigations
 
-Platform-level investigations that apply to any VV environment. Each task gets its own subfolder with analysis, methodology, and test evidence.
+Platform-level investigations that apply to any VV environment. Each task gets its own subfolder with analysis and methodology.
 
-## Sharing Rules
+## What Belongs Here
 
-Tasks produce both **shared** and **personal** artifacts:
+Tasks hold **platform truth** — content that is true regardless of which customer or environment you're looking at.
 
-| Content                                      | Shared? | Reason                                                       |
-| -------------------------------------------- | ------- | ------------------------------------------------------------ |
-| `analysis/` (bug reports, RCA, fix strategy) | Yes     | Platform knowledge — true for all environments               |
-| `matrix.md` (test methodology)               | Yes     | Reproducible coverage tracker                                |
-| `test-cases/` (TC specifications)            | Yes     | Anyone can run these                                         |
-| `runs/` (execution records)                  | **No**  | Reference environment-specific data (record IDs, timestamps) |
-| `summaries/` (per-TC status)                 | **No**  | Personal tracking state                                      |
-| `results.md` (raw evidence)                  | **No**  | Raw session evidence                                         |
+| Content                                      | Example                                    |
+| -------------------------------------------- | ------------------------------------------ |
+| `analysis/` (bug reports, RCA, fix strategy) | "FORM-BUG-5 adds a fake Z suffix"          |
+| `matrix.md` (methodology + expected values)  | Test slot definitions, expected behavior   |
+| `test-cases/` (TC specifications)            | Reproducible specs anyone can run anywhere |
 
-## Relationship to Projects
+Everything here is **shared** (pushed to team repo).
 
-Tasks hold **platform truth** ("FORM-BUG-5 adds a fake Z"). Projects hold **customer-specific impact** ("WADNR has 119 Config B fields exposed"). When an investigation reveals customer impact, the assessment goes in `projects/{customer}/analysis/`, not in the task folder.
+## What Does NOT Belong Here
+
+Execution output bound to a specific customer or environment — actual observed values, record IDs, execution timestamps, pass/fail status. These go in `projects/{customer}/testing/{task}/{component}/`.
+
+| Artifact type    | Location                                                    |
+| ---------------- | ----------------------------------------------------------- |
+| Run files        | `projects/{customer}/testing/{task}/{component}/runs/`      |
+| Per-env status   | `projects/{customer}/testing/{task}/{component}/status.md`  |
+| Session evidence | `projects/{customer}/testing/{task}/{component}/results.md` |
+| Customer impact  | `projects/{customer}/analysis/`                             |
 
 ## Active Tasks
 

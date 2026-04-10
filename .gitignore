@@ -193,6 +193,3 @@ tasks/date-handling/forms-calendar/main.js
 # so all work is version-controlled and backed up.
 #
 # /projects/
-# tasks/**/runs/
-# tasks/**/summaries/
-# tasks/**/results.md

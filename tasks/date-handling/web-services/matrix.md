@@ -1,11 +1,13 @@
 # Web Services — Test Matrix
 
-Authoritative permutation tracker for the web services date-handling investigation.
-API analysis → `analysis/overview.md` | Test evidence → `results.md` | Harness → `webservice-test-harness.js`
+Methodology and test slot definitions for the web services date-handling investigation.
+API analysis → `analysis/overview.md` | Harness → `webservice-test-harness.js`
 
-Last updated: 2026-04-10 | Total slots: 148 | Done: 148 (116P/32F) | **COMPLETE**
+**Execution results**: See `projects/{customer}/testing/date-handling/web-services/status.md` per environment.
 
-> **Cross-environment validation**: All 10 categories re-executed against WADNR (vv5dev) on 2026-04-10. Results identical to EmanuelJofre (vvdemo) — all 6 bugs confirmed as platform-level, not environment-specific. See `runs/wadnr-full-run-2026-04-10.md`.
+Total slots: 148
+
+> **Note**: Results columns in the tables below are a historical snapshot from the EmanuelJofre (vvdemo) baseline run. Live status tracking is in per-project `status.md` files.
 
 ---
 

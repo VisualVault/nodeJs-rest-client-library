@@ -21,9 +21,9 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 ```
 tasks/date-handling/
   analysis/                    # Cross-cutting RCA: temporal-models.md, fix-strategy.md
-  forms-calendar/              # Forms investigation: analysis/, matrix.md, test-cases/, runs/, summaries/
-  web-services/                # WS investigation: analysis/, matrix.md, test-cases/, runs/, summaries/
-  dashboards/                  # Dashboard investigation: analysis/, matrix.md, test-cases/, runs/, summaries/
+  forms-calendar/              # Forms investigation: analysis/, matrix.md, test-cases/
+  web-services/                # WS investigation: analysis/, matrix.md, test-cases/
+  dashboards/                  # Dashboard investigation: analysis/, matrix.md, test-cases/
   document-library/            # Document index field investigation: analysis/overview.md
 ```
 

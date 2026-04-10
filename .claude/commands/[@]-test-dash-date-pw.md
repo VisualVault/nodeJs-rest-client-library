@@ -467,14 +467,14 @@ Update PASS/FAIL/PENDING counts for the affected category.
 
 ## Phase 5A — Generate the run file
 
-Create `tasks/date-handling/dashboards/runs/tc-{id}-run-{N}.md` (or `db-{cat}-batch-run-{N}.md` for batch category runs).
+Create `projects/{customer}/testing/date-handling/dashboards/runs/tc-{id}-run-{N}.md` (or `db-{cat}-batch-run-{N}.md` for batch category runs). The `{customer}` is derived from the active `.env.json` config (`customerAlias.toLowerCase()`).
 
 **Run files are immutable after creation.**
 
 ```markdown
 # TC-{ID} — Run {N} | {YYYY-MM-DD} | {PASS / FAIL-N}
 
-**Spec**: [tc-{id}.md](../test-cases/tc-{id}.md) | **Summary**: [summary](../summaries/tc-{id}.md)
+**Spec**: `tasks/date-handling/dashboards/test-cases/tc-{id}.md`
 
 ## Environment
 
@@ -509,7 +509,7 @@ Create `tasks/date-handling/dashboards/runs/tc-{id}-run-{N}.md` (or `db-{cat}-ba
 
 ## Phase 5B — Create or update the summary file
 
-**Path:** `tasks/date-handling/dashboards/summaries/tc-{id}.md`
+**Path:** `projects/{customer}/testing/date-handling/dashboards/summaries/tc-{id}.md`
 
 If first run: create. If re-run: append to Run History table + update status.
 
@@ -561,12 +561,11 @@ Append a one-line entry to the current session in `dashboards/results.md`:
 
 This command produces both shared and personal artifacts. See CLAUDE.md § "Repository Architecture & Sharing Model" for principles.
 
-| Artifact          | Path                                         | Shared? | Reason                         |
-| ----------------- | -------------------------------------------- | ------- | ------------------------------ |
-| TC spec           | `tasks/date-handling/dashboards/test-cases/` | Yes     | Reproducible specification     |
-| Matrix update     | `tasks/date-handling/dashboards/matrix.md`   | Yes     | Methodology + coverage tracker |
-| Run file          | `tasks/date-handling/dashboards/runs/`       | **No**  | Env-specific execution record  |
-| Summary           | `tasks/date-handling/dashboards/summaries/`  | **No**  | Personal tracking state        |
-| Results.md append | `tasks/date-handling/dashboards/results.md`  | **No**  | Raw session evidence           |
+| Artifact      | Path                                                              | Shared? | Reason                        |
+| ------------- | ----------------------------------------------------------------- | ------- | ----------------------------- |
+| TC spec       | `tasks/date-handling/dashboards/test-cases/`                      | Yes     | Reproducible specification    |
+| Run file      | `projects/{customer}/testing/date-handling/dashboards/runs/`      | No      | Env-specific execution record |
+| Status update | `projects/{customer}/testing/date-handling/dashboards/status.md`  | No      | Per-env pass/fail tracker     |
+| Summary       | `projects/{customer}/testing/date-handling/dashboards/summaries/` | No      | Per-TC tracking state         |
 
 When committing after a test run, stage shared and personal artifacts separately. Personal artifacts should only be pushed to your private remote.

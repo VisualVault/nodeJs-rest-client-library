@@ -247,7 +247,7 @@ Read the following files before doing anything else:
 
     If the Key JavaScript section is not in matrix.md, read `tasks/date-handling/CLAUDE.md` to get it.
 
-5. **If the Evidence column in step 1 references a `results.md` block** (e.g., `results.md § Test 2.5`): read that block in `tasks/date-handling/forms-calendar/results.md` to extract any additional context — exact console output, session notes, observed discrepancies. This supplements Phase 2 but does not replace it.
+5. **If the Evidence column in step 1 references a `results.md` block** (e.g., `results.md § Test 2.5`): read that block in `projects/{customer}/testing/date-handling/forms-calendar/results.md` to extract any additional context — exact console output, session notes, observed discrepancies. This supplements Phase 2 but does not replace it.
 
 Do not proceed to Phase 2 until all required files are read.
 
@@ -688,7 +688,7 @@ Update the PASS/FAIL/PENDING/BLOCKED counts for the affected category row to ref
 
 ## Phase 5A — Generate the run file
 
-Create `tasks/date-handling/forms-calendar/runs/tc-{category-id}-run-{N}.md` from the Phase 2 observations. N is the next sequential integer for this TC (check whether previous run files exist first).
+Create `projects/{customer}/testing/date-handling/forms-calendar/runs/tc-{category-id}-run-{N}.md` from the Phase 2 observations. N is the next sequential integer for this TC (check whether previous run files exist first).
 
 **Run files are immutable after creation.** Never modify a run file — create a new one for each re-run.
 
@@ -739,7 +739,7 @@ Include only steps that have an Expected value in the spec (skip pure UI navigat
 
 ## Phase 5B — Create or update the summary file
 
-**Path:** `tasks/date-handling/forms-calendar/summaries/tc-{category-id}.md`
+**Path:** `projects/{customer}/testing/date-handling/forms-calendar/summaries/tc-{category-id}.md`
 
 If this is the **first run** for the TC (file does not exist): create it.
 If this is a **re-run** (file exists): open it and append a row to the Run History table + update Current Status and Current Interpretation.
@@ -826,13 +826,13 @@ This prevents orphan browser processes. In **batch mode**, close the browser onc
 
 This command produces both shared and personal artifacts. See CLAUDE.md § "Repository Architecture & Sharing Model" for principles.
 
-| Artifact          | Path                                             | Shared? | Reason                         |
-| ----------------- | ------------------------------------------------ | ------- | ------------------------------ |
-| Test-data entry   | `testing/fixtures/test-data.js`                  | Yes     | Reusable test methodology      |
-| TC spec           | `tasks/date-handling/forms-calendar/test-cases/` | Yes     | Reproducible specification     |
-| Matrix update     | `tasks/date-handling/forms-calendar/matrix.md`   | Yes     | Methodology + coverage tracker |
-| Run file          | `tasks/date-handling/forms-calendar/runs/`       | **No**  | Env-specific execution record  |
-| Summary           | `tasks/date-handling/forms-calendar/summaries/`  | **No**  | Personal tracking state        |
-| Results.md append | `tasks/date-handling/forms-calendar/results.md`  | **No**  | Raw session evidence           |
+| Artifact          | Path                                                                  | Shared? | Reason                         |
+| ----------------- | --------------------------------------------------------------------- | ------- | ------------------------------ |
+| Test-data entry   | `testing/fixtures/test-data.js`                                       | Yes     | Reusable test methodology      |
+| TC spec           | `tasks/date-handling/forms-calendar/test-cases/`                      | Yes     | Reproducible specification     |
+| Matrix update     | `tasks/date-handling/forms-calendar/matrix.md`                        | Yes     | Methodology + coverage tracker |
+| Run file          | `projects/{customer}/testing/date-handling/forms-calendar/runs/`      | **No**  | Env-specific execution record  |
+| Summary           | `projects/{customer}/testing/date-handling/forms-calendar/summaries/` | **No**  | Personal tracking state        |
+| Results.md append | `projects/{customer}/testing/date-handling/forms-calendar/results.md` | **No**  | Raw session evidence           |
 
 When committing after a test run, stage shared and personal artifacts separately. Personal artifacts should only be pushed to your private remote.

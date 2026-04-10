@@ -1,9 +1,13 @@
 # Forms Calendar — Test Matrix
 
-Authoritative permutation tracker for the forms calendar date-handling investigation.
-Full test evidence → `results.md` | Bug analysis → `analysis.md`
+Methodology and test slot definitions for the forms calendar date-handling investigation.
+Bug analysis → `analysis/`
 
-Last updated: 2026-04-06 | Total slots: 242 | Executed: 204 (111P, 93F) | Pending: 35 | Blocked: 0
+**Execution results**: See `projects/{customer}/testing/date-handling/forms-calendar/status.md` per environment.
+
+Total slots: 242
+
+> **Note**: Results columns in the tables below are a historical snapshot from the EmanuelJofre (vvdemo) baseline. Live status tracking is in per-project `status.md` files.
 
 ---
 

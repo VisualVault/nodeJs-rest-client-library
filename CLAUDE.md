@@ -149,8 +149,8 @@ See `tasks/` folder. Each task gets its own subfolder with analysis, test result
 
 1. **Reproducibility.** Shared content must be reproducible — bug reports describe the bug, reproduction steps, and root cause. Anyone with a VV environment can verify.
 2. **Environment-agnostic tooling.** Always prefer creating reusable scripts and tools over one-off solutions. Export, audit, inventory, and generator tools must work for any VV customer and environment. Hardcoded customer references go in `projects/`.
-3. **Knowledge separation.** Tasks hold platform knowledge, projects hold customer data. Platform bugs go in `tasks/`, customer-specific assessments go in `projects/{customer}/`.
-4. **Sharing boundary.** Raw test evidence is personal, analysis is shared. Run files and summaries are working notes; derived bug reports and analysis are platform documentation.
+3. **Knowledge separation.** "Is this artifact true regardless of which customer or environment?" If yes → `tasks/`. If bound to a specific customer/environment → `projects/{customer}/`. Platform bugs, methodology, test specs, and expected behavior go in `tasks/`. Actual observed values, execution records, extracted artifacts, and customer-specific config go in `projects/{customer}/`.
+4. **Sharing boundary.** `tasks/` content is shared (platform truth). `projects/` content is personal (customer/env-bound). No mixing — a file belongs to one or the other.
 5. **Defense in depth.** Runtime guards are a safety net, not the primary defense. The primary defense is never writing unsafe code in the first place.
 6. **Documentation as map.** CLAUDE.md files include: identity, structure, principles/rules, commands, pointers to deeper docs. Exclude: file inventories, code snippets, config contents, bug descriptions, API tables, historical narratives — link to the source instead.
 7. **Documentation hygiene.** (1) If derivable with `ls`/`grep`/`cat`, link instead. (2) No duplication. (3) If it goes stale when a file is added, it doesn't belong. (4) Compress on task completion.
@@ -182,7 +182,7 @@ See the [Write Safety](#write-safety--mandatory) section for the 6 mandatory wri
 
 **Create a CLAUDE.md for:** top-level topic folders (`tools/`, `testing/`, `tasks/`, `projects/`, `docs/`, `scripts/`), individual tasks (`tasks/{task-name}/`), individual projects (`projects/{customer}/`).
 
-**Do NOT create CLAUDE.md for:** implementation subfolders (`tools/extract/`, `testing/fixtures/`, etc.), data directories (`projects/wadnr/extracts/`, `tasks/*/runs/`).
+**Do NOT create CLAUDE.md for:** implementation subfolders (`tools/extract/`, `testing/fixtures/`, etc.), data directories (`projects/wadnr/extracts/`, `projects/*/testing/`).
 
 **Size targets:** Root ~200 lines | Scope folders ~30-80 lines | Tasks/Projects flexible but aggressively pruned.
 
@@ -206,12 +206,12 @@ Every developer commits ALL their work to their **private repo** (full backup, m
 
 ### What Goes Where
 
-**Shared** (team repo): `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `tasks/` analysis + matrix + test-cases.
-**Not shared** (private repo only): `projects/`, `tasks/` results/runs/summaries, `.env.json`.
+**Shared** (team repo): `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `tasks/` (analysis, matrix methodology, test-cases).
+**Not shared** (private repo only): `projects/` (extracts, analysis, testing execution), `.env.json`.
 
 ### Current State
 
-Single-repo workflow — `emanueljofre/nodeV2` holds everything until team sharing begins. When shared: add a private remote, uncomment `.gitignore` lines for `/projects/` and `tasks/**/runs/`. New developers clone the team repo, rename origin to `shared`, add their private repo as `origin`.
+Single-repo workflow — `emanueljofre/nodeV2` holds everything until team sharing begins. When shared: add a private remote, uncomment `.gitignore` line for `/projects/`. New developers clone the team repo, rename origin to `shared`, add their private repo as `origin`.
 
 ## Upstream Sync & Protection
 

@@ -216,7 +216,7 @@ Observed: `{value}` instead of expected `{value}`
 
 ## Phase 4 — Generate the run file
 
-**Path:** `tasks/date-handling/web-services/runs/tc-{test-id}-run-{N}.md`
+**Path:** `projects/{customer}/testing/date-handling/web-services/runs/tc-{test-id}-run-{N}.md`
 
 N is the next sequential integer (check for existing run files first). Run files are immutable.
 
@@ -270,7 +270,7 @@ N is the next sequential integer (check for existing run files first). Run files
 
 ## Phase 5 — Create or update the summary file
 
-**Path:** `tasks/date-handling/web-services/summaries/tc-{test-id}.md`
+**Path:** `projects/{customer}/testing/date-handling/web-services/summaries/tc-{test-id}.md`
 
 If first run: create. If re-run: append to Run History table + update status.
 
@@ -346,12 +346,12 @@ When multiple test IDs are provided:
 
 This command produces both shared and personal artifacts. See CLAUDE.md § "Repository Architecture & Sharing Model" for principles.
 
-| Artifact          | Path                                           | Shared? | Reason                         |
-| ----------------- | ---------------------------------------------- | ------- | ------------------------------ |
-| TC spec           | `tasks/date-handling/web-services/test-cases/` | Yes     | Reproducible specification     |
-| Matrix update     | `tasks/date-handling/web-services/matrix.md`   | Yes     | Methodology + coverage tracker |
-| Run file          | `tasks/date-handling/web-services/runs/`       | **No**  | Env-specific execution record  |
-| Summary           | `tasks/date-handling/web-services/summaries/`  | **No**  | Personal tracking state        |
-| Results.md append | `tasks/date-handling/web-services/results.md`  | **No**  | Raw session evidence           |
+| Artifact          | Path                                                                | Shared? | Reason                         |
+| ----------------- | ------------------------------------------------------------------- | ------- | ------------------------------ |
+| TC spec           | `tasks/date-handling/web-services/test-cases/`                      | Yes     | Reproducible specification     |
+| Matrix update     | `tasks/date-handling/web-services/matrix.md`                        | Yes     | Methodology + coverage tracker |
+| Run file          | `projects/{customer}/testing/date-handling/web-services/runs/`      | **No**  | Env-specific execution record  |
+| Summary           | `projects/{customer}/testing/date-handling/web-services/summaries/` | **No**  | Personal tracking state        |
+| Results.md append | `projects/{customer}/testing/date-handling/web-services/results.md` | **No**  | Raw session evidence           |
 
 When committing after a test run, stage shared and personal artifacts separately. Personal artifacts should only be pushed to your private remote.
