@@ -16,10 +16,10 @@ tasks/
 
 ## Active Tasks
 
-| Task                                        | Status      | Description                                                                             |
-| ------------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
-| [date-handling](date-handling/)             | In Progress | Cross-platform date handling bug investigation — Forms, Web Services, Dashboards        |
-| [form-templates](form-templates/)           | Active      | VV form template XML analysis, format documentation, and improved template generation   |
-| [export-optimization](export-optimization/) | Active      | Export pipeline speed + reliability — parallel extraction, revision tracking, API-first |
+| Task                                          | Status      | Description                                                                              |
+| --------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| [date-handling](date-handling/)               | In Progress | Cross-platform date handling bug investigation — Forms, Web Services, Dashboards         |
+| [form-templates](form-templates/)             | Active      | VV form template XML analysis, format documentation, and improved template generation    |
+| [extract-optimization](extract-optimization/) | Active      | Extract pipeline speed + reliability — parallel extraction, revision tracking, API-first |
 
 > **Note:** Customer-specific project work (exports, impact analysis) lives in `projects/`. See [projects/wadnr/](../projects/wadnr/) for the WADNR project.

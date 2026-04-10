@@ -291,7 +291,7 @@ Templates follow a release lifecycle: **Released** (live, read-only) → **New R
 
 1. Click **"New Rev"** (`lnkNewRevision`) on the released row → opens a dock panel
 2. Fill **Revision** (e.g., `"1.2"` — must be unique per template) and **Change Reason** (required on vv5dev)
-3. Click **Save** → grid now shows two rows: released + draft (status: `"Release"`)
+3. Click **Save** → grid now shows two rows: released + draft (status text: `"Release"`, not `"Draft"` — the grid shows the action verb, not the state noun). Automation must match `status !== 'Released'` to find unreleased revisions
 
 **Editing a draft revision:**
 
@@ -301,14 +301,19 @@ Templates follow a release lifecycle: **Released** (live, read-only) → **New R
 
 **Link types on each row:**
 
-| Link ID                 | Text                   | Mechanism                      | Notes                                                      |
-| ----------------------- | ---------------------- | ------------------------------ | ---------------------------------------------------------- |
-| `lnkFormDetail`         | (name)                 | `VV.OpenWindow()` popup        | Opens template detail/preview                              |
-| `lnkDesign`             | "View"                 | `VV.OpenWindow()` popup        | Opens Form Designer (edit if draft, view-only if released) |
-| `lnkChangeState`        | "Released" / "Release" | `__doPostBack` or no-op        | Toggle release state                                       |
-| `lnkNewRevision`        | "New Rev"              | `__doPostBack` → dock panel    | Creates a new draft revision                               |
-| `lnkExportFormTemplate` | "Export"               | `__doPostBack` → file download | Exports template XML                                       |
-| `lnkCopyTemplate`       | "Copy"                 | `__doPostBack`                 | Clones the template                                        |
+| Link ID                 | Text                   | Mechanism                                   | Notes                                                                                                                   |
+| ----------------------- | ---------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `lnkFormDetail`         | (name)                 | `VV.OpenWindow()` popup                     | Opens template detail/preview                                                                                           |
+| `lnkDesign`             | "View"                 | `VV.OpenWindow()` popup                     | Opens Form Designer (edit if draft, view-only if released)                                                              |
+| `lnkChangeState`        | "Released" / "Release" | `__doPostBack` or no-op                     | Toggle release state                                                                                                    |
+| `lnkNewRevision`        | "New Rev"              | `__doPostBack` → dock panel                 | Creates a new draft revision                                                                                            |
+| `lnkImportTemplate`     | "Import"               | `DisplayFileUploadForImport()` → dock panel | Opens RadAsyncUpload dock for XML import. Not `__doPostBack` — uses a JS function. Button: `btnFormDesignerBeginImport` |
+| `lnkExportFormTemplate` | "Export"               | `__doPostBack` → file download              | Exports template XML                                                                                                    |
+| `lnkCopyTemplate`       | "Copy"                 | `__doPostBack`                              | Clones the template                                                                                                     |
+
+**REST API import** (`PUT /formtemplates/{id}/import`): Also available via `vvClient.forms.importFormTemplate(data, revisionId, xmlBuffer)`. Returns 400 `"Form Template revision is released"` if the target revision is not a draft — must create a new revision first via the admin UI, then import into the draft. The `{id}` is the revision GUID.
+
+**XML import behavior on vv5dev**: The platform auto-populates `<Mask>MM/dd/yyyy</Mask>` on all calendar fields during import (even if the source XML has no `<Mask>`), but does **not** auto-set `<EnableQListener>` — that property is preserved as-is from the imported XML. Always verify field properties after import on vv5dev.
 
 ### Form Designer
 
@@ -319,6 +324,7 @@ https://{env}.visualvault.com/FormDesigner/index.html#!/formdesigner?xcid={custo
 ```
 
 - `formId` is the **revision GUID** (not the template GUID)
+- `xcid` and `xcdid` require **actual GUIDs** — string aliases (e.g., `"WADNR"`, `"fpOnline"`) cause a `formErrorCode` null reference error. Get the GUIDs from the `VV.OpenWindow()` call in the FormTemplateAdmin grid row's `lnkDesign` onclick handler
 - Opened via `VV.OpenWindow()` from the FormTemplateAdmin grid — not directly navigable from the VV shell
 - **Left panel:** Controls tree (field names, buttons, containers)
 - **Right panel:** Control Properties — shows field config when a control is selected

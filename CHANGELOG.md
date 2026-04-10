@@ -64,6 +64,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Write policy name-based resolution in `run-ws-test.js` — after auth, resolves `writePolicy.forms[].name` to API template GUIDs via `getFormTemplateIdByName()`, injecting into the live policy object. Enables `.env.json` to use human-readable form names instead of environment-specific GUIDs. No `lib/` changes required
 - `testing/scripts/wadnr-ws-browser-verify.js` — standalone Playwright script for WADNR WS-4 browser verification (BRT + IST) and IST record creation
 - Cross-environment WS date test validation: all 10 categories (140/148 slots) executed against WADNR (vv5dev). All 6 WS bugs confirmed as platform-level. Run file: `tasks/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md`
+- vv5dev `zzzTarget Date Test Harness` template updated to v1.2: `EnableQListener=true` on all 33 fields (was `false` — config gap from initial template creation). Fixes all 32 Cat 4 URL parameter test failures (27/27 BRT+IST pass). Export/modify/import workflow via `testing/tmp/fix-enableqlistener.js`
 
 ### Changed
 
