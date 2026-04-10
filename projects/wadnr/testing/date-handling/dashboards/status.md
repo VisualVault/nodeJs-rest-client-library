@@ -4,9 +4,9 @@ Last run: 2026-04-10 | 27P / 8F / 9B | Run: [wadnr-full-run-2026-04-10.md](runs/
 
 ## DB-1 Display Format
 
-| ID | Config | Field | Actual | Status |
-|---|---|---|---|---|
-| db-1-A | A | Field7 | `3/14/2026` | PASS |
+| ID | Config | Field | Actual | Status | Run |
+|---|---|---|---|---|---|
+| db-1-A | A | Field7 | `3/14/2026` | PASS | [run-1](runs/tc-db-1-A-run-1.md) |
 | db-1-B | B | Field10 | `3/14/2026` | PASS |
 | db-1-C | C | Field6 | `3/15/2026 12:00 AM` | PASS |
 | db-1-D | D | Field5 | `3/15/2026 12:00 AM` | PASS |
