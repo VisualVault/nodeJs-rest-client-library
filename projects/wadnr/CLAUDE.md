@@ -69,6 +69,12 @@ WADNR is a **near-production client environment**. Write operations are governed
 
 See root `CLAUDE.md` § "Write Safety" for the full policy and enforcement architecture.
 
+## WS Date Test Validation (2026-04-10)
+
+Full WS date-handling test suite (10 categories, 140/148 slots) executed against WADNR. All 6 WS bugs + FORM-BUG-7 confirmed as platform-level — results identical to EmanuelJofre. Run file: `tasks/date-handling/web-services/runs/wadnr-full-run-2026-04-10.md`.
+
+Runner requires `--template-name "zzzDate Test Harness"` (form name differs from EmanuelJofre's "DateTest"). Write policy uses name-based resolution at runtime.
+
 ## Related
 
 - **Test assets catalog: [`test-assets.md`](test-assets.md)** — zzzDate Test Harness, zzzJohnDevTest, zzzJohnDevTestWebSvc
