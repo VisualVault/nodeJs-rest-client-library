@@ -69,6 +69,18 @@ WADNR is a **near-production client environment**. Write operations are governed
 
 See root `CLAUDE.md` § "Write Safety" for the full policy and enforcement architecture.
 
+## Testing
+
+Execution data for date-handling test components lives in `testing/date-handling/`:
+
+- **Rollup**: [`testing/date-handling/status.md`](testing/date-handling/status.md) — cross-component summary
+
+| Component      | Status file                                       |
+| -------------- | ------------------------------------------------- |
+| Web Services   | `testing/date-handling/web-services/status.md`    |
+| Dashboards     | `testing/date-handling/dashboards/status.md`      |
+| Forms Calendar | `testing/date-handling/forms-calendar/status.md`  |
+
 ## Date Test Validations (2026-04-10)
 
 ### Web Services

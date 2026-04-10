@@ -51,6 +51,8 @@ No analysis files yet. Run extractions first, then use:
 
 Execution data for all date-handling test components lives in `testing/date-handling/`:
 
+- **Rollup**: [`testing/date-handling/status.md`](testing/date-handling/status.md) — cross-component summary
+
 | Component      | Status file                                       |
 | -------------- | ------------------------------------------------- |
 | Dashboards     | `testing/date-handling/dashboards/status.md`      |
