@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.FormatSSN
  * Parameters: 1
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (SocialSecurityNumber) {
 //Purpose of function is to take a Social Security Number entered in any format and format it into a standard of XXX-XX-XXXX

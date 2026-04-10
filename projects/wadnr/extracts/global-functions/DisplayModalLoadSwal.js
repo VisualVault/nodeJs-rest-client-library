@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.DisplayModalLoadSwal
  * Parameters: 0
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function () {
 //This script is for the SweetAlert2 library, which is a library for creating alert and confirmation dialog boxes with custom messages and buttons. It allows developers to create custom messages and buttons to be shown to users when they interact with a website.

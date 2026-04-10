@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.RedirectToSubmitted
  * Parameters: 0
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function () {
 //RedirectToSubmitted for Global - changes the URL of the page to the designated User Registration success page

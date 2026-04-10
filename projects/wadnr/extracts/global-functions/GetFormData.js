@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.GetFormData
  * Parameters: 1
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (FieldNames) {
 // GetFormData for Global - Builds an array of form field objects for use in microservices (getFieldValueByName) based on passed in field names (FieldNames) or returns the entire form data collection if no array is passed in.

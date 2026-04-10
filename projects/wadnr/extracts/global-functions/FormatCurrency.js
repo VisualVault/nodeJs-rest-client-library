@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.FormatCurrency
  * Parameters: 1
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (Currency) {
 //Purpose of function is to take a Currency entered in any format and format it into a standard of X.XX

@@ -3,21 +3,21 @@
  * Category: Scheduled
  * Modified: 2025-01-09T15:13:46.39Z by john.sevilla@visualvault.com
  * Script ID: Script Id: e267ea38-9cce-ef11-82bf-a0dcc70b93c8
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-10
  */
 const logger = require('../log');
 const dayjs = require('dayjs');
 const currency = require('currency.js');
 
 module.exports.getCredentials = function () {
-    var options = {};
-    options.customerAlias = 'WADNR';
-    options.databaseAlias = 'fpOnline';
-    options.userId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
-    options.password = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
-    options.clientId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
-    options.clientSecret = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
-    return options;
+  var options = {};
+  options.customerAlias = "WADNR";
+  options.databaseAlias = "fpOnline";
+  options.userId = "09f356bb-3f44-49b1-a55f-d2caa2de9cc1";
+  options.password = "xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=";
+  options.clientId = "09f356bb-3f44-49b1-a55f-d2caa2de9cc1";
+  options.clientSecret = "xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=";
+  return options;
 };
 
 module.exports.main = async function (vvClient, response, token) {
@@ -78,7 +78,7 @@ module.exports.main = async function (vvClient, response, token) {
     // Custom Query Names
     /**
      * This query makes use of several TSQL clauses/functions in order return the data in a format that is optimized for this web service's purposes.
-     *
+     * 
      * _Links to the relevant documentation for each function/clause are provided below_:
      * - {@link https://learn.microsoft.com/en-us/sql/t-sql/queries/with-common-table-expression-transact-sql?view=sql-server-ver16 WITH}
      * - {@link https://learn.microsoft.com/en-us/sql/t-sql/queries/select-over-clause-transact-sql?view=sql-server-ver16#a-using-the-over-clause-with-the-row_number-function PARTITION BY}
@@ -91,19 +91,19 @@ module.exports.main = async function (vvClient, response, token) {
     const PENDING = 'Pending';
     const FINALIZED = 'Finalized';
 
-    /** **NOTE**: Represents the period of time in days for fees started since the cutoff to today.
+    /** **NOTE**: Represents the period of time in days for fees started since the cutoff to today. 
      *  Used for determining valid fee transactions for processing. */
     const FEE_CUTOFF_DATE_OFFSET = 365;
 
-    /** **NOTE**: Represents the number of days since a Fee record was last modified so that we can exclude
+    /** **NOTE**: Represents the number of days since a Fee record was last modified so that we can exclude 
      *  records from the results that were recently modified */
     const FEE_EXCLUSION_DATE_OFFSET = 7;
 
-    /** **NOTE**: Used in the custom query to get pending Transactions for the Provider so that their Fee records can be divided (partitioned) into groups, for up to `n` items for each division.
+    /** **NOTE**: Used in the custom query to get pending Transactions for the Provider so that their Fee records can be divided (partitioned) into groups, for up to `n` items for each division. 
      *  - This limit is set in place by the total number of records that can be  handled by the `LibFeeCalculateBalance` web service since it can only process a limited number of specified records.
      *  - e.g., if this limit is set to `10`, and a given Provider (`PROVIDER-001`) has `23` pending Transactions, then their rows will return something approximately like the following:
-     *    - `PROVIDER-001`, `[T1 ... T10]`
-     *    - `PROVIDER-001`, `[T11 ... T20]`
+     *    - `PROVIDER-001`, `[T1 ... T10]` 
+     *    - `PROVIDER-001`, `[T11 ... T20]` 
      *    - `PROVIDER-001`, `[T21 ... T23]` */
     const TRANSACTION_PARTITION_LIMIT = 10;
 
@@ -149,19 +149,14 @@ module.exports.main = async function (vvClient, response, token) {
                 ignoreStatusCode: An integer status code for which no error should be thrown. If you're using checkData(), make sure to pass the same param as well.
         */
         if (!vvClientRes.meta) {
-            throw new Error(
-                `${shortDescription} error. No meta object found in response. Check method call parameters and credentials.`
-            );
+            throw new Error(`${shortDescription} error. No meta object found in response. Check method call parameters and credentials.`);
         }
 
         const status = vvClientRes.meta.status;
 
         // If the status is not the expected one, throw an error
         if (status != 200 && status != 201 && status != ignoreStatusCode) {
-            const errorReason =
-                vvClientRes.meta.errors && vvClientRes.meta.errors[0]
-                    ? vvClientRes.meta.errors[0].reason
-                    : 'unspecified';
+            const errorReason = vvClientRes.meta.errors && vvClientRes.meta.errors[0] ? vvClientRes.meta.errors[0].reason : 'unspecified';
             throw new Error(`${shortDescription} error. Status: ${vvClientRes.meta.status}. Reason: ${errorReason}`);
         }
         return vvClientRes;
@@ -180,9 +175,7 @@ module.exports.main = async function (vvClient, response, token) {
         if (status != ignoreStatusCode) {
             // If the data property doesn't exist, throw an error
             if (!vvClientRes.data) {
-                throw new Error(
-                    `${shortDescription} data property was not present. Please, check parameters and syntax. Status: ${status}.`
-                );
+                throw new Error(`${shortDescription} data property was not present. Please, check parameters and syntax. Status: ${status}.`);
             }
         }
 
@@ -207,18 +200,14 @@ module.exports.main = async function (vvClient, response, token) {
 
             // If the data is empty, throw an error
             if (isEmptyArray || isEmptyObject) {
-                throw new Error(
-                    `${shortDescription} returned no data. Please, check parameters and syntax. Status: ${status}.`
-                );
+                throw new Error(`${shortDescription} returned no data. Please, check parameters and syntax. Status: ${status}.`);
             }
             // If it is a Web Service response, check that the first value is not an Error status
             if (dataIsArray) {
                 const firstValue = vvClientRes.data[0];
 
                 if (firstValue == 'Error') {
-                    throw new Error(
-                        `${shortDescription} returned an error. Please, check called Web Service. Status: ${status}.`
-                    );
+                    throw new Error(`${shortDescription} returned an error. Please, check called Web Service. Status: ${status}.`);
                 }
             }
         }
@@ -226,50 +215,48 @@ module.exports.main = async function (vvClient, response, token) {
     }
 
     /**
-     *
-     * @param {Object} vvClientRes - Parsed response object from the API call
-     * @param {String} webServiceName - Name of the executed web service to be evaluated
+	 * 
+	 * @param {Object} vvClientRes - Parsed response object from the API call
+	 * @param {String} webServiceName - Name of the executed web service to be evaluated
      * @param {String} target - A descriptor of the web service target (e.g., a Form ID)
-     * @returns {Array} The remaining entries in the `data` property of the response following the status and its status message, as an `Array`
-     */
-    function checkWebServiceRes(vvClientRes, webServiceName, target) {
-        const [status, statusMsg, ...data] = vvClientRes.data;
+	 * @returns {Array} The remaining entries in the `data` property of the response following the status and its status message, as an `Array`
+	 */
+	function checkWebServiceRes(vvClientRes, webServiceName, target) {
+		const [ status, statusMsg, ...data ] = vvClientRes.data;
 
-        if (status === 'Error') {
-            throw new Error(statusMsg);
-        } else if (status !== 'Success') {
-            throw new Error(
-                `An unexpected status (${status}) was returned when calling ${webServiceName} for ${target}.`
-            );
-        }
+		if (status === "Error") {
+			throw new Error(statusMsg);
+		}
+		else if (status !== "Success") {
+            throw new Error(`An unexpected status (${status}) was returned when calling ${webServiceName} for ${target}.`);
+		}
 
-        return data;
-    }
+		return data;
+	}
 
     /**
      * Constructor function to streamline executing web services and evaluating their response.
      * @param {String} webServiceName - The name of the web service to be called
      */
-    function WebServiceManager(webServiceName) {
-        this.webServiceName = webServiceName;
-        /**
-         * Executes the web service using the passed in parameters and evaluates its response.
-         * @param {Object} webServiceParams - The parameters to be passed to the web service
-         * @param {String} target - A descriptor of the web service target (e.g., a Form ID)
-         * @returns The `Promise` for the web service API call which returns its `data` property
-         */
-        this.runWebService = (webServiceParams, target) => {
-            // Generate the description using the description of the web service's target
-            const shortDescription = `Executing ${this.webServiceName} for '${target}'`;
-            return vvClient.scripts
-                .runWebService(this.webServiceName, webServiceParams)
-                .then((res) => parseRes(res))
-                .then((res) => checkMetaAndStatus(res, shortDescription))
-                .then((res) => checkDataPropertyExists(res, shortDescription))
-                .then((res) => checkDataIsNotEmpty(res, shortDescription))
-                .then((res) => checkWebServiceRes(res, this.webServiceName, target));
-        };
-    }
+	function WebServiceManager(webServiceName) {
+		this.webServiceName = webServiceName;
+		/**
+		 * Executes the web service using the passed in parameters and evaluates its response.
+		 * @param {Object} webServiceParams - The parameters to be passed to the web service
+		 * @param {String} target - A descriptor of the web service target (e.g., a Form ID)
+		 * @returns The `Promise` for the web service API call which returns its `data` property
+		 */
+		this.runWebService = (webServiceParams, target) => {
+			// Generate the description using the description of the web service's target
+			const shortDescription = `Executing ${this.webServiceName} for '${target}'`;
+			return vvClient.scripts.runWebService(this.webServiceName, webServiceParams)
+				.then((res) => parseRes(res))
+				.then((res) => checkMetaAndStatus(res, shortDescription))
+				.then((res) => checkDataPropertyExists(res, shortDescription))
+				.then((res) => checkDataIsNotEmpty(res, shortDescription))
+				.then((res) => checkWebServiceRes(res, this.webServiceName, target));
+		}
+	}
 
     /* -------------------------------------------------------------------------- */
     /*                                  MAIN CODE                                 */
@@ -278,7 +265,7 @@ module.exports.main = async function (vvClient, response, token) {
     try {
         // Instantiate the web service manager for each web service to be able to create web service requests
         const { runWebService: calculateBalance } = new WebServiceManager(LibFeeCalculateBalance);
-        const { runWebService: finalizeTransaction } = new WebServiceManager(LibTransactionFinalizeTransaction);
+		const { runWebService: finalizeTransaction } = new WebServiceManager(LibTransactionFinalizeTransaction);
 
         // Calculate the cutoff date for Fees with pending Transactions by subtracting today's date by the offset
         const cutoffDate = dayjs().subtract(FEE_CUTOFF_DATE_OFFSET, 'day').toISOString();
@@ -290,30 +277,29 @@ module.exports.main = async function (vvClient, response, token) {
         const getPendingTransactionsParams = {
             params: JSON.stringify([
                 {
-                    parameterName: 'cutoffDate',
-                    value: cutoffDate,
+                    parameterName:  'cutoffDate',
+                    value:          cutoffDate
                 },
                 {
-                    parameterName: 'exclusionDate',
-                    value: exclusionDate,
+                    parameterName:  'exclusionDate',
+                    value:          exclusionDate
                 },
                 {
-                    parameterName: 'txPartitionLimit',
-                    value: TRANSACTION_PARTITION_LIMIT,
-                },
-            ]),
+                    parameterName:  'txPartitionLimit',
+                    value:          TRANSACTION_PARTITION_LIMIT
+                }
+            ])
         };
-        const getPendingTransactionsDescription = `Getting ${PENDING.toLowerCase()} ${TRANSACTION}s before ${exclusionDate} and after ${cutoffDate}.`;
+        const getPendingTransactionsDescription = `Getting ${PENDING.toLowerCase()} ${TRANSACTION}s before ${exclusionDate} and after ${cutoffDate}.`; 
 
         // Get the pending Transactions and their associated Fee data
-        /**
+        /** 
          * Array of custom query results where each row returned contains a `providerID` property for the Provider associated with the transaction collection.
          * A single provider may have multiple `transactionDataJSON` returned depending on the quantity of their pending transactions and the configured number of
          * divisions for those transactions. Each JSON string represents an array of objects, where each object contains a Fee ID and its associated Transaction ID
          * @type {{ providerID: string, transactionDataJSON: { transactionID: string, feeID: string }[]}[]}
          */
-        const pendingTransactionCollections = await vvClient.customQuery
-            .getCustomQueryResultsByName(GetFeePendingTransactionsAfterCutoff, getPendingTransactionsParams)
+        const pendingTransactionCollections = await vvClient.customQuery.getCustomQueryResultsByName(GetFeePendingTransactionsAfterCutoff, getPendingTransactionsParams)
             .then((res) => parseRes(res))
             .then((res) => checkMetaAndStatus(res, getPendingTransactionsDescription))
             .then((res) => checkDataPropertyExists(res, getPendingTransactionsDescription))
@@ -341,50 +327,46 @@ module.exports.main = async function (vvClient, response, token) {
                 // Define the parameters to calculate the balance of the fee(s) for the given Provider in this collection
                 const calculateBalanceParams = [
                     {
-                        name: 'Fee IDs',
-                        value: feeIDs,
+                        name: 	"Fee IDs",
+                        value:	feeIDs
                     },
                     {
-                        name: 'Provider ID',
-                        value: providerID,
+                        name: 	"Provider ID",
+                        value:	providerID
                     },
                     {
-                        name: 'All Provider Flag',
-                        value: 'False',
-                    },
+                        name:	"All Provider Flag",
+                        value: 	"False"
+                    }
                 ];
 
                 // Calculate the balance and determine for each transaction if its associated Fee is fully paid
                 const balanceResult = await calculateBalance(calculateBalanceParams, feeIDs.join('/'))
                     .then((webServiceData) => {
                         // Destruct the web service's returned data to get the relevant balance data
-                        const [balanceDataArr] = webServiceData;
+                        const [ balanceDataArr ] = webServiceData;
 
                         // Iterate over the array of balance data returned and filter the results to only get Fees which have been paid in full
                         const fullyPaidFees = balanceDataArr.reduce((fullyPaidFees, feeBalanceObj) => {
                             // Get the currency value for the finalized balance remaining and check if its value is `0`, which indicates it was fully paid
-                            const finalizedBalanceRemaining = currency(
-                                feeBalanceObj['Balance Due calculated from Finalized Transactions']
-                            ).value;
+                            const finalizedBalanceRemaining = currency(feeBalanceObj["Balance Due calculated from Finalized Transactions"]).value;
                             if (finalizedBalanceRemaining == 0) {
-                                fullyPaidFees.push(feeBalanceObj['Fee ID']);
+                                fullyPaidFees.push(feeBalanceObj["Fee ID"]);
                             }
 
                             return fullyPaidFees;
                         }, []);
-
+                        
                         // Evaluate the determined fully paid Fees and return an array containing each of their corresponding Transaction record IDs
                         const transactionsToFinalize = [];
-                        if (fullyPaidFees.length > 0)
-                            fullyPaidFees.forEach((paidFeeID) => {
-                                // Get the Fee's Transaction record ID from its corresponding `Map`
-                                const transactionID = feeTransactionMap.get(paidFeeID);
-                                transactionsToFinalize.push(transactionID);
-                            });
+                        if (fullyPaidFees.length > 0) fullyPaidFees.forEach((paidFeeID) => {
+                            // Get the Fee's Transaction record ID from its corresponding `Map`
+                            const transactionID = feeTransactionMap.get(paidFeeID);
+                            transactionsToFinalize.push(transactionID);
+                        });
 
                         return { transactionsToFinalize };
-                    })
-                    .catch((error) => new Error(error));
+                    }).catch((error) => new Error(error));
 
                 // Verify that no error occurred from the result of calling LibFeeCalculateBalance
                 if (balanceResult instanceof Error) {
@@ -397,19 +379,17 @@ module.exports.main = async function (vvClient, response, token) {
                 if (balanceResult.transactionsToFinalize.length > 0) {
                     // Create web service parameters to finalize the transaction(s) using `LibTransactionFinalizeTransaction`
                     const finalizeTransactionParams = [
-                        {
-                            name: 'Array Transaction Record ID',
-                            value: balanceResult.transactionsToFinalize,
-                        },
+                        { 
+                            name:   "Array Transaction Record ID",
+                            value:  balanceResult.transactionsToFinalize
+                        }
                     ];
 
                     // Wait for the transaction(s) to be finalized, then add them to the list of finalized Transactions when it completes successfully
-                    await finalizeTransaction(
-                        finalizeTransactionParams,
-                        balanceResult.transactionsToFinalize.join('/')
-                    );
+                    await finalizeTransaction(finalizeTransactionParams, balanceResult.transactionsToFinalize.join('/'));
                     finalizedTransactions.push(...balanceResult.transactionsToFinalize);
-                } else {
+                }
+                else {
                     // It was determined that no Transactions in this set should be finalized, so proceed to the next transaction collection
                     continue;
                 }
@@ -418,7 +398,8 @@ module.exports.main = async function (vvClient, response, token) {
             // Determine response message based on the number of pending transactions processed
             responseMessage = `${finalizedTransactions.length} ${TRANSACTION}s were successfully updated from '${PENDING}' to '${FINALIZED}' `;
             responseMessage += `from a total of ${pendingTransactionsCount} ${PENDING.toLowerCase()} ${TRANSACTION}(s).`;
-        } else {
+        } 
+        else {
             responseMessage = `No ${PENDING.toLowerCase()} ${TRANSACTION}s before '${exclusionDate}' and after '${cutoffDate}' were found.`;
         }
 
@@ -439,3 +420,4 @@ module.exports.main = async function (vvClient, response, token) {
         return vvClient.scheduledProcess.postCompletion(scheduledProcessGUID, 'complete', false, responseMessage);
     }
 };
+

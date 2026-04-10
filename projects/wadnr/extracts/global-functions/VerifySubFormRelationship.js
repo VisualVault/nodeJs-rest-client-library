@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.VerifySubFormRelationship
  * Parameters: 0
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function () {
 /*
@@ -30,7 +30,7 @@ function getFieldNamesByFormID(formID) {
     { prefix: "Legal-Description-", relatedRecordId: "Related Record ID", formId: "Form ID" },
     { prefix: "Forest R-", relatedRecordId: "Related Record ID", formId: "Forest Roads ID" },
     { prefix: "Stream S-", relatedRecordId: "Related Record ID", formId: "Form ID" },
-    { prefix: "WTM-", relatedRecordId: "Related Record ID", formId: "WTMF ID" },
+    { prefix: "WTM-", relatedRecordId: "Parent Record ID", formId: "WTMF ID" },
     { prefix: "Water Se-", relatedRecordId: "Related Record ID", formId: "Form ID" },
     { prefix: "CHAN-CHARAC-", relatedRecordId: "Related Record ID", formId: "Form ID" },
     { prefix: "Water Cr-", relatedRecordId: "FPAN ID", formId: "Water Crossings ID" },

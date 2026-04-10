@@ -3,30 +3,30 @@
  * Category: Scheduled
  * Modified: 2026-02-16T23:33:24.27Z by ross.rhone@visualvault.com
  * Script ID: Script Id: cd50b454-87a8-f011-82fa-ec61d8777d62
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-10
  */
-const logger = require('../log');
-const { createItem, getItem, searchItems } = require('@esri/arcgis-rest-portal');
+const logger = require("../log");
+const { createItem, getItem, searchItems } = require("@esri/arcgis-rest-portal");
 const { ApplicationCredentialsManager, request, ArcGISRequestError } = require('@esri/arcgis-rest-request');
-const { queryFeatures, updateFeatures } = require('@esri/arcgis-rest-feature-service');
+const { queryFeatures, updateFeatures } = require("@esri/arcgis-rest-feature-service");
 const axios = require('axios');
-const FormData = require('form-data');
-const { Blob } = require('node:buffer');
-const { File } = require('undici'); //MUST USE undici@5 (OLD VERSION)
+const FormData = require("form-data");
+const { Blob } = require("node:buffer");
+const { File } = require("undici"); //MUST USE undici@5 (OLD VERSION)
 
 module.exports.getCredentials = function () {
-    var options = {};
-    options.customerAlias = 'WADNR';
-    options.databaseAlias = 'fpOnline';
-    options.userId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
-    options.password = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
-    options.clientId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
-    options.clientSecret = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
-    return options;
+  var options = {};
+  options.customerAlias = 'WADNR';
+  options.databaseAlias = 'fpOnline';
+  options.userId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
+  options.password = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
+  options.clientId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
+  options.clientSecret = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
+  return options;
 };
 
 module.exports.main = async function (vvClient, response, token) {
-    /*Script Name:   AGOLPostFponlineDataToAGOLTables
+   /*Script Name:   AGOLPostFponlineDataToAGOLTables
      Customer:       WA FNR: fpOnline
      Purpose:        Extracts the CSV files of the latest updates to fpOnline forms from the "queue"
                      PendingDataForAGOL form every 24 hrs and POSTs them to Arcgis Online (AGOL)
@@ -68,60 +68,65 @@ module.exports.main = async function (vvClient, response, token) {
                               Delete document and record from VV doc library and pendingDataForAGOL queue if created new table in AGOL
      02/02/2026 - Ross Rhone: Added functionality when an AGOL table is created for the first time, it has the export data setting turned on, so DNR can export the data for testing.
      */
-    logger.info(`Start of the process AGOLPostFponlineDataToAGOLTables at ${Date()}`);
+  logger.info(`Start of the process AGOLPostFponlineDataToAGOLTables at ${Date()}`);
 
-    /* -------------------------------------------------------------------------- */
-    /*                    Response and error handling variables                   */
-    /* -------------------------------------------------------------------------- */
+  /* -------------------------------------------------------------------------- */
+  /*                    Response and error handling variables                   */
+  /* -------------------------------------------------------------------------- */
 
-    // Response array
-    let outputCollection = [];
-    // Array for capturing error messages that may occur during the process
-    let errorLog = [];
+  // Response array
+  let outputCollection = [];
+  // Array for capturing error messages that may occur during the process
+  let errorLog = [];
+      
+  // You will see the responseMessage in the scheduled process log ONLY if the process runs manually.
+  response.json(200, `Start of logic for AGOLPostFponlineDataToAGOLTables on ${new Date()}`);
 
-    // You will see the responseMessage in the scheduled process log ONLY if the process runs manually.
-    response.json(200, `Start of logic for AGOLPostFponlineDataToAGOLTables on ${new Date()}`);
+  let statusMessage = "";
 
-    let statusMessage = '';
+  /* -------------------------------------------------------------------------- */
+  /*                           Global Variables                           */
+  /* -------------------------------------------------------------------------- */
 
-    /* -------------------------------------------------------------------------- */
-    /*                           Global Variables                           */
-    /* -------------------------------------------------------------------------- */
+  const GIS_CLIENT_ID = "BKCsdVEsjVpW2zKC";
+  const GIS_CLIENT_SECRET = "0b1780b9447c4f0084fafd540104a6a6";
 
-    const GIS_CLIENT_ID = 'BKCsdVEsjVpW2zKC';
-    const GIS_CLIENT_SECRET = '0b1780b9447c4f0084fafd540104a6a6';
-
-    // Identifies the process in VV servers
+ // Identifies the process in VV servers
     const scheduledProcessGUID = token;
 
     const emptyJsonFormId = {
+
         params: JSON.stringify([
             {
                 parameterName: 'formId',
-                value: '',
-            },
-        ]),
-    };
+                value: ""
+            }
+        ])
+    }
 
     const PDF_GUID_AGOL_TABLES = new Set([
-        'Application Review Page',
-        'WTM Review Page',
-        'Multi-Purpose',
-        'Notice to Comply',
-        'Notice of conversion to Non Forestry Use',
+        "Application Review Page",
+        "WTM Review Page",
+        "Multi-Purpose",
+        "Notice to Comply",
+        "Notice of conversion to Non Forestry Use"
     ]);
 
     let csvFiles = [];
-    let currentEnv = 'unknown';
+    let currentEnv = "unknown";
+
 
     /* -------------------------------------------------------------------------- */
     /*                              Helper Functions                              */
     /* -------------------------------------------------------------------------- */
 
     function runCustomQuery(formId, queryName) {
+
         const formIdJson = createJsonFormId(formId);
 
+
         const shortDescription = 'Custom Query using filter parameter for backward compatibility';
+
 
         return vvClient.customQuery
             .getCustomQueryResultsByName(queryName, formIdJson)
@@ -160,19 +165,14 @@ module.exports.main = async function (vvClient, response, token) {
         */
 
         if (!vvClientRes.meta) {
-            throw new Error(
-                `${shortDescription} error. No meta object found in response. Check method call parameters and credentials.`
-            );
+            throw new Error(`${shortDescription} error. No meta object found in response. Check method call parameters and credentials.`);
         }
 
         const status = vvClientRes.meta.status;
 
         // If the status is not the expected one, throw an error
         if (status !== 200 && status !== 201 && status !== ignoreStatusCode) {
-            const errorReason =
-                vvClientRes.meta.errors && vvClientRes.meta.errors[0]
-                    ? vvClientRes.meta.errors[0].reason
-                    : 'unspecified';
+            const errorReason = vvClientRes.meta.errors && vvClientRes.meta.errors[0] ? vvClientRes.meta.errors[0].reason : 'unspecified';
             throw new Error(`${shortDescription} error. Status: ${vvClientRes.meta.status}. Reason: ${errorReason}`);
         }
         return vvClientRes;
@@ -191,9 +191,7 @@ module.exports.main = async function (vvClient, response, token) {
         if (status !== ignoreStatusCode) {
             // If the data property doesn't exist, throw an error
             if (!vvClientRes.data) {
-                throw new Error(
-                    `${shortDescription} data property was not present. Please, check parameters and syntax. Status: ${status}.`
-                );
+                throw new Error(`${shortDescription} data property was not present. Please, check parameters and syntax. Status: ${status}.`);
             }
         }
 
@@ -202,22 +200,23 @@ module.exports.main = async function (vvClient, response, token) {
 
     function createJsonFormId(fpanId) {
         if (fpanId) {
-            return (jsonFormId = {
+            return jsonFormId = {
+
                 params: JSON.stringify([
                     {
                         parameterName: 'formId',
-                        value: fpanId,
-                    },
-                ]),
-            });
+                        value: fpanId
+                    }
+                ])
+            }
         } else {
             return emptyJsonFormId;
         }
     }
 
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
     const jitter = (ms) => {
-        const d = Math.floor(ms * 0.2); // ±20% jitter
+        const d = Math.floor(ms * 0.2);          // ±20% jitter
         return ms + Math.floor((Math.random() * 2 - 1) * d);
     };
 
@@ -239,20 +238,15 @@ module.exports.main = async function (vvClient, response, token) {
     }
 
     // Generic retry wrapper (exponential backoff + jitter)
-    async function withRetry(
-        fn,
-        {
-            retries = 3, // total attempts = 1 + retries
-            baseDelayMs = 1000,
-            maxDelayMs = 8000,
-            label = 'operation',
-            onRetry = (err, attempt, nextDelay) => {
-                logger.info(
-                    `AGOLPostFponlineDataToAGOLTables: [retry] ${label} attempt ${attempt} failed: ${err?.message || err}. Retrying in ${nextDelay}ms...`
-                );
-            },
-        } = {}
-    ) {
+    async function withRetry(fn, {
+        retries = 3,               // total attempts = 1 + retries
+        baseDelayMs = 1000,
+        maxDelayMs = 8000,
+        label = "operation",
+        onRetry = (err, attempt, nextDelay) => {
+            logger.info(`AGOLPostFponlineDataToAGOLTables: [retry] ${label} attempt ${attempt} failed: ${err?.message || err}. Retrying in ${nextDelay}ms...`);
+        }
+    } = {}) {
         let attempt = 0;
         let delay = baseDelayMs;
 
@@ -276,7 +270,7 @@ module.exports.main = async function (vvClient, response, token) {
     }
 
     // function-call wrapper (great for arcgis-rest-js helpers like searchItems/getItem/updateItem)
-    function callWithRetry(fn, args, { label = fn.name || 'call', retries = 3 } = {}) {
+    function callWithRetry(fn, args, { label = fn.name || "call", retries = 3 } = {}) {
         return withRetry(() => fn(args), { retries, label });
     }
 
@@ -286,16 +280,16 @@ module.exports.main = async function (vvClient, response, token) {
 
         while (true) {
             const info = await requestWithRetry(statusUrl, {
-                label: 'append:status',
+                label: "append:status",
                 retries: 2,
-                params: { f: 'json', token },
+                params: { f: "json", token }
             });
 
-            const sRaw = info.status || info.jobStatus || info.job?.status || '';
+            const sRaw = info.status || info.jobStatus || info.job?.status || "";
             const s = String(sRaw).toLowerCase();
 
-            if (s.includes('completed') || s.includes('succeeded') || s === 'success') return info;
-            if (s.includes('failed') || s.includes('error') || info.error) {
+            if (s.includes("completed") || s.includes("succeeded") || s === "success") return info;
+            if (s.includes("failed") || s.includes("error") || info.error) {
                 const err = new Error(`Append job failed with status "${sRaw}"`);
                 err.payload = info;
                 throw err;
@@ -313,9 +307,9 @@ module.exports.main = async function (vvClient, response, token) {
 
     async function appendOnce({ featureServiceUrl, token, appendParams }) {
         const appendRes = await requestWithRetry(`${featureServiceUrl}/0/append`, {
-            label: 'append:start',
+            label: "append:start",
             retries: 2,
-            params: { f: 'json', token, ...appendParams },
+            params: { f: "json", token, ...appendParams }
         });
 
         const statusUrl =
@@ -324,7 +318,7 @@ module.exports.main = async function (vvClient, response, token) {
             (appendRes.job?.id && `${featureServiceUrl}/0/append/jobs/${appendRes.job.id}`);
 
         if (!statusUrl) {
-            const err = new Error('Append response missing statusUrl/jobId');
+            const err = new Error("Append response missing statusUrl/jobId");
             err.payload = appendRes;
             throw err;
         }
@@ -332,36 +326,37 @@ module.exports.main = async function (vvClient, response, token) {
         return waitForAppend({ statusUrl, token });
     }
 
-    function appendWithRetry(
-        { featureServiceUrl, token, appendParams },
-        { retries = 2, baseDelayMs = 1500, maxDelayMs = 8000 } = {}
-    ) {
-        return withRetry(() => appendOnce({ featureServiceUrl, token, appendParams }), {
-            retries,
-            baseDelayMs,
-            maxDelayMs,
-            label: 'append:whole',
-            onRetry: (err, attempt, wait) => {
-                const lastStatus = err?.payload?.status || err?.payload?.jobStatus;
-                logger.info(
-                    `AGOLPostFponlineDataToAGOLTables: [retry] append attempt ${attempt} failed (${err?.message}). ${lastStatus ? `Last status: ${lastStatus}. ` : ''}waiting ${wait}ms...`
-                );
-            },
-        });
+    function appendWithRetry({ featureServiceUrl, token, appendParams }, {
+        retries = 2, baseDelayMs = 1500, maxDelayMs = 8000
+    } = {}) {
+        return withRetry(
+            () => appendOnce({ featureServiceUrl, token, appendParams }),
+            {
+                retries,
+                baseDelayMs,
+                maxDelayMs,
+                label: "append:whole",
+                onRetry: (err, attempt, wait) => {
+                    const lastStatus = err?.payload?.status || err?.payload?.jobStatus;
+                    logger.info(`AGOLPostFponlineDataToAGOLTables: [retry] append attempt ${attempt} failed (${err?.message}). ${lastStatus ? `Last status: ${lastStatus}. ` : ""}waiting ${wait}ms...`);
+                }
+            }
+        );
     }
 
     async function getLatestRevisionForDocumentId(client, documentId) {
-        const resourceUri =
-            client._httpHelper._config.ResourceUri.DocumentsId.replace('{id}', documentId) + '/revisions';
+        const resourceUri = client._httpHelper._config.ResourceUri.DocumentsId
+        .replace("{id}", documentId) + "/revisions";
 
         const url = client._httpHelper.getUrl(resourceUri);
 
-        const resp = await client._httpHelper.doVvClientRequest(url, { method: 'GET' }, null, null);
+        const resp = await client._httpHelper.doVvClientRequest(url, { method: "GET" }, null, null);
         const result = JSON.parse(resp);
 
         // pick highest revision
         return (result.data || []).sort((a, b) => Number(b.revision) - Number(a.revision))[0];
     }
+
 
     async function deleteRecord(recordGUID) {
         const shortDescription = `Deleting record ${recordGUID}`;
@@ -387,16 +382,16 @@ module.exports.main = async function (vvClient, response, token) {
 
     /**
      * uses vvClient to detect the current environment
-     * @param {object} vvClient
+     * @param {object} vvClient 
      * @returns "dev" | "qa" | "sandbox" | "production"
      */
     function detectEnvironment(vvClient) {
         // Define known environments and their identifying URL segments.  Add or modify as needed.
         const environments = {
-            'vv5dev.visualvault.com': '_dev',
-            'vv5qa.visualvault.com': '_dev',
-            'sandbox.visualvault-gov.com': '_sbox',
-            'na5.visualvault.com': '_prod',
+            "vv5dev.visualvault.com": "_dev",
+            "vv5qa.visualvault.com": "_dev",
+            "sandbox.visualvault-gov.com": "_sbox",
+            "na5.visualvault.com": "_prod",
         };
         const envUrl = vvClient.getBaseUrl();
 
@@ -407,21 +402,21 @@ module.exports.main = async function (vvClient, response, token) {
             }
         }
 
-        return 'unknown';
+        return "unknown";
     }
 
     /**
      * uses vvClient to detect the current AGOL folder ID
-     * @param {object} vvClient
+     * @param {object} vvClient 
      * @returns "dev/qa" | "sandbox" | "production"
      */
     function getAGOLFolderId(vvClient) {
         // Define known environments and their identifying URL segments.  Add or modify as needed.
         const environments = {
-            'vv5dev.visualvault.com': '97155b694ecf4ab9904a2a1afbf4bd57',
-            'vv5qa.visualvault.com': '97155b694ecf4ab9904a2a1afbf4bd57',
-            'sandbox.visualvault-gov.com': '0dd459db4e4d4c7e99cbd0d19cc64939',
-            'na5.visualvault.com': 'a4fc0751c3cf40a4b4cacce12ebc5437',
+            "vv5dev.visualvault.com": "97155b694ecf4ab9904a2a1afbf4bd57",
+            "vv5qa.visualvault.com": "97155b694ecf4ab9904a2a1afbf4bd57",
+            "sandbox.visualvault-gov.com": "0dd459db4e4d4c7e99cbd0d19cc64939",
+            "na5.visualvault.com": "a4fc0751c3cf40a4b4cacce12ebc5437",
         };
         const envUrl = vvClient.getBaseUrl();
 
@@ -432,45 +427,54 @@ module.exports.main = async function (vvClient, response, token) {
             }
         }
 
-        return 'unknown';
+        return "unknown";
     }
 
     function createGUIDPDFURL(currentEnv, guid) {
-        if (currentEnv === '_dev') {
-            return 'https://fpansearch-dev.visualvault.com/publicSearch/getDocument?fromLink=true&GUID=' + guid;
-        } else if (currentEnv === '_sbox') {
-            return 'https://fpansearch-uat.visualvault-gov.com/publicSearch/getDocument?fromLink=true&GUID=' + guid;
-        } else if (currentEnv === '_prod') {
-            return 'https://fpansearch.visualvault.com/publicSearch/getDocument?fromLink=true&GUID=' + guid;
+        if (currentEnv === "_dev") {
+            return "https://fpansearch-dev.visualvault.com/publicSearch/getDocument?fromLink=true&GUID=" + guid;
+        } else if (currentEnv === "_sbox") {
+            return "https://fpansearch-uat.visualvault-gov.com/publicSearch/getDocument?fromLink=true&GUID=" + guid;
+        } else if (currentEnv === "_prod") {
+            return "https://fpansearch.visualvault.com/publicSearch/getDocument?fromLink=true&GUID=" + guid;
         } else {
-            return '';
+            return "";
         }
     }
 
-    async function updateCsvItemAxios({ portalUrl, owner, itemId, token, csvBlob, fileName }) {
-        const updateUrl = `${portalUrl}/sharing/rest/content/users/${owner}/items/${itemId}/update`;
+    async function updateCsvItemAxios({
+        portalUrl,
+        owner,
+        itemId,
+        token,
+        csvBlob,
+        fileName
+    }) {
+
+        const updateUrl =
+            `${portalUrl}/sharing/rest/content/users/${owner}/items/${itemId}/update`;
 
         // Convert Blob -> Buffer
         const buffer = Buffer.from(await csvBlob.arrayBuffer());
 
         const form = new FormData();
-        form.append('f', 'json');
-        form.append('token', token);
-        form.append('overwrite', 'true');
-        form.append('filename', fileName);
+        form.append("f", "json");
+        form.append("token", token);
+        form.append("overwrite", "true");
+        form.append("filename", fileName);
 
         // Important: send Buffer + filename
-        form.append('file', buffer, {
+        form.append("file", buffer, {
             filename: fileName,
-            contentType: 'text/csv',
+            contentType: "text/csv"
         });
 
         const response = await axios.post(updateUrl, form, {
             headers: {
-                ...form.getHeaders(),
+                ...form.getHeaders()
             },
             maxContentLength: Infinity,
-            maxBodyLength: Infinity,
+            maxBodyLength: Infinity
         });
 
         return response.data;
@@ -490,18 +494,18 @@ module.exports.main = async function (vvClient, response, token) {
 
     function buildWhereIn(fieldName, values) {
         // fieldName IN ('a','b','c')
-        const list = values.map((v) => `'${escapeSqlString(v)}'`).join(',');
+        const list = values.map(v => `'${escapeSqlString(v)}'`).join(",");
         return `${fieldName} IN (${list})`;
     }
 
     // queryFeatures with retries (network/429/5xx)
-    function queryFeaturesWithRetry(args, { label = 'queryFeatures', retries = 3 } = {}) {
+    function queryFeaturesWithRetry(args, { label = "queryFeatures", retries = 3 } = {}) {
         return withRetry(() => queryFeatures(args), { retries, label });
     }
 
     // updateFeatures with retries.
     // NOTE: This retries the HTTP call failures (429/5xx/etc).
-    function updateFeaturesWithRetry(args, { label = 'updateFeatures', retries = 3 } = {}) {
+    function updateFeaturesWithRetry(args, { label = "updateFeatures", retries = 3 } = {}) {
         return withRetry(() => updateFeatures(args), { retries, label });
     }
 
@@ -509,22 +513,22 @@ module.exports.main = async function (vvClient, response, token) {
         const addToDefUrl = `${adminLayerUrl}/addToDefinition`;
 
         return request(addToDefUrl, {
-            httpMethod: 'POST',
+            httpMethod: "POST",
             authentication,
             params: {
-                f: 'json',
+                f: "json",
                 addToDefinition: JSON.stringify({
                     indexes: [
                         {
-                            name: 'DhDocID',
-                            fields: 'DhDocID',
+                            name: "DhDocID",
+                            fields: "DhDocID",
                             isAscending: true,
                             isUnique: true,
-                            description: 'Unique index for upsertMatchingField',
-                        },
-                    ],
-                }),
-            },
+                            description: "Unique index for upsertMatchingField"
+                        }
+                    ]
+                })
+            }
         });
     }
 
@@ -533,29 +537,30 @@ module.exports.main = async function (vvClient, response, token) {
         const updateDefUrl = `${adminLayerOrServiceUrl}/updateDefinition`;
 
         return request(updateDefUrl, {
-            httpMethod: 'POST',
+            httpMethod: "POST",
             authentication,
             params: {
-                f: 'json',
+                f: "json",
                 async: true,
                 updateDefinition: JSON.stringify({
                     // IMPORTANT: include whatever capabilities you want to KEEP, plus Extract
-                    capabilities: 'Query,Editing,Create,Update,Delete,Extract',
-                }),
-            },
+                    capabilities: "Query,Editing,Create,Update,Delete,Extract"
+                })
+            }
         });
     }
 
     function delay(ms) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     async function createAGOLItem(csvFileData, agolFileName, title, titleWithSpaces, fileId, dhid, currentEnv) {
+
         const folderId = getAGOLFolderId(vvClient);
 
-        if (folderId === 'unknown' || !folderId) {
+        if (folderId === "unknown" || !folderId) {
             const errorMessage = `GET AGOL createItem failed: Unknown environment for AGOL folder ID`;
-            logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [5]`);
+            logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [5]`);
             errorLog.push(errorMessage);
             return;
         }
@@ -564,18 +569,18 @@ module.exports.main = async function (vvClient, response, token) {
         const filePosted = await createItem({
             overwrite: true,
             file: csvFileData,
-            filename: agolFileName + '.csv',
+            filename: agolFileName + ".csv",
             folderId: folderId,
             authentication: appManager,
             item: {
-                type: 'CSV',
-                owner: 'VVAGOL',
-                title: agolFileName,
-            },
-        });
+                type: "CSV",
+                owner: "VVAGOL",
+                title: agolFileName
+            }
+        })
         if (filePosted.id === 0) {
             const errorMessage = `GET AGOL searchItems failed: ${agolFileName} CSV file not found in AGOL`;
-            logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [5a]`);
+            logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [5a]`);
             errorLog.push(errorMessage);
             return;
         }
@@ -584,74 +589,70 @@ module.exports.main = async function (vvClient, response, token) {
 
         //5°b AGOL analyze the CSV file before posting to AGOL hosted table
         const analyzeCsv = await requestWithRetry(
-            'https://visualvault.maps.arcgis.com/sharing/rest/content/features/analyze',
+            "https://visualvault.maps.arcgis.com/sharing/rest/content/features/analyze",
             {
                 label: `analyze(${agolFileName})`,
                 retries: 3,
-                params: { id: csvItemId, filetype: 'csv', file: csvFileData },
+                params: { id: csvItemId, filetype: "csv", file: csvFileData }
             }
         );
 
         if (!analyzeCsv.publishParameters) {
-            const errorMessage = `GET AGOL analyze failed : analyzing ${agolFileName} csv file failed`;
-            logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [5b]`);
+            const errorMessage = `GET AGOL analyze failed : analyzing ${agolFileName} csv file failed`
+            logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [5b]`);
             errorLog.push(errorMessage);
             return;
         }
         //Tablename needs to be set from the filename!
-        const tableNameJson = createJsonTableName(titleWithSpaces);
-        const tableFieldTypes = await customQueryParameter(tableNameJson, 'GetTableFieldType');
+        const tableNameJson = createJsonTableName(titleWithSpaces)
+        const tableFieldTypes = await customQueryParameter(tableNameJson, "GetTableFieldType");
 
         // overwrite fields based on your SQL schema rows
-        analyzeCsv.publishParameters.layerInfo.fields = await buildAgolFieldsFromSqlSchema(tableFieldTypes, {
-            defaultStringLen: 256,
-        });
+        analyzeCsv.publishParameters.layerInfo.fields = await buildAgolFieldsFromSqlSchema(tableFieldTypes, { defaultStringLen: 256 });
 
         //5°c Publish the csv file to a hosted table feature service in AGOL
-        const publishedService = await requestWithRetry(
-            'https://visualvault.maps.arcgis.com/sharing/rest/content/users/VVAGOL/publish',
+        const publishedService = await requestWithRetry("https://visualvault.maps.arcgis.com/sharing/rest/content/users/VVAGOL/publish",
             {
                 label: `publish(${agolFileName})`,
                 retries: 3,
                 authentication: appManager,
                 params: {
                     itemid: csvItemId,
-                    filetype: 'csv',
-                    publishParameters: analyzeCsv.publishParameters,
-                },
-            }
-        );
+                    filetype: "csv",
+                    publishParameters: analyzeCsv.publishParameters
+                }
+            });
 
-        const serviceurl = publishedService?.services[0]?.serviceurl;
+        const serviceurl = publishedService?.services[0]?.serviceurl
 
         if (!serviceurl) {
-            const errorMessage = `GET AGOL publish csv file failed : ${agolFileName} csv file publish failed`;
-            logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [5c]`);
+            const errorMessage = `GET AGOL publish csv file failed : ${agolFileName} csv file publish failed`
+            logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [5c]`);
             errorLog.push(errorMessage);
             return;
         }
 
-        const adminServiceUrl = serviceurl.replace('/arcgis/rest/services/', '/arcgis/rest/admin/services/') + '/0';
+        const adminServiceUrl = serviceurl.replace("/arcgis/rest/services/", "/arcgis/rest/admin/services/") + "/0";
 
         await delay(20000); //wait 20 seconds to esnure the service has been published
         //5°d Add unique index on dhDocID field in the hosted table for upsertMatchingField use
         const setUniqueFieldResponse = await addUniqueIndexOnDhDocID(adminServiceUrl, appManager);
 
         if (!setUniqueFieldResponse.success) {
-            const errorMessage = `POST AGOL set unique field failed : ${agolFileName} csv file set unique field failed`;
-            logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [5d]`);
+            const errorMessage = `POST AGOL set unique field failed : ${agolFileName} csv file set unique field failed`
+            logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [5d]`);
             errorLog.push(errorMessage);
             return;
         }
 
-        const adminFeatureServerUrl = serviceurl.replace('/arcgis/rest/services/', '/arcgis/rest/admin/services/');
+        const adminFeatureServerUrl = serviceurl.replace("/arcgis/rest/services/", "/arcgis/rest/admin/services/");
 
         //5°e Enable export data setting in the hosted table for so DNR can export the data
         const setExportDataSettingResponse = await enableExportDataSetting(adminFeatureServerUrl, appManager);
 
         if (!setExportDataSettingResponse.statusURL) {
-            const errorMessage = `GET AGOL enable export data setting failed : ${agolFileName} csv file export data setting failed`;
-            logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [5e]`);
+            const errorMessage = `GET AGOL enable export data setting failed : ${agolFileName} csv file export data setting failed`
+            logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [5e]`);
             errorLog.push(errorMessage);
             return;
         }
@@ -660,11 +661,13 @@ module.exports.main = async function (vvClient, response, token) {
         const isExportSettingCompleted = await checkExportJobUrl(exportJobUrl, appManager, 10);
 
         if (!isExportSettingCompleted) {
-            const errorMessage = `GET AGOL enable export data setting failed : ${agolFileName} csv file export data setting failed`;
-            logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [5e]`);
+            const errorMessage = `GET AGOL enable export data setting failed : ${agolFileName} csv file export data setting failed`
+            logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [5e]`);
             errorLog.push(errorMessage);
             return;
         }
+
+
 
         //5°f Add pdfGUID field "fpOnline" to the hosted table if needed (generated by fpan search)
         if (PDF_GUID_AGOL_TABLES.has(titleWithSpaces)) {
@@ -679,21 +682,26 @@ module.exports.main = async function (vvClient, response, token) {
 
     function createJsonTableName(tableName) {
         if (tableName) {
-            return (tableNameJson = {
+            return tableNameJson = {
+
                 params: JSON.stringify([
                     {
                         parameterName: 'tableName',
-                        value: tableName,
-                    },
-                ]),
-            });
+                        value: tableName
+                    }
+                ])
+            }
         } else {
             return emptyTableName;
         }
     }
 
+
     function customQueryParameter(parameter, queryName) {
+
+
         const shortDescription = 'Custom Query using filter parameter for backward compatibility';
+
 
         return vvClient.customQuery
             .getCustomQueryResultsByName(queryName, parameter)
@@ -707,87 +715,81 @@ module.exports.main = async function (vvClient, response, token) {
         schemaRows,
         {
             defaultStringLen = 256,
-            allowAgolMaxString = true, // nvarchar(max) => 2147483647
-            agolMaxStringLen = 2147483647, // matches what AGOL shows for "max"
-            maxNonMaxStringLen = 32000, // keep your existing cap for nvarchar(n)
+            allowAgolMaxString = true,          // nvarchar(max) => 2147483647
+            agolMaxStringLen = 2147483647,      // matches what AGOL shows for "max"
+            maxNonMaxStringLen = 32000          // keep your existing cap for nvarchar(n)
         } = {}
     ) {
         function getCaseInsensitive(obj, key) {
             if (!obj) return undefined;
-            const found = Object.keys(obj).find((k) => k.toLowerCase() === key.toLowerCase());
+            const found = Object.keys(obj).find(k => k.toLowerCase() === key.toLowerCase());
             return found ? obj[found] : undefined;
         }
 
         function mapSqlTypeToAgol(sqlTypeRaw) {
-            const sqlType = String(sqlTypeRaw || '')
-                .toLowerCase()
-                .trim();
+            const sqlType = String(sqlTypeRaw || "").toLowerCase().trim();
 
             // Strings
-            if (['nvarchar', 'varchar', 'nchar', 'char', 'text', 'ntext', 'xml'].includes(sqlType)) {
-                return { agolType: 'esriFieldTypeString', sqlType: 'sqlTypeNVarchar' };
+            if (["nvarchar", "varchar", "nchar", "char", "text", "ntext", "xml"].includes(sqlType)) {
+                return { agolType: "esriFieldTypeString", sqlType: "sqlTypeNVarchar" };
             }
 
             // GUIDs -> store as string (matches your publishParameters example)
-            if (sqlType === 'uniqueidentifier') {
-                return { agolType: 'esriFieldTypeString', sqlType: 'sqlTypeNVarchar' };
+            if (sqlType === "uniqueidentifier") {
+                return { agolType: "esriFieldTypeString", sqlType: "sqlTypeNVarchar" };
             }
 
             // Dates
-            if (['date', 'datetime', 'datetime2', 'smalldatetime', 'time', 'datetimeoffset'].includes(sqlType)) {
-                return { agolType: 'esriFieldTypeDate', sqlType: 'sqlTypeDate' };
+            if (["date", "datetime", "datetime2", "smalldatetime", "time", "datetimeoffset"].includes(sqlType)) {
+                return { agolType: "esriFieldTypeDate", sqlType: "sqlTypeDate" };
             }
 
             // Integers
-            if (sqlType === 'bigint') {
-                return { agolType: 'esriFieldTypeBigInteger', sqlType: 'sqlTypeBigInt' };
+            if (sqlType === "bigint") {
+                return { agolType: "esriFieldTypeBigInteger", sqlType: "sqlTypeBigInt" };
             }
-            if (sqlType === 'int') {
-                return { agolType: 'esriFieldTypeInteger', sqlType: 'sqlTypeInteger' };
+            if (sqlType === "int") {
+                return { agolType: "esriFieldTypeInteger", sqlType: "sqlTypeInteger" };
             }
-            if (sqlType === 'smallint' || sqlType === 'tinyint') {
-                return { agolType: 'esriFieldTypeInteger', sqlType: 'sqlTypeSmallInteger' };
+            if (sqlType === "smallint" || sqlType === "tinyint") {
+                return { agolType: "esriFieldTypeInteger", sqlType: "sqlTypeSmallInteger" };
             }
 
             // Doubles/decimals
-            if (sqlType === 'float' || sqlType === 'real') {
-                return { agolType: 'esriFieldTypeDouble', sqlType: 'sqlTypeFloat' };
+            if (sqlType === "float" || sqlType === "real") {
+                return { agolType: "esriFieldTypeDouble", sqlType: "sqlTypeFloat" };
             }
-            if (['decimal', 'numeric', 'money', 'smallmoney'].includes(sqlType)) {
-                return { agolType: 'esriFieldTypeDouble', sqlType: 'sqlTypeDecimal' };
+            if (["decimal", "numeric", "money", "smallmoney"].includes(sqlType)) {
+                return { agolType: "esriFieldTypeDouble", sqlType: "sqlTypeDecimal" };
             }
 
             // Booleans
-            if (sqlType === 'bit') {
-                return { agolType: 'esriFieldTypeInteger', sqlType: 'sqlTypeSmallInteger' };
+            if (sqlType === "bit") {
+                return { agolType: "esriFieldTypeInteger", sqlType: "sqlTypeSmallInteger" };
             }
 
             // Fallback: safest is String
-            return { agolType: 'esriFieldTypeString', sqlType: 'sqlTypeNVarchar' };
+            return { agolType: "esriFieldTypeString", sqlType: "sqlTypeNVarchar" };
         }
 
-        return schemaRows.map((r) => {
-            const columnName = getCaseInsensitive(r, 'column_name');
-            const sqlTypeRaw = getCaseInsensitive(r, 'data_type');
-            const maxLen = getCaseInsensitive(r, 'character_maximum_length');
-            const isNullable = String(getCaseInsensitive(r, 'is_nullable') || '').toUpperCase() === 'YES';
+        return schemaRows.map(r => {
+            const columnName = getCaseInsensitive(r, "column_name");
+            const sqlTypeRaw = getCaseInsensitive(r, "data_type");
+            const maxLen = getCaseInsensitive(r, "character_maximum_length");
+            const isNullable = String(getCaseInsensitive(r, "is_nullable") || "").toUpperCase() === "YES";
 
             // Always reserve OBJECTID
-            if (
-                String(columnName || '')
-                    .trim()
-                    .toUpperCase() === 'OBJECTID'
-            ) {
+            if (String(columnName || "").trim().toUpperCase() === "OBJECTID") {
                 return {
-                    name: 'OBJECTID',
-                    type: 'esriFieldTypeOID',
-                    alias: 'OBJECTID',
-                    sqlType: 'sqlTypeInteger',
+                    name: "OBJECTID",
+                    type: "esriFieldTypeOID",
+                    alias: "OBJECTID",
+                    sqlType: "sqlTypeInteger",
                     nullable: false,
                     editable: false,
                     domain: null,
                     defaultValue: null,
-                    locationType: 'unknown',
+                    locationType: "unknown",
                 };
             }
 
@@ -805,11 +807,11 @@ module.exports.main = async function (vvClient, response, token) {
                 editable: true,
                 domain: null,
                 defaultValue: null,
-                locationType: 'unknown',
+                locationType: "unknown",
             };
 
             // Only strings have length
-            if (agolType === 'esriFieldTypeString') {
+            if (agolType === "esriFieldTypeString") {
                 const maxLenNum = Number(maxLen);
 
                 // SQL Server reports nvarchar(max)/varchar(max) as -1
@@ -828,13 +830,14 @@ module.exports.main = async function (vvClient, response, token) {
         });
     }
 
+
     async function createPDFGuidUrl(title, analyzeCsv, featureServiceUrl, agolFileName, currentEnv) {
         const recordsWithGUIDPDFUrl = analyzeCsv.records
-            .map((r) => ({
-                dhDocID: r?.attributes?.dhDocID ?? '',
-                pdF_GUID: (r?.attributes?.pdF_GUID || '').trim(),
+            .map(r => ({
+                dhDocID: r?.attributes?.dhDocID ?? "",
+                pdF_GUID: (r?.attributes?.pdF_GUID || "").trim()
             }))
-            .filter((x) => x.pdF_GUID);
+            .filter(x => x.pdF_GUID);
 
         // Prevent duplicates by dhDocID - last one wins
         const guidByDhDocID = new Map();
@@ -852,22 +855,17 @@ module.exports.main = async function (vvClient, response, token) {
         // Batch the number of dhDocIDs in WHERE IN clauses
         for (const dhBatch of chunkArray(dhDocIDs, DHID_IN_CLAUSE_BATCH)) {
             // Query ONLY ids and dhDocId (fast, small payload)
-            const featuresResult = await queryFeaturesWithRetry(
-                {
-                    url: featureServiceUrl + '/0',
-                    authentication: appManager,
-                    where: buildWhereIn('dhDocID', dhBatch),
-                    outFields: ['OBJECTID', 'dhDocID'],
-                    returnGeometry: false,
-                },
-                { label: `queryFeatures(dhBatch:${dhBatch.length})`, retries: 3 }
-            );
+            const featuresResult = await queryFeaturesWithRetry({
+                url: featureServiceUrl + "/0",
+                authentication: appManager,
+                where: buildWhereIn("dhDocID", dhBatch),
+                outFields: ["OBJECTID", "dhDocID"],
+                returnGeometry: false
+            }, { label: `queryFeatures(dhBatch:${dhBatch.length})`, retries: 3 });
 
             const featuresToBeUpdated = featuresResult?.features || [];
             if (!featuresToBeUpdated.length) {
-                logger.info(
-                    `AGOLPostFponlineDataToAGOLTables: No AGOL rows found for dhDocID batch: ${dhBatch.length}`
-                );
+                logger.info(`AGOLPostFponlineDataToAGOLTables: No AGOL rows found for dhDocID batch: ${dhBatch.length}`);
                 continue;
             }
 
@@ -875,7 +873,7 @@ module.exports.main = async function (vvClient, response, token) {
             const objectIdToDhDocId = new Map();
             for (const f of featuresToBeUpdated) {
                 const oid = f?.attributes?.OBJECTID ?? f?.attributes?.ObjectId;
-                const dh = (f?.attributes?.DhDocID ?? '').trim();
+                const dh = (f?.attributes?.DhDocID ?? "").trim();
                 if (oid !== null && dh) objectIdToDhDocId.set(oid, dh);
             }
 
@@ -892,95 +890,81 @@ module.exports.main = async function (vvClient, response, token) {
                     attributes: {
                         OBJECTID: objectId,
                         dhDocID: dhDocID,
-                        fpOnlineUrl: fpOnlineUrl,
-                    },
+                        fpOnlineUrl: fpOnlineUrl
+                    }
                 });
             }
 
-            const guidPDFResponse = await updateFeaturesWithRetry(
-                {
-                    url: featureServiceUrl + '/0',
-                    authentication: appManager,
-                    features: edits,
-                },
-                { label: `updateFeatures(guidPDFs:${edits.length})`, retries: 3 }
-            );
+            const guidPDFResponse = await updateFeaturesWithRetry({
+                url: featureServiceUrl + "/0",
+                authentication: appManager,
+                features: edits
+            }, { label: `updateFeatures(guidPDFs:${edits.length})`, retries: 3 });
 
             const guidPDFResults = guidPDFResponse?.updateResults || [];
 
             if (guidPDFResults.length === 0) {
                 const resultStr = JSON.stringify(guidPDFResults);
                 const errorMessage = `POST AGOL update features failed : failed to update ${title} pdf url to ${featureServiceUrl} ${resultStr}`;
-                logger.error('AGOLPostfpOnlineDataToAGOLTables: ' + errorMessage + ` after retries [11]`);
+                logger.error("AGOLPostfpOnlineDataToAGOLTables: " + errorMessage + ` after retries [11]`);
                 errorLog.push(errorMessage);
             }
 
             for (const guidPDFRecord of guidPDFResults) {
                 if (!guidPDFRecord.success) {
-                    const pdfUrlError = guidPDFRecord?.error
-                        ? JSON.stringify(guidPDFRecord.error)
-                        : 'unspecified error';
+                    const pdfUrlError = guidPDFRecord?.error ? JSON.stringify(guidPDFRecord.error) : 'unspecified error';
                     const errorMessage = `POST AGOL update features failed : failed to update ${title}'s objectId ${guidPDFRecord.objectId}'s field fpOnline url ${featureServiceUrl} ${pdfUrlError}`;
-                    logger.error('AGOLPostfpOnlineDataToAGOLTables: ' + errorMessage + ` after retries [11]`);
+                    logger.error("AGOLPostfpOnlineDataToAGOLTables: " + errorMessage + ` after retries [11]`);
                     errorLog.push(errorMessage);
                 } else {
-                    logger.info(
-                        `AGOLPostfpOnlineDataToAGOLTables: Successfully updated ${title} object's ${guidPDFRecord.objectId} fpOnlineUrl field ? [11]`
-                    );
+                    logger.info(`AGOLPostfpOnlineDataToAGOLTables: Successfully updated ${title} object's ${guidPDFRecord.objectId} fpOnlineUrl field ? [11]`);
                     totalUpdated++;
                 }
             }
         }
-        logger.info(
-            `AGOLPostfpOnlineDataToAGOLTables: Total updated features with PDF GUIDs in ${agolFileName} table: ${totalUpdated}`
-        );
+        logger.info(`AGOLPostfpOnlineDataToAGOLTables: Total updated features with PDF GUIDs in ${agolFileName} table: ${totalUpdated}`);
     }
 
     async function deleteFileFromVV(fileId, dhId, title) {
         //delete from vv doc
         const docLibResponse = await deleteDocument(fileId, title);
-        logger.info(
-            `AGOLPostFponlineDataToAGOLTables: Deleted document ${fileId} from VV doc library : ${docLibResponse.meta.status} ${docLibResponse.meta.statusMsg} [11]`
-        );
+        logger.info(`AGOLPostFponlineDataToAGOLTables: Deleted document ${fileId} from VV doc library : ${docLibResponse.meta.status} ${docLibResponse.meta.statusMsg} [11]`);
 
         //keep vv doc lib in synch with pendingDataForAGOL form
         if (docLibResponse.meta.status == 200) {
             //delete the record!
             const deleteResponse = await deleteRecord(dhId);
-            logger.info(
-                `AGOLPostFponlineDataToAGOLTables: Deleted record ${dhId} from pendingDataForAGOL form : ${deleteResponse?.meta?.status ?? 'n/a'} ${deleteResponse?.meta?.statusMsg ?? ''} [12]`
-            );
+            logger.info(`AGOLPostFponlineDataToAGOLTables: Deleted record ${dhId} from pendingDataForAGOL form : ${deleteResponse?.meta?.status ?? 'n/a'} ${deleteResponse?.meta?.statusMsg ?? ''} [12]`);
         }
     }
 
     async function addFponlineUrlField(featureServiceUrl, authentication) {
+
         // Add field using addToDefinition
         const addFieldDef = {
-            fields: [
-                {
-                    name: 'fpOnlineUrl',
-                    type: 'esriFieldTypeString',
-                    alias: 'fpOnlineUrl',
-                    length: 512,
-                    nullable: true,
-                    editable: true,
-                },
-            ],
+            fields: [{
+                name: "fpOnlineUrl",
+                type: "esriFieldTypeString",
+                alias: "fpOnlineUrl",
+                length: 512,
+                nullable: true,
+                editable: true
+            }]
         };
 
         const res = await request(`${featureServiceUrl}/addToDefinition`, {
-            httpMethod: 'POST',
+            httpMethod: "POST",
             authentication,
             params: {
-                f: 'json',
-                addToDefinition: JSON.stringify(addFieldDef),
-            },
+                f: "json",
+                addToDefinition: JSON.stringify(addFieldDef)
+            }
         });
 
         if (!res?.success) {
             const resultStr = JSON.stringify(res);
             const errorMessage = `POST AGOL update definition features failed : failed to update ${title} pdf url to ${featureServiceUrl} ${resultStr}`;
-            logger.error('AGOLPostfpOnlineDataToAGOLTables: ' + errorMessage + ` after retries [11]`);
+            logger.error("AGOLPostfpOnlineDataToAGOLTables: " + errorMessage + ` after retries [11]`);
             errorLog.push(errorMessage);
             throw new Error(`Failed to add fpOnlineUrl field: ${JSON.stringify(res)}`);
         }
@@ -991,25 +975,26 @@ module.exports.main = async function (vvClient, response, token) {
     async function checkExportJobUrl(jobUrl, authentication, retries = 10) {
         for (let i = 0; i < retries; i++) {
             const status = await request(jobUrl, {
-                httpMethod: 'GET',
+                httpMethod: "GET",
                 authentication,
-                params: { f: 'json' },
+                params: { f: "json" }
             });
 
-            if (status.status === 'Completed') return true;
-            if (status.status === 'Failed') throw status.error;
+            if (status.status === "Completed") return true;
+            if (status.status === "Failed") throw status.error;
 
-            await new Promise((r) => setTimeout(r, 1500));
+            await new Promise(r => setTimeout(r, 1500));
         }
-        throw new Error('updateDefinition job timed out');
+        throw new Error("updateDefinition job timed out");
     }
 
+    
     async function sendNotificationEmail(relatedRecordIDs, emailTemplate, tokens) {
         const emailRequestArr = [
-            { name: 'Email Name', value: emailTemplate['email Name'] },
+            { name: 'Email Name', value: emailTemplate["email Name"] },
             { name: 'Tokens', value: tokens },
-            { name: 'Email Address', value: emailTemplate['send To'] },
-            { name: 'Email AddressCC', value: emailTemplate['send CC'] },
+            { name: 'Email Address', value: emailTemplate["send To"] },
+            { name: 'Email AddressCC', value: emailTemplate["send CC"] },
             { name: 'SendDateTime', value: new Date().toISOString() },
             { name: 'RELATETORECORD', value: relatedRecordIDs },
             {
@@ -1033,10 +1018,10 @@ module.exports.main = async function (vvClient, response, token) {
         errorLog,
         relatedRecordIDs,
         environment,
-        queryName = 'AGOLGetPostDataFailedEmail',
-        //queryName =
-        subjectStatus = 'Partial Failure',
-    }) {
+        queryName = "AGOLGetPostDataFailedEmail",
+        //queryName = 
+        subjectStatus = "Partial Failure"
+        }) {
         // Only notify if more than 1 error
         if (!Array.isArray(errorLog) || errorLog.length <= 1) {
             return; // intentional no-op
@@ -1048,19 +1033,23 @@ module.exports.main = async function (vvClient, response, token) {
             { name: 'relatedRecordIDs', value: relatedRecordIDs },
             { name: 'status', value: subjectStatus },
             {
-                name: 'message',
-                value: errorLog
-                    .slice(0, 25) // safety cap
-                    .map((e, i) => `${i + 1}. ${e}`)
-                    .join('\n'),
+            name: 'message',
+            value: errorLog
+                .slice(0, 25) // safety cap
+                .map((e, i) => `${i + 1}. ${e}`)
+                .join('\n')
             },
-            { name: 'environment', value: environment },
+            { name: 'environment', value: environment }
         ];
 
-        await sendNotificationEmail(relatedRecordIDs, emailTemplate[0], tokens);
-    }
+        await sendNotificationEmail(
+            relatedRecordIDs,
+            emailTemplate[0],
+            tokens
+        );
+        }
 
-    function callExternalWs(webServiceName, webServiceParams) {
+            function callExternalWs(webServiceName, webServiceParams) {
         let shortDescription = `Run Web Service: ${webServiceName}`;
 
         return vvClient.scripts
@@ -1071,7 +1060,7 @@ module.exports.main = async function (vvClient, response, token) {
             .then((res) => res.data);
     }
 
-    function checkDataIsNotEmpty(vvClientRes, shortDescription, ignoreStatusCode = 999) {
+        function checkDataIsNotEmpty(vvClientRes, shortDescription, ignoreStatusCode = 999) {
         /*
         Checks that the data property of a vvCliente API response object is not empty
         Parameters:
@@ -1089,27 +1078,24 @@ module.exports.main = async function (vvClient, response, token) {
 
             // If the data is empty, throw an error
             if (isEmptyArray || isEmptyObject) {
-                console.log('vvClientRest : ' + vvClientRes);
-                throw new Error(
-                    `${shortDescription} returned no data. Please, check parameters and syntax. Status: ${status}.`
-                );
+                console.log("vvClientRest : " + vvClientRes);
+                throw new Error(`${shortDescription} returned no data. Please, check parameters and syntax. Status: ${status}.`);
             }
             // If it is a Web Service response, check that the first value is not an Error status
             if (dataIsArray) {
                 const firstValue = vvClientRes.data[0];
 
                 if (firstValue == 'Error') {
-                    throw new Error(
-                        `${shortDescription} returned an error. Please, check the called Web Service. Status Description: ${vvClientRes.data[1]}.`
-                    );
+                    throw new Error(`${shortDescription} returned an error. Please, check the called Web Service. Status Description: ${vvClientRes.data[1]}.`);
                 }
             }
         }
         return vvClientRes;
     }
 
+
     //TODO remove
-    let appManager = '';
+    let appManager = "";
     /* -------------------------------------------------------------------------- */
     /*                                  MAIN CODE                                 */
     /* -------------------------------------------------------------------------- */
@@ -1121,14 +1107,16 @@ module.exports.main = async function (vvClient, response, token) {
         appManager = ApplicationCredentialsManager.fromCredentials({
             clientId: GIS_CLIENT_ID,
             clientSecret: GIS_CLIENT_SECRET,
-            portal: 'https://visualvault.maps.arcgis.com/sharing/rest',
+            portal: "https://visualvault.maps.arcgis.com/sharing/rest"
         });
 
         logger.info(`AGOLPostFponlineDataToAGOLTables: Got AGOL appManager [1]`);
 
+
+
         const appToken = await withRetry(() => appManager.getToken(), {
-            label: 'getToken',
-            retries: 3,
+            label: "getToken",
+            retries: 3
         });
 
         if (appToken) {
@@ -1136,10 +1124,12 @@ module.exports.main = async function (vvClient, response, token) {
         }
 
         // 2° Check the "queue" PendingDataForAGOL form for pending data
-        csvFiles = await runCustomQuery(null, 'AGOLCheckPendingData');
+        csvFiles = await runCustomQuery(null, "AGOLCheckPendingData");
 
         for (const csvFile of csvFiles) {
+
             if (csvFile.length !== 0) {
+
                 // 3° Grab CSV files from VV doc library
 
                 const docId = csvFile.csvFileDocumentId;
@@ -1154,45 +1144,40 @@ module.exports.main = async function (vvClient, response, token) {
                 if (returnedBackFile.length === 0) {
                     // 3°a delete record from pendingDataForAGOL because file doesn't exist in VV doc library anymore
                     const response = await deleteRecord(csvFile.dhid);
-                    logger.info(
-                        `AGOLPostFponlineDataToAGOLTables: Deleted record ${csvFile.dhid} from pendingDataForAGOL form : ${response?.meta?.status ?? 'n/a'} ${response?.meta?.statusMsg ?? ''} [3]`
-                    );
+                    logger.info(`AGOLPostFponlineDataToAGOLTables: Deleted record ${csvFile.dhid} from pendingDataForAGOL form : ${response?.meta?.status ?? 'n/a'} ${response?.meta?.statusMsg ?? ''} [3]`);
                 } else {
                     // 2) getFileBytesId MUST use .then()
                     const csv = await vvClient.files
                         .getFileBytesId(returnedBackFile.id)
-                        .then((data) => data) // just return value
+                        .then((data) => data)        // just return value
                         .catch((err) => {
                             const msg = `getFileBytesId failed for ${agolFileName} ${returnedBackFile.id} - ${err}`;
-                            logger.error('AGOLPostFponlineDataToAGOLTables: ' + msg + ` [3]`);
+                            logger.error("AGOLPostFponlineDataToAGOLTables: " + msg + ` [3]`);
                             errorLog.push(msg);
-                            return null; // <-- use null to indicate skip
+                            return null;              // <-- use null to indicate skip
                         });
 
                     if (csv.length === 0) {
                         const errorMessage = `GET VV getFileBytesId failed : ${agolFileName} ${returnedBackFile.id} CSV file is empty in VV doc library`;
-                        logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [4]`);
+                        logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [4]`);
                         errorLog.push(errorMessage);
                         continue;
                     }
 
                     let csvStr = Buffer.isBuffer(csv) ? csv.toString('utf8') : String(csv);
 
+
                     const csvBlob = await toBlob(csvStr);
 
                     // 4° Find the CSV file item ID from AGOL
-                    const { results: csvResultsTokenized } = await callWithRetry(
-                        searchItems,
-                        {
-                            q: `title:${agolFileName} AND type:"CSV" AND owner:VVAGOL`,
-                            num: 5,
-                            authentication: appManager,
-                        },
-                        { label: `searchItems(csv:${agolFileName})`, retries: 3 }
-                    );
+                    const { results: csvResultsTokenized } = await callWithRetry(searchItems, {
+                        q: `title:${agolFileName} AND type:"CSV" AND owner:VVAGOL`,
+                        num: 5,
+                        authentication: appManager
+                    }, { label: `searchItems(csv:${agolFileName})`, retries: 3 });
 
                     // Grab the exact match by title because AGOL search is fuzzy (tokenization, partial match, etc)
-                    const csvResults = csvResultsTokenized.find((r) => r.title === agolFileName);
+                    const csvResults = csvResultsTokenized.find(r => r.title === agolFileName);
 
                     //debugging purposes for the aws servers
                     /*logger.info({
@@ -1209,48 +1194,35 @@ module.exports.main = async function (vvClient, response, token) {
                     });*/
 
                     if (!csvResults || csvResults.title !== agolFileName) {
-                        const csvFileData = new File([csvBlob], agolFileName + '.csv', {
-                            type: 'text/csv',
+                        const csvFileData = new File([csvBlob], agolFileName + ".csv", {
+                            type: "text/csv"
                         });
                         // 5° Update the CSV file in AGOL
-                        await createAGOLItem(
-                            csvFileData,
-                            agolFileName,
-                            title,
-                            titleWithSpaces,
-                            returnedBackFile.id,
-                            csvFile.dhid,
-                            currentEnv
-                        );
+                        await createAGOLItem(csvFileData, agolFileName, title, titleWithSpaces, returnedBackFile.id, csvFile.dhid, currentEnv);
                         continue;
                     }
 
                     const csvItemId = csvResults.id;
                     let fileName = csvResults.name;
-                    logger.info(
-                        `AGOLPostFponlineDataToAGOLTables: Found CSV file in AGOL ${csvItemId} ${fileName} [5]`
-                    );
+                    logger.info(`AGOLPostFponlineDataToAGOLTables: Found CSV file in AGOL ${csvItemId} ${fileName} [5]`);
 
                     //After the update from node 14 to 18, we use axios to update the csv file in AGOL because of issues with
                     // FormData and file uploads using arcgis-rest-js updateItem function.
                     // 6° Update the CSV file in AGOL
-                    const updatedCsvResults = await callWithRetry(
-                        () =>
-                            updateCsvItemAxios({
-                                portalUrl: 'https://visualvault.maps.arcgis.com',
-                                owner: 'VVAGOL',
-                                itemId: csvItemId,
-                                token: appManager.token,
-                                csvBlob: csvBlob,
-                                fileName: fileName,
-                            }),
-                        { label: `updateItem(csv:${agolFileName})`, retries: 3 }
-                    );
+                    const updatedCsvResults = await callWithRetry(() => updateCsvItemAxios({
+                        portalUrl: "https://visualvault.maps.arcgis.com",
+                        owner: "VVAGOL",
+                        itemId: csvItemId,
+                        token: appManager.token,
+                        csvBlob: csvBlob,
+                        fileName: fileName
+                    }), { label: `updateItem(csv:${agolFileName})`, retries: 3 });
+
 
                     if (!updatedCsvResults?.success) {
                         const updatedCsvResultsStr = JSON.stringify(updatedCsvResults);
-                        const errorMessage = `GET AGOL updateItem failed : failed to update ${agolFileName} csv file ${updatedCsvResultsStr}`;
-                        logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [6]`);
+                        const errorMessage = `GET AGOL updateItem failed : failed to update ${agolFileName} csv file ${updatedCsvResultsStr}`
+                        logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [6]`);
                         errorLog.push(errorMessage);
                         continue;
                     }
@@ -1258,119 +1230,97 @@ module.exports.main = async function (vvClient, response, token) {
                     logger.info(`AGOLPostFponlineDataToAGOLTables: Updated CSV file in AGOL [6]`);
 
                     // 7° Find the AGOL hosted feature layer / service id for that CSV file
-                    const { results: svcResultsTokenized } = await callWithRetry(
-                        searchItems,
-                        {
-                            q: `title:"${agolFileName}" AND (type:"Feature Service" OR type:"Feature Layer") AND owner:VVAGOL`,
-                            num: 5,
-                            authentication: appManager,
-                        },
-                        { label: `searchItems(svc:${agolFileName})`, retries: 3 }
-                    );
+                    const { results: svcResultsTokenized } = await callWithRetry(searchItems, {
+                        q: `title:"${agolFileName}" AND (type:"Feature Service" OR type:"Feature Layer") AND owner:VVAGOL`,
+                        num: 5,
+                        authentication: appManager
+                    }, { label: `searchItems(svc:${agolFileName})`, retries: 3 });
 
                     // Grab the exact match by title because AGOL search is fuzzy (tokenization, partial match, etc)
-                    const svcResults = svcResultsTokenized.find((r) => r.title === agolFileName);
+                    const svcResults = svcResultsTokenized.find(r => r.title === agolFileName);
 
                     if (!svcResults || svcResults.title !== agolFileName) {
                         const svcResultsStr = JSON.stringify(svcResults);
-                        const errorMessage = `GET AGOL searchItems failed : ${agolFileName} AGOL Hosted feature layer not found ${svcResultsStr}`;
-                        logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [7]`);
+                        const errorMessage = `GET AGOL searchItems failed : ${agolFileName} AGOL Hosted feature layer not found ${svcResultsStr}`
+                        logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [7]`);
                         errorLog.push(errorMessage);
                         continue;
                     }
-                    const featureItem = svcResults; // has .id and .url
+                    const featureItem = svcResults;            // has .id and .url
                     //logger.info(`AGOLPostFponlineDataToAGOLTables: Found CSV file hosted feature layer ${featureItem.id}`);
 
                     // 8° Find the AGOL hosted table for that CSV file
-                    const tableItem = await withRetry(() => getItem(featureItem.id, { authentication: appManager }), {
-                        label: `getItem(${featureItem.id})`,
-                        retries: 3,
-                    });
+                    const tableItem = await withRetry(
+                        () => getItem(featureItem.id, { authentication: appManager }),
+                        { label: `getItem(${featureItem.id})`, retries: 3 }
+                    );
 
                     if (!tableItem.url) {
-                        const errorMessage = `GET AGOL getItem failed : ${title} AGOL Hosted table feature layer not found`;
-                        logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [8]`);
+                        const errorMessage = `GET AGOL getItem failed : ${title} AGOL Hosted table feature layer not found`
+                        logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [8]`);
                         errorLog.push(errorMessage);
                         continue;
                     }
 
-                    const featureServiceUrl = tableItem.url; // e.g. .../FeatureServer
-                    logger.info(
-                        `AGOLPostFponlineDataToAGOLTables: Found CSV file hosted table ${featureServiceUrl} [8]`
-                    );
+                    const featureServiceUrl = tableItem.url;              // e.g. .../FeatureServer
+                    logger.info(`AGOLPostFponlineDataToAGOLTables: Found CSV file hosted table ${featureServiceUrl} [8]`);
 
                     // 9° AGOL analyze the CSV file before posting to AGOL hosted table
                     const analyzeCsv = await requestWithRetry(
-                        'https://visualvault.maps.arcgis.com/sharing/rest/content/features/analyze',
+                        "https://visualvault.maps.arcgis.com/sharing/rest/content/features/analyze",
                         {
                             label: `analyze(${agolFileName})`,
                             retries: 3,
-                            params: { id: csvItemId, filetype: 'csv', file: csvBlob }, // note: filetype should be "csv" (a string)
+                            params: { id: csvItemId, filetype: "csv", file: csvBlob } // note: filetype should be "csv" (a string)
                         }
                     );
 
                     if (!analyzeCsv.publishParameters) {
-                        const errorMessage = `GET AGOL analyze failed : analyzing ${agolFileName} csv file failed`;
-                        logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` [9]`);
+                        const errorMessage = `GET AGOL analyze failed : analyzing ${agolFileName} csv file failed`
+                        logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` [9]`);
                         errorLog.push(errorMessage);
                         continue;
                     }
                     logger.info(`AGOLPostFponlineDataToAGOLTables: Analyze csv completed [9]`);
 
                     const tableNameJson = createJsonTableName(titleWithSpaces);
-                    const tableFieldTypes = await customQueryParameter(tableNameJson, 'GetTableFieldType');
+                    const tableFieldTypes = await customQueryParameter(tableNameJson, "GetTableFieldType");
 
                     // overwrite fields based on your SQL schema rows
-                    analyzeCsv.publishParameters.layerInfo.fields = await buildAgolFieldsFromSqlSchema(
-                        tableFieldTypes,
-                        { defaultStringLen: 256 }
-                    );
+                    analyzeCsv.publishParameters.layerInfo.fields = await buildAgolFieldsFromSqlSchema(tableFieldTypes, { defaultStringLen: 256 });
 
                     // 10° AGOL Append "publish" with upsert, using the CSV item as the source to the AGOL hosted table
                     const appendParams = {
                         appendItemId: csvItemId,
-                        appendUploadFormat: 'csv',
+                        appendUploadFormat: "csv",
                         upsert: true,
                         rollbackOnFailure: true,
                         appendSourceInfo: analyzeCsv.publishParameters,
-                        upsertMatchingField: 'DhDocID',
+                        upsertMatchingField: "DhDocID"
                     };
 
                     try {
-                        const result = await appendWithRetry(
-                            { featureServiceUrl, token: appManager.token, appendParams },
-                            {
-                                retries: 2,
-                                baseDelayMs: 1500,
-                                maxDelayMs: 8000,
-                            }
-                        );
-                        if (result.status === 'Completed') {
-                            logger.info(
-                                `AGOLPostFponlineDataToAGOLTables: Append for ${agolFileName} completed ✅ [10]`
-                            );
+
+                        const result = await appendWithRetry({ featureServiceUrl, token: appManager.token, appendParams }, {
+                            retries: 2, baseDelayMs: 1500, maxDelayMs: 8000
+                        });
+                        if (result.status === "Completed") {
+                            logger.info(`AGOLPostFponlineDataToAGOLTables: Append for ${agolFileName} completed ✅ [10]`);
 
                             if (PDF_GUID_AGOL_TABLES.has(titleWithSpaces)) {
                                 // 10°a Update the AGOL hosted table with the PDF GUIDs from the csv file
-                                await createPDFGuidUrl(
-                                    titleWithSpaces,
-                                    analyzeCsv,
-                                    featureServiceUrl,
-                                    agolFileName,
-                                    currentEnv
-                                );
+                                await createPDFGuidUrl(titleWithSpaces, analyzeCsv, featureServiceUrl, agolFileName, currentEnv);
                             }
 
                             // 10°b delete record from pendingDataForAGOL queue because file was posted to AGOL.
-                            logger.info(
-                                `AGOLPostFponlineDataToAGOLTables: Append for ${agolFileName} completed ✅ [10]`
-                            );
+                            logger.info(`AGOLPostFponlineDataToAGOLTables: Append for ${agolFileName} completed ✅ [10]`);
                             await deleteFileFromVV(returnedBackFile.id, csvFile.dhid, title);
+
                         } else {
                             //else leave the record to be processed in the queue again
                             const resultStr = JSON.stringify(result);
                             const errorMessage = `POST AGOL append failed : failed to publish ${title} csv file to ${featureServiceUrl} ${resultStr}`;
-                            logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage + ` after retries [10]`);
+                            logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage + ` after retries [10]`);
                             errorLog.push(errorMessage);
                         }
                     } catch (e) {
@@ -1384,41 +1334,41 @@ module.exports.main = async function (vvClient, response, token) {
                             }
                         }
                         const errorMessage = `POST AGOL append failed : ${title} csv file to ${featureServiceUrl} after retries ${errorDetails}`;
-                        logger.error('AGOLPostFponlineDataToAGOLTables: ' + errorMessage);
+                        logger.error("AGOLPostFponlineDataToAGOLTables: " + errorMessage);
                         errorLog.push(errorMessage);
                     }
                 }
             } else {
                 logger.info(`AGOLPostFponlineDataToAGOLTables - No csv files found to process. [3]`);
-                statusMessage = 'No new csv files were found to process.';
+                statusMessage = "No new csv files were found to process."
                 // You will see the responseMessage in the scheduled process log ONLY if the process runs automatically.
                 return vvClient.scheduledProcess.postCompletion(scheduledProcessGUID, 'complete', true, statusMessage);
             }
-        }
+        };
 
         await sendEmailIfErrors({
             errorLog,
-            relatedRecordIDs: csvFiles.map((f) => f?.dhDocID).filter(Boolean),
+            relatedRecordIDs: csvFiles.map(f => f?.dhDocID).filter(Boolean),
             environment: currentEnv,
-            subjectStatus: 'Completed with Errors',
+            subjectStatus: "Completed with Errors"
         });
 
-        statusMessage = "Succesfully updated data to AGOL's tables.";
+        statusMessage = "Succesfully updated data to AGOL's tables."
         // You will see the responseMessage in the scheduled process log ONLY if the process runs automatically.
         return vvClient.scheduledProcess.postCompletion(scheduledProcessGUID, 'complete', true, statusMessage);
 
         //TODO if error handling becomes a hassle we can add an email alert here
-        // keep track of what csvFiles didn't process to AGOL and email a list of those
+        // keep track of what csvFiles didn't process to AGOL and email a list of those      
     } catch (error) {
         logger.error(`AGOLPostFponlineDataToAGOLTables: Error encountered ${error}`);
-        logger.error('Scheduled Service: AGOLPostFponlineDataToAGOLTables failed');
+        logger.error("Scheduled Service: AGOLPostFponlineDataToAGOLTables failed");
 
         // BUILD THE ERROR RESPONSE ARRAY
 
         outputCollection[0] = 'Error'; // Don´t change this
 
         if (error?.originalMessage) {
-            error = error.name + ' ' + error.originalMessage;
+            error = error.name + " " + error.originalMessage;
         }
         if (error?.message) {
             error = error.message;
@@ -1427,17 +1377,19 @@ module.exports.main = async function (vvClient, response, token) {
         if (errorLog.length > 0) {
             responseMessage = `Some errors occurred. Error/s: ${error}, ${errorLog.join('; ')}`;
         } else {
-            responseMessage = error.message ? error.message : `Unhandled error occurred: ${error}`;
+            responseMessage = error.message
+                ? error.message
+                : `Unhandled error occurred: ${error}`;
         }
 
         await sendEmailIfErrors({
             errorLog,
-            relatedRecordIDs: csvFiles.map((f) => f?.dhDocID).filter(Boolean),
+            relatedRecordIDs: csvFiles.map(f => f?.dhDocID).filter(Boolean),
             environment: currentEnv,
-            subjectStatus: 'Completed with Errors',
+            subjectStatus: "Completed with Errors"
         });
 
         // You will see the responseMessage in the scheduled process log ONLY if the process runs automatically.
         return vvClient.scheduledProcess.postCompletion(scheduledProcessGUID, 'complete', false, responseMessage);
     }
-};
+}

@@ -1,10 +1,9 @@
-# WADNR Global Functions
+# Global Functions
 
-Extracted from `VV.Form.Global` on vv5dev (WADNR/fpOnline).
-Generated: 2026-04-08
+Extracted from VV.Form.Global. Generated: 2026-04-10
 
 | # | Function | Params | Size |
-| --: | :------- | :----: | ---: |
+| --: | :--- | :--- | :--- |
 | 1 | [AddRecordLogic](./AddRecordLogic.js) | 1 | 3.4 KB |
 | 2 | [AddRecordModal](./AddRecordModal.js) | 2 | 3.3 KB |
 | 3 | [AddressCheckSameAddressMatch](./AddressCheckSameAddressMatch.js) | 1 | 2.6 KB |
@@ -92,7 +91,7 @@ Generated: 2026-04-08
 | 85 | [GetMapToken](./GetMapToken.js) | 0 | 2.7 KB |
 | 86 | [GetPendingRelatedFees](./GetPendingRelatedFees.js) | 1 | 0.5 KB |
 | 87 | [GetURLParamValue](./GetURLParamValue.js) | 2 | 0.8 KB |
-| 88 | [GIS_BuildCalciteLayout](./GIS_BuildCalciteLayout.js) | 0 | 13.6 KB |
+| 88 | [GIS_BuildCalciteLayout](./GIS_BuildCalciteLayout.js) | 0 | 8.5 KB |
 | 89 | [GIS_BuildFormElementsForLayer](./GIS_BuildFormElementsForLayer.js) | 1 | 3.7 KB |
 | 90 | [GIS_CancelActiveEditing](./GIS_CancelActiveEditing.js) | 0 | 1.4 KB |
 | 91 | [GIS_CreateEditorDropDownListPane](./GIS_CreateEditorDropDownListPane.js) | 4 | 2.6 KB |
@@ -100,13 +99,13 @@ Generated: 2026-04-08
 | 93 | [GIS_DisplayDangerAlert](./GIS_DisplayDangerAlert.js) | 2 | 1.0 KB |
 | 94 | [GIS_GetGISPortalID](./GIS_GetGISPortalID.js) | 0 | 0.4 KB |
 | 95 | [GIS_GetMapViewManager](./GIS_GetMapViewManager.js) | 0 | 1.8 KB |
-| 96 | [GIS_GetModalGISMap](./GIS_GetModalGISMap.js) | 3 | 19.7 KB |
+| 96 | [GIS_GetModalGISMap](./GIS_GetModalGISMap.js) | 3 | 23.3 KB |
 | 97 | [GIS_onLoad](./GIS_onLoad.js) | 1 | 9.8 KB |
 | 98 | [GIS_SetupEditorBtn](./GIS_SetupEditorBtn.js) | 7 | 23.3 KB |
 | 99 | [GIS_SetupGISSearchTSR](./GIS_SetupGISSearchTSR.js) | 1 | 11.4 KB |
 | 100 | [GIS_SetupPreviousViewBtn](./GIS_SetupPreviousViewBtn.js) | 1 | 2.3 KB |
-| 101 | [GIS_SetupPrintWidget](./GIS_SetupPrintWidget.js) | 3 | 40.6 KB |
-| 102 | [GIS_SetupSearchAddress](./GIS_SetupSearchAddress.js) | 1 | 2.8 KB |
+| 101 | [GIS_SetupPrintWidget](./GIS_SetupPrintWidget.js) | 3 | 38.5 KB |
+| 102 | [GIS_SetupSearchAddress](./GIS_SetupSearchAddress.js) | 1 | 3.2 KB |
 | 103 | [GIS_SetupUIWidgets](./GIS_SetupUIWidgets.js) | 6 | 3.5 KB |
 | 104 | [GIS_SetupUploadShapefile](./GIS_SetupUploadShapefile.js) | 4 | 15.1 KB |
 | 105 | [GIS_ShowDangerAlert](./GIS_ShowDangerAlert.js) | 2 | 1.8 KB |
@@ -163,34 +162,4 @@ Generated: 2026-04-08
 | 156 | [ViewDocumentsModalDelete](./ViewDocumentsModalDelete.js) | 1 | 7.0 KB |
 | 157 | [ViewDocumentsModalInvalid](./ViewDocumentsModalInvalid.js) | 1 | 7.2 KB |
 
-**Total**: 157 functions
-
-## Non-Function Properties
-
-| Name | Type | Value |
-| :--- | :--- | :---- |
-| gisLoadPromise | object | `null` |
-| gisLastError | object | `null` |
-| gisIsLoading | boolean | `false` |
-| preFetchedWebMapResponse | object | `[{"name":"token","value":"AAPTajQqDHs1Xf0iX2ISMuDy9Tg..0fiwjoeNmu1skkY6Mo61jp6FX` |
-| mapState | object | `{"_map":null,"_view":null,"_calciteAppNav":null,"_calciteAppPanel":null,"_editor` |
-| PhoneReg | object | `{}` |
-| EmailReg | object | `{}` |
-| URLReg | object | `{}` |
-| BlankReg | object | `{}` |
-| ZipReg | object | `{}` |
-| DDSelectReg | object | `{}` |
-| TimeReg | object | `{}` |
-| PartnerReg | object | `{}` |
-| CGASScore | object | `{}` |
-| DoubleDigitCheck | object | `{}` |
-| SSN | object | `{}` |
-| EIN | object | `{}` |
-| NPI | object | `{}` |
-| Currency | object | `{}` |
-| Percent | object | `{}` |
-| NumberOnly | object | `{}` |
-| NameReg | object | `{}` |
-| NameNumberReg | object | `{}` |
-| MedicaidIDRecipient | object | `{}` |
-| MedicaidIDProvider | object | `{}` |
+**Total**: 157 items

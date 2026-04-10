@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.IsFillAndRelate
  * Parameters: 0
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function () {
 // Global function for determining if the current record was opened as a fill-and-relate from within another form

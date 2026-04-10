@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.UpdateWindowLocationURL
  * Parameters: 0
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function () {
 var baseUrl = VV.BaseAppUrl; //Get the base URL from the global variable to ensure the correct environment is used in the URL

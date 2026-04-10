@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.CentralCheckboxValidation
  * Parameters: 2
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (checkboxArray, requiredNumber) {
 /*

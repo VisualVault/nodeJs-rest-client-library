@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.GIS_DisplayDangerAlert
  * Parameters: 2
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (view, message) {
  // Create a wrapper div that ArcGIS UI knows how to place

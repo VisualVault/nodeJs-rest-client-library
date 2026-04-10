@@ -3,11 +3,11 @@
  * Category: Scheduled
  * Modified: 2026-02-13T21:26:41.307Z by ross.rhone@visualvault.com
  * Script ID: Script Id: 58e0e733-e5a5-f011-82fa-ec61d8777d62
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-10
  */
-const logger = require('../log');
-const { stringify } = require('csv/sync');
-const crypto = require('crypto');
+const logger = require("../log");
+const { stringify } = require("csv/sync");
+const crypto = require("crypto");
 
 module.exports.getCredentials = function () {
     var options = {};
@@ -21,7 +21,7 @@ module.exports.getCredentials = function () {
 };
 
 module.exports.main = async function (vvClient, response, token) {
-    /*Script Name:   AGOLSendUpdatedDataToPendingDataForm
+   /*Script Name:   AGOLSendUpdatedDataToPendingDataForm
  Customer:       WA DNR: fpOnline
  Purpose:        Extracts updated fpOnline form data (last 24 hours) and pushes it into the "queue"
                  (PendingDataForAGOL form/table) as CSV documents stored in the VV Document Library.
@@ -88,33 +88,36 @@ module.exports.main = async function (vvClient, response, token) {
     const scheduledProcessGUID = token;
 
     const emptyJsonFormId = {
+
         params: JSON.stringify([
             {
                 parameterName: 'formId',
-                value: '',
-            },
-        ]),
-    };
+                value: ""
+            }
+        ])
+    }
 
-    let currentQueryName = '';
-    let currentTitle = '';
+    let currentQueryName = "";
+    let currentTitle = "";
     let GISQueries = [];
     let summary = { succeeded: [], skipped: [], failed: [] };
 
-    const templateName = 'PendingDataForAGOL';
 
-    const descriptionTest = 'TestDescription';
+    const templateName = "PendingDataForAGOL";
 
-    const folderPath = '/FailedToUpdateTableInAGOL';
+    const descriptionTest = "TestDescription"
 
-    let pendingDataForAGOLResponse = '';
+    const folderPath = "/FailedToUpdateTableInAGOL"
 
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    let pendingDataForAGOLResponse = "";
+
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
     const jitter = (ms) => {
-        const d = Math.floor(ms * 0.2); // ±20% jitter
+        const d = Math.floor(ms * 0.2);          // ±20% jitter
         return ms + Math.floor((Math.random() * 2 - 1) * d);
     };
+
 
     /* -------------------------------------------------------------------------- */
     /*                              Helper Functions                              */
@@ -122,16 +125,16 @@ module.exports.main = async function (vvClient, response, token) {
 
     /**
      * uses vvClient to detect the current environment
-     * @param {object} vvClient
+     * @param {object} vvClient 
      * @returns "dev" | "qa" | "sandbox" | "production"
      */
     function detectEnvironment(vvClient) {
         // Define known environments and their identifying URL segments.  Add or modify as needed.
         const environments = {
-            'vv5dev.visualvault.com': 'dev',
-            'vv5qa.visualvault.com': 'qa',
-            'sandbox.visualvault-gov.com': 'sandbox',
-            'na5.visualvault.com': 'production',
+            "vv5dev.visualvault.com": "dev",
+            "vv5qa.visualvault.com": "qa",
+            "sandbox.visualvault-gov.com": "sandbox",
+            "na5.visualvault.com": "production",
         };
         const envUrl = vvClient.getBaseUrl();
 
@@ -142,13 +145,16 @@ module.exports.main = async function (vvClient, response, token) {
             }
         }
 
-        return 'unknown';
+        return "unknown";
     }
 
     function testCustomQuery(formId, queryName) {
+
         const formIdJson = createJsonFormId(formId);
 
+
         const shortDescription = 'Custom Query using filter parameter for backward compatibility';
+
 
         return vvClient.customQuery
             .getCustomQueryResultsByName(queryName, formIdJson)
@@ -159,7 +165,9 @@ module.exports.main = async function (vvClient, response, token) {
     }
 
     function getCustomQueryByPagination(queryName, query) {
+
         const shortDescription = 'Custom Query using filter parameter for backward compatibility';
+
 
         return vvClient.customQuery
             .getCustomQueryResultsByName(queryName, query)
@@ -198,22 +206,15 @@ module.exports.main = async function (vvClient, response, token) {
         */
 
         if (!vvClientRes.meta) {
-            throw new Error(
-                `${shortDescription} error. No meta object found in response. Check method call parameters and credentials.`
-            );
+            throw new Error(`${shortDescription} error. No meta object found in response. Check method call parameters and credentials.`);
         }
 
         const status = vvClientRes.meta.status;
 
         // If the status is not the expected one, throw an error
         if (status != 200 && status != 201 && status != ignoreStatusCode) {
-            const errorReason =
-                vvClientRes.meta.errors && vvClientRes.meta.errors[0]
-                    ? vvClientRes.meta.errors[0].reason
-                    : 'unspecified';
-            throw new Error(
-                `AGOLSendUpdatedDataToPendingDataForm: ${shortDescription} error. Status: ${vvClientRes.meta.status}. Reason: ${errorReason}`
-            );
+            const errorReason = vvClientRes.meta.errors && vvClientRes.meta.errors[0] ? vvClientRes.meta.errors[0].reason : 'unspecified';
+            throw new Error(`AGOLSendUpdatedDataToPendingDataForm: ${shortDescription} error. Status: ${vvClientRes.meta.status}. Reason: ${errorReason}`);
         }
         return vvClientRes;
     }
@@ -231,9 +232,7 @@ module.exports.main = async function (vvClient, response, token) {
         if (status != ignoreStatusCode) {
             // If the data property doesn't exist, throw an error
             if (!vvClientRes.data) {
-                throw new Error(
-                    `${shortDescription} data property was not present. Please, check parameters and syntax. Status: ${status}.`
-                );
+                throw new Error(`${shortDescription} data property was not present. Please, check parameters and syntax. Status: ${status}.`);
             }
         }
 
@@ -258,18 +257,14 @@ module.exports.main = async function (vvClient, response, token) {
 
             // If the data is empty, throw an error
             if (isEmptyArray || isEmptyObject) {
-                throw new Error(
-                    `${shortDescription} returned no data. Please, check parameters and syntax. Status: ${status}.`
-                );
+                throw new Error(`${shortDescription} returned no data. Please, check parameters and syntax. Status: ${status}.`);
             }
             // If it is a Web Service response, check that the first value is not an Error status
             if (dataIsArray) {
                 const firstValue = vvClientRes.data[0];
 
                 if (firstValue == 'Error') {
-                    throw new Error(
-                        `${shortDescription} returned an error. Please, check the called Web Service. Status Description: ${vvClientRes.data[1]}.`
-                    );
+                    throw new Error(`${shortDescription} returned an error. Please, check the called Web Service. Status Description: ${vvClientRes.data[1]}.`);
                 }
             }
         }
@@ -278,14 +273,15 @@ module.exports.main = async function (vvClient, response, token) {
 
     function createJsonFormId(fpanId) {
         if (fpanId) {
-            return (jsonFormId = {
+            return jsonFormId = {
+
                 params: JSON.stringify([
                     {
                         parameterName: 'formId',
-                        value: fpanId,
-                    },
-                ]),
-            });
+                        value: fpanId
+                    }
+                ])
+            }
         } else {
             return emptyJsonFormId;
         }
@@ -299,20 +295,15 @@ module.exports.main = async function (vvClient, response, token) {
     }
 
     // Generic retry wrapper (exponential backoff + jitter)
-    async function withRetry(
-        fn,
-        {
-            retries = 3, // total attempts = 1 + retries
-            baseDelayMs = 1000,
-            maxDelayMs = 8000,
-            label = 'operation',
-            onRetry = (err, attempt, nextDelay) => {
-                logger.info(
-                    `AGOLSendUpdatedDataToPendingDataForm: [retry] ${label} attempt ${attempt} failed: ${err?.message || err}. Retrying in ${nextDelay}ms...`
-                );
-            },
-        } = {}
-    ) {
+    async function withRetry(fn, {
+        retries = 3,               // total attempts = 1 + retries
+        baseDelayMs = 1000,
+        maxDelayMs = 8000,
+        label = "operation",
+        onRetry = (err, attempt, nextDelay) => {
+            logger.info(`AGOLSendUpdatedDataToPendingDataForm: [retry] ${label} attempt ${attempt} failed: ${err?.message || err}. Retrying in ${nextDelay}ms...`);
+        }
+    } = {}) {
         let attempt = 0;
         let delay = baseDelayMs;
 
@@ -364,7 +355,7 @@ module.exports.main = async function (vvClient, response, token) {
 
     function createDocName(formName, currentDate) {
         const currentDateTime = currentDate.toISOString();
-        let docName = formName + '_' + currentDateTime;
+        let docName = formName + "_" + currentDateTime;
         // Create document in the VV Document Library
         return docName;
     }
@@ -413,6 +404,7 @@ module.exports.main = async function (vvClient, response, token) {
             .then((res) => checkDataIsNotEmpty(res, shortDescription));
     }
 
+
     async function putUpdatedFormDataInVVDocLib(docName, folderId, failedData) {
         const docData = await postDoc(docName, folderId);
 
@@ -426,9 +418,9 @@ module.exports.main = async function (vvClient, response, token) {
         const shortDescription = `Post form ${templateName}`;
         const newRecordData = {
             // You can convert these values or this object to arguments of this function
-            CSVFileDocumentId: csvData.data.documentId,
-            CSVFileName: csvData.data.fileName,
-            AGOLCSVFileName: title,
+            'CSVFileDocumentId': csvData.data.documentId,
+            'CSVFileName': csvData.data.fileName,
+            'AGOLCSVFileName': title
         };
 
         return vvClient.forms
@@ -441,26 +433,29 @@ module.exports.main = async function (vvClient, response, token) {
     }
 
     async function postCSVFileToDocLib(GISQueries) {
+
         const succeeded = [];
         const failed = [];
-        const skipped = []; // items attempted but skipped (e.g., 0 rows)
+        const skipped = [];  // items attempted but skipped (e.g., 0 rows)
 
         let i = 0; //index
 
-        let cqNameAll = '';
+        let cqNameAll = "";
+
+
 
         for (const { title, cqName } of GISQueries) {
             //Can change to GIS_GetCount_ and GIS_GetAll_ to retrieve all records instead of just 24hr changes
             //2°b Convert GIS_GetCount24_* → GIS_Get24h_* (the “data pull” query name)
             currentTitle = title;
-            cqNameAll = cqName.replace('GIS_GetCount24_', 'GIS_Get24h_');
+            cqNameAll = cqName.replace("GIS_GetCount24_", "GIS_Get24h_");
             currentQueryName = cqNameAll;
 
             try {
                 //2°c Run GIS_GetCount24_* to get total updated row count
                 const totalRecordResponse = await withRetry(() => testCustomQuery(null, cqName), {
                     label: `testCustomQuery(${cqName})`,
-                    retries: 2,
+                    retries: 2
                 });
 
                 let totalRecordCount = 0;
@@ -470,7 +465,7 @@ module.exports.main = async function (vvClient, response, token) {
                     skipped.push({
                         title,
                         cqName,
-                        reason: 'No records returned',
+                        reason: "No records returned"
                     });
                     i++;
                     continue;
@@ -482,10 +477,10 @@ module.exports.main = async function (vvClient, response, token) {
                         skipped.push({
                             title,
                             cqName,
-                            reason: 'No records returned',
+                            reason: "No records returned"
                         });
-                        i++;
-                        continue;
+                            i++;
+                            continue;
                     }
 
                     await streamQueryToChunkedCsvDocs(totalRecordCount, {
@@ -493,7 +488,7 @@ module.exports.main = async function (vvClient, response, token) {
                         totalRecordCount,
                         cqNameAll,
                         folderPath,
-                        maxChunkBytes: 9 * 1024 * 1024,
+                        maxChunkBytes: 9 * 1024 * 1024
                     });
 
                     succeeded.push({ title, cqName });
@@ -503,7 +498,7 @@ module.exports.main = async function (vvClient, response, token) {
             }
             i++;
         }
-        logger.info('AGOLSendUpdatedDataToPendingDataForm: ==== SUMMARY ====');
+        logger.info("AGOLSendUpdatedDataToPendingDataForm: ==== SUMMARY ====");
         logger.info(`AGOLSendUpdatedDataToPendingDataForm: Total:     ${GISQueries.length}`);
         logger.info(`AGOLSendUpdatedDataToPendingDataForm: Succeeded: ${succeeded.length}`);
         logger.info(`AGOLSendUpdatedDataToPendingDataForm: Skipped:   ${skipped.length}`);
@@ -525,10 +520,10 @@ module.exports.main = async function (vvClient, response, token) {
 
     async function sendNotificationEmail(emailTemplate, tokens) {
         const emailRequestArr = [
-            { name: 'Email Name', value: emailTemplate['email Name'] },
+            { name: 'Email Name', value: emailTemplate["email Name"] },
             { name: 'Tokens', value: tokens },
-            { name: 'Email Address', value: emailTemplate['send To'] },
-            { name: 'Email AddressCC', value: emailTemplate['send CC'] },
+            { name: 'Email Address', value: emailTemplate["send To"] },
+            { name: 'Email AddressCC', value: emailTemplate["send CC"] },
             { name: 'SendDateTime', value: new Date().toISOString() },
             {
                 name: 'OTHERFIELDSTOUPDATE',
@@ -550,18 +545,19 @@ module.exports.main = async function (vvClient, response, token) {
     //Using the replaces function to make names under the 55 character limit in VV's database
     function replace_WA_Adpx(tableName) {
         return tableName
-            .replace(/\bApdx\b/g, 'Appendix')
-            .replace(/\bWa\b/g, 'Washington')
-            .replace(/\bNat\b/g, 'Natural')
-            .replace(/\bReg\b/g, 'Regeneration')
-            .replace(/\bEA\b/g, 'Eastern')
-            .replace(/\bPrac\b/g, 'Practices')
-            .replace(/\bFor\b/g, 'Forest')
-            .replace(/\bForry\b/g, 'Forestry');
+            .replace(/\bApdx\b/g, "Appendix")
+            .replace(/\bWa\b/g, "Washington")
+            .replace(/\bNat\b/g, "Natural")
+            .replace(/\bReg\b/g, "Regeneration")
+            .replace(/\bEA\b/g, "Eastern")
+            .replace(/\bPrac\b/g, "Practices")
+            .replace(/\bFor\b/g, "Forest")
+            .replace(/\bForry\b/g, "Forestry");
+
     }
 
     function utf8Bytes(str) {
-        return Buffer.byteLength(str, 'utf8');
+        return Buffer.byteLength(str, "utf8");
     }
 
     function makeHeaderCsv(columns, { bom = true } = {}) {
@@ -581,16 +577,16 @@ module.exports.main = async function (vvClient, response, token) {
         folderId,
         currentDate,
         batchId,
-        flushChunk, // async ({ csv, chunkIndex, chunkCountUnknownYet }) => void
+        flushChunk,   // async ({ csv, chunkIndex, chunkCountUnknownYet }) => void
         bomEveryChunk = true, // set false if you only want BOM on chunk 1
     }) {
-        if (!columns || columns.length === 0) throw new Error('columns required');
+        if (!columns || columns.length === 0) throw new Error("columns required");
 
         let chunkIndex = 0;
         let headerCsv = makeHeaderCsv(columns, { bom: true });
         let headerBytes = utf8Bytes(headerCsv);
 
-        let parts = []; // array of csv lines (strings)
+        let parts = [];          // array of csv lines (strings)
         let sizeBytes = headerBytes;
 
         async function flush() {
@@ -598,9 +594,9 @@ module.exports.main = async function (vvClient, response, token) {
 
             chunkIndex++;
 
-            const bom = bomEveryChunk ? true : chunkIndex === 1;
+            const bom = bomEveryChunk ? true : (chunkIndex === 1);
             const header = makeHeaderCsv(columns, { bom });
-            const csv = header + parts.join('');
+            const csv = header + parts.join("");
 
             // sanity check
             const csvBytes = utf8Bytes(csv);
@@ -612,7 +608,7 @@ module.exports.main = async function (vvClient, response, token) {
 
             // reset for next chunk
             parts = [];
-            headerCsv = header; // reuse last-built header (minor)
+            headerCsv = header;                 // reuse last-built header (minor)
             headerBytes = utf8Bytes(headerCsv);
             sizeBytes = headerBytes;
         }
@@ -645,21 +641,18 @@ module.exports.main = async function (vvClient, response, token) {
 
     //3° Chunk large CSV output into multiple VV documents (≤ ~9MB each)
     // - Needed because AGOL analyze has a 10MB CSV limit
-    async function streamQueryToChunkedCsvDocs(
-        totalRecordCount,
-        {
-            title,
-            cqNameAll, // GIS_GetAll_...
-            folderPath,
-            maxChunkBytes = 9 * 1024 * 1024,
-        }
-    ) {
+    async function streamQueryToChunkedCsvDocs(totalRecordCount,{
+        title,
+        cqNameAll,            // GIS_GetAll_...
+        folderPath,
+        maxChunkBytes = 9 * 1024 * 1024,
+    }) {
         // Ensure folder
         let folderId = await getFolderId(folderPath);
         if (folderId === null) folderId = await createFolder(folderPath, descriptionTest);
 
         const currentDate = new Date();
-        const batchId = crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex');
+        const batchId = (crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString("hex"));
 
         const PAGE_SIZE = 2000;
         let offset = 0;
@@ -668,8 +661,9 @@ module.exports.main = async function (vvClient, response, token) {
         //4°a Create VV Document (postDoc) in folderPath (/FailedToUpdateTableInAGOL)
         // A small helper that actually writes one chunk to VV + pending form
         const flushChunk = async ({ csv, chunkIndex, batchId }) => {
-            const docName = `${createDocName(title, currentDate)}__batch_${batchId}__part_${String(chunkIndex).padStart(3, '0')}`;
-
+            const docName =
+                `${createDocName(title, currentDate)}__batch_${batchId}__part_${String(chunkIndex).padStart(3, "0")}`;
+            
             //4°b Upload CSV file bytes to that document (postFile)
             const fileDataResponse = await putUpdatedFormDataInVVDocLib(docName, folderId, csv);
 
@@ -685,7 +679,7 @@ module.exports.main = async function (vvClient, response, token) {
                 batchId,
                 chunkIndex,
                 // chunkCount unknown at this moment (unless you buffer all chunks)
-                sourceCqName: cqNameAll,
+                sourceCqName: cqNameAll
             });
 
             if (!pendingDataForAGOLResponse?.instanceName) {
@@ -698,7 +692,7 @@ module.exports.main = async function (vvClient, response, token) {
         const seen = new Set(); // to acccount for potential duplicates
 
         while (offset < totalRecordCount) {
-            const query = { sort: 'vvCreateDate', sortdir: 'desc', limit: PAGE_SIZE, offset };
+            const query = { sort: "vvCreateDate", sortdir: "desc", limit: PAGE_SIZE, offset };
             const rows = await getCustomQueryByPagination(cqNameAll, query);
 
             if (!rows || rows.length === 0) break;
@@ -726,11 +720,11 @@ module.exports.main = async function (vvClient, response, token) {
 
                 const { needsFlush } = writer.addRow(row);
                 if (needsFlush) {
-                    await writer.flush(); // flush current chunk
+                    await writer.flush();           // flush current chunk
                     const again = writer.addRow(row); // re-add row (it fits in empty chunk)
                     if (again.needsFlush) {
                         // Should never happen because we check single-row oversize
-                        throw new Error('Unexpected: row still needsFlush after flush()');
+                        throw new Error("Unexpected: row still needsFlush after flush()");
                     }
                 }
             }
@@ -751,12 +745,13 @@ module.exports.main = async function (vvClient, response, token) {
     /* -------------------------------------------------------------------------- */
 
     try {
+
         //If there is ever a need to do a full migration of all records use the query
         //GetAGOLCountCustomQueryNames this will return the total record count for each form
         //Then use the GIS_GetAll_ custom queries to pull all records from each form
 
         //1° Retrieve list of “count” custom queries for last-24hr changes (GetAGOLCount24CustomQueryNames)
-        const customQueryNames = await testCustomQuery(null, 'GetAGOLCount24CustomQueryNames');
+        const customQueryNames = await testCustomQuery(null, "GetAGOLCount24CustomQueryNames");
 
         //2° For each form/table returned, build GISQueries array
         for (const row of customQueryNames) {
@@ -766,17 +761,17 @@ module.exports.main = async function (vvClient, response, token) {
             const fullTableName = replace_WA_Adpx(tableName);
             const customQuery = {
                 title: fullTableName,
-                cqName: cqName,
-            };
+                cqName: cqName
+            }
             GISQueries.push(customQuery);
         }
 
         summary = await postCSVFileToDocLib(GISQueries);
 
-        statusMessage = 'Completed all queries.';
+        statusMessage = "Completed all queries."
 
-        if (summary.failed.length > 0) {
-            throw new Error('One or more queries failed. See summary for details.');
+        if(summary.failed.length > 0){
+            throw new Error("One or more queries failed. See summary for details.");
         }
 
         // You will see the responseMessage in the scheduled process log ONLY if the process runs automatically.
@@ -794,44 +789,36 @@ module.exports.main = async function (vvClient, response, token) {
         //       -  skipped (Name of skipped queries)
         //       -  failed (Name of failed queries)
         logger.error(`AGOLSendUpdatedDataToPendingDataForm: Error encountered ${error}`);
-        logger.error('Scheduled Service: AGOLSendUpdatedDataToPendingDataForm failed!');
+        logger.error("Scheduled Service: AGOLSendUpdatedDataToPendingDataForm failed!");
 
-        logger.error('AGOLSendUpdatedDataToPendingDataForm: ==== SUMMARY ====');
+        logger.error("AGOLSendUpdatedDataToPendingDataForm: ==== SUMMARY ====");
         logger.error(`AGOLSendUpdatedDataToPendingDataForm: Total:     ${GISQueries.length}`);
         logger.error(`AGOLSendUpdatedDataToPendingDataForm: Succeeded: ${summary?.succeeded.length}`);
         logger.error(`AGOLSendUpdatedDataToPendingDataForm: Skipped:   ${summary?.skipped.length}`);
         logger.error(`AGOLSendUpdatedDataToPendingDataForm: Failed:    ${summary?.failed.length}`);
 
-        const emailTemplate = await testCustomQuery(null, 'GISGetSQLUpdatedDataFailedEmail');
+
+        const emailTemplate = await testCustomQuery(null, "GISGetSQLUpdatedDataFailedEmail");
         const currentEnv = detectEnvironment(vvClient);
 
         const tokens = [
-            {
-                name: 'message',
-                value:
-                    error +
-                    ' .Failed during ' +
-                    currentQueryName +
-                    '.Failed to query updated data for ' +
-                    currentEnv +
-                    ' AGOL tables',
-            },
-            { name: 'environment', value: currentEnv },
-            { name: 'failedAtTitle', value: currentTitle },
-            { name: 'failedAtQuery', value: currentQueryName },
-            { name: 'succeeded', value: JSON.stringify(summary?.succeeded || [], null, 2) },
-            { name: 'skipped', value: JSON.stringify(summary?.skipped || [], null, 2) },
-            { name: 'failed', value: JSON.stringify(summary?.failed || [], null, 2) },
-        ];
+            { name: 'message', value: error + " .Failed during " + currentQueryName + ".Failed to query updated data for " + currentEnv + " AGOL tables" },
+            { name: "environment", value: currentEnv },
+            { name: "failedAtTitle", value: currentTitle },
+            { name: "failedAtQuery", value: currentQueryName },
+            { name: "succeeded", value: JSON.stringify(summary?.succeeded || [], null, 2) },
+            { name: "skipped", value: JSON.stringify(summary?.skipped || [], null, 2) },
+            { name: "failed", value: JSON.stringify(summary?.failed || [], null, 2) }
+        ]
 
-        await sendNotificationEmail(emailTemplate[0], tokens);
+        await sendNotificationEmail(emailTemplate[0], tokens)
 
         // BUILD THE ERROR RESPONSE ARRAY
 
         outputCollection[0] = 'Error'; // Don´t change this
 
         if (error?.originalMessage) {
-            error = error.name + ' ' + error.originalMessage;
+            error = error.name + " " + error.originalMessage;
         } else {
             error = error.message;
         }
@@ -839,11 +826,13 @@ module.exports.main = async function (vvClient, response, token) {
         if (errorLog.length > 0) {
             responseMessage = `Some errors occurred. Error/s: ${errorLog.join('; ')}`;
         } else {
-            responseMessage = error.message ? error.message : `Unhandled error occurred: ${error}`;
+            responseMessage = error.message
+                ? error.message
+                : `Unhandled error occurred: ${error}`;
         }
         logger.info(`End of the process AGOLSendUpdatedDataToPendingDataForm at ${Date()}`);
 
         // You will see the responseMessage in the scheduled process log ONLY if the process runs automatically.
         return vvClient.scheduledProcess.postCompletion(scheduledProcessGUID, 'complete', false, responseMessage);
     }
-};
+}

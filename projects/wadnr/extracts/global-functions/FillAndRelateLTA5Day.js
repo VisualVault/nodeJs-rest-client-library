@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.FillAndRelateLTA5Day
  * Parameters: 0
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function () {
 const templateId = "c0b92b5e-c0fa-ef11-aa7f-874c1b64b9a4";

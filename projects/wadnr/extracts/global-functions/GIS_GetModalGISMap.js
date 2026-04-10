@@ -1,9 +1,10 @@
 /**
  * VV.Form.Global.GIS_GetModalGISMap
  * Parameters: 3
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (mapViewManager, portalID, fpId) {
+/* eslint-disable no-unused-vars */
 /*Function Name:   GIS_GetModalGISMap
   Customer:       WA FNR: fpOnline
   Purpose:        Display a GIS map from ArcGISOnline's APIs / SDKs to allow the user to create a map
@@ -23,9 +24,6 @@ function (mapViewManager, portalID, fpId) {
                  fpId     - FPAN Id
     
   Return:         modalObject. Returns back the map 
-
-    04/08/2026 - Ross Rhone: Making this UI mobile friendly                         
-
 */
 
 /* -------------------------------------------------------------------------- */
@@ -44,188 +42,129 @@ function injectActivityMapResponsiveStyles() {
   const style = document.createElement("style");
   style.id = "activity-map-responsive-style";
   style.textContent = `
-    .activity-map-container {
-      padding: 0.5rem !important;
-      align-items: stretch !important;
-      box-sizing: border-box;
-    }
-
-    .activity-map-modal,
-    .activity-map-modal.swal2-popup,
-    .activity-map-shell,
-    .activity-map-shell-container {
-      width: 100%;
-      min-height: calc(var(--vv-activity-map-vh, 1vh) * 100 - 1rem);
-      height: calc(var(--vv-activity-map-vh, 1vh) * 100 - 1rem);
-      max-height: calc(var(--vv-activity-map-vh, 1vh) * 100 - 1rem);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .activity-map-modal,
-    .activity-map-modal.swal2-popup {
-      width: min(96vw, 90rem) !important;
-      max-width: min(96vw, 90rem) !important;
-      margin: 0 auto !important;
-    }
-
-    .activity-map-shell,
-    .activity-map-shell-container,
-    #calcite-shell-map-container {
-      min-width: 0;
-      min-height: 0;
-    }
-
-    .activity-map-shell calcite-navigation {
-      flex: 0 0 auto;
-    }
-
     .activity-map-shell-panel {
-      --calcite-shell-panel-width: min(20rem, 32vw);
-      --calcite-shell-panel-min-width: min(16rem, 28vw);
-      max-width: min(20rem, 32vw);
       height: 100%;
-      max-height: 100%;
+    }
+
+    .activity-map-shell-panel calcite-panel::part(content),
+    .activity-map-shell-panel calcite-panel::part(content-container) {
+      min-height: 0;
       overflow: hidden;
     }
 
-    .activity-map-panel-content,
-    .activity-map-whitebox {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
+    .activity-map-widget-panel,
+    .activity-map-scroll-region,
+    .activity-map-widget-panel .esri-layer-list,
+    .activity-map-widget-panel .esri-layer-list__list,
+    .activity-map-widget-panel .esri-basemap-gallery,
+    .activity-map-widget-panel .esri-basemap-gallery__items {
       min-height: 0;
-      overflow: auto;
-      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .activity-map-search-panel {
-      display: flex;
-      flex-direction: column;
+    .activity-map-shell-panel .draw-grid {
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 1rem;
+      padding: 0.75rem;
+      align-content: start;
     }
 
-    .activity-map-search-section {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .activity-map-search-section > p,
-    .activity-map-search-section > label,
-    .activity-map-whitebox > p,
-    .activity-map-whitebox > label {
-      margin: 0;
-    }
-
-    .activity-map-search-section calcite-select,
-    .activity-map-search-section calcite-combobox,
-    .activity-map-search-section calcite-input,
-    .activity-map-search-section calcite-text-area,
-    .activity-map-search-section .esri-search,
-    .activity-map-whitebox calcite-select,
-    .activity-map-whitebox calcite-combobox,
-    .activity-map-whitebox calcite-input,
-    .activity-map-whitebox calcite-text-area,
-    .activity-map-whitebox .esri-search {
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-
-    .activity-map-toolbar {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      padding: 0.5rem;
-    }
-
-    .draw-grid {
-      gap: 0.75rem !important;
-    }
-
-    .draw-grid calcite-button {
+    .activity-map-shell-panel .draw-grid calcite-button {
       width: 100%;
       min-height: 44px;
     }
 
-    .activity-map-print-form {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .activity-map-print-form calcite-radio-button-group {
-      width: 100%;
-    }
-
-    .activity-map-alert.esri-component {
-      width: min(24rem, calc(100vw - 2rem));
-      max-width: min(24rem, calc(100vw - 2rem));
-    }
-
-    .activity-map-shell .esri-ui,
-    .activity-map-shell .esri-ui-inner-container,
-    .activity-map-shell .esri-search {
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-
-    .activity-map-shell .esri-ui-top-right,
-    .activity-map-shell .esri-ui-top-left {
-      max-width: calc(100% - 0.5rem);
-    }
-
-    @media (max-width: 1024px) {
-      .activity-map-container {
-        padding: 0 !important;
+    @media (pointer: coarse) and (orientation: portrait) and (min-width: 641px) {
+      .swal2-popup {
+        width: min(94vw, 52rem) !important;
+        max-width: min(94vw, 52rem) !important;
       }
 
-      .activity-map-modal,
-      .activity-map-modal.swal2-popup {
-        width: 100vw !important;
-        max-width: 100vw !important;
-        min-height: calc(var(--vv-activity-map-vh, 1vh) * 100) !important;
-        height: calc(var(--vv-activity-map-vh, 1vh) * 100) !important;
-        max-height: calc(var(--vv-activity-map-vh, 1vh) * 100) !important;
-        border-radius: 0 !important;
+      .activity-map-scroll-region {
+        max-height: calc(var(--vv-activity-map-vh, 1vh) * 100 - 12rem);
+      }
+
+      .activity-map-shell-panel .draw-grid {
+        gap: 0.35rem;
+        padding: 0.35rem;
+      }
+
+      .activity-map-shell-panel .draw-grid calcite-button {
+        min-height: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (pointer: coarse) and (orientation: landscape) and (max-width: 1400px) {
+      .swal2-popup {
+        width: min(96vw, 64rem) !important;
+        max-width: min(96vw, 64rem) !important;
+      }
+
+      .activity-map-scroll-region,
+      .activity-map-widget-panel,
+      .activity-map-widget-panel .esri-layer-list,
+      .activity-map-widget-panel .esri-layer-list__list,
+      .activity-map-widget-panel .esri-basemap-gallery,
+      .activity-map-widget-panel .esri-basemap-gallery__items {
+        max-height: calc(var(--vv-activity-map-vh, 1vh) * 100 - 11rem);
+      }
+
+      .activity-map-shell-panel .draw-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0.75rem;
+      }
+
+      .activity-map-shell-panel .draw-grid calcite-button {
+        min-height: 44px;
+        height: 44px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .swal2-popup {
+        width: min(96vw, 32rem) !important;
+        max-width: min(96vw, 32rem) !important;
       }
 
       .activity-map-shell-panel {
-        --calcite-shell-panel-width: min(14rem, 36vw);
-        --calcite-shell-panel-min-width: min(12rem, 32vw);
-        max-width: min(14rem, 36vw);
+        --calcite-shell-panel-width: min(18rem, 82vw);
+        --calcite-shell-panel-min-width: min(18rem, 82vw);
       }
 
-      .activity-map-panel-content,
-      .activity-map-whitebox {
-        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
-        -webkit-overflow-scrolling: touch;
+      .activity-map-scroll-region,
+      .activity-map-widget-panel,
+      .activity-map-widget-panel .esri-layer-list,
+      .activity-map-widget-panel .esri-layer-list__list,
+      .activity-map-widget-panel .esri-basemap-gallery,
+      .activity-map-widget-panel .esri-basemap-gallery__items {
+        max-height: calc(var(--vv-activity-map-vh, 1vh) * 100 - 11rem);
       }
 
-      .draw-grid calcite-button {
-        min-height: 48px;
+      .esri-search {
+        max-width: min(10.5rem, calc(100vw - 7rem));
+        min-width: 0 !important;
       }
 
-      .activity-map-shell .esri-search {
-        max-width: min(12rem, 48vw);
+      .esri-search,
+      .esri-search__container,
+      .esri-search__input-container {
+        width: min(10.5rem, calc(100vw - 7rem)) !important;
+        max-width: min(10.5rem, calc(100vw - 7rem)) !important;
       }
 
-      .is-select-mode .esri-editor__actions {
-        flex-direction: column;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .activity-map-shell-panel {
-        --calcite-shell-panel-width: min(100vw, 18rem);
-        --calcite-shell-panel-min-width: min(100vw, 18rem);
-        max-width: min(100vw, 18rem);
+      .esri-scale-bar {
+        transform: scale(0.78);
+        transform-origin: left bottom;
       }
     }
   `;
-
   document.head.appendChild(style);
 }
 
@@ -257,6 +196,81 @@ function enforceMapModalHeight() {
   }
 }
 
+function getPolyActivityDomain(layer) {
+
+  const fld = layer.fields.find(f => f.name === "activity_type");
+  if (!fld || !fld.domain || fld.domain.type !== "coded-value") {
+    return null;                               // no domain = exit
+  }
+  return {
+    field: fld,
+    codedValues: fld.domain.codedValues        // [{name,value}, …]
+  };
+}
+
+function showEditorDropDownListPane(show, editorDrawPane, backArrow) {
+  if (editorDrawPane) { editorDrawPane.style.display = show ? "block" : "none"; }
+
+  // Move back arrow into active calcite-flow-item
+  function moveBackArrowIntoEditorUI() {
+    const flowItem = editorDiv.querySelector("calcite-flow-item[selected]");
+    const flowHeader = flowItem?.shadowRoot?.querySelector(".header") ||
+      flowItem?.querySelector(".esri-editor__panel-content");
+
+    if (flowHeader && !flowHeader.contains(backArrow)) {
+      flowHeader.prepend(backArrow);
+      backArrow.style.display = "block"; // ✅ Ensure it shows
+    }
+  }
+
+  if (editorDiv.querySelector("calcite-flow-item[selected]")) {
+    moveBackArrowIntoEditorUI();
+  } else {
+    const observer = new MutationObserver(() => {
+      const readyItem = editorDiv.querySelector("calcite-flow-item[selected]");
+      if (readyItem) {
+        observer.disconnect();
+        moveBackArrowIntoEditorUI();
+      }
+    });
+    observer.observe(editorDiv, { childList: true, subtree: true });
+  }
+}
+/* ------------------------------------------------------------------ */
+/*  Helper: injectDrawGridStyles                                      */
+/* ------------------------------------------------------------------ *
+ * Creates a <style> tag on‑the‑fly and pushes all grid / action
+ * styles into <head>.  Brand colors can be overridden in one place.
+ */
+function injectDrawGridStyles(opts = {}) {
+  const css = `
+    /*  grid wrapper  */
+    .draw-grid {
+      display: grid;
+      grid-template-columns: 1fr;               /* 👈 always one column */
+      gap: 3.0rem;
+      padding: .75rem;
+    }
+    /*  make every button fill its grid cell  */
+    .draw-grid calcite-button {
+      width: 100%;
+      height: 48px;             /* consistent vertical rhythm */
+      --calcite-color-brand: ${opts.brandColor || "#236d9e"};
+      --calcite-color-brand-hover: ${opts.brandHover || "#184d73"};
+    }
+    /*  1‑column stack on narrow screens  */
+    @media (max-width: 480px) {
+      .draw-grid { grid-template-columns: 1fr; }
+    }
+  `;
+  if (!document.getElementById("draw-grid-style")) {
+    const style = document.createElement("style");
+    style.id = "draw-grid-style";
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+}
+
 function loadSavedMap(viewpoint, view) {
    const viewpointJSON = JSON.parse(viewpoint);
 
@@ -273,6 +287,8 @@ function createMapView(mapViewManager, portalID, fpId, token, calciteDivs) {
   let attempt    = 1;
   let savedMapView = "";
   let lastError = null;
+  let guid; // used when reading saved map view
+
   function wait(ms) {
     return new Promise(function (resolve) { setTimeout(resolve, ms); });
   }
@@ -387,10 +403,31 @@ function createMapView(mapViewManager, portalID, fpId, token, calciteDivs) {
   return attemptRun();
 }
 
+
+let zoomInBtn, zoomOutBtn;
+function onZoomIn() { mapViewManager.view.goTo({ zoom: mapViewManager.view.zoom + 1 }); }
+function onZoomOut() { mapViewManager.view.goTo({ zoom: mapViewManager.view.zoom - 1 }); }
+
 /* -------------------------------------------------------------------------- */
 /*                              Config Variables                              */
 /* -------------------------------------------------------------------------- */
 
+// Globally available SweetAlert2 toast mixin
+const SwalAlert = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  }
+});
+
+let layerListEl;
+let editorDropDownListPane;                         // one pane reused for each layer
+let pickedActivityType;
 let guid;
 const webServiceName = "ActivityMapUpdateMapView";
 
@@ -399,20 +436,10 @@ const webServiceName = "ActivityMapUpdateMapView";
 /* -------------------------------------------------------------------------- */
 
 const modalObject = {
-  Title: 'Map',
-  HtmlContent: '<calcite-shell id="calcite-shell-map" class="activity-map-shell" style="width: 100%; height: 100%"></calcite-shell>',
-  Width: '96%',
+  Title: '',
+  HtmlContent: '<calcite-shell id="calcite-shell-map" style="width: 100%; height: 100%"></calcite-shell>',
+  Width: '80%',
   didOpen: function () {
-    const container = document.querySelector(".swal2-container");
-    if (container) {
-      container.classList.add("activity-map-container");
-    }
-
-    const popup = document.querySelector(".swal2-popup");
-    if (popup) {
-      popup.classList.add("activity-map-modal");
-    }
-
     if (!window.__activityMapResizeBound) {
       window.addEventListener("resize", setMapViewportHeightVar);
       window.__activityMapResizeBound = true;
@@ -424,7 +451,7 @@ const modalObject = {
   initializeMap: function () {
 
     if (mapViewManager.map && mapViewManager.view) {
-      mapViewManager.view.container = "calcite-shell-map-container";
+      mapViewManager.view.container = "calcite-shell-map";
 
       const shell = document.querySelector('calcite-shell');
       shell.appendChild(mapViewManager.calciteAppNav);
@@ -432,6 +459,8 @@ const modalObject = {
 
       // ✅ Check if UI's pane (or other layout elements) were lost after modal close
       if (mapViewManager.editor) {
+
+        const editorDiv = document.getElementById("editorDiv");
         let editor = mapViewManager.editor;
         if (mapViewManager.stateBeforeClose === "creating-features") {
           editor.startCreateFeaturesWorkflowAtFeatureCreation({
@@ -563,6 +592,58 @@ const modalObject = {
       mapViewManager.stateBeforeClose = previousState;
     }
 
+    // Triggering download of features if needed
+    //downloadFeatures(); turning off for now
+
+    function downloadFeatures() {
+      const webmap = mapViewManager.map;
+      const collectedFeatures = [];
+
+      const layers = webmap.layers.items;
+      const promises = [];
+
+      if (mapViewManager.map) {
+        mapViewManager.map = null;
+      }
+
+      layers.forEach(function (layer) {
+        // Check if the layer's title starts with "edit"
+        if (/^edit/i.test(layer.title) || (layer.type === 'feature' && layer.userUploaded)) {
+          const query = layer.createQuery();
+          query.returnGeometry = true;
+          query.outFields = ['*'];
+          const promise = layer.queryFeatures(query).then(function (result) {
+            collectedFeatures.push(...result.features);
+          });
+          promises.push(promise);
+        }
+      });
+
+      Promise.all(promises).then(function () {
+        if (collectedFeatures.length === 0) {
+          SwalAlert.fire({
+            icon: "error",
+            title: "No features to download."
+          });
+        } else {
+          const esriJSON = modalObject.getEsriJSON(collectedFeatures);
+          VV.Form.SetFieldValue('JSONTextBox', JSON.stringify(esriJSON), false);
+        }
+      }).catch(function (error) {
+        console.error("Error querying features:", error);
+        SwalAlert.fire({
+          icon: "error",
+          title: "Error downloading features."
+        });
+      });
+
+
+      // Remove listeners to avoid leaks / duplicate zooms next time
+      if (zoomInBtn) zoomInBtn.removeEventListener("click", onZoomIn);
+      if (zoomOutBtn) zoomOutBtn.removeEventListener("click", onZoomOut);
+
+      zoomInBtn = zoomOutBtn = null;   // free references
+    }
   },
   getEsriJSON: function (features) {
     const esriJSONFeatures = features.map(function (feature) {

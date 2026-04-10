@@ -3,19 +3,19 @@
  * Category: Scheduled
  * Modified: 2026-01-13T21:37:42.793Z by roobini.krishnandam@visualvault.com
  * Script ID: Script Id: 49787d34-7e91-ef11-82b1-b3f8aa6cdd67
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-10
  */
 var logger = require('../log');
 
 module.exports.getCredentials = function () {
-    var options = {};
-    options.customerAlias = 'WADNR';
-    options.databaseAlias = 'fpOnline';
-    options.userId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
-    options.password = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
-    options.clientId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
-    options.clientSecret = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
-    return options;
+  var options = {};
+  options.customerAlias = 'WADNR';
+  options.databaseAlias = 'fpOnline';
+  options.userId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
+  options.password = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
+  options.clientId = '09f356bb-3f44-49b1-a55f-d2caa2de9cc1';
+  options.clientSecret = 'xlzFwRAIHZS9FYC/tqTWs+1IgQFpwG+pWNNW9VQaYSo=';
+  return options;
 };
 
 module.exports.main = async function (vvClient, response, token) {
@@ -54,7 +54,7 @@ module.exports.main = async function (vvClient, response, token) {
 
     response.json(
         '200',
-        'Process started, please check back in this log for more information as the process completes.'
+        'Process started, please check back in this log for more information as the process completes.',
     );
 
     //CONFIGURABLE VALUES IN THE FOLLOWING AREA.
@@ -91,10 +91,15 @@ module.exports.main = async function (vvClient, response, token) {
         var queryparams = {};
 
         //Run query to get the communication log items.
-        let commLogs = await vvClient.customQuery.getCustomQueryResultsByName(commLogQuery, queryparams);
+        let commLogs = await vvClient.customQuery.getCustomQueryResultsByName(
+            commLogQuery,
+            queryparams,
+        );
         var responseItem = JSON.parse(commLogs);
         if (responseItem.meta.status !== 200) {
-            throw new Error('Error encountered when running the query to get communication logs that need to be sent.');
+            throw new Error(
+                'Error encountered when running the query to get communication logs that need to be sent.',
+            );
         }
 
         if (responseItem.data.length === 0) {
@@ -115,10 +120,15 @@ module.exports.main = async function (vvClient, response, token) {
 
                 //Fetch Docs
                 var getRelatedDocsParams = {};
-                let relatedDocs = await vvClient.forms.getFormRelatedDocs(locItem.dhid, getRelatedDocsParams);
+                let relatedDocs = await vvClient.forms.getFormRelatedDocs(
+                    locItem.dhid,
+                    getRelatedDocsParams,
+                );
                 var docResp = JSON.parse(relatedDocs);
                 if (docResp.meta.status !== 200) {
-                    throw new Error('The call to get related documents for email returned with an error.');
+                    throw new Error(
+                        'The call to get related documents for email returned with an error.',
+                    );
                 }
                 let docsData = docResp.data;
 
@@ -190,10 +200,14 @@ module.exports.main = async function (vvClient, response, token) {
                         null,
                         updateObj,
                         commLogTemplateID,
-                        locItem.dhid
+                        locItem.dhid,
                     );
                     if (updateRecordResp.meta.status !== 201) {
-                        throw new Error('Error updating record ' + locItem['comm Log ID'] + ' after emails were sent.');
+                        throw new Error(
+                            'Error updating record ' +
+                                locItem['comm Log ID'] +
+                                ' after emails were sent.',
+                        );
                     }
                 }
             } catch (err) {
@@ -206,11 +220,16 @@ module.exports.main = async function (vvClient, response, token) {
             //Errors captured
             logger.info(JSON.stringify(errorLog));
             throw new Error(
-                'Error encountered during processing.  Please contact support to troubleshoot the errors that are occurring.'
+                'Error encountered during processing.  Please contact support to troubleshoot the errors that are occurring.',
             );
         } else {
             // response.json('200', 'Emails processed successfully');
-            return vvClient.scheduledProcess.postCompletion(token, 'complete', true, 'Emails processed successfully');
+            return vvClient.scheduledProcess.postCompletion(
+                token,
+                'complete',
+                true,
+                'Emails processed successfully',
+            );
         }
     } catch (err) {
         // Return errors captured.
@@ -218,7 +237,7 @@ module.exports.main = async function (vvClient, response, token) {
             token,
             'complete',
             true,
-            'Error encountered during processing.  Error was ' + err
+            'Error encountered during processing.  Error was ' + err,
         );
     }
 };

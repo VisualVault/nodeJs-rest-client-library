@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.BlankFields
  * Parameters: 3
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (arrayOfNameFields, executeEvaluateGroupConditions, executeOnChange) {
 /*

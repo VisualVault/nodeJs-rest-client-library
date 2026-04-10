@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.RRCGetSelectedRows
  * Parameters: 2
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (gridControl, expandRowData) {
 // RRGetSelectedRows for Global - Returns an array of dataIds (revisionIds) from all the currently-selected rows.

@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.ValidateCheckboxFields
  * Parameters: 3
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (CheckboxFields, ControlName, RunAll) {
 /**

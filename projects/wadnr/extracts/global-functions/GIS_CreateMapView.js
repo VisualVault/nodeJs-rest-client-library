@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.GIS_CreateMapView
  * Parameters: 2
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (portalId, token) {
   /*Function Name:   GIS_CreateMapView

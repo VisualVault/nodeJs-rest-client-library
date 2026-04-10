@@ -1,7 +1,7 @@
 /**
  * VV.Form.Global.SetRadioCheckbox
  * Parameters: 2
- * Extracted from WADNR (vv5dev/fpOnline) on 2026-04-08
+ * Extracted: 2026-04-10
  */
 function (checkboxName, radioCheckboxNames) {
 /* SetRadioCheckbox - Sets a checkbox and unchecks all other checkboxes in its group. Ideally used in a template function 
