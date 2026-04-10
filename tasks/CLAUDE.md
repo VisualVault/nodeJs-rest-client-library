@@ -21,6 +21,7 @@ Execution output bound to a specific customer or environment — actual observed
 | Artifact type    | Location                                                    |
 | ---------------- | ----------------------------------------------------------- |
 | Run files        | `projects/{customer}/testing/{task}/{component}/runs/`      |
+| Per-task rollup  | `projects/{customer}/testing/{task}/status.md`              |
 | Per-env status   | `projects/{customer}/testing/{task}/{component}/status.md`  |
 | Session evidence | `projects/{customer}/testing/{task}/{component}/results.md` |
 | Customer impact  | `projects/{customer}/analysis/`                             |

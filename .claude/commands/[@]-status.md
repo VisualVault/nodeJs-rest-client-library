@@ -34,12 +34,13 @@ ahead_behind=$(git rev-list --left-right --count origin/$branch...$branch 2>/dev
 
 - Read the Scope table to get component statuses
 - Read the "Next Steps" section (last ~5 lines of the section)
-- For each `tasks/*/forms-calendar/matrix.md`, `tasks/*/web-services/matrix.md`, `tasks/*/dashboards/matrix.md`: extract line 6 which contains `Total slots: N | Done: M (NP/NF)` or similar
+- For execution coverage: read `projects/*/testing/{task}/status.md` (rollup files). These have per-component pass/fail/pending totals. Aggregate across projects if multiple exist.
 
 **3. Active projects** — for each `projects/*/`:
 
 - Read `CLAUDE.md` for environment info
 - For each `extracts/*/manifest.json`: extract `generatedAt` and item count
+- For each `testing/*/status.md` (task rollup files): extract component summary table
 
 **4. Recent activity:**
 
@@ -109,12 +110,9 @@ done
 
 In addition to the default task row, include:
 
-**1. Per-component matrix coverage:**
+**1. Per-project execution status:**
 
-For each matrix.md in the task, extract:
-
-- Line 6 (summary line with total/done/pass/fail)
-- The Coverage Summary table (the category-level breakdown)
+For each `projects/*/testing/{task}/status.md` (rollup files), extract the Summary table. Show one section per project.
 
 **2. "What Has NOT Been Tested" section** — read verbatim from the task's CLAUDE.md
 
@@ -131,17 +129,15 @@ git log --oneline -5 -- tasks/{name}/
 ```markdown
 ## Task: {name} — Deep View
 
-### Matrix Coverage
+### Execution Status
 
-**Forms Calendar** ({total} slots: {done} done, {pending} pending)
-| Category | Total | PASS | FAIL | PENDING |
-{rows from Coverage Summary table}
+**EmanuelJofre (vvdemo)** — from `projects/emanueljofre/testing/{task}/status.md`
+| Component | Slots | Executed | PASS | FAIL | Pending | Status |
+{rows from rollup Summary table}
 
-**Web Services** ({total} slots — COMPLETE)
-{same format}
-
-**Dashboards** ({total} slots — COMPLETE)
-{same format}
+**WADNR (vv5dev)** — from `projects/wadnr/testing/{task}/status.md`
+| Component | Slots | Executed | PASS | FAIL | Pending | Status |
+{rows from rollup Summary table}
 
 ### Not Yet Tested
 
@@ -171,9 +167,13 @@ For each `extracts/*/manifest.json`, extract:
 - Generated date
 - For scripts: count of `.js` files on disk vs manifest count
 
-**2. Analysis files** — list files in `analysis/` with sizes
+**2. Testing status:**
 
-**3. Recent commits for this project:**
+For each `testing/*/status.md` (task rollup files), extract the Summary table.
+
+**3. Analysis files** — list files in `analysis/` with sizes
+
+**4. Recent commits for this project:**
 
 ```bash
 git log --oneline -5 -- projects/{name}/
@@ -196,6 +196,11 @@ git log --oneline -5 -- projects/{name}/
 | schedules        | {N} items | {N} .js files  | {date}          |
 | global-functions | —         | {N} .js files  | {date from git} |
 | form-templates   | —         | {N} .xml files | {date from git} |
+
+### Testing
+
+{For each testing/\*/status.md rollup, show the task name and Summary table}
+{If no rollup files exist, show "No test execution data"}
 
 ### Analysis Files
 

@@ -16,10 +16,12 @@ projects/{customer}/
   extracts/              # Extracted data from VV admin panels
   analysis/              # Customer-specific impact assessment
   testing/               # Test execution output (runs, status, session evidence)
-    {task}/{component}/
-      status.md          # Per-slot pass/fail with actual values
-      runs/              # Immutable execution records
-      results.md         # Session log (optional)
+    {task}/
+      status.md          # Task rollup: per-component summary
+      {component}/
+        status.md        # Per-slot pass/fail with actual values
+        runs/            # Immutable execution records
+        results.md       # Session log (optional)
 ```
 
 Activity subfolders (`extracts/`, `analysis/`, `testing/`) are created as needed. Future activities (e.g., `audits/`, `monitoring/`) follow the same pattern.
