@@ -20,7 +20,7 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 
 ```
 tasks/date-handling/
-  analysis/                    # Cross-cutting RCA: temporal-models.md, fix-strategy.md
+  analysis/                    # RCA, fix strategy, leadership recommendation, cross-layer consistency matrix
   forms-calendar/              # Forms investigation: analysis/, matrix.md, test-cases/
   web-services/                # WS investigation: analysis/, matrix.md, test-cases/
   dashboards/                  # Dashboard investigation: analysis/, matrix.md, test-cases/
