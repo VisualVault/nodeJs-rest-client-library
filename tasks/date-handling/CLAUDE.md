@@ -82,11 +82,15 @@ Tests run via Chrome MCP extension or Playwright. Cross-timezone testing require
 - Web service / scheduled script input (Category 10)
 - Preset/Current Date with `enableTime=true` fields — needs new form fields
 - Category 2 legacy typed input (E-H) across all TZs
+- **Mask impact on values (Cat 14)** — `<Mask>MM/dd/yyyy</Mask>` on DateTime fields: does it truncate stored values? 8 WADNR production fields at risk
+- **Kendo v1 vs v2 widget internals (Cat 15)** — EmanuelJofre v1 data not yet captured for comparison
+- **Server TZ on form save pipeline (Cat 16)** — form UI save path (distinct from API write, which was proven TZ-independent)
 
 ### Next Steps
 
-1. **Category 2 — Typed Input legacy (E-H)**: Typed input for legacy configs across BRT, IST, UTC+0.
-2. **Category 10 — Web service input**: How production scripts set dates via Node.js.
-3. **Category 5/6 — DateTime presets**: Requires new test form fields with `enableTime=true` + initial value.
+1. **Category 14 — Mask Impact** (critical): Empirically verify whether masks affect stored values. 8 WADNR DateTime fields have date-only masks.
+2. **Category 15 — Kendo Widget Comparison**: Run audit on EmanuelJofre to complete the v1 vs v2 differential.
+3. **Category 2 — Typed Input legacy (E-H)**: Typed input for legacy configs across BRT, IST, UTC+0.
+4. **Category 10 — Web service input**: How production scripts set dates via Node.js.
 
-See `forms-calendar/matrix.md` for the full test matrix.
+See `forms-calendar/matrix.md` for the full test matrix (269 slots, Cat 1–16).

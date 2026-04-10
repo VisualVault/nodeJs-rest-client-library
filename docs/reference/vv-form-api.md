@@ -51,6 +51,8 @@ The primary developer interface. Contains both own properties (form state) and p
 | `RefreshParentWindowWhenUnloading` | `boolean`  | Whether parent window refreshes on close                                                                                                                                                                 | `true`                                   |
 | `SuppressExtraMessages`            | `boolean`  | Suppresses additional UI messages                                                                                                                                                                        | `false`                                  |
 | `CalendarConditionalGroups`        | `array`    | Calendar conditional group definitions                                                                                                                                                                   | `[]`                                     |
+| `LocalizationResources`            | `object`   | **v6.1+ only.** Localization resource map. Present as empty `{}` on vv5dev (2026-04-10); not present on v5.1 vvdemo. Keys unknown — no configured localization observed yet.                             | `{}`                                     |
+| `LocalizeString`                   | `function` | **v6.1+ only.** String localization helper. Present on vv5dev alongside `LocalizationResources`.                                                                                                         | —                                        |
 
 ### Sub-Objects on `VV.Form`
 

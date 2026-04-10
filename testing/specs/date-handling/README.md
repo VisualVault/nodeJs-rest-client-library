@@ -7,7 +7,7 @@ Automated regression tests for VisualVault Forms calendar field date-handling be
 The VisualVault platform has **16 confirmed date-handling bugs** across Forms (7), Web Services (6), Dashboards (1), and Document Library (2). This test suite:
 
 - Runs the same scenarios across BRT (UTC-3), IST (UTC+5:30), UTC+0, PST/PDT (UTC-8/-7), and JST (UTC+9) to expose timezone-dependent bugs
-- Covers ~242 test slots across 13 categories (popup, typed input, reload, SetFieldValue, GetFieldValue, round-trip, etc.)
+- Covers ~269 test slots across 16 categories (popup, typed input, reload, SetFieldValue, GetFieldValue, round-trip, mask impact, Kendo widget comparison, server TZ)
 - Produces both human-readable test documentation (in `tasks/date-handling/`) and reusable Playwright specs (here)
 
 Full investigation context: `tasks/date-handling/CLAUDE.md`
@@ -60,34 +60,35 @@ Shared config:
 
 ## File Reference
 
-| File                              | Purpose                                                                                 |
-| --------------------------------- | --------------------------------------------------------------------------------------- |
-| `../../fixtures/vv-config.js`     | Shared constants: form URL, field map (A-H), record definitions, saved record URLs      |
-| `../../fixtures/test-data.js`     | All test case definitions as structured data (data-driven parameterization)             |
-| `../../helpers/vv-form.js`        | Generic VV form helpers: navigation, field verification, value capture, save            |
-| `../../helpers/vv-calendar.js`    | Calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input    |
-| `../../global-setup.js`           | Runs before all tests: auth + creates saved records via browser UI per timezone         |
-| `cat-1-calendar-popup.spec.js`    | Category 1 — calendar popup date selection tests (non-legacy Kendo fields)              |
-| `cat-1-legacy-popup.spec.js`      | Category 1 — legacy popup tests for Configs E-H (FORM-BUG-2 audit spec)                 |
-| `cat-2-typed-input.spec.js`       | Category 2 — keyboard segment-by-segment date entry tests                               |
-| `cat-3-server-reload.spec.js`     | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                   |
-| `cat-4-url-params.spec.js`        | Category 4 — URL parameter input tests (TargetDateTest form, `enableQListener=true`)    |
-| `cat-4-fillinrelate.spec.js`      | Category 4 — FillinAndRelate chain tests (source GFV → URL encode → target form)        |
-| `cat-5-preset-date.spec.js`       | Category 5 — preset date default auto-population tests                                  |
-| `cat-6-current-date.spec.js`      | Category 6 — current date default auto-population tests                                 |
-| `cat-7-setfieldvalue.spec.js`     | Category 7 — SetFieldValue input format tests (Date obj, ISO±Z, US, epoch)              |
-| `cat-8-getfieldvalue.spec.js`     | Category 8 — GetFieldValue return value tests                                           |
-| `cat-8b-getdateobject.spec.js`    | Category 8B — GetDateObjectFromCalendar return tests                                    |
-| `cat-9-gfv-roundtrip.spec.js`     | Category 9 — GFV round-trip drift tests (SetFieldValue → GetFieldValue → SetFieldValue) |
-| `cat-9-gdoc-roundtrip.spec.js`    | Category 9-GDOC — GDOC round-trip tests (SetFieldValue → GetDateObject → SetFieldValue) |
-| `cat-11-cross-timezone.spec.js`   | Category 11 — cross-timezone reload, multi-user compound drift, TZ spectrum tests       |
-| `cat-12-edge-cases.spec.js`       | Category 12 — edge case and boundary condition tests                                    |
-| `audit-bug1-tz-stripping.spec.js` | FORM-BUG-1 audit — independent Playwright verification of parseDateString() Z-stripping |
-| `dash-filter.spec.js`             | DB-5 — dashboard SQL filter tests (WHERE clause on date fields)                         |
-| `dash-sort.spec.js`               | DB-4 — dashboard column sort order verification (ascending/descending)                  |
-| `dash-export.spec.js`             | DB-7 — dashboard export verification (Excel, Word, XML vs grid values)                  |
-| `dash-cross-layer.spec.js`        | DB-6 — dashboard vs Forms SPA cross-layer value comparison                              |
-| `doc-index-field-dates.spec.js`   | DOC-BUG-1/2 — document index field date handling (API round-trip, 17 tests)             |
+| File                              | Purpose                                                                                                               |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `../../fixtures/vv-config.js`     | Shared constants: form URL, field map (A-H), record definitions, saved record URLs                                    |
+| `../../fixtures/test-data.js`     | All test case definitions as structured data (data-driven parameterization)                                           |
+| `../../helpers/vv-form.js`        | Generic VV form helpers: navigation, field verification, value capture, save                                          |
+| `../../helpers/vv-calendar.js`    | Calendar helpers: popup selection (date-only + DateTime + legacy popup), typed input                                  |
+| `../../global-setup.js`           | Runs before all tests: auth + creates saved records via browser UI per timezone                                       |
+| `cat-1-calendar-popup.spec.js`    | Category 1 — calendar popup date selection tests (non-legacy Kendo fields)                                            |
+| `cat-1-legacy-popup.spec.js`      | Category 1 — legacy popup tests for Configs E-H (FORM-BUG-2 audit spec)                                               |
+| `cat-2-typed-input.spec.js`       | Category 2 — keyboard segment-by-segment date entry tests                                                             |
+| `cat-3-server-reload.spec.js`     | Category 3 — save/reload value integrity tests (same-TZ and cross-TZ)                                                 |
+| `cat-4-url-params.spec.js`        | Category 4 — URL parameter input tests (TargetDateTest form, `enableQListener=true`)                                  |
+| `cat-4-fillinrelate.spec.js`      | Category 4 — FillinAndRelate chain tests (source GFV → URL encode → target form)                                      |
+| `cat-5-preset-date.spec.js`       | Category 5 — preset date default auto-population tests                                                                |
+| `cat-6-current-date.spec.js`      | Category 6 — current date default auto-population tests                                                               |
+| `cat-7-setfieldvalue.spec.js`     | Category 7 — SetFieldValue input format tests (Date obj, ISO±Z, US, epoch)                                            |
+| `cat-8-getfieldvalue.spec.js`     | Category 8 — GetFieldValue return value tests                                                                         |
+| `cat-8b-getdateobject.spec.js`    | Category 8B — GetDateObjectFromCalendar return tests                                                                  |
+| `cat-9-gfv-roundtrip.spec.js`     | Category 9 — GFV round-trip drift tests (SetFieldValue → GetFieldValue → SetFieldValue)                               |
+| `cat-9-gdoc-roundtrip.spec.js`    | Category 9-GDOC — GDOC round-trip tests (SetFieldValue → GetDateObject → SetFieldValue)                               |
+| `cat-11-cross-timezone.spec.js`   | Category 11 — cross-timezone reload, multi-user compound drift, TZ spectrum tests                                     |
+| `cat-12-edge-cases.spec.js`       | Category 12 — edge case and boundary condition tests                                                                  |
+| `audit-bug1-tz-stripping.spec.js` | FORM-BUG-1 audit — independent Playwright verification of parseDateString() Z-stripping                               |
+| `audit-kendo-version.spec.js`     | Category 15 — cross-env Kendo widget comparison (VV.Form properties, fieldMaster, widget options, parsing/formatting) |
+| `dash-filter.spec.js`             | DB-5 — dashboard SQL filter tests (WHERE clause on date fields)                                                       |
+| `dash-sort.spec.js`               | DB-4 — dashboard column sort order verification (ascending/descending)                                                |
+| `dash-export.spec.js`             | DB-7 — dashboard export verification (Excel, Word, XML vs grid values)                                                |
+| `dash-cross-layer.spec.js`        | DB-6 — dashboard vs Forms SPA cross-layer value comparison                                                            |
+| `doc-index-field-dates.spec.js`   | DOC-BUG-1/2 — document index field date handling (API round-trip, 17 tests)                                           |
 
 ### External Config
 

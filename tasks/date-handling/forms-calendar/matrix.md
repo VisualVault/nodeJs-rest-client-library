@@ -62,7 +62,10 @@ All tests target one of 8 field configurations defined by three boolean flags:
 | 11. Cross-Timezone        |   18    |   11    |    6    |    1    |    0    |    0    |   0   |
 | 12. Edge Cases            |   20    |    3    |   16    |    0    |    0    |    0    |   1   |
 | 13. Database              |   10    |    4    |    6    |    0    |    0    |    0    |   0   |
-| **TOTAL**                 | **242** | **113** | **100** | **26**  |  **0**  |  **1**  | **2** |
+| 14. Mask Impact           |   13    |    0    |    0    |   13    |    0    |    0    |   0   |
+| 15. Kendo Widget Compare  |    8    |    0    |    0    |    8    |    0    |    0    |   0   |
+| 16. Server TZ Form Save   |    6    |    0    |    0    |    6    |    0    |    0    |   0   |
+| **TOTAL**                 | **269** | **113** | **100** | **53**  |  **0**  |  **1**  | **2** |
 
 ---
 
@@ -541,3 +544,88 @@ Direct DB query to verify stored values. Requires SQL access to the VisualVault 
 | 13-C-vs-D-storage       | SQL comparison: Config C vs Config D storage for BRT midnight                  | Config C: `"2026-03-15T03:00:00"` (UTC-equiv, prediction corrected from T21:00); Config D: `"2026-03-15T00:00:00"` (local)                         | Browser-saved: C=`T03:00:00.000Z` (real UTC), D=`T00:00:00.000Z` (local); API-written: C=D (uniform). Mixed storage is Forms-only.                                                 | FAIL   | 2026-04-08 | [summary](summaries/tc-13-C-vs-D-storage.md)       |
 | 13-multi-roundtrip-db   | Raw SQL after 8 BRT round-trips on Config D                                    | `"2026-03-14T00:00:00"` (drifted -24h from `"2026-03-15T00:00:00"`)                                                                                | API: `"2026-03-14T00:00:00Z"` — exactly -24h, full day lost (DateTest-001920)                                                                                                      | FAIL   | 2026-04-08 | [summary](summaries/tc-13-multi-roundtrip-db.md)   |
 | 13-preset-vs-user-input | Config A: preset field vs user-input field — same logical date, SQL comparison | Two different raw SQL values for same logical date (UTC Date obj vs local string)                                                                  | BRT: preset=`T03:00:00Z` (UTC), user-input=`T00:00:00Z` (local); IST: preset=`Feb 28 T18:30:00Z` (UTC, crosses month), user-input=`Mar 14 T00:00:00Z` (BUG-7)                      | FAIL   | 2026-04-08 | [summary](summaries/tc-13-preset-vs-user-input.md) |
+
+---
+
+### Group: Cross-Environment Differential
+
+Categories 14–16 investigate whether environmental differences between vvdemo (Kendo v1, progVersion 5.1) and vv5dev (Kendo v2, progVersion 6.1) cause date behavior divergence. Motivated by:
+
+- **Mask auto-population** on vv5dev (54/137 WADNR calendar fields masked, 8 are DateTime + date-only mask)
+- **Kendo v1 vs v2** widget layer differences (DOM structure, global `kendo` object, selectors)
+- **Server UTC offset** -3 (BRT) vs -7 (PDT)
+
+Audit run data (2026-04-10): `projects/wadnr/testing/date-handling/forms-calendar/runs/audit-kendo-version-wadnr-2026-04-10.md`
+
+## 14 — Mask Impact
+
+Does `<Mask>MM/dd/yyyy</Mask>` on a calendar field affect stored values, GetFieldValue return, or API responses? Documentation claims masks are display-only but this was **never empirically verified**.
+
+**Environment**: EmanuelJofre (unrestricted — can modify field masks via Form Designer)
+**Method**: Phase A (unmasked baseline, already known), Phase B (add mask to Field5+Field6), Phase C (re-run same tests), Phase D (remove masks).
+**Natural comparison pair on WADNR**: Field3 (`mask="MM/dd/yyyy"`) vs Field7 (no mask) — both Config A, date-only.
+**Bugs exercised**: potential new bug (mask-induced value truncation on DateTime fields)
+**Spec**: `audit-mask-impact.spec.js`
+
+| Test ID    | Config           | Action              | Input                   | Expected (no mask)                  | With Mask: verify                | Status  | Run Date | Evidence |
+| ---------- | ---------------- | ------------------- | ----------------------- | ----------------------------------- | -------------------------------- | ------- | -------- | -------- |
+| 14-A-SFV   | A (date-only)    | SetFieldValue       | `"2026-03-15"`          | raw=`"2026-03-15"`                  | Same?                            | PENDING |          |          |
+| 14-C-SFV   | C (DateTime)     | SetFieldValue       | `"2026-03-15T14:30:00"` | raw=`"2026-03-15T14:30:00"`         | Time truncated?                  | PENDING |          |          |
+| 14-D-SFV   | D (DateTime+iTZ) | SetFieldValue       | `"2026-03-15T14:30:00"` | raw=`"2026-03-15T14:30:00"`         | Time truncated?                  | PENDING |          |          |
+| 14-C-GFV   | C (DateTime)     | GetFieldValue       | (after 14-C-SFV)        | api=`"2026-03-15T17:30:00.000Z"`    | Mask affect return?              | PENDING |          |          |
+| 14-D-GFV   | D (DateTime+iTZ) | GetFieldValue       | (after 14-D-SFV)        | api=`"2026-03-15T14:30:00.000Z"`    | Mask affect return?              | PENDING |          |          |
+| 14-C-popup | C                | Calendar popup      | 3/15/2026               | raw=`"2026-03-15T03:00:00"`         | Time picker hidden — what value? | PENDING |          |          |
+| 14-D-popup | D                | Calendar popup      | 3/15/2026               | raw=`"2026-03-15T00:00:00"`         | Time picker hidden — what value? | PENDING |          |          |
+| 14-C-typed | C                | Typed input         | `03/15/2026`            | display shows `03/15/2026 12:00 AM` | Mask forces date-only format?    | PENDING |          |          |
+| 14-D-typed | D                | Typed input         | `03/15/2026`            | display shows `03/15/2026 12:00 AM` | Mask forces date-only format?    | PENDING |          |          |
+| 14-C-save  | C                | Save + reload       | (after 14-C-popup)      | raw preserved after reload          | Mask affect save pipeline?       | PENDING |          |          |
+| 14-D-save  | D                | Save + reload       | (after 14-D-popup)      | raw preserved after reload          | Mask affect save pipeline?       | PENDING |          |          |
+| 14-C-API   | C                | API read (getForms) | (after 14-C-save)       | ISO+Z in API response               | Server-side care about mask?     | PENDING |          |          |
+| 14-D-API   | D                | API read (getForms) | (after 14-D-save)       | ISO+Z in API response               | Server-side care about mask?     | PENDING |          |          |
+
+## 15 — Kendo Widget Comparison
+
+Captures Kendo widget internals and VV framework properties on each environment. Run separately on vvdemo (v1) and vv5dev (v2), then diff.
+
+**Environment**: Both (run separately, compare results)
+**Method**: JS console captures via `page.evaluate()`, no form modifications needed.
+**Spec**: `audit-kendo-version.spec.js`
+
+**Preliminary findings (WADNR, 2026-04-10)**:
+
+- `kendo` global: **does not exist on v2** (exists on v1)
+- DOM selectors: `[name="FieldN"]` **does not match on v2** (matches on v1)
+- `VV.Form.formId`: **undefined on v2** (populated on v1)
+- `LocalizationResources`: **empty object on v2** (absent on v1 — TBD)
+- `calendarValueService` methods: identical set on both
+- `useUpdatedCalendarValueLogic`: `false` on both (V1 path)
+- VV value pipeline (raw/api): **identical behavior** on both
+
+| Test ID          | What                                  | Captures                                        | vvdemo (v1) | vv5dev (v2)                      | Status  | Run Date   | Evidence                                                                                                            |
+| ---------------- | ------------------------------------- | ----------------------------------------------- | ----------- | -------------------------------- | ------- | ---------- | ------------------------------------------------------------------------------------------------------------------- |
+| 15-vv-core       | VV.Form properties                    | formId, V1/V2 flag, method list, property count | TBD         | formId=undef, V1, 28 props       | PARTIAL | 2026-04-10 | [wadnr run](../../projects/wadnr/testing/date-handling/forms-calendar/runs/audit-kendo-version-wadnr-2026-04-10.md) |
+| 15-fieldMaster-D | fieldMaster Config D                  | All 50+ properties                              | TBD         | mask="", no format/displayFormat | PARTIAL | 2026-04-10 | same                                                                                                                |
+| 15-fieldMaster-C | fieldMaster Config C                  | All 50+ properties                              | TBD         | mask="", no format/displayFormat | PARTIAL | 2026-04-10 | same                                                                                                                |
+| 15-kendo-global  | `kendo` global object                 | version, culture, calendar patterns             | TBD         | **not defined**                  | PARTIAL | 2026-04-10 | same                                                                                                                |
+| 15-widget-opts-D | Kendo widget `.options` for Field5    | format, parseFormats, culture                   | TBD         | **input not found** (v2 DOM)     | PARTIAL | 2026-04-10 | same                                                                                                                |
+| 15-widget-opts-A | Kendo widget `.options` for Field7    | format, parseFormats, culture                   | TBD         | **input not found** (v2 DOM)     | PARTIAL | 2026-04-10 | same                                                                                                                |
+| 15-sfv-widget    | Widget `.value()` after SetFieldValue | Date epoch, toString, toISOString               | TBD         | widget=null (v2 DOM)             | PARTIAL | 2026-04-10 | same                                                                                                                |
+| 15-mask-scan     | All calendar fields mask properties   | mask, placeholder, format per field             | TBD         | Field3/4 have mask, rest empty   | PARTIAL | 2026-04-10 | same                                                                                                                |
+
+## 16 — Server TZ on Form Save
+
+Does the VV server UTC offset affect the form save→reload→API-read pipeline? API write path was proven offset-independent (WS-1), but the browser form save path goes through different server-side code.
+
+**Environment**: Both (requires form saves — WADNR test harness is in writePolicy)
+**Method**: Save identical values via browser form UI on each env, then API read on each.
+**Spec**: `audit-server-tz.spec.js`
+**Prerequisite**: Run after Cat 14–15 to establish baseline assumptions.
+
+| Test ID       | Config           | Input method  | Input                   | Compare                                     | Status  | Run Date | Evidence |
+| ------------- | ---------------- | ------------- | ----------------------- | ------------------------------------------- | ------- | -------- | -------- |
+| 16-A-typed    | A (date-only)    | Typed         | `03/15/2026`            | getForms API response on both envs          | PENDING |          |          |
+| 16-C-typed    | C (DateTime)     | Typed         | `03/15/2026 12:00 AM`   | getForms API response on both envs          | PENDING |          |          |
+| 16-D-SFV      | D (DateTime+iTZ) | SetFieldValue | `"2026-03-15T14:30:00"` | getForms API response on both envs          | PENDING |          |          |
+| 16-A-controls | A                | (after save)  | —                       | `forminstance/Controls` response comparison | PENDING |          |          |
+| 16-C-controls | C                | (after save)  | —                       | `forminstance/Controls` response comparison | PENDING |          |          |
+| 16-D-controls | D                | (after save)  | —                       | `forminstance/Controls` response comparison | PENDING |          |          |

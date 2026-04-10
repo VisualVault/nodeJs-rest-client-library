@@ -635,6 +635,22 @@ Returns `VaultVersionInfo` — the core platform version and database schema ver
 - `utcOffset` reflects the server's configured UTC offset
 - Verified 2026-04-09 on vvdemo
 
+**Cross-environment comparison (2026-04-10):**
+
+| Property         | vvdemo (EmanuelJofre) | vv5dev (WADNR)   |
+| ---------------- | --------------------- | ---------------- |
+| `progVersion`    | `5.1.20210525.1`      | `6.1.20240711.1` |
+| `dbVersion`      | `3041`                | `3041`           |
+| `utcOffset`      | `-3` (BRT)            | `-7` (PDT)       |
+| FormViewer build | `20260304.1`          | `20260404.1`     |
+| FormViewer code  | `v0.5.1`              | `v0.5.1`         |
+| Kendo variant    | v1                    | v2               |
+| `docapi`         | disabled              | enabled          |
+| Infrastructure   | IIS/10.0, ASP.NET 4.0 | No IIS header    |
+| Deployment age   | ~1,766 days           | ~631 days        |
+
+Despite these differences, all 116 forms regression tests (BRT-chromium) produce **identical results** on both environments. All 16 platform bugs are confirmed as platform-level, not environment-specific. The `progVersion` major version jump (5.1→6.1) did not fix any date bugs. The `utcOffset` difference (-3 vs -7) does not affect API write path (CB-4 confirmed). Differential investigation (mask impact, Kendo widget layer, server TZ on form save) in progress — see `tasks/date-handling/forms-calendar/matrix.md` Cat 14–16.
+
 ### FormViewer Build Number
 
 The FormViewer Angular SPA exposes build info via a **static JSON file** — no authentication or browser needed:

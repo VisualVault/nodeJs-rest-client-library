@@ -70,6 +70,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - Cross-environment WS date test validation: all 10 categories (148/148 slots) executed against WADNR (vv5dev). All 6 WS bugs + CB-29 confirmed as platform-level
 - **Write policy forminstance/ support**: `assertApiWriteAllowed` and `__isAllowedByPolicy` now accept request body for `forminstance/` URLs where the template GUID is in the payload, not the URL. Matches against both `templateId` and `revisionId` (FormsAPI uses revision ID). `run-ws-test.js` resolves and stores revision IDs at startup. `verify-ws10-browser.js` now environment-aware (loads config from `env-config.js` instead of hardcoded vvdemo constants)
 - vv5dev `zzzTarget Date Test Harness` template updated to v1.2: `EnableQListener=true` on all 33 fields (was `false` — config gap from initial template creation). Fixes all 32 Cat 4 URL parameter test failures (27/27 BRT+IST pass). Export/modify/import workflow via `testing/tmp/fix-enableqlistener.js`
+- Cross-environment differential investigation (Cat 14–16): 27 new matrix slots for mask impact, Kendo widget comparison, and server TZ form save. Audit spec `audit-kendo-version.spec.js` captures VV.Form properties, fieldMaster entries, Kendo widget internals, and mask properties per environment. Key finding: Kendo v2 (vv5dev) does not expose `kendo` global or `[name="FieldN"]` DOM selectors — widget access requires different patterns than v1
+- WADNR forms-calendar first regression: 116/116 PASS on BRT-Chromium (2026-04-10). All results identical to EmanuelJofre baseline. Run artifacts in `projects/wadnr/testing/date-handling/forms-calendar/`
 
 ### Changed
 
