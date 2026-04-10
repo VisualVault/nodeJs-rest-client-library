@@ -67,7 +67,7 @@ See `forms-calendar/matrix.md` for current coverage status.
 - **V1 vs V2**: Two init paths gated by `useUpdatedCalendarValueLogic`. All live tests use V1 (default). See `forms-calendar/analysis/overview.md` § V1 vs V2.
 - **Code paths**: SetFieldValue, GetFieldValue, form load, save — documented in `forms-calendar/analysis/overview.md` § Confirmed Code Paths.
 - **Test assets by environment**: [`projects/emanueljofre/test-assets.md`](../../projects/emanueljofre/test-assets.md) (read-write), [`projects/wadnr/test-assets.md`](../../projects/wadnr/test-assets.md) (read-only)
-- **Test forms**: URLs in `testing/fixtures/vv-config.js`. Three forms: template (new each load), DateTest-000080 (BRT-saved), DateTest-000084 (IST-saved).
+- **Test forms**: URLs in `testing/fixtures/vv-config.js`. Per-env form names and saved records in `projects/{customer}/test-assets.md`.
 - **Field configs**: 8 configs (A-H) × 3 initial-value modes. Field map in `testing/fixtures/vv-config.js` FIELD_MAP. Config details in `forms-calendar/matrix.md`.
 - **Console API**: See `docs/reference/vv-form-api.md` for VV.Form inspection methods.
 

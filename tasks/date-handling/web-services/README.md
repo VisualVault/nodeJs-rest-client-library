@@ -6,17 +6,16 @@ REST API date handling investigation. Tests how dates are sent, stored, and retu
 
 | File                                                | Purpose                                                        |
 | --------------------------------------------------- | -------------------------------------------------------------- |
-| `matrix.md`                                         | Test matrix — 10 categories, 148 slots                         |
+| `matrix.md`                                         | Test matrix methodology — 10 categories, 148 slots             |
 | `analysis/`                                         | Analysis & conclusions (overview + per-bug documents)          |
-| `results.md`                                        | Live test evidence                                             |
 | `scripts/server-scripts/webservice-test-harness.js` | Server-side harness — all 10 categories via `Action` parameter |
 | `scripts/templates/webservice-pattern.js`           | Clean VV web service template (reference)                      |
 | `scripts/form-scripts/ws-harness-button.js`         | Client-side form button script to call the harness             |
 | `scripts/templates/web-service-call-pattern.js`     | Generic VV web service call pattern (reference)                |
 | `tools/runners/run-ws-test.js`                      | Direct Node.js CLI runner (auth + harness invocation)          |
 | `test-cases/`                                       | Individual TC spec files                                       |
-| `runs/`                                             | Immutable execution records                                    |
-| `summaries/`                                        | Per-TC status files                                            |
+
+Execution output (runs, summaries, status, results) lives in `projects/{customer}/testing/date-handling/web-services/`.
 
 ---
 
@@ -33,20 +32,12 @@ REST API date handling investigation. Tests how dates are sent, stored, and retu
 **Quick smoke test:**
 
 ```bash
-node tools/runners/run-ws-test.js --action WS-2 --configs A --record-id DateTest-000080
+node tools/runners/run-ws-test.js --action WS-2 --configs A --record-id <record-id>
 ```
 
 If this prints a JSON response with `"status": "Success"`, the runner is working.
 
-**WADNR environment** (form is named differently — use `--template-name`):
-
-```bash
-# Create a test record in WADNR
-node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15 --template-name "zzzDate Test Harness"
-
-# Read back a record
-node tools/runners/run-ws-test.js --action WS-2 --configs A --record-id <record-id> --template-name "zzzDate Test Harness"
-```
+Use `--template-name` when the form name differs from the default (e.g., `--template-name "zzzDate Test Harness"` for WADNR). See `projects/{customer}/test-assets.md` for form names and record IDs per environment.
 
 ### Prerequisites (Browser Path — form button tests)
 
@@ -76,13 +67,13 @@ Navigate to **Enterprise Tools > Microservices** (`/outsideprocessadmin`):
 
 On the DateTest form template (or a new dedicated WS test form), add 5 text fields:
 
-| Field Name    | Type                  | Purpose                                         |
-| ------------- | --------------------- | ----------------------------------------------- |
-| `WSAction`    | Text                  | Test action: `WS-1` through `WS-9`              |
-| `WSConfigs`   | Text                  | Target configs: `A,C,D` or `ALL`                |
-| `WSRecordID`  | Text                  | Instance name for read tests: `DateTest-000080` |
-| `WSInputDate` | Text                  | Date to write: `2026-03-15`                     |
-| `WSResult`    | Text (large/textarea) | Displays JSON response                          |
+| Field Name    | Type                  | Purpose                                                |
+| ------------- | --------------------- | ------------------------------------------------------ |
+| `WSAction`    | Text                  | Test action: `WS-1` through `WS-9`                     |
+| `WSConfigs`   | Text                  | Target configs: `A,C,D` or `ALL`                       |
+| `WSRecordID`  | Text                  | Instance name for read tests (e.g., `DateTest-000080`) |
+| `WSInputDate` | Text                  | Date to write: `2026-03-15`                            |
+| `WSResult`    | Text (large/textarea) | Displays JSON response                                 |
 
 Optional: `WSInputFormats` (Text) for WS-5 format tolerance.
 
@@ -114,7 +105,7 @@ Calls the harness directly in Node.js — no server, no VV Microservice, no brow
 node tools/runners/run-ws-test.js --action WS-1 --configs A,D --input-date 2026-03-15
 
 # Read existing record
-node tools/runners/run-ws-test.js --action WS-2 --configs ALL --record-id DateTest-000080
+node tools/runners/run-ws-test.js --action WS-2 --configs ALL --record-id <record-id>
 
 # With debug (includes raw API response in output)
 node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03-15 --debug
