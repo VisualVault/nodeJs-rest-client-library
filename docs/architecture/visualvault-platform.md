@@ -129,9 +129,13 @@ All sections are accessed from the top nav bar within `https://{env}.visualvault
 
 ## Dashboard Details
 
-### Dashboard List vs Dashboard Detail
+### Dashboard List (`/formdata`)
 
-The **Dashboards** nav item (`/formdata`) shows a list of all form dashboards. Clicking a dashboard opens the detail view:
+The **Dashboards** nav item (`/formdata`) shows a RadGrid of all form dashboards. Grid columns: View, Edit, Name, Modify Security, Created By, Created Date. Default page size 15, sorted alphabetically by Name. View/Edit links use `__doPostBack` to navigate.
+
+### Dashboard Detail
+
+Clicking "View" on a dashboard in the list opens the detail view:
 
 ```
 /FormDataDetails?Mode=ReadOnly&ReportID={dashboardGUID}
@@ -176,14 +180,14 @@ The `ignoreTimezone` and `useLegacy` flags do **not** affect the server-side dis
 
 ### Features
 
-| Feature          | Details                                                                                                                                                                              |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Sort**         | Click any column header to sort ascending/descending (server postback via `__doPostBack`)                                                                                            |
-| **Search**       | SQL filter builder (`a[title="Toggle search toolbar display"]`) — see [SQL Filter](#sql-filter-behavior) below                                                                       |
-| **Export**       | Excel (`.xls`), Word (`.doc`), XML (`.xml`) — inside a collapsible dock panel (hidden by default, toggle via toolbar "Export" button). See [Export Behavior](#export-behavior) below |
-| **Print**        | Print dialog with page range selection                                                                                                                                               |
-| **Record click** | `VV.OpenWindow()` opens `FormDetails?DataID=...&Mode=ReadOnly&hidemenu=true` in a popup (loads VV.Form on main page, no iframe)                                                      |
-| **Pagination**   | Server-side paging with configurable page size                                                                                                                                       |
+| Feature         | Details                                                                                                                                                                                    |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Sort**        | Click any column header to sort ascending/descending (server postback via `__doPostBack`)                                                                                                  |
+| **Search**      | SQL filter builder (`a[title="Toggle search toolbar display"]`) — see [SQL Filter](#sql-filter-behavior) below                                                                             |
+| **Export**      | Excel (`.xls`), Word (`.doc`), XML (`.xml`) — inside a collapsible dock panel (hidden by default, toggle via toolbar "Export" button). See [Export Behavior](#export-behavior) below       |
+| **Print**       | Print dialog with page range selection                                                                                                                                                     |
+| **Record Edit** | `window.open()` opens `FormDetails?DataID={guid}&hidemenu=true` in a named popup (`window_edit_{formInstanceName}`). Reuses existing popup if open. Loads VV.Form on the page (no iframe). |
+| **Pagination**  | Server-side paging with configurable page size                                                                                                                                             |
 
 ### Sort Behavior
 
@@ -196,6 +200,8 @@ Dates sort **chronologically** (as proper datetime values), not alphabetically a
 ### SQL Filter Behavior
 
 The dashboard has a **hidden SQL filter panel** (`txtSQLFilter` textarea) that accepts raw SQL WHERE clauses. It can be driven programmatically by setting the textarea value and triggering `__doPostBack` on the Update button.
+
+**Note:** The search/filter toolbar is **not guaranteed** on all dashboards. Newly created dashboards may lack the filter toolbar entirely (no `rgFilterRow`, no `Toggle search toolbar display` link). The filter must be enabled in the dashboard's Edit settings (VV Admin).
 
 **Date comparison semantics on DateTime columns:**
 

@@ -14,6 +14,11 @@ These are the documentation files in the project and what each one covers:
 | File                                        | Tracks                                                                            |
 | ------------------------------------------- | --------------------------------------------------------------------------------- |
 | `CLAUDE.md`                                 | Repo structure, server architecture, dev commands, active tasks, API managers     |
+| `tools/CLAUDE.md`                           | Tools folder scope: subfolders, key helpers, commands                             |
+| `testing/CLAUDE.md`                         | Testing folder scope: spec dirs, helpers, fixtures, pipelines                     |
+| `tasks/date-handling/CLAUDE.md`             | Date investigation scope table, bug index, component status                       |
+| `projects/wadnr/CLAUDE.md`                  | WADNR env config, extracts summary, write safety, validation results              |
+| `projects/emanueljofre/CLAUDE.md`           | EmanuelJofre env config, extracts summary, commands                               |
 | `README.md`                                 | Library usage, installation, API examples, module list                            |
 | `CHANGELOG.md`                              | Server/library changes under Unreleased (lib/ scope + project tooling)            |
 | `docs/guides/dev-setup.md`                  | **Canonical setup guide** — env setup, Playwright, credentials, troubleshooting   |
@@ -43,23 +48,25 @@ Run `git diff HEAD~10 --stat` and `git log --oneline -10` to understand recent c
 
 For each change, determine which docs **might** need updating using this mapping:
 
-| Change area                                  | Docs to check                                                                                            |
-| -------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `lib/VVRestApi/` (new features, API changes) | `CHANGELOG.md`, `README.md`, `CLAUDE.md` (API managers table)                                            |
-| `lib/VVRestApi/` (bug fixes, refactors)      | `CHANGELOG.md`                                                                                           |
-| `package.json` (scripts, deps, tooling)      | `CLAUDE.md` (dev commands), `CHANGELOG.md`, `docs/guides/dev-setup.md` (commands/tooling)                |
-| `scripts/`                                   | `CLAUDE.md` (repo structure if new dirs)                                                                 |
-| `tools/` (new or changed tools)              | `CLAUDE.md` (tools section), `docs/guides/dev-setup.md` (if runner/pipeline paths change)                |
-| `tools/helpers/` (vv-admin, vv-sync, etc.)   | `docs/guides/playwright-testing.md` (key files table), `CLAUDE.md` (tools helpers list)                  |
-| `testing/` (helpers, fixtures, config)       | `docs/guides/dev-setup.md`, `docs/guides/playwright-testing.md`, `testing/specs/date-handling/README.md` |
-| `testing/helpers/` (vv-form, vv-calendar)    | `docs/guides/playwright-testing.md` (key files table), `CLAUDE.md` (test infrastructure list)            |
-| `testing/pipelines/` (regression runners)    | `CLAUDE.md` (dev commands), `package.json` (npm scripts)                                                 |
-| `docs/` (new or updated files)               | `docs/README.md` if index needs update                                                                   |
-| `tasks/` (new task folders)                  | `tasks/README.md` (task index table), `CLAUDE.md` (active tasks table)                                   |
-| `projects/` (new project or extract updates) | `CLAUDE.md` (projects section), project's own `CLAUDE.md`                                                |
-| `.claude/` (commands, config)                | `CLAUDE.md` if it references commands                                                                    |
-| Config files (eslint, prettier, husky, etc.) | `CHANGELOG.md` (tooling), `docs/guides/dev-setup.md` (code quality section)                              |
-| `app.js`, routes (new endpoints)             | `CLAUDE.md` (server architecture), `Readme-microservices.md`                                             |
+| Change area                                  | Docs to check                                                                                                                 |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `lib/VVRestApi/` (new features, API changes) | `CHANGELOG.md`, `README.md`, `CLAUDE.md` (API managers table)                                                                 |
+| `lib/VVRestApi/` (bug fixes, refactors)      | `CHANGELOG.md`                                                                                                                |
+| `package.json` (scripts, deps, tooling)      | `CLAUDE.md` (dev commands), `CHANGELOG.md`, `docs/guides/dev-setup.md` (commands/tooling)                                     |
+| `scripts/`                                   | `CLAUDE.md` (repo structure if new dirs)                                                                                      |
+| `tools/` (new or changed tools)              | `tools/CLAUDE.md`, `CLAUDE.md` (tools section), `docs/guides/dev-setup.md` (if runner/pipeline paths change)                  |
+| `tools/helpers/` (vv-admin, vv-sync, etc.)   | `tools/CLAUDE.md`, `docs/guides/playwright-testing.md` (key files table)                                                      |
+| `testing/` (helpers, fixtures, config)       | `testing/CLAUDE.md`, `docs/guides/dev-setup.md`, `docs/guides/playwright-testing.md`, `testing/specs/date-handling/README.md` |
+| `testing/helpers/` (vv-form, vv-calendar)    | `testing/CLAUDE.md`, `docs/guides/playwright-testing.md` (key files table)                                                    |
+| `testing/pipelines/` (regression runners)    | `testing/CLAUDE.md`, `CLAUDE.md` (dev commands), `package.json` (npm scripts)                                                 |
+| `docs/` (new or updated files)               | `docs/README.md` if index needs update                                                                                        |
+| `tasks/` (new task folders)                  | `tasks/README.md` (task index table), `CLAUDE.md` (active tasks table)                                                        |
+| `tasks/date-handling/` (results, analysis)   | `tasks/date-handling/CLAUDE.md` (scope table, bug index)                                                                      |
+| `projects/` (new project or extract updates) | `CLAUDE.md` (projects section), project's own `CLAUDE.md`                                                                     |
+| `projects/wadnr/` (test runs, new assets)    | `projects/wadnr/CLAUDE.md` (validation results, test assets)                                                                  |
+| `.claude/` (commands, config)                | `CLAUDE.md` if it references commands                                                                                         |
+| Config files (eslint, prettier, husky, etc.) | `CHANGELOG.md` (tooling), `docs/guides/dev-setup.md` (code quality section)                                                   |
+| `app.js`, routes (new endpoints)             | `CLAUDE.md` (server architecture), `Readme-microservices.md`                                                                  |
 
 ### 3. Read and evaluate each affected doc
 
@@ -73,7 +80,8 @@ For each doc identified in step 2:
 
 Apply updates following these rules:
 
-- **CLAUDE.md**: Keep the existing structure. Update repo structure tree, tables, and dev commands to reflect reality. Do not add commentary — this is a reference doc. Does NOT contain setup instructions — those live in `dev-setup.md`.
+- **CLAUDE.md (all tiers)**: Keep the existing structure. Update tables and pointers to reflect reality. Follow the content standard from root `CLAUDE.md` § "CLAUDE.md Standards" — do NOT add progress counts, config contents, code snippets >5 lines, or file inventories. Use pointers (e.g., "See `matrix.md` for status") instead. Root CLAUDE.md does NOT contain setup instructions — those live in `dev-setup.md`.
+- **Scope/task/project CLAUDE.md**: Update scope tables, status, and validation results. Keep within size targets (scope ~30-60 lines, task/project flexible but <400). If `/maintain-claude-md` recently trimmed a file, preserve that trimming — don't re-add content it removed.
 - **README.md**: Only update if public API surface changed (new managers, new usage patterns). Do not touch prose style.
 - **CHANGELOG.md**: Add entries under `## [Unreleased]` in the correct subsection (Added/Changed/Fixed/Removed). Follow existing entry style. Keep entries concise. Scope: lib/ changes + project-wide tooling only.
 - **docs/guides/dev-setup.md**: Canonical setup guide. Update when dependencies, scripts, config, credentials, auth flow, or troubleshooting steps change. All other docs link here for setup — if this file is wrong, everything downstream is wrong.
