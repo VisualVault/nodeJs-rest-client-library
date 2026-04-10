@@ -11,6 +11,8 @@
 | Read-Only | Yes (enforced in `.env.json`) |
 | Write Policy | **allowlist** — writes ONLY to forms/WS listed in `.env.json` `writePolicy` |
 
+Full environment profile (platform versions, services, front-end stack): [`environment.json`](environment.json) — generate with `npm run env:profile -- --project wadnr`.
+
 ## Extracts
 
 All data extracted via `tools/extract/` from the WADNR admin panels on vv5dev.

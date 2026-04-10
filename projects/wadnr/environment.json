@@ -1,0 +1,153 @@
+{
+  "$schema": "environment-profile-v1",
+  "generatedAt": "2026-04-10T12:50:10.496Z",
+  "capturedIn": "21.0s",
+  "environment": {
+    "server": "vv5dev",
+    "customer": "WADNR",
+    "database": "fpOnline",
+    "baseUrl": "https://vv5dev.visualvault.com",
+    "instance": "vv5dev/WADNR",
+    "environmentType": "dev"
+  },
+  "platform": {
+    "progVersion": "6.1.20240711.1",
+    "dbVersion": "3041",
+    "utcOffset": -7,
+    "dataTypeCount": 91,
+    "dbCreateDate": "2024-07-17T19:08:18.043Z",
+    "dbModifiedDate": "2024-07-17T19:08:18.043Z",
+    "progCreateDate": "2024-07-17T19:08:18.043Z",
+    "progModifiedDate": "2024-07-17T19:08:18.043Z",
+    "deploymentAgeDays": 631
+  },
+  "formViewer": {
+    "buildNumber": "20260404.1",
+    "codeVersion": "v0.5.1",
+    "buildDate": "2026-04-04",
+    "production": false,
+    "enableSockets": true,
+    "socketsUrl": "https://sockets-pre.visualvault.com",
+    "audience": "e98f5a306fed4a279a2837dee47751b6"
+  },
+  "infrastructure": {
+    "serverHeader": null,
+    "aspNetVersion": null
+  },
+  "services": {
+    "formsapi": {
+      "url": "https://preformsapi.visualvault.com",
+      "enabled": true,
+      "stackifyId": "V2|782a1105-eeb4-41c3-a7bb-94b465ffd9fd|C100221|CD23",
+      "rowsPerPage": 15,
+      "maxRows": 1000,
+      "lockLimitMinutes": 1
+    },
+    "docapi": {
+      "url": "https://predocumentsapi.visualvault.com",
+      "enabled": true,
+      "roleSecurity": false,
+      "defaultForDocList": false
+    },
+    "studioapi": {
+      "url": "https://dbvvyys8gc.execute-api.us-east-1.amazonaws.com/Api/",
+      "enabled": true,
+      "maxRowCount": 1000
+    },
+    "workflowapi": {
+      "url": "https://preworkflow.visualvault.com"
+    },
+    "objectsapi": {
+      "url": null,
+      "enabled": null
+    },
+    "notificationapi": {
+      "url": null,
+      "enabled": null
+    }
+  },
+  "adminApp": {
+    "captured": true,
+    "jquery": "3.7.1",
+    "kendo": "2020.1.406",
+    "telerik": null,
+    "angular": null,
+    "globalObjects": [
+      "Sys",
+      "Telerik",
+      "kendo",
+      "VV",
+      "require",
+      "__VIEWSTATE",
+      "__doPostBack"
+    ],
+    "telerikControls": [
+      "RadAjaxPanel",
+      "RadButton",
+      "RadComboBox",
+      "RadComboBoxDropDown",
+      "RadGrid",
+      "RadInput",
+      "RadMenu",
+      "RadToolBar",
+      "RadUploadWindow"
+    ],
+    "kendoWidgets": [
+      "k-webkit"
+    ],
+    "cssFrameworks": [
+      "Bootstrap",
+      "Kendo UI CSS"
+    ],
+    "jsLibraries": [
+      "Kendo UI",
+      "RequireJS",
+      "Telerik: Telerik.Web.UI.WebResource.axd?_TSM_HiddenField_=ctl00_ScriptManager1_TSM&compress=1&_TSM_CombinedScripts_=%3b%3bSystem.Web.Extensions%2c+Version%3d4.0.0.0%2c+Culture%3dneutral%2c+PublicKeyToken%3d31bf3856ad364e35%3aen-US%3aa8328cc8-0a99-4e41-8fe3-b58afac64e45%3aea597d4b%3ab25378d2%3bTelerik.Web.UI%3aen-US%3a88f9a2dc-9cbf-434f-a243-cf2dd9f642dc%3a16e4e7cd%3af7645509%3aed16cbdc%3a88144a7a%3a24ee1bba%3ac128760b%3a19620875%3a874f8ea2%3af46195d3%3ab2e06756%3a92fe8ea0%3afa31b949%3a4877f69a%3a33715776%3a490a9d4e%3abd8f85e4%3ae330518b%3a2003d0b8%3a1e771326%3ac8618e41%3ae4f8f289%3a1a73651d%3a333f8d94%3aaa288e2d%3a258f1c72%3ab7778d6c%3a6d43f6d9%3aa7e79140%3a9151b61d%3a58366029%3a82923ac3%3ae085fe68%3ac08e9f8a%3bAuersoft.SessionTimer%2c+Version%3d4.0.0.0%2c+Culture%3dneutral%2c+PublicKeyToken%3d2460ad52e352f1b1%3aen-US%3a19e9ed7b-29a1-4f47-a7fd-0c09449f2633%3aa1de1c57",
+      "jQuery: jquery?v=1OwEGqNKycivfsGztDEhT4gzLvIPGlPsaJnHtH8fPv81",
+      "jQuery: jqueryextras?v=tUDk2sZlq8JbWADndvApIE5ncSkwJjX2ziWCM3HxPIc1"
+    ],
+    "viewState": true,
+    "eventValidation": false,
+    "scriptCount": 16,
+    "stylesheetCount": 21
+  },
+  "formViewerApp": {
+    "captured": true,
+    "angular": null,
+    "kendo": null,
+    "kendoVariant": "v2",
+    "signalR": false,
+    "momentJs": false,
+    "requireJs": false,
+    "vvFormProperties": [
+      "VV.Form.messageService",
+      "VV.Form.VV",
+      "VV.Form.calendarValueService",
+      "VV.Form.signingService",
+      "VV.Form.Template",
+      "VV.Form.Global",
+      "VV.Form.FormLanguage",
+      "VV.Form.CurrentLanguageCode",
+      "VV.Form.UnsavedChanges",
+      "VV.Form.DataID",
+      "VV.Form.CurrentPageId",
+      "VV.Form.DhDocID",
+      "VV.Form.FormUsID",
+      "VV.Form.FormUserID",
+      "VV.Form.FormUserSiteID",
+      "VV.Form.FormUserSiteName",
+      "VV.Form.FormUserGroups",
+      "VV.Form.IsFormSaved",
+      "VV.Form.IsFormFillin",
+      "VV.Form.IsOfflineMode",
+      "VV.Form.IsFormTemplatePreview",
+      "VV.Form.IsReadOnly",
+      "VV.Form.RefreshParentWindowWhenUnloading",
+      "VV.Form.SuppressExtraMessages",
+      "VV.Form.FormSaved",
+      "VV.Form.CalendarConditionalGroups",
+      "VV.Form.LocalizationResources"
+    ]
+  },
+  "errors": []
+}

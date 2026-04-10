@@ -669,6 +669,10 @@ The `/App/` MVC routes include the MVC version header; API routes do not.
 
 ## UI Framework Stack
 
+The VV platform runs **two distinct front-end applications** with separate technology stacks. Library versions and available globals differ between them — tools that detect versions must probe both.
+
+### Admin App (ASP.NET WebForms)
+
 The main VV application (non-FormViewer pages) uses a classic ASP.NET WebForms stack with Telerik UI components. Verified on vvdemo 2026-04-09.
 
 ### Client-Side Libraries
@@ -721,6 +725,18 @@ The main app loads 5 classic ASP.NET ASMX web services for real-time UI operatio
 
 The main app polls `GET /App/{customer}/{db}/Notification` for real-time notifications. This is a standard ASP.NET MVC route (not REST API), returning notification data consumed by `VV.Notifications`.
 
+### FormViewer SPA (Angular)
+
+The FormViewer is a separate Angular application with its own library bundle. **Key difference from the admin app**: Angular production builds do not expose `window.angular` or `window.kendo` as globals — these are compiled into the bundle and not accessible for version detection. Verified 2026-04-10 on both vvdemo (Kendo v1) and vv5dev (Kendo v2).
+
+**Version detection methods:**
+
+- `window.kendo.version` and `window.angular.version.full` → **not available** on FormViewer (both return `null`)
+- **Kendo variant** (v1 vs v2) → detect via DOM inspection: find a `kendo-datepicker` input and check its `role` attribute (`spinbutton` = v1, `combobox` = v2). See `docs/reference/form-fields.md` § "Kendo UI Version Differences" for the full selector table.
+- **Build info** → available via static files (`/FormViewer/assets/build.json`, `/FormViewer/assets/config.json`) without authentication
+
+The `tools/explore/environment-profile.js` tool captures both admin and FormViewer stacks. Use `npm run env:profile:browser` to run the full detection.
+
 ---
 
 ## Service Architecture
@@ -733,7 +749,7 @@ The VV platform consists of multiple backend services, each running independentl
 GET /api/v1/{customer}/{db}/configuration/{component}
 ```
 
-Returns the service URL and enabled status. Discovered services (vvdemo, 2026-04-09):
+Returns the service URL, enabled status, and service-specific behavioral configuration. Discovered services (vvdemo, 2026-04-09):
 
 | Component        | URL                                                           | Enabled | Tech                     |
 | ---------------- | ------------------------------------------------------------- | ------- | ------------------------ |
@@ -743,6 +759,18 @@ Returns the service URL and enabled status. Discovered services (vvdemo, 2026-04
 | WorkflowAPI      | `https://preworkflow.visualvault.com`                         | yes     | .NET                     |
 | ObjectsAPI       | (not configured)                                              | n/a     | —                        |
 | NotificationsAPI | (not configured)                                              | n/a     | —                        |
+
+#### Per-Service Behavioral Configuration
+
+Beyond URL and enabled status, configuration endpoints return operational settings that vary between environments. Verified 2026-04-10.
+
+| Service   | Property                  | Type    | Description                                                                 |
+| --------- | ------------------------- | ------- | --------------------------------------------------------------------------- |
+| DocAPI    | `roleSecurity`            | boolean | When `true`, document access checks role membership — changes who sees what |
+| DocAPI    | `docApiDefaultForDocList` | boolean | When `true`, document lists route through DocAPI instead of core API        |
+| StudioAPI | `maxRowCount`             | number  | Workflow/Studio API row limit (observed: `1000`)                            |
+
+FormsAPI operational limits are exposed via a separate authenticated endpoint (see [FormsAPI FormSettings](#formsapi-formsettings) below).
 
 ### Sockets Service
 
@@ -807,6 +835,18 @@ The FormViewer SPA communicates with a **separate .NET service** (FormsAPI) for 
 | GET    | `/Menu/Tab/<id>`                                                    | Tab configuration                                                            |
 | GET    | `/FormSettings`                                                     | Global form settings                                                         |
 | GET    | `/DefaultValues`                                                    | Default field values/settings                                                |
+
+### FormsAPI FormSettings
+
+`GET /FormSettings` (JWT auth) returns operational limits that affect form behavior. These vary between environments. Verified 2026-04-10 on vvdemo and vv5dev.
+
+| Property           | Type   | Description                                                                   | Observed |
+| ------------------ | ------ | ----------------------------------------------------------------------------- | -------- |
+| `rowsPerPage`      | number | Default pagination for form data grids                                        | `15`     |
+| `maxRows`          | number | Maximum rows returned in a single query — affects data retrieval + dashboards | `1000`   |
+| `lockLimitMinutes` | number | Form lock expiry — how long a form stays locked for concurrent editing        | `1`      |
+
+These are distinct from StudioAPI's `maxRowCount` (which limits workflow API responses).
 
 ### Serialization Format Difference (CB-29)
 

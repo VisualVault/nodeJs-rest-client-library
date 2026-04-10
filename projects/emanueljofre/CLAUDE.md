@@ -11,6 +11,8 @@
 | Read-Only | No                                       |
 | Write Policy | `unrestricted` — development sandbox, all writes allowed |
 
+Full environment profile (platform versions, services, front-end stack): [`environment.json`](environment.json) — generate with `npm run env:profile -- --project emanueljofre`.
+
 ## Extracts
 
 All data extracted via `tools/extract/` from the EmanuelJofre admin panels on vvdemo.

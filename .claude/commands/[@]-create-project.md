@@ -75,6 +75,8 @@ Use this template, filling in the provided values:
 | Read-Only    | <Yes/No> (enforced in `.env.json`)     |
 | Write Policy | `<mode>` — <description based on mode> |
 
+Full environment profile (platform versions, services, front-end stack): [`environment.json`](environment.json) — generate with `npm run env:profile -- --project <name>`.
+
 ## Write Safety
 
 {If mode is "allowlist":}
@@ -111,6 +113,10 @@ Last full extraction: not yet run.
 ## Commands
 
 ```bash
+# Capture environment profile (platform versions, services, library stack)
+npm run env:profile -- --project <name>              # HTTP only (~3s)
+npm run env:profile:browser -- --project <name>      # + browser probes (~12s)
+
 # Export all components
 node tools/extract/extract.js --project <name>
 
@@ -182,8 +188,10 @@ projects/<name>/analysis/
 Next steps:
 
 1. Ensure .env.json has the <server>/<customer> credentials
-2. Run: node tools/extract/extract.js --project <name> --dry-run
-3. Review and run without --dry-run to populate exports
+2. Run: npm run env:profile -- --project <name> (capture environment profile)
+3. Run: npm run env:profile:browser -- --project <name> (add library versions — optional)
+4. Run: node tools/extract/extract.js --project <name> --dry-run
+5. Review and run without --dry-run to populate exports
 
 ```
 

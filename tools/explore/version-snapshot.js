@@ -25,6 +25,16 @@
 const fs = require('fs');
 const path = require('path');
 const { loadConfig } = require('../../testing/fixtures/env-config');
+const {
+    getToken,
+    captureApiVersion,
+    captureConfigEndpoints,
+    captureServerHeaders,
+    captureFormViewerBuild,
+    captureFormViewerConfig,
+    captureFormsApiInfo,
+    captureApiMeta,
+} = require('../helpers/vv-probes');
 
 // --- CLI args ---
 const args = process.argv.slice(2);
@@ -38,136 +48,6 @@ const CUSTOMER = config.customerAlias;
 const DATABASE = config.databaseAlias;
 const ENV_NAME = config.instance.replace('/', '-'); // e.g., "vvdemo-EmanuelJofre"
 
-// --- OAuth ---
-
-async function getToken() {
-    const params = new URLSearchParams({
-        client_id: config.clientId,
-        client_secret: config.clientSecret,
-        username: config.username,
-        password: config.password,
-        grant_type: 'password',
-    });
-    const resp = await fetch(`${BASE_URL}/OAuth/Token`, { method: 'POST', body: params });
-    if (!resp.ok) throw new Error(`OAuth failed: ${resp.status}`);
-    const data = await resp.json();
-    return data.access_token;
-}
-
-// --- API probes (no Playwright needed) ---
-
-async function captureApiVersion(token) {
-    const url = `${BASE_URL}/api/v1/${CUSTOMER}/${DATABASE}/version`;
-    const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!resp.ok) return { error: `${resp.status} ${resp.statusText}` };
-    const json = await resp.json();
-    return json.data || json;
-}
-
-async function captureConfigEndpoints(token) {
-    const components = ['docapi', 'formsapi', 'objectsapi', 'studioapi', 'notificationapi'];
-    const results = {};
-    for (const component of components) {
-        const url = `${BASE_URL}/api/v1/${CUSTOMER}/${DATABASE}/configuration/${component}`;
-        try {
-            const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-            if (resp.ok) {
-                const json = await resp.json();
-                results[component] = json.data || json;
-            } else {
-                results[component] = { error: `${resp.status}` };
-            }
-        } catch (e) {
-            results[component] = { error: e.message };
-        }
-    }
-    return results;
-}
-
-async function captureServerHeaders(token) {
-    // Hit the main API endpoint to capture IIS/ASP.NET headers
-    const url = `${BASE_URL}/api/v1/${CUSTOMER}/${DATABASE}/version`;
-    const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    const headers = {};
-    for (const [name, value] of resp.headers) {
-        if (/server|version|powered|aspnet|mvc/i.test(name)) {
-            headers[name] = value;
-        }
-    }
-    return headers;
-}
-
-// --- FormViewer static files (no browser needed!) ---
-
-async function captureFormViewerBuild() {
-    try {
-        const buildResp = await fetch(`${BASE_URL}/FormViewer/assets/build.json`);
-        if (!buildResp.ok) return { error: `build.json: ${buildResp.status}` };
-        return await buildResp.json();
-    } catch (e) {
-        return { error: e.message };
-    }
-}
-
-async function captureFormViewerConfig() {
-    try {
-        const configResp = await fetch(`${BASE_URL}/FormViewer/assets/config.json`);
-        if (!configResp.ok) return { error: `config.json: ${configResp.status}` };
-        return await configResp.json();
-    } catch (e) {
-        return { error: e.message };
-    }
-}
-
-// --- FormsAPI probe (requires JWT) ---
-
-async function captureFormsApiInfo(token) {
-    try {
-        // Get JWT for FormsAPI auth
-        const jwtResp = await fetch(`${BASE_URL}/api/v1/${CUSTOMER}/${DATABASE}/users/getjwt`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!jwtResp.ok) return { error: `getjwt: ${jwtResp.status}` };
-        const jwt = (await jwtResp.json()).data.token;
-
-        // Hit FormsAPI to capture Stackify ID and other headers
-        const fvConfig = await captureFormViewerConfig();
-        const formsApiUrl = fvConfig.formsApiUrl || 'https://preformsapi.visualvault.com/api/v1';
-        const resp = await fetch(`${formsApiUrl}/FormSettings`, {
-            headers: { Authorization: 'Bearer ' + jwt },
-        });
-
-        const headers = {};
-        for (const [name, value] of resp.headers) {
-            headers[name] = value;
-        }
-
-        return {
-            stackifyId: headers['x-stackifyid'] || null,
-            headers,
-            formSettings: resp.ok ? await resp.json() : null,
-        };
-    } catch (e) {
-        return { error: e.message };
-    }
-}
-
-// --- /meta endpoint ---
-
-async function captureApiMeta(token) {
-    try {
-        const resp = await fetch(`${BASE_URL}/api/v1/${CUSTOMER}/${DATABASE}/meta`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!resp.ok) return { error: `${resp.status}` };
-        const json = await resp.json();
-        const dataTypes = json.data?.dataTypes || [];
-        return { dataTypeCount: dataTypes.length, dataTypes };
-    } catch (e) {
-        return { error: e.message };
-    }
-}
-
 // --- Main ---
 
 async function main() {
@@ -176,7 +56,7 @@ async function main() {
     console.log(`Environment: ${BASE_URL}\n`);
 
     // All probes run via HTTP — no browser needed
-    const token = await getToken();
+    const token = await getToken(config);
 
     console.log('  [1/6] API version endpoint...');
     console.log('  [2/6] Configuration endpoints...');
@@ -185,14 +65,16 @@ async function main() {
     console.log('  [5/6] FormsAPI probe (JWT + Stackify)...');
     console.log('  [6/6] API meta endpoint...');
 
-    const [apiVersion, configEndpoints, serverHeaders, fvBuild, fvConfig, formsApiInfo, apiMeta] = await Promise.all([
-        captureApiVersion(token),
-        captureConfigEndpoints(token),
-        captureServerHeaders(token),
-        captureFormViewerBuild(),
-        captureFormViewerConfig(),
-        captureFormsApiInfo(token),
-        captureApiMeta(token),
+    // Capture FormViewer config first — needed by both snapshot assembly and FormsAPI probe
+    const fvConfig = await captureFormViewerConfig(BASE_URL);
+
+    const [apiVersion, configEndpoints, serverHeaders, fvBuild, formsApiInfo, apiMeta] = await Promise.all([
+        captureApiVersion(BASE_URL, CUSTOMER, DATABASE, token),
+        captureConfigEndpoints(BASE_URL, CUSTOMER, DATABASE, token),
+        captureServerHeaders(BASE_URL, CUSTOMER, DATABASE, token),
+        captureFormViewerBuild(BASE_URL),
+        captureFormsApiInfo(BASE_URL, CUSTOMER, DATABASE, token, fvConfig),
+        captureApiMeta(BASE_URL, CUSTOMER, DATABASE, token),
     ]);
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);

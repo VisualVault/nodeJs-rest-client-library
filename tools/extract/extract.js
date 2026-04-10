@@ -52,36 +52,16 @@ const PROJECT_NAME = getArg('--project');
 
 // Resolve output path and environment from --project or --output
 const PROJECTS_DIR = path.resolve(__dirname, '..', '..', 'projects');
-const ENV_JSON_PATH = path.resolve(__dirname, '..', '..', '.env.json');
 
-/**
- * Find a customer in .env.json by name (case-insensitive).
- * Returns { server, customer } with the exact key names from .env.json.
- */
-function findCustomer(name) {
-    const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
-    const needle = name.toLowerCase();
-    for (const [serverKey, serverObj] of Object.entries(env.servers || {})) {
-        for (const customerKey of Object.keys(serverObj.customers || {})) {
-            if (customerKey.toLowerCase() === needle) {
-                return { server: serverKey, customer: customerKey };
-            }
-        }
-    }
-    return null;
-}
+const { findCustomer } = vvAdmin;
 
 function resolveProject() {
     if (PROJECT_NAME) {
         // --project <name>: project name = customer name (case-insensitive)
         const match = findCustomer(PROJECT_NAME);
         if (!match) {
-            const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
-            const available = Object.entries(env.servers || {}).flatMap(([s, obj]) =>
-                Object.keys(obj.customers || {}).map((c) => `${s}/${c}`)
-            );
             console.error(`No customer "${PROJECT_NAME}" found in .env.json`);
-            console.error(`Available: ${available.join(', ')}`);
+            console.error(`Available: ${vvAdmin.listCustomers().join(', ')}`);
             process.exit(1);
         }
         return {
@@ -90,21 +70,20 @@ function resolveProject() {
             customer: match.customer,
         };
     }
+    const active = vvAdmin.getActiveCustomer();
     if (getArg('--output')) {
         // Custom output path — use active env from .env.json
-        const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
         return {
             output: getArg('--output'),
-            server: env.activeServer,
-            customer: env.activeCustomer,
+            server: active.server,
+            customer: active.customer,
         };
     }
     // Default: use active env from .env.json, output to that project folder
-    const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
     return {
-        output: path.join(PROJECTS_DIR, env.activeCustomer.toLowerCase(), 'extracts'),
-        server: env.activeServer,
-        customer: env.activeCustomer,
+        output: path.join(PROJECTS_DIR, active.customer.toLowerCase(), 'extracts'),
+        server: active.server,
+        customer: active.customer,
     };
 }
 

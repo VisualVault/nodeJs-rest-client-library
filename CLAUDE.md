@@ -125,7 +125,11 @@ npm run explore              # Run exploration specs (headless)
 npm run explore:headed       # Headed mode (visible browser)
 npm run version:snapshot     # Capture current platform version state
 npm run version:diff         # Compare two most recent snapshots
+npm run env:profile          # Generate customer environment profile (HTTP, ~3s)
+npm run env:profile:browser  # Generate profile with browser probes (~12s)
 ```
+
+Environment profiles consolidate platform version, service configuration, and front-end library stack into `projects/{customer}/environment.json`. Use `--project <name>` to target a specific customer.
 
 ## Active Tasks
 

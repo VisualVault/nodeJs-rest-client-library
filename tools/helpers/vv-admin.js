@@ -15,6 +15,43 @@ const path = require('path');
 const ENV_JSON_PATH = path.resolve(__dirname, '..', '..', '.env.json');
 
 /**
+ * Find a customer in .env.json by name (case-insensitive).
+ * Returns { server, customer } with the exact key names from .env.json, or null.
+ */
+function findCustomer(name) {
+    const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
+    const needle = name.toLowerCase();
+    for (const [serverKey, serverObj] of Object.entries(env.servers || {})) {
+        for (const customerKey of Object.keys(serverObj.customers || {})) {
+            if (customerKey.toLowerCase() === needle) {
+                return { server: serverKey, customer: customerKey };
+            }
+        }
+    }
+    return null;
+}
+
+/**
+ * List all available server/customer pairs from .env.json.
+ * @returns {string[]} e.g., ['vvdemo/EmanuelJofre', 'vv5dev/WADNR']
+ */
+function listCustomers() {
+    const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
+    return Object.entries(env.servers || {}).flatMap(([s, obj]) =>
+        Object.keys(obj.customers || {}).map((c) => `${s}/${c}`)
+    );
+}
+
+/**
+ * Get the active server/customer from .env.json.
+ * @returns {{ server: string, customer: string }}
+ */
+function getActiveCustomer() {
+    const env = JSON.parse(fs.readFileSync(ENV_JSON_PATH, 'utf8'));
+    return { server: env.activeServer, customer: env.activeCustomer };
+}
+
+/**
  * Load credentials for a specific server/customer from .env.json.
  * @param {string} serverName - e.g., 'vv5dev', 'vvdemo'
  * @param {string} customerName - e.g., 'WADNR', 'EmanuelJofre'
@@ -309,6 +346,9 @@ async function readGridRows(page, columnDefs) {
 }
 
 module.exports = {
+    findCustomer,
+    listCustomers,
+    getActiveCustomer,
     loadEnvConfig,
     login,
     adminUrl,

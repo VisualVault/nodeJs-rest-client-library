@@ -77,6 +77,8 @@
         "version:snapshot": "node tools/explore/version-snapshot.js",
         "version:diff": "node tools/explore/version-diff.js",
         "version:list": "node tools/explore/version-diff.js --list",
+        "env:profile": "node tools/explore/environment-profile.js",
+        "env:profile:browser": "node tools/explore/environment-profile.js --with-browser",
         "lint": "eslint lib/ scripts/",
         "lint:fix": "eslint --fix lib/ scripts/",
         "format": "prettier --write \"lib/**/*.js\" \"scripts/**/*.js\"",
