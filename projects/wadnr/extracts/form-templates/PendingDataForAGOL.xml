@@ -2311,7 +2311,7 @@
 	<SaveDateTime>2025-10-12T22:46:03Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>b18690f7-b76c-4d6a-ade2-ea94fd6de3ba</ScriptItemId>
+			<ScriptItemId>9892c4ee-00ec-4dfc-aac8-9fce477baaa0</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnAdminSave_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2320,7 +2320,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>91d01ab0-4857-4437-9e73-3353bc69a205</ScriptItemId>
+			<ScriptItemId>39ff65e8-bfdd-43d8-bcd5-01c577e69ab2</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnClose1_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2329,7 +2329,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>61bb72da-ed83-41e5-92df-e976ab56dbfe</ScriptItemId>
+			<ScriptItemId>b48e35c3-f045-469c-9cc1-c4baf9f4ea73</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnTabFourTwo_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2338,7 +2338,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>d0285d84-12e8-42a1-bcbd-4247ca279500</ScriptItemId>
+			<ScriptItemId>1ab2d0e8-f0b7-426f-8a21-3bc1971a893d</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnClose2_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2347,7 +2347,7 @@
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>7dc976bd-cb13-4a65-9f5b-e38e8e7906ef</ScriptItemId>
+			<ScriptItemId>afdb910d-f4a0-4b10-a6c7-e468a77cc561</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Form_onDataLoad</Name>
 			<Arguments>event</Arguments>
@@ -2359,7 +2359,7 @@ VV.Form.Global.DisplayModalLoad();</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>66c361f9-f892-486e-b88b-5f6764624e09</ScriptItemId>
+			<ScriptItemId>9ce9b016-1105-40b0-bd74-d9bc84428004</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnTabFourOne_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2370,55 +2370,55 @@ VV.Form.Global.DisplayModalLoad();</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>b5226b8b-7770-4d63-a2d4-6741fbfa2d71</ScriptAssignmentId>
+			<ScriptAssignmentId>ee285767-7a4b-4411-a1af-a848fb3ab42b</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>66c361f9-f892-486e-b88b-5f6764624e09</ScriptItemId>
-			<ControlId>ede21e46-85e5-9232-15c3-572e995ebf29</ControlId>
+			<ScriptItemId>9892c4ee-00ec-4dfc-aac8-9fce477baaa0</ScriptItemId>
+			<ControlId>987211b3-011c-7297-c11f-cb0217abbb52</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>95105c8d-82b5-43cf-ad46-b7d4649565be</ScriptAssignmentId>
+			<ScriptAssignmentId>4a19ebf2-4a0c-4565-a7e2-5041b260706e</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>7dc976bd-cb13-4a65-9f5b-e38e8e7906ef</ScriptItemId>
-			<ControlId>00000001-0000-0000-0000-e0000000f010</ControlId>
-			<EventId>16</EventId>
-			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
-			<DefinedTemplateRevision>1</DefinedTemplateRevision>
-		</FormScriptAssignment>
-		<FormScriptAssignment>
-			<ScriptAssignmentId>dc6fe58b-91a8-4725-b51d-6284cdb11331</ScriptAssignmentId>
-			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>d0285d84-12e8-42a1-bcbd-4247ca279500</ScriptItemId>
-			<ControlId>dcc4c208-d05e-cac1-fade-70334c13b657</ControlId>
-			<EventId>4</EventId>
-			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
-			<DefinedTemplateRevision>1</DefinedTemplateRevision>
-		</FormScriptAssignment>
-		<FormScriptAssignment>
-			<ScriptAssignmentId>82b9ded7-1e6d-4c29-824e-af231e0ed1bc</ScriptAssignmentId>
-			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>61bb72da-ed83-41e5-92df-e976ab56dbfe</ScriptItemId>
-			<ControlId>63d8f4ec-1ad7-e63b-78c0-862e7b86c7fb</ControlId>
-			<EventId>4</EventId>
-			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
-			<DefinedTemplateRevision>1</DefinedTemplateRevision>
-		</FormScriptAssignment>
-		<FormScriptAssignment>
-			<ScriptAssignmentId>ce49b7ae-8bcf-4ac1-be48-d3fa60faf111</ScriptAssignmentId>
-			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>91d01ab0-4857-4437-9e73-3353bc69a205</ScriptItemId>
+			<ScriptItemId>39ff65e8-bfdd-43d8-bcd5-01c577e69ab2</ScriptItemId>
 			<ControlId>a4f97f0c-71b3-74d4-4ac2-3a7e899a1bce</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>e3f83c65-fe94-4453-82de-aeffffcd06f6</ScriptAssignmentId>
+			<ScriptAssignmentId>a0eef3f8-6206-4926-9c73-55660c6f5240</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>b18690f7-b76c-4d6a-ade2-ea94fd6de3ba</ScriptItemId>
-			<ControlId>987211b3-011c-7297-c11f-cb0217abbb52</ControlId>
+			<ScriptItemId>b48e35c3-f045-469c-9cc1-c4baf9f4ea73</ScriptItemId>
+			<ControlId>63d8f4ec-1ad7-e63b-78c0-862e7b86c7fb</ControlId>
+			<EventId>4</EventId>
+			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
+			<DefinedTemplateRevision>1</DefinedTemplateRevision>
+		</FormScriptAssignment>
+		<FormScriptAssignment>
+			<ScriptAssignmentId>3b66b9a2-ed95-459e-adbd-e3111a70459d</ScriptAssignmentId>
+			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
+			<ScriptItemId>1ab2d0e8-f0b7-426f-8a21-3bc1971a893d</ScriptItemId>
+			<ControlId>dcc4c208-d05e-cac1-fade-70334c13b657</ControlId>
+			<EventId>4</EventId>
+			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
+			<DefinedTemplateRevision>1</DefinedTemplateRevision>
+		</FormScriptAssignment>
+		<FormScriptAssignment>
+			<ScriptAssignmentId>7c9832e0-0c5c-4613-816c-6f6b55c6a0b2</ScriptAssignmentId>
+			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
+			<ScriptItemId>afdb910d-f4a0-4b10-a6c7-e468a77cc561</ScriptItemId>
+			<ControlId>00000001-0000-0000-0000-e0000000f010</ControlId>
+			<EventId>16</EventId>
+			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
+			<DefinedTemplateRevision>1</DefinedTemplateRevision>
+		</FormScriptAssignment>
+		<FormScriptAssignment>
+			<ScriptAssignmentId>e0c08846-d535-4217-8633-b514c2b0ec7f</ScriptAssignmentId>
+			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
+			<ScriptItemId>9ce9b016-1105-40b0-bd74-d9bc84428004</ScriptItemId>
+			<ControlId>ede21e46-85e5-9232-15c3-572e995ebf29</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>

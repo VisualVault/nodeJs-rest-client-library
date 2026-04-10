@@ -2523,7 +2523,7 @@
 	<SaveDateTime>2025-07-10T13:52:06Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>34fc85ac-09d1-486a-a4e2-25edd0507588</ScriptItemId>
+			<ScriptItemId>c2b02a33-a900-44a6-a85b-47a57ce08fdc</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>GetPortalID</Name>
 			<Arguments />
@@ -2554,7 +2554,7 @@ return portalID</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>cdb6c6bb-92a7-40ef-91c5-62a486300762</ScriptItemId>
+			<ScriptItemId>d669ab8b-ce0b-431a-a08e-8cc3730a7aa2</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>OpenGISModal</Name>
 			<Arguments />
@@ -2571,7 +2571,7 @@ return portalID</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>4daeaa12-66fe-454d-abdf-5117b86131e9</ScriptItemId>
+			<ScriptItemId>bf589223-d464-4254-84c1-93d8c49c9fe0</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>DisplayMapDynamically</Name>
 			<Arguments>modalObject</Arguments>
@@ -2672,7 +2672,7 @@ function isNull(param) {
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>1576b495-4abd-4807-8f1e-3206ad43264c</ScriptItemId>
+			<ScriptItemId>a0a500df-6939-4fe1-a032-171d5ee555a0</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>SetupSearchTSR</Name>
 			<Arguments>view</Arguments>
@@ -3011,7 +3011,7 @@ let whitebox = createWhiteBox(view);</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>b75df4d8-616e-4163-b3b7-9ef72b489f13</ScriptItemId>
+			<ScriptItemId>2d0825d5-972e-4f83-b869-c85fa4a1f7ec</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>GetModalGISMap</Name>
 			<Arguments>mapViewManager, portalID</Arguments>
@@ -3557,7 +3557,7 @@ return modalObject;</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>8d7c5ad6-eef7-410c-9f44-5f5457ece403</ScriptItemId>
+			<ScriptItemId>2f9f64b0-7d86-4ae2-895b-38b025e7aead</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>GetMapToken</Name>
 			<Arguments />
@@ -3615,7 +3615,7 @@ return $.when(getToken()).then(handleResponse);</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>6c32059b-73e3-46e1-a2f7-c34d0e83f29b</ScriptItemId>
+			<ScriptItemId>d54c5ba2-4a52-4c1b-aa00-a9bd26240bc7</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>GetMapViewManager</Name>
 			<Arguments />
@@ -3644,7 +3644,7 @@ return $.when(getToken()).then(handleResponse);</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>ebe142f9-85db-402f-9926-82712558b221</ScriptItemId>
+			<ScriptItemId>4c9937c3-51e1-4510-a24a-fe8dcb632e60</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Form_onLoad</Name>
 			<Arguments>event</Arguments>
@@ -3713,7 +3713,7 @@ VV.Form.Template.GetMapToken()
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>2cfd0b7e-39f7-494b-a98b-36f04b5aa0bf</ScriptItemId>
+			<ScriptItemId>d8e5947e-6ef3-48f9-8a5a-b627a57daa07</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnActivityMap_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -3741,7 +3741,7 @@ VV.Form.Template.OpenGISModal();</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>655cdab5-f7b2-414b-b459-6a2776134477</ScriptItemId>
+			<ScriptItemId>418da5c9-63a7-4cea-9b84-a735ea99ca87</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Form_onDataLoad</Name>
 			<Arguments>event</Arguments>
@@ -3753,7 +3753,7 @@ VV.Form.Global.DisplayModalLoad();</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>3b6dc102-bdcb-4168-8c42-781287840e35</ScriptItemId>
+			<ScriptItemId>275e9fc6-4165-4260-bba2-808ce8c0f650</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnTabFourTwo_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -3762,7 +3762,7 @@ VV.Form.Global.DisplayModalLoad();</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>ca640d95-6281-402f-a56e-fb97e8f9402f</ScriptItemId>
+			<ScriptItemId>38a6e4c3-2e41-4e68-9393-88af2a5f88c5</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnAdminSave_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -3771,7 +3771,7 @@ VV.Form.Global.DisplayModalLoad();</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>8c915a59-6681-40fb-8951-bd3095e7de1c</ScriptItemId>
+			<ScriptItemId>b03cacd0-7920-4459-b5c4-c7a6ffc8d0d9</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnClose2_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -3780,7 +3780,7 @@ VV.Form.Global.DisplayModalLoad();</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>212e22a8-0ff7-415b-97f6-84c047c0dbcc</ScriptItemId>
+			<ScriptItemId>609ab5ad-ebc9-4391-a671-8ed0e767dd9c</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnClose1_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -3789,7 +3789,7 @@ VV.Form.Global.DisplayModalLoad();</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>848d0168-6cc0-4bda-be2b-7d69356f6dfd</ScriptItemId>
+			<ScriptItemId>ae5c619e-9ed8-4539-a405-7e9e60baa76b</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnTabFourOne_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -3800,72 +3800,72 @@ VV.Form.Global.DisplayModalLoad();</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>894a48a9-90ba-4ba8-ae7a-d23daefa136f</ScriptAssignmentId>
+			<ScriptAssignmentId>36317b09-a34e-49d7-af84-c9523339603a</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>848d0168-6cc0-4bda-be2b-7d69356f6dfd</ScriptItemId>
+			<ScriptItemId>ae5c619e-9ed8-4539-a405-7e9e60baa76b</ScriptItemId>
 			<ControlId>ede21e46-85e5-9232-15c3-572e995ebf29</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>dc14e748-f927-461b-a8d0-78c9e44b2b45</ScriptAssignmentId>
+			<ScriptAssignmentId>784b6c4b-6c57-4761-8f0e-9d3afda6cc16</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>8c915a59-6681-40fb-8951-bd3095e7de1c</ScriptItemId>
+			<ScriptItemId>b03cacd0-7920-4459-b5c4-c7a6ffc8d0d9</ScriptItemId>
 			<ControlId>dcc4c208-d05e-cac1-fade-70334c13b657</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>694c581f-2cb5-4312-844e-879fec4cb32a</ScriptAssignmentId>
+			<ScriptAssignmentId>2f504ec8-85f5-4111-bc4e-d16573400285</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>ca640d95-6281-402f-a56e-fb97e8f9402f</ScriptItemId>
+			<ScriptItemId>38a6e4c3-2e41-4e68-9393-88af2a5f88c5</ScriptItemId>
 			<ControlId>987211b3-011c-7297-c11f-cb0217abbb52</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>c36365eb-9c1d-4609-8458-0b23d949e850</ScriptAssignmentId>
+			<ScriptAssignmentId>3d381a7b-1192-4e98-9e46-d12d3cdd24c9</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>655cdab5-f7b2-414b-b459-6a2776134477</ScriptItemId>
+			<ScriptItemId>418da5c9-63a7-4cea-9b84-a735ea99ca87</ScriptItemId>
 			<ControlId>00000001-0000-0000-0000-e0000000f010</ControlId>
 			<EventId>16</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>cd5081ee-c7a2-4e8d-9e64-16a4a4a91196</ScriptAssignmentId>
+			<ScriptAssignmentId>d5b71db5-af49-47f9-8763-2ed896061e7f</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>3b6dc102-bdcb-4168-8c42-781287840e35</ScriptItemId>
+			<ScriptItemId>275e9fc6-4165-4260-bba2-808ce8c0f650</ScriptItemId>
 			<ControlId>63d8f4ec-1ad7-e63b-78c0-862e7b86c7fb</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>16aa76eb-bc96-49e0-84e5-c8f80e082853</ScriptAssignmentId>
+			<ScriptAssignmentId>6d52b8f5-3beb-4590-8c8d-2a8c6b41f403</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>2cfd0b7e-39f7-494b-a98b-36f04b5aa0bf</ScriptItemId>
+			<ScriptItemId>d8e5947e-6ef3-48f9-8a5a-b627a57daa07</ScriptItemId>
 			<ControlId>29844afa-ab04-124a-8e83-f90c8ffae919</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>12</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>81f733b0-d8d5-44fa-b68d-7ffa6937f98f</ScriptAssignmentId>
+			<ScriptAssignmentId>1043eddb-8b63-487e-8bfe-58bcf05edb51</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>ebe142f9-85db-402f-9926-82712558b221</ScriptItemId>
+			<ScriptItemId>4c9937c3-51e1-4510-a24a-fe8dcb632e60</ScriptItemId>
 			<ControlId>00000001-0000-0000-0000-e0000000f010</ControlId>
 			<EventId>10</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>12</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>2ad12d39-b8c1-4790-8dc5-05a0064aba11</ScriptAssignmentId>
+			<ScriptAssignmentId>650b172a-bcc7-46de-8965-9131fb11e936</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>212e22a8-0ff7-415b-97f6-84c047c0dbcc</ScriptItemId>
+			<ScriptItemId>609ab5ad-ebc9-4391-a671-8ed0e767dd9c</ScriptItemId>
 			<ControlId>a4f97f0c-71b3-74d4-4ac2-3a7e899a1bce</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>

@@ -2713,7 +2713,7 @@
 	<SaveDateTime>2026-02-02T17:00:25Z</SaveDateTime>
 	<ScriptLibrary>
 		<FormScriptItem>
-			<ScriptItemId>ef7d30de-bde4-4ec6-a11d-6bd239fdf5d6</ScriptItemId>
+			<ScriptItemId>d19bba33-93df-48cd-afa6-2f976e597780</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Save</Name>
 			<Arguments />
@@ -2746,7 +2746,7 @@ VV.Form.DoAjaxFormSave()
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>dd604af8-5d01-41be-bafd-bb3f96981270</ScriptItemId>
+			<ScriptItemId>ff0bad37-50ec-4fc3-ba0f-adaf3d0524ef</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnAdminSave_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2755,7 +2755,7 @@ VV.Form.DoAjaxFormSave()
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>bd1bedb3-f6e1-43bb-8211-f8b4251f6fde</ScriptItemId>
+			<ScriptItemId>ef93f8ed-71c8-4b76-866d-d275eaec1a48</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnSave_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2764,7 +2764,7 @@ VV.Form.DoAjaxFormSave()
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>0bc9826b-cb48-41b1-8f0c-06f4c7a7e6bc</ScriptItemId>
+			<ScriptItemId>3b5dc031-10eb-427d-9f04-fe98b0358e5a</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnClose2_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2773,7 +2773,7 @@ VV.Form.DoAjaxFormSave()
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>7c28f35b-9b6c-4e93-bfe5-7edc07444bbe</ScriptItemId>
+			<ScriptItemId>ac993b85-77d6-412f-bf17-99deb53b650b</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>Form_onDataLoad</Name>
 			<Arguments>event</Arguments>
@@ -2785,7 +2785,7 @@ VV.Form.Global.DisplayModalLoad();</Script>
 			<FormTemplateIdList />
 		</FormScriptItem>
 		<FormScriptItem>
-			<ScriptItemId>9712f35b-00d0-4679-b453-e87961e9307a</ScriptItemId>
+			<ScriptItemId>2143073b-dc06-4f90-995f-374e970395c5</ScriptItemId>
 			<FormChId>00000000-0000-0000-0000-000000000000</FormChId>
 			<Name>btnClose1_onClick</Name>
 			<Arguments>event, control</Arguments>
@@ -2796,47 +2796,47 @@ VV.Form.Global.DisplayModalLoad();</Script>
 	</ScriptLibrary>
 	<ScriptAssignments>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>7f828583-39ac-47b6-8f03-2b2e08ba4fc6</ScriptAssignmentId>
+			<ScriptAssignmentId>b8db5c2e-dfa6-4880-bb7f-fe38426a0233</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>bd1bedb3-f6e1-43bb-8211-f8b4251f6fde</ScriptItemId>
+			<ScriptItemId>ef93f8ed-71c8-4b76-866d-d275eaec1a48</ScriptItemId>
 			<ControlId>7bd046c8-f30e-b42d-571c-2295b559e772</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>2</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>78cc38a5-316f-426b-b462-4d1c33db6aa7</ScriptAssignmentId>
+			<ScriptAssignmentId>7275e594-3015-4fa4-8822-be7273938e89</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>7c28f35b-9b6c-4e93-bfe5-7edc07444bbe</ScriptItemId>
-			<ControlId>00000001-0000-0000-0000-e0000000f010</ControlId>
-			<EventId>16</EventId>
-			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
-			<DefinedTemplateRevision>1</DefinedTemplateRevision>
-		</FormScriptAssignment>
-		<FormScriptAssignment>
-			<ScriptAssignmentId>58af0404-47ea-46e6-86d1-5a47bdef87a8</ScriptAssignmentId>
-			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>9712f35b-00d0-4679-b453-e87961e9307a</ScriptItemId>
-			<ControlId>a4f97f0c-71b3-74d4-4ac2-3a7e899a1bce</ControlId>
+			<ScriptItemId>3b5dc031-10eb-427d-9f04-fe98b0358e5a</ScriptItemId>
+			<ControlId>dcc4c208-d05e-cac1-fade-70334c13b657</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>1f1ce2b8-c7a5-4db6-99b3-5ff256a8720b</ScriptAssignmentId>
+			<ScriptAssignmentId>b22868f1-8a52-4c9d-8475-a0b193fecab0</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>dd604af8-5d01-41be-bafd-bb3f96981270</ScriptItemId>
+			<ScriptItemId>ff0bad37-50ec-4fc3-ba0f-adaf3d0524ef</ScriptItemId>
 			<ControlId>987211b3-011c-7297-c11f-cb0217abbb52</ControlId>
 			<EventId>4</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
 		<FormScriptAssignment>
-			<ScriptAssignmentId>4abfdf0c-eb5b-45f4-a403-11e205b27ad5</ScriptAssignmentId>
+			<ScriptAssignmentId>73e86774-9bdb-4540-b2e1-4580a45c28ba</ScriptAssignmentId>
 			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
-			<ScriptItemId>0bc9826b-cb48-41b1-8f0c-06f4c7a7e6bc</ScriptItemId>
-			<ControlId>dcc4c208-d05e-cac1-fade-70334c13b657</ControlId>
+			<ScriptItemId>2143073b-dc06-4f90-995f-374e970395c5</ScriptItemId>
+			<ControlId>a4f97f0c-71b3-74d4-4ac2-3a7e899a1bce</ControlId>
 			<EventId>4</EventId>
+			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
+			<DefinedTemplateRevision>1</DefinedTemplateRevision>
+		</FormScriptAssignment>
+		<FormScriptAssignment>
+			<ScriptAssignmentId>c1f702fb-8452-4825-ad32-d0ea72d29c75</ScriptAssignmentId>
+			<FormTemplateId>00000000-0000-0000-0000-000000000000</FormTemplateId>
+			<ScriptItemId>ac993b85-77d6-412f-bf17-99deb53b650b</ScriptItemId>
+			<ControlId>00000001-0000-0000-0000-e0000000f010</ControlId>
+			<EventId>16</EventId>
 			<DefinedFormTemplateId>00000000-0000-0000-0000-000000000000</DefinedFormTemplateId>
 			<DefinedTemplateRevision>1</DefinedTemplateRevision>
 		</FormScriptAssignment>
