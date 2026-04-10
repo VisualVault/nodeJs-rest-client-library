@@ -77,8 +77,6 @@ testing/helpers/vv-request.js     →  Playwright API write guard (guardedPut/Po
 lib/.../common.js                 →  Node.js REST client guard (HTTP-layer blocking)
 ```
 
-Runtime guards are a **safety net**, not the primary defense. The primary defense is following rules 1-6 above so unsafe code is never written in the first place.
-
 ## Development Commands
 
 > Full environment setup: [Dev Setup Guide](docs/guides/dev-setup.md)
@@ -140,6 +138,47 @@ See `tasks/` folder. Each task gets its own subfolder with analysis, test result
 | [extract-optimization](tasks/extract-optimization/) | Active      | Extract pipeline speed: parallel extraction, revision tracking, API-first                               |
 | [wadnr](projects/wadnr/)                            | In Progress | WADNR client project: impact analysis, exported artifacts                                               |
 
+## Principles
+
+1. **Reproducibility.** Shared content must be reproducible — bug reports describe the bug, reproduction steps, and root cause. Anyone with a VV environment can verify.
+2. **Environment-agnostic tooling.** Always prefer creating reusable scripts and tools over one-off solutions. Export, audit, inventory, and generator tools must work for any VV customer and environment. Hardcoded customer references go in `projects/`.
+3. **Knowledge separation.** Tasks hold platform knowledge, projects hold customer data. Platform bugs go in `tasks/`, customer-specific assessments go in `projects/{customer}/`.
+4. **Sharing boundary.** Raw test evidence is personal, analysis is shared. Run files and summaries are working notes; derived bug reports and analysis are platform documentation.
+5. **Defense in depth.** Runtime guards are a safety net, not the primary defense. The primary defense is never writing unsafe code in the first place.
+6. **Documentation as map.** CLAUDE.md files include: identity, structure, principles/rules, commands, pointers to deeper docs. Exclude: file inventories, code snippets, config contents, bug descriptions, API tables, historical narratives — link to the source instead.
+7. **Documentation hygiene.** (1) If derivable with `ls`/`grep`/`cat`, link instead. (2) No duplication. (3) If it goes stale when a file is added, it doesn't belong. (4) Compress on task completion.
+
+## Rules
+
+### Write Safety
+
+See the [Write Safety](#write-safety--mandatory) section for the 6 mandatory write rules, environment classification, and enforcement architecture.
+
+### Upstream Protection
+
+- **Never modify `lib/` files without explicit user approval.** This mirrors Write Safety rules for customer environments.
+- To commit a protected file: `UPSTREAM_OK=1 git commit ...`
+- To permanently allow a path: add it to `.husky/upstream-allowlist`
+
+### Content Boundaries
+
+- **Customer data never reaches the team repo.** Exported scripts, templates, field inventories — all customer IP. Lives in `projects/{customer}/`.
+- **Historical records are immutable.** Run files and test-case specs document state at execution time. Don't update paths or data retroactively.
+
+### Browser Automation
+
+- **Always use Playwright** for browser navigation, testing, and interaction — never the Claude Chrome extension (`mcp__claude-in-chrome__*` tools).
+- **Always run Playwright in headless mode** unless the user explicitly requests headed mode.
+- Use the `playwright-cli` skill and existing Playwright infrastructure in `testing/`.
+
+### CLAUDE.md Standards
+
+**Create a CLAUDE.md for:** top-level topic folders (`tools/`, `testing/`, `tasks/`, `projects/`, `docs/`, `scripts/`), individual tasks (`tasks/{task-name}/`), individual projects (`projects/{customer}/`).
+
+**Do NOT create CLAUDE.md for:** implementation subfolders (`tools/extract/`, `testing/fixtures/`, etc.), data directories (`projects/wadnr/extracts/`, `tasks/*/runs/`).
+
+**Size targets:** Root ~200 lines | Scope folders ~30-80 lines | Tasks/Projects flexible but aggressively pruned.
+
 ## Repository Architecture & Sharing Model
 
 This repo serves as both a **shared team workspace** and a **personal development environment**. The sharing boundary is which Git remote you push to, not which files you track.
@@ -163,41 +202,9 @@ Every developer commits ALL their work to their **private repo** (full backup, m
 **Shared** (team repo): `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `tasks/` analysis + matrix + test-cases.
 **Not shared** (private repo only): `projects/`, `tasks/` results/runs/summaries, `.env.json`.
 
-### Guiding Principles
-
-1. **Shared content must be reproducible.** Bug reports describe the bug, reproduction steps, and root cause — anyone with a VV environment can verify.
-2. **Tools are environment-agnostic.** Export, audit, inventory, and generator tools work for any VV customer. Hardcoded customer references go in `projects/`.
-3. **Customer data never reaches the team repo.** Exported scripts, templates, field inventories — all customer IP. Lives in `projects/{customer}/`.
-4. **Tasks hold platform knowledge, projects hold customer data.** Platform bugs go in `tasks/`, customer-specific assessments go in `projects/{customer}/`.
-5. **Raw test evidence is personal, analysis is shared.** Run files and summaries are working notes; derived bug reports and analysis are platform documentation.
-6. **Historical records are immutable.** Run files and test-case specs document state at execution time. Don't update paths or data retroactively.
-
 ### Current State
 
 Single-repo workflow — `emanueljofre/nodeV2` holds everything until team sharing begins. When shared: add a private remote, uncomment `.gitignore` lines for `/projects/` and `tasks/**/runs/`. New developers clone the team repo, rename origin to `shared`, add their private repo as `origin`.
-
-### CLAUDE.md Convention
-
-Every folder that represents a **distinct scope** gets its own `CLAUDE.md`. This gives Claude Code immediate context when working in that area.
-
-**Placement — create a CLAUDE.md for:**
-
-- Top-level topic folders (`tools/`, `testing/`, `tasks/`, `projects/`, `docs/`, `scripts/`)
-- Individual tasks (`tasks/{task-name}/`)
-- Individual projects (`projects/{customer}/`)
-
-**Placement — do NOT create CLAUDE.md for:**
-
-- Implementation subfolders (`tools/extract/`, `testing/fixtures/`, etc.) — described by the parent
-- Data directories (`projects/wadnr/extracts/`, `tasks/*/runs/`) — no context needed beyond the parent
-
-#### Content Standard: CLAUDE.md Is a Map, Not a Textbook
-
-**Include:** identity (1-2 sentences), structure (subfolder purposes), principles/rules, quick reference commands, pointers to deeper docs. **Exclude:** detailed file inventories, code snippets, config contents, full bug descriptions, per-test counts, API tables, historical narratives — link to the source instead.
-
-**Pruning rules:** (1) One-command rule — if derivable with `ls`/`grep`/`cat`, link instead. (2) No duplication. (3) If it goes stale when a file is added, it doesn't belong. (4) Compress on task completion.
-
-**Size targets:** Root ~200 lines (includes Write Safety) | Scope folders ~30-80 lines | Tasks/Projects flexible but aggressively pruned.
 
 ## Upstream Sync & Protection
 
@@ -209,12 +216,6 @@ Every folder that represents a **distinct scope** gets its own `CLAUDE.md`. This
 2. **Allowlist** (`.husky/upstream-allowlist`) — declares which `lib/` paths are locally maintained (currently: `routes/`)
 3. **CI drift report** (`.github/workflows/upstream-guard.yml`) — reports `lib/` divergence from upstream on PRs (informational, non-blocking)
 4. **Gitattributes** — `lib/VVRestApi/**` marked `upstream-tracked` for tooling visibility
-
-### Rules
-
-- **Never modify `lib/` files without explicit user approval.** This mirrors the Write Safety rules for customer environments.
-- To commit a protected file: `UPSTREAM_OK=1 git commit ...`
-- To permanently allow a path: add it to `.husky/upstream-allowlist`
 
 ### Sync commands
 
