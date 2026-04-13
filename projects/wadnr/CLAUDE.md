@@ -95,7 +95,7 @@ Runner requires `--template-name "zzzDate Test Harness"` (form name differs from
 
 ### Forms Calendar
 
-116 PASS / 0 FAIL — BRT-Chromium only (2026-04-10). All 116 tests identical to EmanuelJofre baseline. Covers Categories 1-9, 11-12, and Bug 1 audit spec. IST/UTC timezones and Firefox/WebKit not yet run. Cat 3 cross-TZ requires WADNR saved records. Cross-environment differential investigation (Cat 14–16) in progress — Kendo v2 audit data captured, mask impact and server TZ pending. See `testing/date-handling/forms-calendar/status.md`.
+116 PASS / 0 FAIL — BRT-Chromium (2026-04-10) for Cat 1-12. Cross-environment differential (Cat 14-16) completed 2026-04-13: Cat 14 Phase A 13 tests (8P/5F-3 Bug #5), Cat 15 Kendo comparison 8 PASS (v1≈v2, corrected assumptions), Cat 16 Server TZ 6 PASS (identical across envs). See `testing/date-handling/forms-calendar/status.md`.
 
 ## Related
 

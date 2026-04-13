@@ -1,6 +1,6 @@
 # Forms Calendar Status — WADNR (vv5dev)
 
-Last run: 2026-04-10 | BRT-Chromium only | 116P / 0F | Run: [wadnr-full-run-2026-04-10.md](runs/wadnr-full-run-2026-04-10.md)
+Last run: 2026-04-13 | BRT-Chromium | 135P / 5F-3 / 3 PENDING | Cat 1-12: [wadnr-full-run-2026-04-10.md](runs/wadnr-full-run-2026-04-10.md) | Cat 14-16: session 2026-04-13
 
 ## Summary
 
@@ -25,25 +25,22 @@ Last run: 2026-04-10 | BRT-Chromium only | 116P / 0F | Run: [wadnr-full-run-2026
 
 ## Cross-Environment Differential (Cat 14–16)
 
-| Category | Slots | Status | Notes |
-|----------|:-----:|--------|-------|
-| 14 — Mask Impact | 13 | PENDING | Requires mask modification on EmanuelJofre DateTest |
-| 15 — Kendo Widget Compare | 8 | PARTIAL | WADNR v2 data captured; vvdemo v1 TBD |
-| 16 — Server TZ Form Save | 6 | PENDING | After Cat 14–15 |
+| Category | Slots | PASS | FAIL | Status | Notes |
+|----------|:-----:|:----:|:----:|--------|-------|
+| 14 — Mask Impact | 13 | 8 | 5 (Bug #5) | Phase A done | Unmasked baseline on WADNR. Phase B/C (add masks) pending on EmanuelJofre. |
+| 15 — Kendo Widget Compare | 8 | 8 | 0 | **Complete** | Cross-env done. v1≈v2 (corrected: both lack kendo global + name attrs). |
+| 16 — Server TZ Form Save | 6 | 6 | 0 | **Complete** | Cross-env done. vv5dev=vvdemo — server TZ irrelevant. |
 
-**Audit run (2026-04-10)**: [audit-kendo-version-wadnr-2026-04-10.md](runs/audit-kendo-version-wadnr-2026-04-10.md) — Key findings: `kendo` global absent on v2, DOM selectors differ, VV value pipeline identical.
-
-**Natural mask comparison**: Field3 (`mask="MM/dd/yyyy"`) vs Field7 (no mask) — both Config A on WADNR test harness.
+**Cat 15 findings (corrected 2026-04-13)**: Both envs use Angular module system — no `kendo` global on either, no `[name=FieldN]` DOM selectors on either. Real differences: calendarValueService methods (1 vs 4), property count (26 vs 28). VV value pipeline identical.
 
 ## Coverage Gaps
 
-- **IST/UTC timezones**: Not run. Only BRT executed in this session.
+- **IST/UTC timezones**: Not run. Only BRT executed.
 - **Cat 1 C-H**: Calendar popup only tested for Config A, B.
 - **Cat 3 cross-TZ**: No WADNR saved records — Cat 3 IST↔BRT not possible yet.
 - **Cat 5/6 A, D**: Preset/current date not tested for these configs.
 - **Cat 10**: Web service input — not implemented in spec suite.
-- **Cat 14 Mask Impact**: 8 WADNR DateTime fields at risk (date-only mask on DateTime config).
-- **Cat 15 vvdemo side**: Need to run audit on EmanuelJofre for comparison.
+- **Cat 14 Phase B/C**: Mask impact verification pending (requires Form Designer on EmanuelJofre).
 
 ## Comparison to EmanuelJofre Baseline
 

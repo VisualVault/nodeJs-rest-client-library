@@ -2338,3 +2338,29 @@ Full evidence is in the linked run file. Narrative context is in the summary fil
 - 2026-04-09 [TC-9-D-IST-8 Run 2](runs/tc-9-D-IST-8-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #5
 - 2026-04-09 [TC-9-D-IST-10 Run 2](runs/tc-9-D-IST-10-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #5
 - 2026-04-09 [TC-9-B-IST Run 2](runs/tc-9-B-IST-run-2.md) — IST — FAIL — Chromium confirms known bug — Bug #7
+
+## Session 2026-04-13 (BRT — Cat 16 Server TZ, vvdemo half)
+
+**Purpose**: Cat 16 server TZ comparison — EmanuelJofre (vvdemo, server BRT) half
+**Key outcomes**: 6 PASS — all values identical to vv5dev (server PDT). Server TZ confirmed irrelevant.
+
+- 2026-04-13 [TC-16-A-typed Run 1](runs/tc-16-A-typed-run-1.md) — BRT — PASS — API T00:00:00Z identical to vv5dev
+- 2026-04-13 [TC-16-C-typed Run 1](runs/tc-16-C-typed-run-1.md) — BRT — PASS — API T00:00:00Z identical to vv5dev
+- 2026-04-13 [TC-16-D-SFV Run 1](runs/tc-16-D-SFV-run-1.md) — BRT — PASS — API T14:30:00Z identical (Bug #5 on both)
+- 2026-04-13 [TC-16-A-controls Run 1](runs/tc-16-A-controls-run-1.md) — BRT — PASS — reload preserved, identical
+- 2026-04-13 [TC-16-C-controls Run 1](runs/tc-16-C-controls-run-1.md) — BRT — PASS — reload preserved, identical
+- 2026-04-13 [TC-16-D-controls Run 1](runs/tc-16-D-controls-run-1.md) — BRT — PASS — reload preserved, Bug #5 on both
+
+## Session 2026-04-13 (BRT — Cat 15 Kendo Widget Comparison, vvdemo half)
+
+**Purpose**: Cat 15 Kendo widget audit — vvdemo (v1) captures for cross-env comparison
+**Key outcomes**: 8 PASS. Surprise: vvdemo lacks kendo global and name attrs too (corrects v1/v2 assumptions). Real differences: calendarValueService methods (1 vs 4), 2 extra props on v2.
+
+- 2026-04-13 [TC-15-vv-core Run 1](runs/tc-15-vv-core-run-1.md) — BRT — PASS — formId=undef, V1, 26 props, 1 method (vs v2: 28 props, 4 methods)
+- 2026-04-13 [TC-15-fieldMaster-D Run 1](runs/tc-15-fieldMaster-D-run-1.md) — BRT — PASS — identical to v2
+- 2026-04-13 [TC-15-fieldMaster-C Run 1](runs/tc-15-fieldMaster-C-run-1.md) — BRT — PASS — identical to v2
+- 2026-04-13 [TC-15-kendo-global Run 1](runs/tc-15-kendo-global-run-1.md) — BRT — PASS — not defined (same as v2!)
+- 2026-04-13 [TC-15-widget-opts-D Run 1](runs/tc-15-widget-opts-D-run-1.md) — BRT — PASS — input not found (same as v2!)
+- 2026-04-13 [TC-15-widget-opts-A Run 1](runs/tc-15-widget-opts-A-run-1.md) — BRT — PASS — input not found (same as v2!)
+- 2026-04-13 [TC-15-sfv-widget Run 1](runs/tc-15-sfv-widget-run-1.md) — BRT — PASS — VV values identical, widget=null on both
+- 2026-04-13 [TC-15-mask-scan Run 1](runs/tc-15-mask-scan-run-1.md) — BRT — PASS — no masks on EmanuelJofre (WADNR has Field3/4 masks)

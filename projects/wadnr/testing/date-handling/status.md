@@ -1,21 +1,23 @@
 # Date Handling Status — WADNR (vv5dev)
 
-Last updated: 2026-04-10
+Last updated: 2026-04-13
 
 ## Summary
 
 | Component | Slots | Executed | PASS | FAIL | BLOCKED | Status | Details |
 |-----------|-------|----------|------|------|---------|--------|---------|
-| Forms Calendar | 242 | 116 | 116 | 0 | 0 | BRT-Chromium done | [status](forms-calendar/status.md) |
+| Forms Calendar | 269 | 143 | 135 | 5 | 0 | Cat 1-12 + 14-16 done | [status](forms-calendar/status.md) |
 | Web Services | 148 | 148 | 130 | 18 | 0 | Complete | [status](web-services/status.md) |
 | Dashboards | 44 | 35 | 27 | 8 | 9 | Complete | [status](dashboards/status.md) |
-| **Total** | **434** | **299** | **273** | **26** | **9** | | |
+| **Total** | **461** | **326** | **292** | **31** | **9** | | |
 
 ## Notes
 
 - All 6 WS bugs + FORM-BUG-7 + CB-29 confirmed as platform-level — results identical to EmanuelJofre baseline.
 - WS-10 forminstance/ previously BLOCKED (8 slots) — **now complete** after write policy fix (body-based template matching).
 - Dashboard DB-5 (filter) BLOCKED — filter toolbar not enabled. DB-3 D-H BLOCKED — no IST browser data.
-- Forms Calendar: 116/116 PASS on BRT-Chromium (2026-04-10). IST/UTC TZs and Firefox/WebKit not yet run. Cat 3 cross-TZ requires WADNR saved records.
-- Cross-env differential (Cat 14–16): 27 new slots defined. Cat 15 audit captured WADNR v2 data (kendo global absent, DOM selectors differ, VV pipeline identical). Cat 14 (mask impact) and Cat 16 (server TZ) pending.
+- Forms Calendar Cat 1-12: 116/116 PASS on BRT-Chromium (2026-04-10).
+- Cat 14 (Mask Impact): Phase A complete — 13 tests (8P/5F-3 Bug #5). Phase B/C pending.
+- Cat 15 (Kendo Widget): Complete — 8 PASS. v1≈v2, corrected assumptions (both lack kendo global).
+- Cat 16 (Server TZ): Complete — 6 PASS. Server TZ irrelevant for form save pipeline.
 - Near-production constraint: no changes to DNR environment beyond zzz-prefixed test assets.
