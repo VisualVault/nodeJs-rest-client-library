@@ -33,3 +33,4 @@ Execution output bound to a specific customer or environment — actual observed
 | `date-handling/`        | Cross-platform date bug investigation (Forms, WS, Dashboards, Document Library) — 16 confirmed bugs |
 | `form-templates/`       | VV form template XML analysis, format documentation, template generation                            |
 | `extract-optimization/` | Extract pipeline speed + reliability — parallel extraction, revision tracking, API-first            |
+| `ws-naming/`            | Web service naming — valid character investigation (`_`, `-`, special chars)                        |

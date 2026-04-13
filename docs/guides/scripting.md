@@ -22,16 +22,35 @@ module.exports.main = async function (ffCollection, vvClient, response) {
 
 ### Scheduled Scripts (`/scheduledscripts`)
 
-Triggered by cron schedules. No form context — scripts must query data explicitly.
+Triggered by cron schedules or manually via the "Test Microservice" button in `scheduleradmin`. No form context — scripts must query data explicitly.
 
 ```javascript
+module.exports.getCredentials = function () {
+    var options = {};
+    options.customerAlias = 'CustomerName';
+    options.databaseAlias = 'Main';
+    options.userId = 'user@example.com';
+    options.password = '...';
+    options.clientId = '...';
+    options.clientSecret = '...';
+    return options;
+};
+
 module.exports.main = async function (vvClient, response, token) {
-    // vvClient: authenticated VV REST API client
+    // vvClient: authenticated VV REST API client (uses getCredentials() above)
     // response: Express response object
-    // token: optional token parameter from the scheduler
+    // token: the scheduledProcessGUID — pass to postCompletion() to report results
     // NOTE: no ffCollection — scheduled scripts have no form context
+
+    var scheduledProcessGUID = token;
+    // ... do work ...
+    return vvClient.scheduledProcess.postCompletion(scheduledProcessGUID, 'complete', true, 'Success message');
 };
 ```
+
+**Script caching:** The server writes the script to `lib/VVRestApi/VVRestApiNodeJs/files/{scriptId}.js` on first execution. On subsequent calls, it deletes the cached file and re-writes the latest version from VV. This means script changes in the admin UI take effect on the next execution without a server restart.
+
+**`getCredentials()` is required** for scheduled scripts — the server calls it to authenticate with the VV API before invoking `main()`. Form scripts don't need it (the server uses the calling user's session).
 
 ---
 
@@ -111,16 +130,37 @@ VV Server responds with JSON
     │
     └── Script receives parsed JavaScript object
            - Dates are normalized to ISO 8601 datetime with Z suffix (e.g., "2026-03-15T00:00:00Z")
-           - Field names are in camelCase (e.g., "dataField7" not "Field7")
+           - Field names have first character lowercased (e.g., "dataField7" not "Field7", "start Date" not "Start Date")
 ```
 
-### Field Name Casing
+### Field Name Casing (Response Key Transformation)
 
-The VV REST API returns field names in **camelCase** (e.g., `dataField7`, not `Field7` or `datafield7`). When reading field values from API response objects (e.g., from `getForms()`), use camelCase:
+The VV REST API transforms field names in response objects by **lowercasing only the first character** — the rest of the name is preserved exactly. This is not camelCase; it's a single-character transformation applied uniformly.
+
+| Source Name (Template / SQL Column) | Response Key           | Rule                         |
+| ----------------------------------- | ---------------------- | ---------------------------- |
+| `Status`                            | `status`               | S→s                          |
+| `Address`                           | `address`              | A→a                          |
+| `Start Date`                        | `start Date`           | S→s, space + rest preserved  |
+| `Subscription Pack ID`              | `subscription Pack ID` | S→s, spaces + rest preserved |
+| `ADDRESS`                           | `aDDRESS`              | A→a, rest stays uppercase    |
+| `UsId`                              | `usId`                 | U→u                          |
+| `UsSiteID`                          | `usSiteID`             | U→u                          |
+| `Field7` → `dataField7`             | `dataField7`           | d→d (already lowercase)      |
+
+**This applies to all API response types** — `getForms()`, `getCustomQueryResultsByName()`, and system table queries all apply the same transformation. For custom queries, the source name is the SQL column name or alias.
+
+**`q` filters are case-insensitive** — `[Start Date] eq '...'` and `[start date] eq '...'` both work. But response object keys always use the transformed form.
 
 ```javascript
-const record = await getForms(...);
-const value = record.data[0]['dataField7'];  // camelCase, not 'Field7'
+// Reading: use the transformed key (lowercase first char)
+const record = (await getForms(...)).data[0];
+record['dataField7'];    // getForms field access
+record['start Date'];    // multi-word field (space preserved)
+
+const cqRow = (await getCustomQueryResultsByName(...)).data[0];
+cqRow.usFirstName;       // SQL column UsFirstName → usFirstName
+cqRow['provider ID'];    // SQL column/alias "Provider ID" → "provider ID"
 ```
 
 When **writing** field values (e.g., `postForms()`, `postFormRevision()`), the API accepts the original casing:

@@ -72,6 +72,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - vv5dev `zzzTarget Date Test Harness` template updated to v1.2: `EnableQListener=true` on all 33 fields (was `false` — config gap from initial template creation). Fixes all 32 Cat 4 URL parameter test failures (27/27 BRT+IST pass). Export/modify/import workflow via `testing/tmp/fix-enableqlistener.js`
 - Cross-environment differential investigation (Cat 14–16): 27 new matrix slots for mask impact, Kendo widget comparison, and server TZ form save. Audit spec `audit-kendo-version.spec.js` captures VV.Form properties, fieldMaster entries, Kendo widget internals, and mask properties per environment. Key finding: Kendo v2 (vv5dev) does not expose `kendo` global or `[name="FieldN"]` DOM selectors — widget access requires different patterns than v1
 - WADNR forms-calendar first regression: 116/116 PASS on BRT-Chromium (2026-04-10). All results identical to EmanuelJofre baseline. Run artifacts in `projects/wadnr/testing/date-handling/forms-calendar/`
+- `tools/admin/` — Playwright-based admin tools for creating and verifying VV objects: `create-ws.js` (web services), `create-schedule.js` (scheduled services), `verify-ws.js` (REST API verification with glob matching and invocation), `test-schedule.js` (enable + trigger "Test Microservice" + verify execution), `explore-admin.js` (generic admin page explorer for toolbar/dock panel/grid discovery). All tools use `--project` flag, respect `readOnly` environments, and reuse `vv-admin.js` helpers
+- `tasks/ws-naming/` — investigation confirming `_` and `-` are valid in web service and scheduled service names. No transformation, no encoding. Verified via creation, API visibility, runtime execution, and `postCompletion()` callback on vvdemo
+- `/@-create-task` scope check — skill now asks whether the investigation is platform-level (`tasks/`) or customer-bound (`projects/{customer}/analysis/`) before scaffolding
 
 ### Changed
 

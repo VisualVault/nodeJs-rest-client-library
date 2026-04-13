@@ -403,7 +403,18 @@ Where external service endpoints are registered. The Node.js server (`nodeV2`) a
 
 **How it connects to nodeV2:** When a form event fires or a scheduled process runs, VV calls the registered URL in this library. The `nodeV2` server receives the POST, executes the script code, and returns results.
 
-**REST API:** `GET /outsideprocesses` returns all registered microservices with metadata: `id`, `name`, `description`, `processCategory` (0=Form, 1=Scheduled, 5=Workflow), `processType`, `createDate`, `createBy`, `modifyDate`, `modifyBy`. Does **NOT** include script source code. Individual resource fetch (`GET /outsideprocesses/{id}`) returns HTTP 405 — not supported.
+**REST API:** `GET /outsideprocesses` returns all registered microservices with metadata: `id`, `name`, `description`, `processCategory` (0=Form, 1=Scheduled, 5=Workflow), `processType`, `createDate`, `createBy`, `modifyDate`, `modifyBy`. Does **NOT** include script source code. Individual resource fetch (`GET /outsideprocesses/{id}`) returns HTTP 405 — not supported. Note: the VV client returns the response as a **raw JSON string** — parse with `typeof res === 'string' ? JSON.parse(res) : res` before accessing `.data`.
+
+**No REST API for creating microservices** — CRUD operations (create, update, delete) are only available via the admin UI.
+
+#### Toolbar
+
+| Button                   | Title attribute                 | Notes                                  |
+| ------------------------ | ------------------------------- | -------------------------------------- |
+| Add Service              | `AddOutsideProcess`             | Opens empty dock panel for new service |
+| Delete Selected Services | `Remove selected microservices` | Deletes checked rows                   |
+
+Toolbar buttons are Telerik RadToolBar items (`a.StandardToolBarButton.rtbWrap`).
 
 **WADNR stats (2026-04-08):** 272 registered microservices (44 Form, 19 Scheduled, 209 Workflow).
 
@@ -413,18 +424,34 @@ Clicking a service name in the grid opens an inline **"MICROSERVICE DETAILS"** d
 
 **Detail panel fields:**
 
-| Field                      | Element             | Notes                                                            |
-| -------------------------- | ------------------- | ---------------------------------------------------------------- |
-| Name                       | `txtOpName`         | Service name (editable)                                          |
-| Description                | `txtDescription`    | (editable)                                                       |
-| Service Type               | `ddlCategory`       | Dropdown                                                         |
-| Connection Type            | `ddlConnectionType` | Dropdown                                                         |
-| Timeout                    | `txtServiceTimeout` | Long Running Service Settings section                            |
-| Allow anonymous access     | checkbox            | Security Settings section                                        |
-| IP Address Restrictions    | text                | Security Settings section                                        |
-| Enable completion callback | checkbox            | Completion callback section                                      |
-| **Script source**          | `txtScriptCode`     | Full textarea ID: `ctl00_ContentBody_dockDetail_C_txtScriptCode` |
-| Script ID                  | `lblScriptId`       | GUID displayed at bottom of panel                                |
+| Field                      | Element             | Notes                                                                                                                                      |
+| -------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Name                       | `txtOpName`         | Service name (editable). `_` and `-` are valid characters.                                                                                 |
+| Description                | `txtDescription`    | (editable)                                                                                                                                 |
+| Service Type               | `ddlCategory`       | Dropdown (see options below)                                                                                                               |
+| Connection Type            | `ddlConnectionType` | Dropdown: `1`=Web Service, `2`=Node.Js Server. **Changing this triggers a postback** that switches between `txtWSURL` and `txtScriptCode`. |
+| Timeout                    | `txtServiceTimeout` | Long Running Service Settings section                                                                                                      |
+| Allow anonymous access     | checkbox            | Security Settings section                                                                                                                  |
+| IP Address Restrictions    | text                | Security Settings section                                                                                                                  |
+| Enable completion callback | checkbox            | Completion callback section                                                                                                                |
+| WS URL                     | `txtWSURL`          | Textarea — visible when Connection Type = Web Service (1)                                                                                  |
+| **Script source**          | `txtScriptCode`     | Textarea — visible when Connection Type = Node.Js Server (2). Full ID: `ctl00_ContentBody_dockDetail_C_txtScriptCode`                      |
+| Script ID                  | `lblScriptId`       | GUID displayed at bottom of panel                                                                                                          |
+
+**Category dropdown values (`ddlCategory`):**
+
+| Value | Label                         |
+| ----- | ----------------------------- |
+| 0     | Form Controls                 |
+| 1     | Scheduled Service             |
+| 2     | Web Service Data Query        |
+| 3     | Two Factor Authentication     |
+| 4     | User Session End              |
+| 5     | Node.Js Script Service        |
+| 6     | Form Workflow Web Service     |
+| 7     | Document Workflow Web Service |
+
+**Connection type postback:** Changing `ddlConnectionType` requires an ASP.NET `__doPostBack` to reload the dock panel with the correct fields. The dropdown value alone does not update the UI — the postback switches between `txtWSURL` (Web Service) and `txtScriptCode` (Node.Js Server). Without the postback, services may be saved with the wrong connection type and become invisible to the `outsideprocesses` API. Use `triggerPostback(page, 'ctl00$ContentBody$dockDetail$C$ddlConnectionType', 'outsideprocessadmin')` in Playwright.
 
 **Grid column layout (10 columns, verified 2026-04-08):**
 
@@ -448,7 +475,39 @@ Clicking a service name in the grid opens an inline **"MICROSERVICE DETAILS"** d
 **UI Label:** "Scheduled Services"
 **Breadcrumb:** Control Panel > Enterprise Tools > Scheduled Services
 
-Cron-like configuration for automated scripts. Each schedule references a Microservice by name. No REST API exists for listing schedules — the `scheduledProcess` manager only exposes `postCompletion()` and `runAllScheduledProcesses()`.
+Cron-like configuration for automated scripts. Each schedule references a Microservice by name. No REST API exists for listing or creating schedules — the `scheduledProcess` manager only exposes `postCompletion()` and `runAllScheduledProcesses()`.
+
+**No REST API for creating scheduled services** — CRUD operations are only available via the admin UI.
+
+#### Toolbar
+
+| Button                    | Title attribute             | Notes                  |
+| ------------------------- | --------------------------- | ---------------------- |
+| Add a Scheduled Service   | `Add a Scheduled Service`   | Opens empty dock panel |
+| Delete Selected Schedules | `Remove Selected Schedules` | Deletes checked rows   |
+
+#### Schedule Detail Panel
+
+Clicking a schedule name opens an inline dock panel with these fields:
+
+| Field                | Element                                     | Notes                                                                                                                |
+| -------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Name                 | `txtSpName`                                 | Schedule name (required). `_` and `-` are valid characters.                                                          |
+| Description          | `txtSpDescription`                          | (optional)                                                                                                           |
+| Enabled              | `chkEnabled`                                | Checkbox — activates the schedule                                                                                    |
+| Localization         | `DdlCultureCode`                            | Dropdown: en-US, pt-BR, zh-HANS, es-PE, es-CO                                                                        |
+| Start Date           | `calStartDate1`                             | Telerik RadDatePicker                                                                                                |
+| Start Time           | `txtStartHour`, `txtStartMinute`, `cboAMPM` | Hour/minute/AM-PM                                                                                                    |
+| Recurring            | `chkRecurring`                              | **Defaults to checked on new items.** Must uncheck or provide interval — save fails with validation error otherwise. |
+| Recurrence Interval  | `txtRecurrenceInterval`                     | Numeric (e.g., "2")                                                                                                  |
+| Recurrence Unit      | `cboRecurrenceUnitType`                     | Minutes (0), Hours (1), Days (2), Weeks (3), Months (4), Years (5)                                                   |
+| Linked Service       | `cboOutsideProcessName`                     | Dropdown of Microservices with Category = Scheduled. References by GUID, displays by name.                           |
+| Test Microservice    | `btnTest_input`                             | Triggers immediate execution (see below)                                                                             |
+| Save And Add Another | `btnSaveAndAdd_input`                       | Saves and resets panel for next entry                                                                                |
+| Save                 | `btnSave_input`                             | Saves current entry                                                                                                  |
+| Close                | `btnCancel_input`                           | Closes panel without saving                                                                                          |
+
+**"Test Microservice" button behavior:** Triggers an immediate execution of the linked service via the VV cloud → Node.js server pipeline. The response appears in a RadWindow dialog. **Does NOT update "Last Run Date"** in the grid — that field only updates for automatic scheduled triggers, not manual tests. Verified 2026-04-13 on vvdemo.
 
 **Grid column layout (verified 2026-04-08, WADNR: 21 schedules):**
 
@@ -601,6 +660,8 @@ VV Platform
 The Microservice registered in VV points to `{nodeV2 server URL}/scripts` or `/scheduledscripts`. VV calls this URL with the script code as payload. The server executes it and responds.
 
 **Registration:** Each script is registered in **Microservices** (`/outsideprocessadmin`) as `Service Type: NodeServer`. Form scripts use `Category: Form`; cron scripts use `Category: Scheduled` and appear in **Scheduled Services** too.
+
+**vvdemo routing:** The vvdemo environment routes Node.js microservice calls through **ngrok** to `localhost:3000`. When the local server isn't running, the error is `ERR_NGROK_8012: Traffic successfully made it to the ngrok agent, but the agent failed to establish a connection to the upstream web service at localhost:3000`. Start the server with `node lib/VVRestApi/VVRestApiNodeJs/app.js` before testing microservice execution.
 
 ---
 
@@ -1036,9 +1097,9 @@ https://vvdemo.visualvault.com/OfflineForms/index.html#!/land?xcid=...&xcdid=...
 
 ## API Behavior Notes
 
-### Field Name Casing
+### Field Name Casing (Response Key Transformation)
 
-The VV REST API returns field names in **camelCase** in response objects (e.g., `dataField7` instead of `Field7`). When writing data, the API accepts the original mixed casing. Scripts must account for this asymmetry when reading field values from API responses vs. constructing field data for writes.
+The VV REST API transforms field names in response objects by **lowercasing only the first character** — the rest of the name is preserved exactly (not camelCase). Examples: `Status`→`status`, `Start Date`→`start Date`, `ADDRESS`→`aDDRESS`, `UsId`→`usId`. This applies to all response types: `getForms()`, `getCustomQueryResultsByName()`, and system table queries. For custom queries, the source is the SQL column name or alias. `q` filters are case-insensitive; response keys are not. When writing data, the API accepts the original mixed casing. See [scripting.md § Field Name Casing](../guides/scripting.md#field-name-casing-response-key-transformation) for the full reference table.
 
 ### Date Format Normalization
 

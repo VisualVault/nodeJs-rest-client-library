@@ -143,6 +143,7 @@ See `tasks/` folder. Each task gets its own subfolder with analysis, test result
 | [date-handling](tasks/date-handling/)               | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Document Library |
 | [form-templates](tasks/form-templates/)             | Active      | VV form template XML analysis, format documentation, and improved template generation                   |
 | [extract-optimization](tasks/extract-optimization/) | Active      | Extract pipeline speed: parallel extraction, revision tracking, API-first                               |
+| [ws-naming](tasks/ws-naming/)                       | Active      | Web service naming — valid character investigation                                                      |
 | [wadnr](projects/wadnr/)                            | In Progress | WADNR client project: impact analysis, exported artifacts                                               |
 
 ## Principles

@@ -12,6 +12,7 @@ Standalone CLI utilities for working with VV environments. Not tied to Playwrigh
 | `inventory/`  | Analyze extracted project data                | `node tools/inventory/inventory-fields.js`                                                 |
 | `generators/` | Create structured artifacts from test results | `node tools/generators/generate-artifacts.js`                                              |
 | `explore/`    | Platform exploration + version monitoring     | `npm run explore:headed`, `npm run version:snapshot`                                       |
+| `admin/`      | Create/manage VV admin objects via Playwright | `node tools/admin/create-ws.js --project emanueljofre --name myWS`                         |
 | `helpers/`    | Shared libraries used by tools                | `vv-admin.js`, `vv-probes.js`, `vv-browser-probes.js`, `vv-explore.js`, `build-context.js` |
 
 ## Explore Commands
