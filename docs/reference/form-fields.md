@@ -49,18 +49,20 @@ Each calendar field has the following boolean config flags. These are readable a
 
 VV environments run different Kendo UI versions. The calendar field rendering differs significantly:
 
-| Property                   | Kendo v1 (vvdemo)                                                    | Kendo v2 (vv5dev)                                                                                                                                          |
-| -------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Input `role`               | `spinbutton`                                                         | `combobox`                                                                                                                                                 |
-| Container classes          | `k-widget k-datepicker`                                              | `k-datepicker k-input k-input-md k-rounded-md k-input-solid`                                                                                               |
-| DateTime placeholder       | `MM/dd/yyyy hh:mm a`                                                 | `MM/dd/yyyy hh:mm a` (only if `<Mask>` is empty — see below)                                                                                               |
-| Calendar header            | `kendo-calendar-header .k-title`                                     | `kendo-calendar-header button.k-calendar-title`                                                                                                            |
-| Time tab active            | `button.k-time-tab.k-state-active`                                   | `button[title="Time tab"][aria-pressed="true"]`                                                                                                            |
-| Toggle button              | `<span>` with `role="button"` (date-only)                            | `<button>` with `aria-label="Toggle popup"` or `"Toggle calendar"`                                                                                         |
-| `VV.Form.formId`           | Populated (template GUID)                                            | `undefined` — use URL `formid` param instead                                                                                                               |
-| `kendo` global             | Available (`kendo.version`, `kendo.parseDate()`, `kendo.toString()`) | **Not defined** — Kendo v2 is bundled as a module, not exposed as a global. Access widget API through Angular DI or `$().data('kendoDatePicker')` instead. |
-| `VV.Form` properties       | 25 properties                                                        | 28 properties (adds `LocalizationResources`, `LocalizeString`, `CurrentLanguageCode`, `FormLanguage`)                                                      |
-| `[name="FieldN"]` selector | Matches calendar input elements                                      | **Does not match** — v2 DOM structure differs. Use VV.Form JS API for value access instead of DOM selectors.                                               |
+| Property                   | Kendo v1 (vvdemo)                                                                   | Kendo v2 (vv5dev)                                                                                                          |
+| -------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Input `role`               | `spinbutton`                                                                        | `combobox`                                                                                                                 |
+| Container classes          | `k-widget k-datepicker`                                                             | `k-datepicker k-input k-input-md k-rounded-md k-input-solid`                                                               |
+| DateTime placeholder       | `MM/dd/yyyy hh:mm a`                                                                | `MM/dd/yyyy hh:mm a` (only if `<Mask>` is empty — see below)                                                               |
+| Calendar header            | `kendo-calendar-header .k-title`                                                    | `kendo-calendar-header button.k-calendar-title`                                                                            |
+| Time tab active            | `button.k-time-tab.k-state-active`                                                  | `button[title="Time tab"][aria-pressed="true"]`                                                                            |
+| Toggle button              | `<span>` with `role="button"` (date-only)                                           | `<button>` with `aria-label="Toggle popup"` or `"Toggle calendar"`                                                         |
+| `VV.Form.formId`           | Populated (template GUID)                                                           | `undefined` — use URL `formid` param instead                                                                               |
+| `kendo` global             | **Not defined** — same as v2 (corrected 2026-04-13; both use Angular module system) | **Not defined** — Kendo is bundled as a module, not exposed as a global.                                                   |
+| `VV.Form` properties       | 26 properties                                                                       | 28 properties (adds `LocalizationResources`, `LocalizeString`, `CurrentLanguageCode`, `FormLanguage`)                      |
+| `calendarValueService`     | 1 key (`useUpdatedCalendarValueLogic` only)                                         | 4 keys (adds `formatDateStringForDisplay`, `getCalendarFieldValue`, `getSaveValue`, `parseDateString`)                     |
+| `LocalizationResources`    | `undefined`                                                                         | `{}` (empty object)                                                                                                        |
+| `[name="FieldN"]` selector | **Does not match** — same as v2 (corrected 2026-04-13)                              | **Does not match** — Angular-compiled DOM lacks `name` attributes on calendar inputs. Use VV.Form JS API for value access. |
 
 **Mask auto-population (vv5dev):** When creating a form template on vv5dev (Kendo v2), the platform auto-populates `<Mask>MM/dd/yyyy</Mask>` on all calendar fields — even if the source XML has no `<Mask>` element. This forces DateTime fields to render as date-only (no time segments). **Fix:** Clear the Mask field in the Form Designer for each affected field. Verified 2026-04-09 on build 20260130.1.
 
@@ -103,6 +105,14 @@ Two completely different popup widgets exist depending on the field type:
 - A calendar icon (`<span class="k-icon k-i-calendar cal-icon">`) exists next to the input. It does NOT have the Kendo `aria-label="Toggle calendar"` attribute — it's a plain span with the `cal-icon` class. Clicking it opens a **Kendo calendar popup** (same `<kendo-popup>` + `<kendo-calendar>` structure as non-legacy date-only fields). The toggle mechanism differs from non-legacy but the popup DOM is identical. Confirmed via Playwright DOM inspection (2026-04-06).
 - For DateTime legacy fields (`enableTime=true`), the popup closes immediately on day click without showing a Time tab — time defaults to midnight.
 - The popup stores raw `toISOString()` UTC via `calChangeSetValue()`, bypassing `getSaveValue()` (see FORM-BUG-2). This results in different DB values than typed input — see FORM-BUG-2 DB evidence.
+
+**Kendo v2 popup storage (verified 2026-04-13 on vv5dev build 20260410.1):**
+
+- On Kendo v2 (vv5dev), the DateTime popup stores **local midnight** (`"2026-03-15T00:00:00"`) — NOT the UTC-equivalent (`"2026-03-15T03:00:00"`) that was predicted from code analysis. This means the popup and typed input produce identical raw values on v2, unlike v1 where they may differ (FORM-BUG-2).
+
+**Kendo v2 typed input (verified 2026-04-13):**
+
+- On Kendo v2, DateTime fields (`enableTime=true`) require typing ALL segments: month, day, year, hour, minute, AM/PM. Typing only the date portion leaves time segments as placeholders (`hour:minute AM/PM`) and the value does NOT commit. This differs from v1 where a partial value may default the time to midnight.
 
 **Common rules:**
 

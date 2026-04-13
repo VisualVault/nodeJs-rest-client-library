@@ -6,15 +6,15 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 
 ## Scope
 
-| Component                           | Status      | Folder                                                 |
-| ----------------------------------- | ----------- | ------------------------------------------------------ |
-| **Forms — Calendar Fields**         | In Progress | `forms-calendar/` (WADNR BRT-Chromium 116P 2026-04-10) |
-| **Web Services (REST API)**         | Complete    | `web-services/` (validated on WADNR 2026-04-10)        |
-| **Analytic Dashboards**             | Complete    | `dashboards/` (validated on WADNR 2026-04-10)          |
-| **VisualVault Reports**             | Not Started | `reports/` (future)                                    |
-| **Document Library (index fields)** | In Progress | `document-library/`                                    |
-| **Workflows (date triggers)**       | Not Started | `workflows/` (future)                                  |
-| **Node.js Client Library**          | Not Started | `node-client/` (future)                                |
+| Component                           | Status      | Folder                                                                         |
+| ----------------------------------- | ----------- | ------------------------------------------------------------------------------ |
+| **Forms — Calendar Fields**         | In Progress | `forms-calendar/` (Cat 1-13 complete, Cat 14 Phase A done, Cat 15-16 complete) |
+| **Web Services (REST API)**         | Complete    | `web-services/` (validated on WADNR 2026-04-10)                                |
+| **Analytic Dashboards**             | Complete    | `dashboards/` (validated on WADNR 2026-04-10)                                  |
+| **VisualVault Reports**             | Not Started | `reports/` (future)                                                            |
+| **Document Library (index fields)** | In Progress | `document-library/`                                                            |
+| **Workflows (date triggers)**       | Not Started | `workflows/` (future)                                                          |
+| **Node.js Client Library**          | Not Started | `node-client/` (future)                                                        |
 
 ## Folder Structure
 
@@ -82,15 +82,11 @@ Tests run via Chrome MCP extension or Playwright. Cross-timezone testing require
 - Web service / scheduled script input (Category 10)
 - Preset/Current Date with `enableTime=true` fields — needs new form fields
 - Category 2 legacy typed input (E-H) across all TZs
-- **Mask impact on values (Cat 14)** — `<Mask>MM/dd/yyyy</Mask>` on DateTime fields: does it truncate stored values? 8 WADNR production fields at risk
-- **Kendo v1 vs v2 widget internals (Cat 15)** — EmanuelJofre v1 data not yet captured for comparison
-- **Server TZ on form save pipeline (Cat 16)** — form UI save path (distinct from API write, which was proven TZ-independent)
 
 ### Next Steps
 
-1. **Category 14 — Mask Impact** (critical): Empirically verify whether masks affect stored values. 8 WADNR DateTime fields have date-only masks.
-2. **Category 15 — Kendo Widget Comparison**: Run audit on EmanuelJofre to complete the v1 vs v2 differential.
-3. **Category 2 — Typed Input legacy (E-H)**: Typed input for legacy configs across BRT, IST, UTC+0.
-4. **Category 10 — Web service input**: How production scripts set dates via Node.js.
+1. **Category 14 — Mask Impact Phase C**: Phase A (unmasked baseline) complete on WADNR (13/13). Phase B/C (add masks, re-run) requires Form Designer on EmanuelJofre.
+2. **Category 2 — Typed Input legacy (E-H)**: Typed input for legacy configs across BRT, IST, UTC+0.
+3. **Category 10 — Web service input**: How production scripts set dates via Node.js.
 
 See `forms-calendar/matrix.md` for the full test matrix (269 slots, Cat 1–16).
