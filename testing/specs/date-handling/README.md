@@ -82,6 +82,8 @@ Shared config:
 | `cat-9-gdoc-roundtrip.spec.js`    | Category 9-GDOC — GDOC round-trip tests (SetFieldValue → GetDateObject → SetFieldValue)                               |
 | `cat-11-cross-timezone.spec.js`   | Category 11 — cross-timezone reload, multi-user compound drift, TZ spectrum tests                                     |
 | `cat-12-edge-cases.spec.js`       | Category 12 — edge case and boundary condition tests                                                                  |
+| `cat-14-mask-impact.spec.js`      | Category 14 — mask impact on DateTime fields (does `<Mask>MM/dd/yyyy</Mask>` truncate stored values?)                 |
+| `cat-16-server-tz.spec.js`        | Category 16 — server TZ on form save (cross-env: vvdemo BRT vs vv5dev PDT)                                            |
 | `audit-bug1-tz-stripping.spec.js` | FORM-BUG-1 audit — independent Playwright verification of parseDateString() Z-stripping                               |
 | `audit-kendo-version.spec.js`     | Category 15 — cross-env Kendo widget comparison (VV.Form properties, fieldMaster, widget options, parsing/formatting) |
 | `dash-filter.spec.js`             | DB-5 — dashboard SQL filter tests (WHERE clause on date fields)                                                       |

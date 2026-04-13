@@ -567,21 +567,21 @@ Does `<Mask>MM/dd/yyyy</Mask>` on a calendar field affect stored values, GetFiel
 **Bugs exercised**: potential new bug (mask-induced value truncation on DateTime fields)
 **Spec**: `audit-mask-impact.spec.js`
 
-| Test ID    | Config           | Action              | Input                   | Expected (no mask)                  | With Mask: verify                | Status  | Run Date | Evidence |
-| ---------- | ---------------- | ------------------- | ----------------------- | ----------------------------------- | -------------------------------- | ------- | -------- | -------- |
-| 14-A-SFV   | A (date-only)    | SetFieldValue       | `"2026-03-15"`          | raw=`"2026-03-15"`                  | Same?                            | PENDING |          |          |
-| 14-C-SFV   | C (DateTime)     | SetFieldValue       | `"2026-03-15T14:30:00"` | raw=`"2026-03-15T14:30:00"`         | Time truncated?                  | PENDING |          |          |
-| 14-D-SFV   | D (DateTime+iTZ) | SetFieldValue       | `"2026-03-15T14:30:00"` | raw=`"2026-03-15T14:30:00"`         | Time truncated?                  | PENDING |          |          |
-| 14-C-GFV   | C (DateTime)     | GetFieldValue       | (after 14-C-SFV)        | api=`"2026-03-15T17:30:00.000Z"`    | Mask affect return?              | PENDING |          |          |
-| 14-D-GFV   | D (DateTime+iTZ) | GetFieldValue       | (after 14-D-SFV)        | api=`"2026-03-15T14:30:00.000Z"`    | Mask affect return?              | PENDING |          |          |
-| 14-C-popup | C                | Calendar popup      | 3/15/2026               | raw=`"2026-03-15T03:00:00"`         | Time picker hidden — what value? | PENDING |          |          |
-| 14-D-popup | D                | Calendar popup      | 3/15/2026               | raw=`"2026-03-15T00:00:00"`         | Time picker hidden — what value? | PENDING |          |          |
-| 14-C-typed | C                | Typed input         | `03/15/2026`            | display shows `03/15/2026 12:00 AM` | Mask forces date-only format?    | PENDING |          |          |
-| 14-D-typed | D                | Typed input         | `03/15/2026`            | display shows `03/15/2026 12:00 AM` | Mask forces date-only format?    | PENDING |          |          |
-| 14-C-save  | C                | Save + reload       | (after 14-C-popup)      | raw preserved after reload          | Mask affect save pipeline?       | PENDING |          |          |
-| 14-D-save  | D                | Save + reload       | (after 14-D-popup)      | raw preserved after reload          | Mask affect save pipeline?       | PENDING |          |          |
-| 14-C-API   | C                | API read (getForms) | (after 14-C-save)       | ISO+Z in API response               | Server-side care about mask?     | PENDING |          |          |
-| 14-D-API   | D                | API read (getForms) | (after 14-D-save)       | ISO+Z in API response               | Server-side care about mask?     | PENDING |          |          |
+| Test ID    | Config           | Action              | Input                   | Expected (no mask)                                                                                            | With Mask: verify                | Status | Run Date   | Evidence                              |
+| ---------- | ---------------- | ------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------- | ------ | ---------- | ------------------------------------- |
+| 14-A-SFV   | A (date-only)    | SetFieldValue       | `"2026-03-15"`          | raw=`"2026-03-15"`                                                                                            | Same?                            | PASS   | 2026-04-13 | [summary](summaries/tc-14-A-SFV.md)   |
+| 14-C-SFV   | C (DateTime)     | SetFieldValue       | `"2026-03-15T14:30:00"` | raw=`"2026-03-15T14:30:00"`                                                                                   | Time truncated?                  | PASS   | 2026-04-13 | [summary](summaries/tc-14-C-SFV.md)   |
+| 14-D-SFV   | D (DateTime+iTZ) | SetFieldValue       | `"2026-03-15T14:30:00"` | raw=`"2026-03-15T14:30:00"`                                                                                   | Time truncated?                  | PASS   | 2026-04-13 | [summary](summaries/tc-14-D-SFV.md)   |
+| 14-C-GFV   | C (DateTime)     | GetFieldValue       | (after 14-C-SFV)        | api=`"2026-03-15T17:30:00.000Z"`                                                                              | Mask affect return?              | PASS   | 2026-04-13 | [summary](summaries/tc-14-C-GFV.md)   |
+| 14-D-GFV   | D (DateTime+iTZ) | GetFieldValue       | (after 14-D-SFV)        | api=`"2026-03-15T14:30:00.000Z"`                                                                              | Mask affect return?              | PASS   | 2026-04-13 | [summary](summaries/tc-14-D-GFV.md)   |
+| 14-C-popup | C                | Calendar popup      | 3/15/2026               | raw=`"2026-03-15T00:00:00"` (prediction corrected: Kendo v2 stores local midnight, not UTC-equiv `T03:00:00`) | Time picker hidden — what value? | PASS   | 2026-04-13 | [summary](summaries/tc-14-C-popup.md) |
+| 14-D-popup | D                | Calendar popup      | 3/15/2026               | raw=`"2026-03-15T00:00:00"`                                                                                   | Time picker hidden — what value? | PASS   | 2026-04-13 | [summary](summaries/tc-14-D-popup.md) |
+| 14-C-typed | C                | Typed input         | `03/15/2026 12:00 AM`   | display=`03/15/2026 12:00 AM`, raw=`"2026-03-15T00:00:00"` (same as popup)                                    | Mask forces date-only format?    | PASS   | 2026-04-13 | [summary](summaries/tc-14-C-typed.md) |
+| 14-D-typed | D                | Typed input         | `03/15/2026 12:00 AM`   | display=`03/15/2026 12:00 AM`, raw=`"2026-03-15T00:00:00"` (same as popup)                                    | Mask forces date-only format?    | PASS   | 2026-04-13 | [summary](summaries/tc-14-D-typed.md) |
+| 14-C-save  | C                | Save + reload       | (after 14-C-popup)      | raw=`"2026-03-15T00:00:00"` preserved, api=`"2026-03-15T03:00:00.000Z"`                                       | Mask affect save pipeline?       | PASS   | 2026-04-13 | [summary](summaries/tc-14-C-save.md)  |
+| 14-D-save  | D                | Save + reload       | (after 14-D-popup)      | raw=`"2026-03-15T00:00:00"` preserved, api=`"2026-03-15T00:00:00.000Z"` (Bug #5)                              | Mask affect save pipeline?       | PASS   | 2026-04-13 | [summary](summaries/tc-14-D-save.md)  |
+| 14-C-API   | C                | API read (getForms) | (after 14-C-save)       | field6=`"2026-03-15T00:00:00Z"` — server stores with Z                                                        | Server-side care about mask?     | PASS   | 2026-04-13 | [summary](summaries/tc-14-C-API.md)   |
+| 14-D-API   | D                | API read (getForms) | (after 14-D-save)       | field5=`"2026-03-15T00:00:00Z"` — **identical to Config C**                                                   | Server-side care about mask?     | PASS   | 2026-04-13 | [summary](summaries/tc-14-D-API.md)   |
 
 ## 15 — Kendo Widget Comparison
 
@@ -591,26 +591,27 @@ Captures Kendo widget internals and VV framework properties on each environment.
 **Method**: JS console captures via `page.evaluate()`, no form modifications needed.
 **Spec**: `audit-kendo-version.spec.js`
 
-**Preliminary findings (WADNR, 2026-04-10)**:
+**Findings (cross-env comparison complete 2026-04-13)**:
 
-- `kendo` global: **does not exist on v2** (exists on v1)
-- DOM selectors: `[name="FieldN"]` **does not match on v2** (matches on v1)
-- `VV.Form.formId`: **undefined on v2** (populated on v1)
-- `LocalizationResources`: **empty object on v2** (absent on v1 — TBD)
-- `calendarValueService` methods: identical set on both
+- `kendo` global: **does not exist on either** — both use Angular module system (corrects preliminary assumption)
+- DOM selectors: `[name="FieldN"]` **does not match on either** — both lack name attributes (corrects preliminary assumption)
+- `VV.Form.formId`: **undefined on both**
+- `LocalizationResources`: empty object `{}` on v2, **undefined** on v1 (4 extra localization properties on v2)
+- `calendarValueService` methods: v1 has **1** (`useUpdatedCalendarValueLogic`), v2 has **4** (adds `formatDateStringForDisplay`, `getCalendarFieldValue`, `getSaveValue`, `parseDateString`)
 - `useUpdatedCalendarValueLogic`: `false` on both (V1 path)
 - VV value pipeline (raw/api): **identical behavior** on both
+- Masks: WADNR Field3/4 retain masks (not present on EmanuelJofre form)
 
-| Test ID          | What                                  | Captures                                        | vvdemo (v1) | vv5dev (v2)                      | Status  | Run Date   | Evidence                                                                                                            |
-| ---------------- | ------------------------------------- | ----------------------------------------------- | ----------- | -------------------------------- | ------- | ---------- | ------------------------------------------------------------------------------------------------------------------- |
-| 15-vv-core       | VV.Form properties                    | formId, V1/V2 flag, method list, property count | TBD         | formId=undef, V1, 28 props       | PARTIAL | 2026-04-10 | [wadnr run](../../projects/wadnr/testing/date-handling/forms-calendar/runs/audit-kendo-version-wadnr-2026-04-10.md) |
-| 15-fieldMaster-D | fieldMaster Config D                  | All 50+ properties                              | TBD         | mask="", no format/displayFormat | PARTIAL | 2026-04-10 | same                                                                                                                |
-| 15-fieldMaster-C | fieldMaster Config C                  | All 50+ properties                              | TBD         | mask="", no format/displayFormat | PARTIAL | 2026-04-10 | same                                                                                                                |
-| 15-kendo-global  | `kendo` global object                 | version, culture, calendar patterns             | TBD         | **not defined**                  | PARTIAL | 2026-04-10 | same                                                                                                                |
-| 15-widget-opts-D | Kendo widget `.options` for Field5    | format, parseFormats, culture                   | TBD         | **input not found** (v2 DOM)     | PARTIAL | 2026-04-10 | same                                                                                                                |
-| 15-widget-opts-A | Kendo widget `.options` for Field7    | format, parseFormats, culture                   | TBD         | **input not found** (v2 DOM)     | PARTIAL | 2026-04-10 | same                                                                                                                |
-| 15-sfv-widget    | Widget `.value()` after SetFieldValue | Date epoch, toString, toISOString               | TBD         | widget=null (v2 DOM)             | PARTIAL | 2026-04-10 | same                                                                                                                |
-| 15-mask-scan     | All calendar fields mask properties   | mask, placeholder, format per field             | TBD         | Field3/4 have mask, rest empty   | PARTIAL | 2026-04-10 | same                                                                                                                |
+| Test ID          | What                                  | Captures                                        | vvdemo (v1)                                                        | vv5dev (v2)                                                         | Status | Run Date   | Evidence                                    |
+| ---------------- | ------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- | ------ | ---------- | ------------------------------------------- |
+| 15-vv-core       | VV.Form properties                    | formId, V1/V2 flag, method list, property count | formId=undef, V1, **1 method**, no LocalizationResources, 26 props | formId=undef, V1, **4 methods**, LocalizationResources={}, 28 props | PASS   | 2026-04-13 | [summary](summaries/tc-15-vv-core.md)       |
+| 15-fieldMaster-D | fieldMaster Config D                  | All 50+ properties                              | mask="", no format/displayFormat                                   | mask="", no format/displayFormat — **IDENTICAL**                    | PASS   | 2026-04-13 | [summary](summaries/tc-15-fieldMaster-D.md) |
+| 15-fieldMaster-C | fieldMaster Config C                  | All 50+ properties                              | mask="", no format/displayFormat                                   | mask="", no format/displayFormat — **IDENTICAL**                    | PASS   | 2026-04-13 | [summary](summaries/tc-15-fieldMaster-C.md) |
+| 15-kendo-global  | `kendo` global object                 | version, culture, calendar patterns             | **not defined** (same as v2!)                                      | **not defined** — both use module system                            | PASS   | 2026-04-13 | [summary](summaries/tc-15-kendo-global.md)  |
+| 15-widget-opts-D | Kendo widget `.options` for Field5    | format, parseFormats, culture                   | **input not found** (same as v2!)                                  | **input not found** — both lack name attr                           | PASS   | 2026-04-13 | [summary](summaries/tc-15-widget-opts-D.md) |
+| 15-widget-opts-A | Kendo widget `.options` for Field7    | format, parseFormats, culture                   | **input not found** (same as v2!)                                  | **input not found** — both lack name attr                           | PASS   | 2026-04-13 | [summary](summaries/tc-15-widget-opts-A.md) |
+| 15-sfv-widget    | Widget `.value()` after SetFieldValue | Date epoch, toString, toISOString               | VV OK, widget=null (DOM)                                           | VV OK, widget=null — **IDENTICAL**                                  | PASS   | 2026-04-13 | [summary](summaries/tc-15-sfv-widget.md)    |
+| 15-mask-scan     | All calendar fields mask properties   | mask, placeholder, format per field             | No masks (all empty, 26 fields)                                    | Field3/4 have mask (WADNR only), rest empty                         | PASS   | 2026-04-13 | [summary](summaries/tc-15-mask-scan.md)     |
 
 ## 16 — Server TZ on Form Save
 
@@ -621,11 +622,11 @@ Does the VV server UTC offset affect the form save→reload→API-read pipeline?
 **Spec**: `audit-server-tz.spec.js`
 **Prerequisite**: Run after Cat 14–15 to establish baseline assumptions.
 
-| Test ID       | Config           | Input method  | Input                   | Compare                                     | Status  | Run Date | Evidence |
-| ------------- | ---------------- | ------------- | ----------------------- | ------------------------------------------- | ------- | -------- | -------- |
-| 16-A-typed    | A (date-only)    | Typed         | `03/15/2026`            | getForms API response on both envs          | PENDING |          |          |
-| 16-C-typed    | C (DateTime)     | Typed         | `03/15/2026 12:00 AM`   | getForms API response on both envs          | PENDING |          |          |
-| 16-D-SFV      | D (DateTime+iTZ) | SetFieldValue | `"2026-03-15T14:30:00"` | getForms API response on both envs          | PENDING |          |          |
-| 16-A-controls | A                | (after save)  | —                       | `forminstance/Controls` response comparison | PENDING |          |          |
-| 16-C-controls | C                | (after save)  | —                       | `forminstance/Controls` response comparison | PENDING |          |          |
-| 16-D-controls | D                | (after save)  | —                       | `forminstance/Controls` response comparison | PENDING |          |          |
+| Test ID       | Config           | Input method  | Input                   | Compare                                                                   | Status | Run Date   | Evidence                                 |
+| ------------- | ---------------- | ------------- | ----------------------- | ------------------------------------------------------------------------- | ------ | ---------- | ---------------------------------------- |
+| 16-A-typed    | A (date-only)    | Typed         | `03/15/2026`            | Both: `"2026-03-15T00:00:00Z"` — **IDENTICAL**                            | PASS   | 2026-04-13 | [summary](summaries/tc-16-A-typed.md)    |
+| 16-C-typed    | C (DateTime)     | Typed         | `03/15/2026 12:00 AM`   | Both: `"2026-03-15T00:00:00Z"` — **IDENTICAL**                            | PASS   | 2026-04-13 | [summary](summaries/tc-16-C-typed.md)    |
+| 16-D-SFV      | D (DateTime+iTZ) | SetFieldValue | `"2026-03-15T14:30:00"` | Both: `"2026-03-15T14:30:00Z"` — **IDENTICAL**                            | PASS   | 2026-04-13 | [summary](summaries/tc-16-D-SFV.md)      |
+| 16-A-controls | A                | (after save)  | —                       | Both: raw=`"2026-03-15"` — **IDENTICAL**                                  | PASS   | 2026-04-13 | [summary](summaries/tc-16-A-controls.md) |
+| 16-C-controls | C                | (after save)  | —                       | Both: raw=`"2026-03-15T00:00:00"` — **IDENTICAL**                         | PASS   | 2026-04-13 | [summary](summaries/tc-16-C-controls.md) |
+| 16-D-controls | D                | (after save)  | —                       | Both: raw=`"2026-03-15T14:30:00"` — **IDENTICAL** (Bug #5 fake Z on both) | PASS   | 2026-04-13 | [summary](summaries/tc-16-D-controls.md) |
