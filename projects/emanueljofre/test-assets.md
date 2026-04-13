@@ -61,6 +61,17 @@ Run via:
 - Direct (no completion): `node tools/runners/run-sp-test.js --skip-completion`
 - Server: `curl http://localhost:3000/testscripts/scheduled/ScheduledProcessTestHarness`
 
+### VV Admin Objects
+
+| Name | Type | Script ID | Notes |
+|------|------|-----------|-------|
+| ScheduledProcessTestHarness | Outside Process (Scheduled, Node.Js) | `ccdc50f3-5e37-f111-ba23-0e3ceb11fc25` | Completion Callback enabled |
+| SPTestHarness | Scheduled Service | — | Linked to ScheduledProcessTestHarness. **Disabled** after testing. |
+
+### Log Behavior Finding (2026-04-13)
+
+The `response.json()` message appears in the VV Scheduled Service Log for **both** the Test button and the scheduler path. The `postCompletion()` message does NOT appear in the log — it signals completion to the scheduler (advances recurrence, sets Result flag) but the visible Message column comes from `response.json()`. Confirmed on WADNR production schedules (CommunicationLogSendImmediate, AGOLPostFponlineDataToAGOLTables).
+
 ## Notes
 
 - **Playwright integration**: `testing/fixtures/vv-config.js` exports `FORM_TEMPLATE_URL`, `TARGET_FORM_TEMPLATE_URL`, `FIELD_MAP`, `SAVED_RECORDS`, and `RECORD_DEFINITIONS` for programmatic test use.
