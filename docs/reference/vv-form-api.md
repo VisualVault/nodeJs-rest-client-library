@@ -643,6 +643,31 @@ VV.Form.VV.currentUser.DatabaseAlias; // "Main"
 VV.Form.VV.currentUser.AccessToken; // OAuth token (sensitive)
 ```
 
+### `beforeunload` Handler
+
+The FormViewer installs a `window.onbeforeunload` handler after form load. Navigating away from a loaded form (via `page.goto()`, closing the tab, or browser back) triggers a browser-native "Leave site?" confirmation dialog. This applies to both saved and unsaved forms.
+
+**Playwright impact**: `page.goto()` within a loaded form page triggers the dialog, which blocks further Playwright commands. Workarounds:
+
+```javascript
+// Option A: Auto-dismiss all dialogs (before navigating)
+page.on('dialog', (d) => d.accept());
+
+// Option B: Nullify the handler before navigating
+await page.evaluate(() => {
+    window.onbeforeunload = null;
+});
+await page.goto(nextUrl);
+
+// Option C: Open each record in a new page (recommended for multi-record)
+const page2 = await context.newPage();
+await page2.goto(recordUrl);
+// ... capture values ...
+await page2.close();
+```
+
+Option C (new page per record) is most reliable — it avoids the handler entirely. Confirmed 2026-04-13 on vv5dev Build 20260413.1.
+
 ---
 
 ## Script Event Types

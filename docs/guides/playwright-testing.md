@@ -221,3 +221,13 @@ npm run test:dash:regression -- --skip-artifacts
 ## Troubleshooting
 
 See [Dev Setup Guide — Troubleshooting](dev-setup.md#6-troubleshooting) for common issues (auth, timeouts, timezone mismatches, missing tools).
+
+### FormViewer `beforeunload` dialog blocks navigation
+
+VV's FormViewer installs `window.onbeforeunload` after form load. This fires on any `page.goto()` away from the form, producing a browser dialog that blocks Playwright. The `playwright-cli` MCP tool is especially affected — it checks for modal state before executing any command and refuses to proceed.
+
+**For `playwright-cli` sessions**: Open a fresh browser session per record rather than reusing one page. If you must navigate away, run `await page.evaluate(() => { window.onbeforeunload = null; })` first.
+
+**For programmatic Playwright scripts**: Open a new `context.newPage()` per record and close it after capture. This avoids the dialog entirely and is the recommended pattern for multi-record verification.
+
+See [`docs/reference/vv-form-api.md` § beforeunload Handler](../reference/vv-form-api.md#beforeunload-handler) for full details and code examples.
