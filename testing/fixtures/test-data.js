@@ -4947,4 +4947,351 @@ const TEST_DATA = [
     },
 ];
 
-module.exports = { TEST_DATA };
+// ═══════════════════════════════════════════════════════════════════════
+// Document Library — Index Field Date Handling
+//
+// Separate from TEST_DATA because document index fields have no Config A-H
+// dimension and no TZ sensitivity for API tests. Single "Date Time" type.
+//
+// Field reference:
+//   id            — Unique test ID: "doc-{category}-{variant}"
+//   category      — DOC category number (1-8)
+//   categoryName  — Human-readable category name
+//   action        — "api-write-read", "api-clear", "api-update", "ui-roundtrip", "cross-layer", "query", "infra-diff"
+//   inputValue    — Date string to write via PUT /documents/{id}/indexfields
+//   inputValue2   — (DOC-4 only) Second write value for overwrite tests
+//   expectedStored— Expected value on GET readback
+//   bugs          — Array of bug IDs this test exercises
+//   notes         — Why this test case exists and what it proves
+//   tcRef         — Path to the markdown TC spec (when created)
+// ═══════════════════════════════════════════════════════════════════════
+
+const DOC_TEST_DATA = [
+    // ═══════════════════════════════════════════════════════════════════════
+    // DOC-1 — API Write Format Normalization
+    // How different input formats are normalized when written to index fields.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: 'doc-1-iso-date',
+        category: 1,
+        categoryName: 'Format Normalization',
+        action: 'api-write-read',
+        inputValue: '2026-03-15',
+        expectedStored: '2026-03-15T00:00:00',
+        bugs: [],
+        notes: 'ISO date-only → appends T00:00:00',
+    },
+    {
+        id: 'doc-1-us-date',
+        category: 1,
+        categoryName: 'Format Normalization',
+        action: 'api-write-read',
+        inputValue: '03/15/2026',
+        expectedStored: '2026-03-15T00:00:00',
+        bugs: [],
+        notes: 'US date format parsed and normalized to ISO',
+    },
+    {
+        id: 'doc-1-eu-date',
+        category: 1,
+        categoryName: 'Format Normalization',
+        action: 'api-write-read',
+        inputValue: '15/03/2026',
+        expectedStored: '2026-03-15T00:00:00',
+        bugs: [],
+        notes: 'EU date (DD/MM) correctly parsed — unlike WS-BUG-2 in forms API',
+    },
+    {
+        id: 'doc-1-iso-naive',
+        category: 1,
+        categoryName: 'Format Normalization',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T14:30:00',
+        expectedStored: '2026-03-15T14:30:00',
+        bugs: [],
+        notes: 'ISO naive datetime preserved exactly — baseline format',
+    },
+    {
+        id: 'doc-1-us-12h',
+        category: 1,
+        categoryName: 'Format Normalization',
+        action: 'api-write-read',
+        inputValue: '03/15/2026 2:30 PM',
+        expectedStored: '2026-03-15T14:30:00',
+        bugs: [],
+        notes: 'US 12h datetime parsed → 24h ISO normalization',
+    },
+    {
+        id: 'doc-1-us-24h',
+        category: 1,
+        categoryName: 'Format Normalization',
+        action: 'api-write-read',
+        inputValue: '03/15/2026 14:30',
+        expectedStored: '2026-03-15T14:30:00',
+        bugs: [],
+        notes: 'US 24h datetime parsed and normalized',
+    },
+    {
+        id: 'doc-1-iso-ms',
+        category: 1,
+        categoryName: 'Format Normalization',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T14:30:00.000',
+        expectedStored: null, // TBD — are milliseconds preserved or stripped?
+        bugs: [],
+        notes: 'ISO with milliseconds — TBD: ms preserved or stripped?',
+    },
+    {
+        id: 'doc-1-ambiguous',
+        category: 1,
+        categoryName: 'Format Normalization',
+        action: 'api-write-read',
+        inputValue: '01/02/2026',
+        expectedStored: null, // TBD — Jan 2 or Feb 1?
+        bugs: [],
+        notes: 'Ambiguous date — EU parsing works above, does ambiguous default to US (Jan 2)?',
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // DOC-2 — Timezone Offset Handling (DOC-BUG-1)
+    // TZ offsets silently converted to UTC, Z marker stripped.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: 'doc-2-z-strip',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T14:30:00Z',
+        expectedStored: '2026-03-15T14:30:00',
+        bugs: ['DOC-BUG-1'],
+        notes: 'Z silently stripped — value looks naive but is actually UTC',
+    },
+    {
+        id: 'doc-2-brt-offset',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T14:30:00-03:00',
+        expectedStored: '2026-03-15T17:30:00',
+        bugs: ['DOC-BUG-1'],
+        notes: 'BRT offset → UTC conversion: 14:30 - (-03:00) = 17:30, Z stripped',
+    },
+    {
+        id: 'doc-2-ist-offset',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T14:30:00+05:30',
+        expectedStored: '2026-03-15T09:00:00',
+        bugs: ['DOC-BUG-1'],
+        notes: 'IST offset → UTC conversion: 14:30 - (+05:30) = 09:00, Z stripped',
+    },
+    {
+        id: 'doc-2-pdt-offset',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T14:30:00-07:00',
+        expectedStored: '2026-03-15T21:30:00',
+        bugs: ['DOC-BUG-1'],
+        notes: 'PDT offset → UTC conversion: 14:30 - (-07:00) = 21:30, Z stripped',
+    },
+    {
+        id: 'doc-2-midnight-brt',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T00:00:00-03:00',
+        expectedStored: '2026-03-15T03:00:00',
+        bugs: ['DOC-BUG-1'],
+        notes: 'Midnight BRT → 03:00 UTC. Date correct but time shifted.',
+    },
+    {
+        id: 'doc-2-midnight-z',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T00:00:00Z',
+        expectedStored: '2026-03-15T00:00:00',
+        bugs: ['DOC-BUG-1'],
+        notes: 'Midnight UTC — Z stripped but value numerically correct',
+    },
+    {
+        id: 'doc-2-late-ist',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T23:00:00+05:30',
+        expectedStored: '2026-03-15T17:30:00',
+        bugs: ['DOC-BUG-1'],
+        notes: 'Late night UTC+ — stays same day after conversion',
+    },
+    {
+        id: 'doc-2-early-ist',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T02:00:00+05:30',
+        expectedStored: '2026-03-14T20:30:00',
+        bugs: ['DOC-BUG-1'],
+        notes: 'Early morning UTC+ → PREVIOUS day in UTC. 02:00 IST Mar 15 = 20:30 UTC Mar 14.',
+    },
+    {
+        id: 'doc-2-dst-edge',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-08T02:30:00-05:00',
+        expectedStored: null, // TBD — US DST spring forward
+        bugs: ['DOC-BUG-1'],
+        notes: 'US DST transition date (spring forward). EST offset pre-transition.',
+    },
+    {
+        id: 'doc-2-no-z-resp',
+        category: 2,
+        categoryName: 'TZ Offset Handling',
+        action: 'api-write-read',
+        inputValue: '2026-03-15T14:30:00',
+        expectedStored: '2026-03-15T14:30:00',
+        bugs: [],
+        notes: 'Confirm: naive write → read-back never includes Z suffix on index fields',
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // DOC-3 — Field Clearing & Empty Values (DOC-BUG-2)
+    // All known attempts to clear a date index field fail silently.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: 'doc-3-empty-string',
+        category: 3,
+        categoryName: 'Field Clearing',
+        action: 'api-clear',
+        inputValue: '',
+        expectedStored: null, // Previous value persists (BUG)
+        bugs: ['DOC-BUG-2'],
+        notes: 'Empty string — most obvious clearing method. Previous value persists.',
+    },
+    {
+        id: 'doc-3-null-string',
+        category: 3,
+        categoryName: 'Field Clearing',
+        action: 'api-clear',
+        inputValue: 'null',
+        expectedStored: null, // Previous value persists
+        bugs: ['DOC-BUG-2'],
+        notes: 'String literal "null" — previous value persists',
+    },
+    {
+        id: 'doc-3-undefined',
+        category: 3,
+        categoryName: 'Field Clearing',
+        action: 'api-clear',
+        inputValue: 'undefined',
+        expectedStored: null, // Previous value persists
+        bugs: ['DOC-BUG-2'],
+        notes: 'String literal "undefined" — previous value persists',
+    },
+    {
+        id: 'doc-3-zero',
+        category: 3,
+        categoryName: 'Field Clearing',
+        action: 'api-clear',
+        inputValue: '0',
+        expectedStored: null, // Previous value persists
+        bugs: ['DOC-BUG-2'],
+        notes: 'Numeric zero as string — previous value persists',
+    },
+    {
+        id: 'doc-3-invalid',
+        category: 3,
+        categoryName: 'Field Clearing',
+        action: 'api-clear',
+        inputValue: '2026',
+        expectedStored: null, // Previous value persists
+        bugs: ['DOC-BUG-2'],
+        notes: 'Incomplete/invalid date — silent failure, previous value persists',
+    },
+    {
+        id: 'doc-3-space',
+        category: 3,
+        categoryName: 'Field Clearing',
+        action: 'api-clear',
+        inputValue: ' ',
+        expectedStored: null, // TBD
+        bugs: ['DOC-BUG-2'],
+        notes: 'Whitespace only — TBD: does server trim and treat as empty?',
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // DOC-4 — Update Path & Overwrite
+    // Write a date, then overwrite with a different format/value.
+    // ═══════════════════════════════════════════════════════════════════════
+    {
+        id: 'doc-4-naive-to-offset',
+        category: 4,
+        categoryName: 'Update Path',
+        action: 'api-update',
+        inputValue: '2026-03-15T14:30:00',
+        inputValue2: '2026-06-01T10:00:00-03:00',
+        expectedStored: '2026-06-01T13:00:00',
+        bugs: ['DOC-BUG-1'],
+        notes: 'Naive → offset overwrite. Second value converted to UTC.',
+    },
+    {
+        id: 'doc-4-offset-to-naive',
+        category: 4,
+        categoryName: 'Update Path',
+        action: 'api-update',
+        inputValue: '2026-03-15T14:30:00-03:00',
+        inputValue2: '2026-06-01T10:00:00',
+        expectedStored: '2026-06-01T10:00:00',
+        bugs: [],
+        notes: 'Offset → naive overwrite. Second value stored as-is.',
+    },
+    {
+        id: 'doc-4-us-to-iso',
+        category: 4,
+        categoryName: 'Update Path',
+        action: 'api-update',
+        inputValue: '03/15/2026',
+        inputValue2: '2026-06-01T14:30:00',
+        expectedStored: '2026-06-01T14:30:00',
+        bugs: [],
+        notes: 'US format → ISO overwrite. Format change accepted.',
+    },
+    {
+        id: 'doc-4-date-to-dt',
+        category: 4,
+        categoryName: 'Update Path',
+        action: 'api-update',
+        inputValue: '2026-03-15',
+        inputValue2: '2026-03-15T14:30:00',
+        expectedStored: '2026-03-15T14:30:00',
+        bugs: [],
+        notes: 'Date-only → datetime overwrite. Time component added.',
+    },
+    {
+        id: 'doc-4-dt-to-date',
+        category: 4,
+        categoryName: 'Update Path',
+        action: 'api-update',
+        inputValue: '2026-03-15T14:30:00',
+        inputValue2: '2026-06-01',
+        expectedStored: '2026-06-01T00:00:00',
+        bugs: [],
+        notes: 'Datetime → date-only overwrite. Time zeroed out.',
+    },
+    {
+        id: 'doc-4-idempotent',
+        category: 4,
+        categoryName: 'Update Path',
+        action: 'api-update',
+        inputValue: '2026-03-15T14:30:00',
+        inputValue2: '2026-03-15T14:30:00',
+        expectedStored: '2026-03-15T14:30:00',
+        bugs: [],
+        notes: 'Same value written twice — idempotent, no change.',
+    },
+];
+
+module.exports = { TEST_DATA, DOC_TEST_DATA };

@@ -146,18 +146,22 @@ Note: built-in dates INCLUDE the Z suffix (UTC). Index field dates do NOT. This 
 
 ## Automated Regression Tests
 
-**17 tests** in `testing/specs/date-handling/doc-index-field-dates.spec.js`:
+**32 tests** in `testing/specs/date-handling/doc-index-field-dates.spec.js` (data-driven from `testing/fixtures/test-data.js` DOC_TEST_DATA):
 
-- Format normalization (6 tests): ISO date-only, US, EU, naive datetime, US 12h, US 24h
-- DOC-BUG-1 (7 tests): Z stripped, BRT offset, IST offset, midnight BRT, midnight UTC, late night UTC+, early morning date shift
-- DOC-BUG-2 (2 tests): empty string, null-like values
-- Z suffix comparison (1 test): index fields vs forms API
-- Built-in dates (1 test): document system dates include Z
+- DOC-1: Format normalization (8 tests): ISO date-only, US, EU, naive datetime, US 12h/24h, milliseconds, ambiguous
+- DOC-2: TZ offset handling (10 tests): Z stripping, BRT/IST/PDT offsets, midnight scenarios, DST edge, date shift
+- DOC-3: Field clearing (6 tests): empty string, null/undefined/zero/invalid strings, whitespace
+- DOC-4: Update path (6 tests): format changes, date↔datetime, idempotent overwrite
+- Cross-cutting (2 tests): Z suffix comparison, built-in dates
+
+Full matrix: `matrix.md` (8 categories, 52 slots). Test config: `testing/fixtures/vv-config.js` (CUSTOMER_DOC_CONFIG).
 
 Run: `npx playwright test --config=testing/playwright.config.js --project=BRT-chromium testing/specs/date-handling/doc-index-field-dates.spec.js`
 
 ## Open Items
 
-1. **UI save round-trip** — Editing requires: Check Out → Index Fields tab → edit RadDateTimePicker → Save. The document checkout flow changes the ASP.NET postback page state. RadDateTimePicker sends Telerik internal format (`YYYY-MM-DD-HH-mm-ss`) in postback. Needs manual testing or a dedicated Playwright helper for document checkout flow.
-2. **WADNR impact** — WADNR scripts use `putDocumentIndexFields()` with date values. Check if they write with timezone offsets (DOC-BUG-1 risk).
-3. **Cross-timezone UI test** — View the same document from BRT and IST browsers. Does the displayed date change?
+1. **DOC-5: UI save round-trip** — Editing requires: Check Out → Index Fields tab → edit RadDateTimePicker → Save. Needs Playwright helper for document checkout flow and RadDateTimePicker interaction. See `matrix.md` DOC-5 (8 slots).
+2. **DOC-6: Cross-layer comparison** — Same date written to form field + index field. Different normalization paths (forms API adds Z; index fields strip Z). See `matrix.md` DOC-6 (6 slots).
+3. **DOC-7: Query & search** — Can documents be filtered by date index fields? Does DOC-BUG-1 ambiguity break date range queries? See `matrix.md` DOC-7 (4 slots).
+4. **DOC-8: DocAPI infrastructure differential** — vv5dev has `docapi: enabled`, vvdemo has it disabled. Requires WADNR test document setup (zzz-prefixed folder + document + writePolicy entry). See `matrix.md` DOC-8 (4 slots).
+5. **WADNR script impact** — `LibPDFCreationGeneratePDF.js` writes folder index fields. Low risk (no TZ offsets in extracted code), but needs full code review.

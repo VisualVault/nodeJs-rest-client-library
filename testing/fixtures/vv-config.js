@@ -52,6 +52,19 @@ const CUSTOMER_TEMPLATES = {
 
 const customerTemplates = CUSTOMER_TEMPLATES[vvConfig.customerAlias] || CUSTOMER_TEMPLATES.EmanuelJofre;
 
+// Per-customer document library test assets.
+// Each customer needs a test folder with a Date index field and at least one test document.
+const CUSTOMER_DOC_CONFIG = {
+    EmanuelJofre: {
+        testDocumentId: '5c4c9e8c-25ca-eb11-8202-d7701a6d4070', // Test1003 in /TestFolder
+        dateFieldLabel: 'Date', // Date index field (fieldType 4) assigned to /TestFolder
+        testFolderPath: '/TestFolder',
+    },
+    // WADNR: TBD — create zzz-prefixed test folder + document, add to writePolicy.documents[]
+};
+
+const customerDocConfig = CUSTOMER_DOC_CONFIG[vvConfig.customerAlias] || CUSTOMER_DOC_CONFIG.EmanuelJofre;
+
 // DateTest form template URL — navigating here creates a fresh form instance with all fields empty.
 // Never use a saved record URL (DataID=) for tests that need a clean state.
 const FORM_TEMPLATE_URL = customerTemplates.dateTest;
@@ -284,6 +297,8 @@ module.exports = {
     vvConfig,
     AUTH_STATE_PATH,
     CUSTOMER_TEMPLATES,
+    CUSTOMER_DOC_CONFIG,
+    customerDocConfig,
     FORM_TEMPLATE_URL,
     TARGET_FORM_TEMPLATE_URL,
     FIELD_MAP,

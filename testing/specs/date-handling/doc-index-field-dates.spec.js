@@ -1,32 +1,35 @@
 /**
  * Document Index Field Date Handling Tests
  *
- * Verifies date storage, retrieval, and timezone handling for Document Library
- * index fields (fieldType 4 "Date Time") via the REST API.
+ * Data-driven tests for document library date storage, retrieval, and timezone
+ * handling via the REST API. Test cases defined in testing/fixtures/test-data.js
+ * (DOC_TEST_DATA array).
  *
  * Confirmed bugs tested:
  *   DOC-BUG-1: Timezone offset converted to UTC with Z stripped → ambiguous values
  *   DOC-BUG-2: Cannot clear a date index field once set
  *
+ * Matrix: tasks/date-handling/document-library/matrix.md (8 categories, 52 slots)
+ *
  * Prerequisites:
- *   - /TestFolder exists with "Date" index field assigned (fieldType 4)
- *   - Document "Test1003" in /TestFolder
- *   - Configured via .env.json (vvdemo/EmanuelJofre/Main)
+ *   - Test document with Date index field (per-customer config in vv-config.js)
+ *   - Configured via .env.json
  *
  * Run:
  *   npx playwright test --config=testing/playwright.config.js --project=BRT-chromium testing/specs/date-handling/doc-index-field-dates.spec.js
  */
 const { test, expect } = require('@playwright/test');
 const { loadConfig } = require('../../fixtures/env-config');
+const { customerDocConfig } = require('../../fixtures/vv-config');
+const { DOC_TEST_DATA } = require('../../fixtures/test-data');
 const { guardedPut } = require('../../helpers/vv-request');
 
 const config = loadConfig();
 const BASE_URL = config.baseUrl;
 const API_BASE = `/api/v1/${config.customerAlias}/${config.databaseAlias}`;
 
-// Test document in /TestFolder (has Date index field assigned)
-const DOC_ID = '5c4c9e8c-25ca-eb11-8202-d7701a6d4070';
-const DATE_FIELD_LABEL = 'Date';
+const DOC_ID = customerDocConfig.testDocumentId;
+const DATE_FIELD_LABEL = customerDocConfig.dateFieldLabel;
 
 let token;
 
@@ -68,146 +71,141 @@ async function readDateField(request) {
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('Document Index Field Date Handling', () => {
-    test.describe('Format normalization', () => {
-        test('ISO date-only → appends T00:00:00', async ({ request }) => {
-            await writeDateField(request, '2026-03-15');
-            const stored = await readDateField(request);
-            expect(stored).toBe('2026-03-15T00:00:00');
-        });
+// ---------------------------------------------------------------------------
+// DOC-1: API Write Format Normalization
+// ---------------------------------------------------------------------------
+const doc1Tests = DOC_TEST_DATA.filter((t) => t.category === 1);
 
-        test('US format → normalized to ISO', async ({ request }) => {
-            await writeDateField(request, '03/15/2026');
-            const stored = await readDateField(request);
-            expect(stored).toBe('2026-03-15T00:00:00');
-        });
-
-        test('EU format (DD/MM/YYYY) → correctly parsed as day/month', async ({ request }) => {
-            await writeDateField(request, '15/03/2026');
-            const stored = await readDateField(request);
-            // Unlike forms API (WS-BUG-2), index fields parse EU dates correctly
-            expect(stored).toBe('2026-03-15T00:00:00');
-        });
-
-        test('ISO naive datetime → preserved exactly', async ({ request }) => {
-            await writeDateField(request, '2026-03-15T14:30:00');
-            const stored = await readDateField(request);
-            expect(stored).toBe('2026-03-15T14:30:00');
-        });
-
-        test('US datetime 12h → normalized to ISO', async ({ request }) => {
-            await writeDateField(request, '03/15/2026 2:30 PM');
-            const stored = await readDateField(request);
-            expect(stored).toBe('2026-03-15T14:30:00');
-        });
-
-        test('US datetime 24h → normalized to ISO', async ({ request }) => {
-            await writeDateField(request, '03/15/2026 14:30');
-            const stored = await readDateField(request);
-            expect(stored).toBe('2026-03-15T14:30:00');
-        });
-    });
-
-    test.describe('DOC-BUG-1: Timezone offset converted to UTC, Z stripped', () => {
-        test('UTC marker (Z) silently stripped', async ({ request }) => {
-            await writeDateField(request, '2026-03-15T14:30:00Z');
-            const stored = await readDateField(request);
-            // BUG: Z is stripped — value looks like local time but is actually UTC
-            expect(stored).toBe('2026-03-15T14:30:00');
-        });
-
-        test('BRT offset (-03:00) → converted to UTC, Z stripped', async ({ request }) => {
-            await writeDateField(request, '2026-03-15T14:30:00-03:00');
-            const stored = await readDateField(request);
-            // BUG: 14:30 BRT = 17:30 UTC, but stored without Z marker
-            expect(stored).toBe('2026-03-15T17:30:00');
-        });
-
-        test('IST offset (+05:30) → converted to UTC, Z stripped', async ({ request }) => {
-            await writeDateField(request, '2026-03-15T14:30:00+05:30');
-            const stored = await readDateField(request);
-            // BUG: 14:30 IST = 09:00 UTC, but stored without Z marker
-            expect(stored).toBe('2026-03-15T09:00:00');
-        });
-
-        test('midnight BRT → shifts to 03:00 UTC (wrong day visible)', async ({ request }) => {
-            await writeDateField(request, '2026-03-15T00:00:00-03:00');
-            const stored = await readDateField(request);
-            // BUG: midnight BRT becomes 03:00 — the date looks correct but time is wrong
-            expect(stored).toBe('2026-03-15T03:00:00');
-        });
-
-        test('midnight UTC → stored as midnight, Z stripped', async ({ request }) => {
-            await writeDateField(request, '2026-03-15T00:00:00Z');
-            const stored = await readDateField(request);
-            expect(stored).toBe('2026-03-15T00:00:00');
-        });
-
-        test('late night UTC+ → date shifts backward', async ({ request }) => {
-            // 23:00 IST on March 15 = 17:30 UTC on March 15 (same day)
-            await writeDateField(request, '2026-03-15T23:00:00+05:30');
-            const stored = await readDateField(request);
-            expect(stored).toBe('2026-03-15T17:30:00');
-        });
-
-        test('early morning UTC+ → date shifts backward across midnight', async ({ request }) => {
-            // 02:00 IST on March 15 = 20:30 UTC on March 14 (PREVIOUS day!)
-            await writeDateField(request, '2026-03-15T02:00:00+05:30');
-            const stored = await readDateField(request);
-            // BUG: Date shifts to March 14 — wrong day stored without any indication why
-            expect(stored).toBe('2026-03-14T20:30:00');
-        });
-    });
-
-    test.describe('DOC-BUG-2: Cannot clear date field', () => {
-        test('empty string does not clear the value', async ({ request }) => {
-            // First set a known value
-            await writeDateField(request, '2026-06-01T12:00:00');
-            const before = await readDateField(request);
-            expect(before).toBe('2026-06-01T12:00:00');
-
-            // Try to clear with empty string
-            await writeDateField(request, '');
-            const after = await readDateField(request);
-            // BUG: value is NOT cleared — previous value persists
-            expect(after).toBe('2026-06-01T12:00:00');
-        });
-
-        test('null-like values do not clear the field', async ({ request }) => {
-            // Set known value
-            await writeDateField(request, '2026-06-01T12:00:00');
-
-            // Try null-like values
-            for (const val of ['null', 'undefined', 'none', '0']) {
-                await writeDateField(request, val);
+test.describe('DOC-1: Format Normalization', () => {
+    for (const tc of doc1Tests) {
+        const skip = tc.expectedStored === null; // TBD slots
+        test(`${tc.id}: ${tc.notes}`, async ({ request }) => {
+            if (skip) {
+                // Run the test but record actual value for TBD slots
+                await writeDateField(request, tc.inputValue);
                 const stored = await readDateField(request);
-                expect(stored).toBe('2026-06-01T12:00:00');
+                console.log(`[TBD] ${tc.id}: input="${tc.inputValue}" → stored="${stored}"`);
+                expect(stored).toBeTruthy(); // At minimum, something was stored
+                return;
+            }
+            await writeDateField(request, tc.inputValue);
+            const stored = await readDateField(request);
+            expect(stored).toBe(tc.expectedStored);
+        });
+    }
+});
+
+// ---------------------------------------------------------------------------
+// DOC-2: Timezone Offset Handling (DOC-BUG-1)
+// ---------------------------------------------------------------------------
+const doc2Tests = DOC_TEST_DATA.filter((t) => t.category === 2);
+
+test.describe('DOC-2: TZ Offset Handling (DOC-BUG-1)', () => {
+    for (const tc of doc2Tests) {
+        const skip = tc.expectedStored === null;
+        test(`${tc.id}: ${tc.notes}`, async ({ request }) => {
+            if (skip) {
+                await writeDateField(request, tc.inputValue);
+                const stored = await readDateField(request);
+                console.log(`[TBD] ${tc.id}: input="${tc.inputValue}" → stored="${stored}"`);
+                expect(stored).toBeTruthy();
+                return;
+            }
+            await writeDateField(request, tc.inputValue);
+            const stored = await readDateField(request);
+            expect(stored).toBe(tc.expectedStored);
+
+            // DOC-BUG-1 verification: response should never contain Z
+            if (tc.id === 'doc-2-no-z-resp') {
+                expect(stored).not.toContain('Z');
             }
         });
+    }
+});
+
+// ---------------------------------------------------------------------------
+// DOC-3: Field Clearing & Empty Values (DOC-BUG-2)
+// ---------------------------------------------------------------------------
+const doc3Tests = DOC_TEST_DATA.filter((t) => t.category === 3);
+
+test.describe('DOC-3: Field Clearing (DOC-BUG-2)', () => {
+    // Set a known value before all clearing attempts
+    const SEED_VALUE = '2026-06-01T12:00:00';
+
+    for (const tc of doc3Tests) {
+        test(`${tc.id}: ${tc.notes}`, async ({ request }) => {
+            // Seed with known value
+            await writeDateField(request, SEED_VALUE);
+            const before = await readDateField(request);
+            expect(before).toBe(SEED_VALUE);
+
+            // Attempt to clear
+            await writeDateField(request, tc.inputValue);
+            const after = await readDateField(request);
+
+            // DOC-BUG-2: previous value persists for all known clearing methods
+            if (tc.expectedStored === null) {
+                // TBD slot — log actual behavior
+                console.log(`[TBD] ${tc.id}: clear="${tc.inputValue}" → after="${after}"`);
+                // Most likely persists, but log for confirmation
+            } else {
+                expect(after).toBe(SEED_VALUE); // BUG: should be null/empty, but persists
+            }
+        });
+    }
+});
+
+// ---------------------------------------------------------------------------
+// DOC-4: Update Path & Overwrite
+// ---------------------------------------------------------------------------
+const doc4Tests = DOC_TEST_DATA.filter((t) => t.category === 4);
+
+test.describe('DOC-4: Update Path & Overwrite', () => {
+    for (const tc of doc4Tests) {
+        test(`${tc.id}: ${tc.notes}`, async ({ request }) => {
+            // First write
+            await writeDateField(request, tc.inputValue);
+            const first = await readDateField(request);
+            expect(first).toBeTruthy();
+
+            // Second write (overwrite)
+            await writeDateField(request, tc.inputValue2);
+            const second = await readDateField(request);
+            expect(second).toBe(tc.expectedStored);
+        });
+    }
+});
+
+// ---------------------------------------------------------------------------
+// Cross-cutting verifications (not data-driven)
+// ---------------------------------------------------------------------------
+test.describe('Cross-cutting: Z suffix behavior', () => {
+    test('API response never includes Z suffix on index field dates', async ({ request }) => {
+        await writeDateField(request, '2026-03-15T14:30:00');
+        const stored = await readDateField(request);
+        expect(stored).not.toContain('Z');
+        expect(stored).toBe('2026-03-15T14:30:00');
     });
 
-    test.describe('No response Z suffix (unlike forms API)', () => {
-        test('API response never includes Z suffix on index field dates', async ({ request }) => {
-            await writeDateField(request, '2026-03-15T14:30:00');
-            const stored = await readDateField(request);
-            // Index fields: no Z. Forms API: always adds Z. Inconsistent.
-            expect(stored).not.toContain('Z');
-            expect(stored).toBe('2026-03-15T14:30:00');
+    test('Built-in document dates include Z suffix (UTC)', async ({ request }) => {
+        const t = await getToken(request);
+        const resp = await request.get(`${BASE_URL}${API_BASE}/documents/${DOC_ID}`, {
+            headers: { Authorization: `Bearer ${t}` },
         });
-    });
+        const doc = (await resp.json()).data;
 
-    test.describe('Built-in document dates (for comparison)', () => {
-        test('built-in dates include Z suffix (UTC)', async ({ request }) => {
-            const t = await getToken(request);
-            const resp = await request.get(`${BASE_URL}${API_BASE}/documents/${DOC_ID}`, {
-                headers: { Authorization: `Bearer ${t}` },
-            });
-            const doc = (await resp.json()).data;
-
-            // Built-in dates have Z — they're explicitly UTC
-            expect(doc.createDate).toMatch(/Z$/);
-            expect(doc.modifyDate).toMatch(/Z$/);
-            // This proves the same server handles both, but index fields strip Z
-        });
+        // Built-in dates have Z — they're explicitly UTC
+        expect(doc.createDate).toMatch(/Z$/);
+        expect(doc.modifyDate).toMatch(/Z$/);
+        // This proves the same server handles both, but index fields strip Z
     });
 });
+
+// ---------------------------------------------------------------------------
+// DOC-5 through DOC-8: Future categories (require additional infrastructure)
+//
+// DOC-5: UI Round-Trip — needs Playwright helper for RadDateTimePicker + checkout
+// DOC-6: Cross-Layer Comparison — needs forms test coordination
+// DOC-7: Query & Search — needs document query API investigation
+// DOC-8: DocAPI Infrastructure Differential — needs WADNR test document setup
+// ---------------------------------------------------------------------------
