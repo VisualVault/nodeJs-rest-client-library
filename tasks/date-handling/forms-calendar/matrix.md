@@ -450,6 +450,8 @@ Simulate a scheduled script, form button event, or REST API call setting a date 
 **Blocker**: ~~Requires a Node.js test script to send values via `VVRestApi`.~~ Resolved — full WS test infrastructure built.
 
 > **Cross-reference**: Most Cat 10 scenarios are covered by the [WS test matrix](../web-services/matrix.md) (WS-1, WS-4, WS-5). Evidence links below point to WS run files. Gap tests: [cat10-gaps-run-1.md](../web-services/runs/cat10-gaps-run-1.md).
+>
+> **WADNR cross-validation (2026-04-13)**: All 6 Config D scenarios re-verified on vv5dev/WADNR via WS-1 + Playwright CLI. API storage and Forms behavior identical to EmanuelJofre baseline. See [cat10-wadnr-run-1](../../projects/wadnr/testing/date-handling/forms-calendar/runs/cat10-wadnr-run-1.md).
 
 | Test ID                | Config | Source           | Value                             | Actual (Forms Display / rawValue)                                         | Status  | Run Date   | Evidence                                                                 |
 | ---------------------- | :----: | ---------------- | --------------------------------- | ------------------------------------------------------------------------- | :-----: | ---------- | ------------------------------------------------------------------------ |
