@@ -48,7 +48,13 @@ module.exports.main = async function (vvClient, response, token) {
 };
 ```
 
+**`response.json()` vs `postCompletion()` — what appears in the VV Scheduled Service Log:**
+
+The `response.json()` message is what VV records in the Scheduled Service Log (the "Message" column in `scheduleradmin` > View Log). This applies to **both** the Test button and the scheduler. `postCompletion()` signals completion status to the scheduler (advances recurrence, sets the Result flag to true/false) but its message parameter does **not** appear in the log. Verified 2026-04-13 on WADNR production schedules (`CommunicationLogSendImmediate`, `AGOLPostFponlineDataToAGOLTables`) and vvdemo (`ScheduledProcessTestHarness`).
+
 **Script caching:** The server writes the script to `lib/VVRestApi/VVRestApiNodeJs/files/{scriptId}.js` on first execution. On subsequent calls, it deletes the cached file and re-writes the latest version from VV. This means script changes in the admin UI take effect on the next execution without a server restart.
+
+**Logger path:** VV writes uploaded scripts to `lib/VVRestApi/VVRestApiNodeJs/files/{scriptId}.js`. From there, `require('../log')` resolves to the server's Winston logger at `lib/VVRestApi/VVRestApiNodeJs/log.js`. Scripts in `scripts/server-scripts/` use the same `require('../log')` which resolves via `scripts/log.js` (a shim). Test scripts that must work in **both** contexts (VV platform upload + direct runner) need a try/catch dual-path — see `scripts/test-scripts/scheduled/ScheduledProcessTestHarness.js`.
 
 **`getCredentials()` is required** for scheduled scripts — the server calls it to authenticate with the VV API before invoking `main()`. Form scripts don't need it (the server uses the calling user's session).
 

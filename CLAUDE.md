@@ -119,6 +119,8 @@ npm run test:dash:regression # Dashboard regression pipeline
 
 REST API date handling tests via the DateTestWSHarness. Run with `node tools/runners/run-ws-test.js --action WS-2`. See `tasks/date-handling/web-services/README.md`.
 
+Scheduled process pattern validation via `node tools/runners/run-sp-test.js`. See `scripts/templates/scheduledprocess-pattern.js` for the canonical pattern.
+
 ## Platform Exploration & Version Monitoring
 
 Playwright-based exploration of VV platform structure and version state. See `tools/CLAUDE.md` for details.

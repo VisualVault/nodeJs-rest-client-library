@@ -75,8 +75,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 - `tools/admin/` — Playwright-based admin tools for creating and verifying VV objects: `create-ws.js` (web services), `create-schedule.js` (scheduled services), `verify-ws.js` (REST API verification with glob matching and invocation), `test-schedule.js` (enable + trigger "Test Microservice" + verify execution), `explore-admin.js` (generic admin page explorer for toolbar/dock panel/grid discovery). All tools use `--project` flag, respect `readOnly` environments, and reuse `vv-admin.js` helpers
 - `tasks/ws-naming/` — investigation confirming `_` and `-` are valid in web service and scheduled service names. No transformation, no encoding. Verified via creation, API visibility, runtime execution, and `postCompletion()` callback on vvdemo
 - `/@-create-task` scope check — skill now asks whether the investigation is platform-level (`tasks/`) or customer-bound (`projects/{customer}/analysis/`) before scaffolding
-- `tools/runners/run-sp-test.js` — scheduled process test runner: authenticates via `env-config.js`, triggers scheduled processes by name, polls for completion, captures execution results. Supports `--action` flag for named test scenarios
-- `scripts/templates/scheduledprocess-pattern.js` — boilerplate template for scheduled process scripts with structured logging, error handling, and `postCompletion()` callback pattern
+- `tools/runners/run-sp-test.js` — direct Node.js runner for scheduled process test scripts (analogous to `run-ws-test.js`). Authenticates via `env-config.js`, supports `--skip-completion` (no-op postCompletion), `--token <guid>` (real GUID), and `--script <name>` (default: ScheduledProcessTestHarness)
+- `scripts/templates/scheduledprocess-pattern.js` — boilerplate template for scheduled process scripts with structured logging (`sanitizeLog`), error handling (try/catch/finally), and `postCompletion()` callback pattern. Documents verified log behavior: `response.json()` message appears in VV Scheduled Service Log for both Test button and scheduler paths
 
 ### Changed
 

@@ -252,6 +252,16 @@ node tools/runners/run-ws-test.js --action WS-1 --configs A --input-date 2026-03
 
 The runner also resolves `writePolicy.forms[].name` entries to API GUIDs at startup, so `.env.json` can use human-readable form names instead of environment-specific template IDs.
 
+**Scheduled Process Runner** (analogous to WS runner):
+
+```bash
+node tools/runners/run-sp-test.js                          # default harness + placeholder token
+node tools/runners/run-sp-test.js --skip-completion         # skip postCompletion call
+node tools/runners/run-sp-test.js --script MyTestScript     # custom script name
+```
+
+See `scripts/templates/scheduledprocess-pattern.js` for the canonical scheduled process pattern.
+
 ### 5.3 Browser Path Setup (Optional — for WS-4 or production-path validation)
 
 This path calls the harness through VV's Microservice routing, like a real production form button would. Only needed for WS-4 (API→Forms cross-layer) or to validate the full production path.

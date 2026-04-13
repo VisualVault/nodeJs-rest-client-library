@@ -424,19 +424,21 @@ Clicking a service name in the grid opens an inline **"MICROSERVICE DETAILS"** d
 
 **Detail panel fields:**
 
-| Field                      | Element             | Notes                                                                                                                                      |
-| -------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Name                       | `txtOpName`         | Service name (editable). `_` and `-` are valid characters.                                                                                 |
-| Description                | `txtDescription`    | (editable)                                                                                                                                 |
-| Service Type               | `ddlCategory`       | Dropdown (see options below)                                                                                                               |
-| Connection Type            | `ddlConnectionType` | Dropdown: `1`=Web Service, `2`=Node.Js Server. **Changing this triggers a postback** that switches between `txtWSURL` and `txtScriptCode`. |
-| Timeout                    | `txtServiceTimeout` | Long Running Service Settings section                                                                                                      |
-| Allow anonymous access     | checkbox            | Security Settings section                                                                                                                  |
-| IP Address Restrictions    | text                | Security Settings section                                                                                                                  |
-| Enable completion callback | checkbox            | Completion callback section                                                                                                                |
-| WS URL                     | `txtWSURL`          | Textarea — visible when Connection Type = Web Service (1)                                                                                  |
-| **Script source**          | `txtScriptCode`     | Textarea — visible when Connection Type = Node.Js Server (2). Full ID: `ctl00_ContentBody_dockDetail_C_txtScriptCode`                      |
-| Script ID                  | `lblScriptId`       | GUID displayed at bottom of panel                                                                                                          |
+| Field                      | Element                         | Notes                                                                                                                                      |
+| -------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Name                       | `txtOpName`                     | Service name (editable). `_` and `-` are valid characters.                                                                                 |
+| Description                | `txtDescription`                | (editable)                                                                                                                                 |
+| Service Type               | `ddlCategory`                   | Dropdown (see options below)                                                                                                               |
+| Connection Type            | `ddlConnectionType`             | Dropdown: `1`=Web Service, `2`=Node.Js Server. **Changing this triggers a postback** that switches between `txtWSURL` and `txtScriptCode`. |
+| Timeout                    | `txtServiceTimeout`             | Long Running Service Settings section                                                                                                      |
+| Allow anonymous access     | checkbox                        | Security Settings section                                                                                                                  |
+| IP Address Restrictions    | text                            | Security Settings section                                                                                                                  |
+| Enable completion callback | `chkCompletionCallback`         | Completion callback section. When enabled, VV waits for `postCompletion()` to advance recurrence.                                          |
+| Callback Timeout           | `txtCompletionCallbackTimeout`  | Numeric timeout value. Unit controlled by dropdown below.                                                                                  |
+| Callback Timeout Unit      | `cboCompletionCallbackUnitType` | Minutes (0), Hours (1), Days (2), Weeks (3), Months (4), Years (5)                                                                         |
+| WS URL                     | `txtWSURL`                      | Textarea — visible when Connection Type = Web Service (1)                                                                                  |
+| **Script source**          | `txtScriptCode`                 | Textarea — visible when Connection Type = Node.Js Server (2). Full ID: `ctl00_ContentBody_dockDetail_C_txtScriptCode`                      |
+| Script ID                  | `lblScriptId`                   | GUID displayed at bottom of panel                                                                                                          |
 
 **Category dropdown values (`ddlCategory`):**
 
@@ -507,7 +509,9 @@ Clicking a schedule name opens an inline dock panel with these fields:
 | Save                 | `btnSave_input`                             | Saves current entry                                                                                                  |
 | Close                | `btnCancel_input`                           | Closes panel without saving                                                                                          |
 
-**"Test Microservice" button behavior:** Triggers an immediate execution of the linked service via the VV cloud → Node.js server pipeline. The response appears in a RadWindow dialog. **Does NOT update "Last Run Date"** in the grid — that field only updates for automatic scheduled triggers, not manual tests. Verified 2026-04-13 on vvdemo.
+**"Test Microservice" button behavior:** Triggers an immediate execution of the linked service via the VV cloud → Node.js server pipeline. The response appears in a RadWindow dialog titled "Response from OutsideProcess". The dialog shows the `response.json()` message from the script (e.g., `"ScheduledProcessTestHarness Started"`). **Does NOT update "Last Run Date"** in the grid — that field only updates for automatic scheduled triggers, not manual tests. Verified 2026-04-13 on vvdemo.
+
+**"View" link / Scheduled Service Log:** The `lnkViewLog` link in grid column 2 opens a `dockScheduledProcessLog` RadWindow showing execution history. Grid columns: Row, Scheduled Run Date, Actual Run Date, Completion Date, Result (True/False), Message. The **Message column** shows the `response.json()` message, not the `postCompletion()` message — see `docs/guides/scripting.md` for details. Verified 2026-04-13 on WADNR production schedules.
 
 **Grid column layout (verified 2026-04-08, WADNR: 21 schedules):**
 

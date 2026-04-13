@@ -51,7 +51,12 @@ module.exports.main = async function (vvClient, response, token) {
     const serviceName = 'MyScheduledProcess';
     const scheduledProcessGUID = token;
 
-    // Platform acknowledgment — immediate response before any work begins
+    // Platform acknowledgment — immediate response before any work begins.
+    // This message appears in the VV Scheduled Service Log for BOTH the Test button
+    // and the scheduler. Despite old documentation claiming otherwise, postCompletion's
+    // message does NOT appear in the log — only this response.json message does.
+    // postCompletion() signals completion status to the scheduler (advances recurrence,
+    // sets the Result flag) but the visible Message column comes from response.json().
     response.json(200, `${serviceName} Started`);
 
     const output = {
