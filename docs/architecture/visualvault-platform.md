@@ -710,7 +710,17 @@ Returns `VaultVersionInfo` — the core platform version and database schema ver
 | Infrastructure   | IIS/10.0, ASP.NET 4.0 | No IIS header    |
 | Deployment age   | ~1,766 days           | ~631 days        |
 
-Despite these differences, all 116 forms regression tests (BRT-chromium) produce **identical results** on both environments. All 16 platform bugs are confirmed as platform-level, not environment-specific. The `progVersion` major version jump (5.1→6.1) did not fix any date bugs. The `utcOffset` difference (-3 vs -7) does not affect API write path (CB-4 confirmed). Differential investigation (mask impact, Kendo widget layer, server TZ on form save) in progress — see `tasks/date-handling/forms-calendar/matrix.md` Cat 14–16.
+Despite these differences, all tested slots (742 executions across Forms, Web Services, and Dashboards) produce **identical results** on both environments. All 16 platform bugs are confirmed as platform-level, not environment-specific.
+
+**Why results are identical despite infrastructure differences:**
+
+- **Shared centralized services**: Both servers use the same FormsAPI (`preformsapi.visualvault.com`), DocAPI (`predocumentsapi.visualvault.com`), and Sockets service. The bugs live in these shared service layers, not in per-server code.
+- **Same FormViewer code version**: Both run `v0.5.1` — the `calendarValueService` (where most form date bugs originate) is identical despite different build numbers.
+- **`progVersion` is the admin app version, not the services**: The 5.1→6.1 jump affects the ASP.NET admin application, not the Angular FormViewer or .NET FormsAPI. Date-handling code paths are decoupled from the admin version.
+- **Server TZ is irrelevant to form saves**: Cat 16 confirmed that `utcOffset` (-3 vs -7) does not affect form date storage — all processing happens client-side or in FormsAPI.
+- **Kendo v1 vs v2 produce equivalent values**: Cat 15 confirmed the widget layer difference doesn't affect date values — bugs are in the `calendarValueService`, not the Kendo widget.
+
+**One infrastructure gap remains**: DocAPI is enabled on vv5dev but disabled on vvdemo. Document Library date bugs (DOC-BUG-1/2) have not been formally tested on either environment — this is the one component where the infrastructure difference could produce divergent behavior.
 
 ### FormViewer Build Number
 
@@ -831,6 +841,8 @@ The `tools/explore/environment-profile.js` tool captures both admin and FormView
 ## Service Architecture
 
 The VV platform consists of multiple backend services, each running independently. The core API at `{env}.visualvault.com` acts as the gateway; individual services are discovered via `/configuration/*` endpoints.
+
+**Key architectural fact**: Backend services (FormsAPI, DocAPI, WorkflowAPI, Sockets) are **shared across VV servers**, not deployed per-server. Both `vvdemo` and `vv5dev` route to the same `preformsapi.visualvault.com`, `predocumentsapi.visualvault.com`, etc. Only the core API gateway and admin app are per-server. This means bugs in shared services affect all environments equally, regardless of `progVersion` differences. Verified 2026-04-13 via environment profile comparison.
 
 ### Configuration Discovery
 
@@ -1142,7 +1154,18 @@ Key behaviors:
 - **Checkout required for UI editing**: datepicker is disabled when document is checked in; API can always write regardless
 - **Built-in document dates** (`createDate`, `modifyDate`, `reviewDate`, `expireDate`) include Z suffix; index field dates do not — inconsistent within the same document
 
-See `tasks/date-handling/document-library/analysis/overview.md` for full investigation and `testing/specs/date-handling/doc-index-field-dates.spec.js` for 17 automated regression tests.
+**REST API endpoints** for document index fields (from `lib/.../config.yml`):
+
+| Endpoint                                   | Method | Purpose                                                             |
+| ------------------------------------------ | ------ | ------------------------------------------------------------------- |
+| `/documents/{id}/indexfields`              | GET    | Read index field values on a document                               |
+| `/documents/{id}/indexfields`              | PUT    | Write index field values (JSON-stringified `{ FieldLabel: value }`) |
+| `/folders/{id}/indexfields`                | GET    | List index fields assigned to a folder                              |
+| `/folders/{id}/indexfields/{indexFieldId}` | PUT    | Update folder index field settings (default value, queryId)         |
+| `/indexfields`                             | GET    | List all index field definitions                                    |
+| `/indexfields/{id}/folders/{folderId}`     | PUT    | Assign an index field to a folder                                   |
+
+See `tasks/date-handling/document-library/matrix.md` for the test matrix (8 categories, 52 slots) and `testing/specs/date-handling/doc-index-field-dates.spec.js` for 32 data-driven regression tests.
 
 ### Auto-Save
 

@@ -1,3 +1,5 @@
+// When VV uploads this script, it runs from lib/.../files/ — require('../log') resolves correctly.
+// For local test scripts that also run via a direct runner, use a try/catch dual-path (see test-scripts/).
 const logger = require('../log');
 
 module.exports.getCredentials = function () {

@@ -12,7 +12,7 @@ Comprehensive investigation of date handling defects across **all VisualVault co
 | **Web Services (REST API)**         | Complete    | `web-services/` (validated on WADNR 2026-04-10)                                |
 | **Analytic Dashboards**             | Complete    | `dashboards/` (validated on WADNR 2026-04-10)                                  |
 | **VisualVault Reports**             | Not Started | `reports/` (future)                                                            |
-| **Document Library (index fields)** | In Progress | `document-library/`                                                            |
+| **Document Library (index fields)** | In Progress | `document-library/` (matrix: 8 categories, 52 slots)                           |
 | **Workflows (date triggers)**       | Not Started | `workflows/` (future)                                                          |
 | **Node.js Client Library**          | Not Started | `node-client/` (future)                                                        |
 
@@ -79,14 +79,14 @@ Tests run via Chrome MCP extension or Playwright. Cross-timezone testing require
 
 - `useUpdatedCalendarValueLogic=true` — V2 code path never exercised live
 - V1 load path FORM-BUG-7 in IST — code-confirmed but no live test
-- Web service / scheduled script input (Category 10)
 - Preset/Current Date with `enableTime=true` fields — needs new form fields
 - Category 2 legacy typed input (E-H) across all TZs
+- Category 14 Phase B/C — masked field behavior (requires Form Designer on EmanuelJofre)
 
 ### Next Steps
 
-1. **Category 14 — Mask Impact Phase C**: Phase A (unmasked baseline) complete on WADNR (13/13). Phase B/C (add masks, re-run) requires Form Designer on EmanuelJofre.
+1. **Category 14 — Mask Impact Phase B/C**: Phase A (unmasked baseline) complete on both environments (13/13, 8P/5F). Phase B/C (add masks, re-run) requires Form Designer on EmanuelJofre.
 2. **Category 2 — Typed Input legacy (E-H)**: Typed input for legacy configs across BRT, IST, UTC+0.
-3. **Category 10 — Web service input**: How production scripts set dates via Node.js.
+3. **Document Library test harness**: DOC-BUG-1/2 identified but no formal test harness yet. Infrastructure difference (`docapi` enabled on vv5dev, disabled on vvdemo) may expose divergent behavior.
 
 See `forms-calendar/matrix.md` for the full test matrix (269 slots, Cat 1–16).

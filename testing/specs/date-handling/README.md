@@ -1,18 +1,18 @@
 # Date-Handling Playwright Test Suite
 
-Automated regression tests for VisualVault Forms calendar field date-handling behavior. Verifies how dates are stored, transformed, and returned across 8 field configurations and 5 timezones (BRT, IST, UTC0, PST, JST).
+Automated regression tests for VisualVault date-handling behavior across Forms calendar fields, Dashboards, and Document Library index fields. Forms tests verify storage and retrieval across 8 field configurations and 5 timezones (BRT, IST, UTC0, PST, JST). Document Library tests verify API-level date normalization and timezone handling.
 
 ## Why This Exists
 
 The VisualVault platform has **16 confirmed date-handling bugs** across Forms (7), Web Services (6), Dashboards (1), and Document Library (2). This test suite:
 
 - Runs the same scenarios across BRT (UTC-3), IST (UTC+5:30), UTC+0, PST/PDT (UTC-8/-7), and JST (UTC+9) to expose timezone-dependent bugs
-- Covers ~269 test slots across 16 categories (popup, typed input, reload, SetFieldValue, GetFieldValue, round-trip, mask impact, Kendo widget comparison, server TZ)
+- Covers ~269 Forms test slots across 16 categories + 52 Document Library slots across 8 categories
 - Produces both human-readable test documentation (in `tasks/date-handling/`) and reusable Playwright specs (here)
 
 Full investigation context: `tasks/date-handling/CLAUDE.md`
-Bug analysis: `tasks/date-handling/forms-calendar/analysis/overview.md`
-Test matrix: `tasks/date-handling/forms-calendar/matrix.md`
+Forms matrix: `tasks/date-handling/forms-calendar/matrix.md`
+Document Library matrix: `tasks/date-handling/document-library/matrix.md`
 
 ---
 
