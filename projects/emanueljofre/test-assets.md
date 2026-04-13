@@ -50,6 +50,17 @@ Created by `testing/global-setup.js` and cached in `testing/config/saved-records
 | cat3-H-BRT | H | BRT | typed | Reload test — legacy datetime + ignoreTZ |
 | cat3-B-IST | B | IST | typed | Cross-TZ reload — ignoreTZ |
 
+## Scheduled Processes
+
+| Name | Script Location | Purpose |
+|------|----------------|---------|
+| ScheduledProcessTestHarness | `scripts/test-scripts/scheduled/ScheduledProcessTestHarness.js` | Validates SP pattern: auth, read-only query, postCompletion |
+
+Run via:
+- Direct: `node tools/runners/run-sp-test.js`
+- Direct (no completion): `node tools/runners/run-sp-test.js --skip-completion`
+- Server: `curl http://localhost:3000/testscripts/scheduled/ScheduledProcessTestHarness`
+
 ## Notes
 
 - **Playwright integration**: `testing/fixtures/vv-config.js` exports `FORM_TEMPLATE_URL`, `TARGET_FORM_TEMPLATE_URL`, `FIELD_MAP`, `SAVED_RECORDS`, and `RECORD_DEFINITIONS` for programmatic test use.
