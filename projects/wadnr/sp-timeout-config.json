@@ -1,0 +1,205 @@
+{
+  "generatedAt": "2026-04-14T13:57:26.717Z",
+  "results": [
+    {
+      "name": "AGOLPostFponlineDataToAGOLTables",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "AGOLSendUpdatedDataToPendingDataForm",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "CommunicationLogSendDigest",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "CommunicationLogSendImmediate",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "FeeSCHFinalizePendingTransactions",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "FeeSCHInstallmentReminderNotifications",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "fpnpLoadTesting",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "LibCreatezActivtyMapGISJSON",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "PostPermitsToDOR",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "ReminderExternalReviewerEmailNotification",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "SCH_FPNP_NotificationSystem",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "SCHExpirationMaintenanceInARP",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "SCHFPANExpirationClearOfflineFlags",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "SCHGenerateWorkQueueExcelFiles",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "SCHHardDeleteReadyRecords",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "SCHRetriggerBoxWorkflow",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "SCHSoftDeleteStaleRecords",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "SCHSoftDeleteWarningNotifications",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "sendReconciliationReport",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    },
+    {
+      "name": "ShoppingCartSCHDisableStaleCarts",
+      "category": "Scheduled",
+      "gridTimeout": "0",
+      "gridCallback": "False",
+      "callbackEnabled": false,
+      "callbackTimeout": "0",
+      "callbackUnit": "Minutes",
+      "serviceTimeout": "0"
+    }
+  ]
+}
