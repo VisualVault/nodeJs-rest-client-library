@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-04-14T14:24:53.776Z",
+  "results": [
+    {
+      "delaySec": 10,
+      "elapsed": 16030,
+      "dialogMessage": "",
+      "success": "",
+      "isTimeout": "",
+      "isNgrokError": ""
+    },
+    {
+      "delaySec": 30,
+      "elapsed": 35447,
+      "dialogMessage": "",
+      "success": "",
+      "isTimeout": "",
+      "isNgrokError": ""
+    },
+    {
+      "delaySec": 60,
+      "elapsed": 65300,
+      "dialogMessage": "",
+      "success": "",
+      "isTimeout": "",
+      "isNgrokError": ""
+    },
+    {
+      "delaySec": 90,
+      "elapsed": 95795,
+      "dialogMessage": "",
+      "success": "",
+      "isTimeout": "",
+      "isNgrokError": ""
+    },
+    {
+      "delaySec": 120,
+      "elapsed": 125408,
+      "dialogMessage": "",
+      "success": "",
+      "isTimeout": "",
+      "isNgrokError": ""
+    },
+    {
+      "delaySec": 180,
+      "elapsed": 185613,
+      "dialogMessage": "",
+      "success": "",
+      "isTimeout": "",
+      "isNgrokError": ""
+    },
+    {
+      "delaySec": 300,
+      "elapsed": 304649,
+      "dialogMessage": "SchedulerAdmin The microservice could not complete and provided the following error message 'An exception was thrown while Calling a scheduled microservice to a Node Server: System.AggregateException: One or more errors occurred. ---> System.AggregateException: One or more errors occurred. ---> System.Threading.Tasks.TaskCanceledException: A task was canceled. --- End of inner exception stack trace --- at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification) at Auersoft.VisualVault.Engine.Entities.OutsideProcess.OutsideProcessNodeServer.<>c__DisplayClass25_0.b__0(Task`1 taskwithresponse) in c:\\TfsAgent\\_work\\77\\s\\Auersoft.VisualVault.Engine\\Entities\\OutsideProcess\\OutsideProcessNodeServer.cs:line 172 at System.Threading.Tasks.Task.Execute() --- End of inner exception stack trace --- at System.Threading.Tasks.Task.ThrowIfExceptional(Boolean includeTaskCanceledExceptions) at System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken) at Auersoft.VisualVault.Engine.Entities.OutsideProcess.OutsideProcessNodeServer.DoOutsideProcess(String[] connections, String cultureCode, Guid& token, Boolean& response, String& message, VaultIdentity vaultIdentity) in c:\\TfsAgent\\_work\\77\\s\\Auersoft.VisualVault.Engine\\Entities\\OutsideProcess\\OutsideProcessNodeServer.cs:line 205---> (Inner Exception #0) System.AggregateException: One or more errors occurred. ---> System.Threading.Tasks.TaskCanceledException: A task was canceled. --- End of inner exception stack trace --- at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification) at Auersoft.VisualVault.Engine.Entities.OutsideProcess.OutsideProcessNodeServer.<>c__DisplayClass25_0.b__0(Task`1 taskwithresponse) in c:\\TfsAgent\\_work\\77\\s\\Auersoft.VisualVault.Engine\\Entities\\OutsideProcess\\OutsideProcessNodeServer.cs:line 172 at System.Threading.Tasks.Task.Execute()---> (Inner Exception #0) System.Threading.Tasks.TaskCanceledException: A task was canceled.<---<---' status label",
+      "success": false,
+      "isTimeout": true,
+      "isNgrokError": false
+    }
+  ]
+}

@@ -1,9 +1,18 @@
 {
-  "generatedAt": "2026-04-09T17:01:52.493Z",
+  "generatedAt": "2026-04-14T13:26:22.402Z",
   "environment": "vv5dev/WADNR/fpOnline",
   "component": "schedules",
-  "totalItems": 5,
+  "totalItems": 10,
   "schedules": [
+    {
+      "name": "SPTestHarness",
+      "enabled": true,
+      "runState": "Idle",
+      "lastRunDate": "Not Run Yet",
+      "recurrence": "Every 15 Minutes",
+      "nextRunDate": "4/14/2026 10:25 AM",
+      "serviceName": "ScheduledProcessTestHarness"
+    },
     {
       "name": "test",
       "enabled": false,
@@ -48,6 +57,42 @@
       "recurrence": "Recurrence Not Enabled",
       "nextRunDate": "7/6/2022 12:00 AM",
       "serviceName": "updateForms"
+    },
+    {
+      "name": "zzzSched_Mixed-2",
+      "enabled": false,
+      "runState": "Idle",
+      "lastRunDate": "Not Run Yet",
+      "recurrence": "Recurrence Not Enabled",
+      "nextRunDate": "4/13/2026 10:21 AM",
+      "serviceName": "zzzSchedTarget"
+    },
+    {
+      "name": "zzzSched_RunTest",
+      "enabled": true,
+      "runState": "Idle",
+      "lastRunDate": "4/13/2026 10:31 AM",
+      "recurrence": "Recurrence Not Enabled",
+      "nextRunDate": "4/13/2026 10:31 AM",
+      "serviceName": "zzzSchedTestScript"
+    },
+    {
+      "name": "zzzSched_Underscore2",
+      "enabled": false,
+      "runState": "Idle",
+      "lastRunDate": "Not Run Yet",
+      "recurrence": "Recurrence Not Enabled",
+      "nextRunDate": "4/13/2026 10:20 AM",
+      "serviceName": "zzzSchedTarget"
+    },
+    {
+      "name": "zzzSched-Hyphen2",
+      "enabled": false,
+      "runState": "Idle",
+      "lastRunDate": "Not Run Yet",
+      "recurrence": "Recurrence Not Enabled",
+      "nextRunDate": "4/13/2026 10:20 AM",
+      "serviceName": "zzzSchedTarget"
     }
   ]
 }

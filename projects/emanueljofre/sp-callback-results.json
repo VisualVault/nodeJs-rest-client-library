@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-04-14T14:59:05.586Z",
+  "results": [
+    {
+      "id": "S1",
+      "name": "Callback Disabled + postCompletion called (control)",
+      "callbackEnabled": false,
+      "callPostCompletion": true,
+      "dialogMessage": "",
+      "testElapsed": 5989,
+      "latestLogEntry": {
+        "row": "1",
+        "scheduledDate": "4/14/2026 10:25 AM",
+        "actualDate": "4/14/2026 10:25 AM",
+        "completionDate": "4/14/2026 10:25 AM",
+        "result": "True",
+        "message": "Traffic successfully made it to the ngrok agent, but the agent failed to establish a connection to the upstream web service at localhost:3000.\r\n\r\nERR_NGROK_8012"
+      }
+    },
+    {
+      "id": "S2",
+      "name": "Callback Enabled + postCompletion called",
+      "callbackEnabled": true,
+      "callPostCompletion": true,
+      "dialogMessage": "",
+      "testElapsed": 5693,
+      "latestLogEntry": {
+        "row": "1",
+        "scheduledDate": "4/14/2026 10:25 AM",
+        "actualDate": "4/14/2026 10:25 AM",
+        "completionDate": "4/14/2026 10:25 AM",
+        "result": "True",
+        "message": "Traffic successfully made it to the ngrok agent, but the agent failed to establish a connection to the upstream web service at localhost:3000.\r\n\r\nERR_NGROK_8012"
+      }
+    },
+    {
+      "id": "S3",
+      "name": "Callback Enabled + postCompletion NOT called",
+      "callbackEnabled": true,
+      "callPostCompletion": false,
+      "dialogMessage": "",
+      "testElapsed": 5651,
+      "latestLogEntry": {
+        "row": "1",
+        "scheduledDate": "4/14/2026 10:25 AM",
+        "actualDate": "4/14/2026 10:25 AM",
+        "completionDate": "4/14/2026 10:25 AM",
+        "result": "True",
+        "message": "Traffic successfully made it to the ngrok agent, but the agent failed to establish a connection to the upstream web service at localhost:3000.\r\n\r\nERR_NGROK_8012"
+      }
+    }
+  ]
+}
