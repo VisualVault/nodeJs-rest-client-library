@@ -21,6 +21,7 @@ docs/
 ### Standards
 
 - [bug-report-standard.md](standards/bug-report-standard.md) — Bug report structure, writing principles, severity levels, companion doc format, field configuration appendix pattern
+- [form-template-standard.md](standards/form-template-standard.md) — 18 atomic form template standards (naming, accessibility, tab order, calendar config, script hygiene, orphan refs) with pass/fail definitions
 
 ### Guides
 

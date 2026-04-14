@@ -35,3 +35,4 @@ Execution output bound to a specific customer or environment — actual observed
 | `extract-optimization/`   | Extract pipeline speed + reliability — parallel extraction, revision tracking, API-first               |
 | `ws-naming/`              | Web service naming — valid character investigation (`_`, `-`, special chars)                           |
 | `scheduled-process-logs/` | Scheduled process execution mechanics: response.json vs postCompletion, platform timeout, log behavior |
+| `standards-review/`       | Deterministic standards compliance tool for VV components (form templates, web services, dashboards)   |

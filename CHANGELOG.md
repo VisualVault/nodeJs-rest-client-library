@@ -14,6 +14,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay und
 
 ### Added
 
+- Form template standards review tool (`tools/review/`) — 18 atomic rules checking naming, accessibility, tab order, calendar config, script hygiene, and orphan references. CLI with `--project`, `--rule`, `--severity`, `--print` flags. Generates per-template reports, summary, and `run-metadata.json`. Standards defined in `docs/standards/form-template-standard.md`
 - Custom Queries extract component (`tools/extract/components/queries.js`) — API-first probe with Playwright fallback, parallel SQL extraction via dock panel response interception, hash-based incremental sync, connection discovery from ConnectionsAdmin grid
 - Renamed extract pipeline: `tools/export/` → `tools/extract/`, `projects/*/exports/` → `projects/*/extracts/`. Clarifies that the tools pull data from VV (extract), not push data out. All code, docs, commands updated.
 - Bug report standard (`docs/standards/bug-report-standard.md`) — document structure, 21 writing principles, severity levels, reading guide, companion doc format, field config appendix pattern

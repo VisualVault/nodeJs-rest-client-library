@@ -136,6 +136,17 @@ npm run env:profile:browser  # Generate profile with browser probes (~12s)
 
 Environment profiles consolidate platform version, service configuration, and front-end library stack into `projects/{customer}/environment.json`. Use `--project <name>` to target a specific customer.
 
+## Standards Review
+
+Deterministic rule-based review of form template XML against codified standards. See `tasks/standards-review/` for task status and `docs/standards/form-template-standard.md` for the 18 atomic standards.
+
+```bash
+npm run review:forms -- --project wadnr        # Full review with file output
+npm run review:forms -- --project wadnr --print # Stdout only
+```
+
+Reports written to `projects/{customer}/analysis/standards-review/` (summary.md, per-template reports, run-metadata.json).
+
 ## Active Tasks
 
 See `tasks/` folder. Each task gets its own subfolder with analysis, test results, and working notes.
@@ -147,6 +158,7 @@ See `tasks/` folder. Each task gets its own subfolder with analysis, test result
 | [extract-optimization](tasks/extract-optimization/)     | Active      | Extract pipeline speed: parallel extraction, revision tracking, API-first                               |
 | [ws-naming](tasks/ws-naming/)                           | Active      | Web service naming — valid character investigation                                                      |
 | [scheduled-process-logs](tasks/scheduled-process-logs/) | Complete    | SP execution mechanics: response.json vs postCompletion, platform timeout, log behavior                 |
+| [standards-review](tasks/standards-review/)             | In Progress | Deterministic standards compliance tool for VV components (form templates first)                        |
 | [wadnr](projects/wadnr/)                                | In Progress | WADNR client project: impact analysis, exported artifacts                                               |
 
 ## Principles
