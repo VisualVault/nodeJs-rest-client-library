@@ -16,11 +16,12 @@ tasks/
 
 ## Active Tasks
 
-| Task                                          | Status      | Description                                                                              |
-| --------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
-| [date-handling](date-handling/)               | In Progress | Cross-platform date handling bug investigation — Forms, Web Services, Dashboards         |
-| [form-templates](form-templates/)             | Active      | VV form template XML analysis, format documentation, and improved template generation    |
-| [extract-optimization](extract-optimization/) | Active      | Extract pipeline speed + reliability — parallel extraction, revision tracking, API-first |
-| [ws-naming](ws-naming/)                       | Complete    | Web service naming — valid character investigation (`_`, `-` confirmed safe)             |
+| Task                                              | Status      | Description                                                                              |
+| ------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| [date-handling](date-handling/)                   | In Progress | Cross-platform date handling bug investigation — Forms, Web Services, Dashboards         |
+| [form-templates](form-templates/)                 | Active      | VV form template XML analysis, format documentation, and improved template generation    |
+| [extract-optimization](extract-optimization/)     | Active      | Extract pipeline speed + reliability — parallel extraction, revision tracking, API-first |
+| [ws-naming](ws-naming/)                           | Complete    | Web service naming — valid character investigation (`_`, `-` confirmed safe)             |
+| [scheduled-process-logs](scheduled-process-logs/) | Complete    | SP execution mechanics: response.json vs postCompletion, platform timeout, log behavior  |
 
 > **Note:** Customer-specific project work (exports, impact analysis) lives in `projects/`. See [projects/wadnr/](../projects/wadnr/) for the WADNR project.

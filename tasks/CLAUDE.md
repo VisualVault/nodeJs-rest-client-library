@@ -28,9 +28,10 @@ Execution output bound to a specific customer or environment — actual observed
 
 ## Active Tasks
 
-| Task                    | Description                                                                                         |
-| ----------------------- | --------------------------------------------------------------------------------------------------- |
-| `date-handling/`        | Cross-platform date bug investigation (Forms, WS, Dashboards, Document Library) — 16 confirmed bugs |
-| `form-templates/`       | VV form template XML analysis, format documentation, template generation                            |
-| `extract-optimization/` | Extract pipeline speed + reliability — parallel extraction, revision tracking, API-first            |
-| `ws-naming/`            | Web service naming — valid character investigation (`_`, `-`, special chars)                        |
+| Task                      | Description                                                                                            |
+| ------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `date-handling/`          | Cross-platform date bug investigation (Forms, WS, Dashboards, Document Library) — 16 confirmed bugs    |
+| `form-templates/`         | VV form template XML analysis, format documentation, template generation                               |
+| `extract-optimization/`   | Extract pipeline speed + reliability — parallel extraction, revision tracking, API-first               |
+| `ws-naming/`              | Web service naming — valid character investigation (`_`, `-`, special chars)                           |
+| `scheduled-process-logs/` | Scheduled process execution mechanics: response.json vs postCompletion, platform timeout, log behavior |

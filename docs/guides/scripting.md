@@ -48,9 +48,31 @@ module.exports.main = async function (vvClient, response, token) {
 };
 ```
 
-**`response.json()` vs `postCompletion()` — what appears in the VV Scheduled Service Log:**
+**`response.json()` vs `postCompletion()` — execution flow and logging:**
 
-The `response.json()` message is what VV records in the Scheduled Service Log (the "Message" column in `scheduleradmin` > View Log). This applies to **both** the Test button and the scheduler. `postCompletion()` signals completion status to the scheduler (advances recurrence, sets the Result flag to true/false) but its message parameter does **not** appear in the log. Verified 2026-04-13 on WADNR production schedules (`CommunicationLogSendImmediate`, `AGOLPostFponlineDataToAGOLTables`) and vvdemo (`ScheduledProcessTestHarness`).
+The route handler calls `main(vvClient, res, token)` **without awaiting** — fire and forget. The async script now owns the Express `res` object. Once `response.json()` is called, the HTTP connection closes and VV records the message. The script continues running asynchronously; `postCompletion()` is a separate HTTP POST back to VV's API.
+
+|                 | `response.json()`                                          | `postCompletion()`                                                                                                                                                            |
+| --------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What it is      | Express `res.json()` — closes the HTTP connection          | Separate `POST /scheduledProcess/{GUID}?action=complete&result=...` to VV's REST API (not related to the HTTP response — this is a new outbound request from the Node server) |
+| What VV records | "Message" column in Scheduled Service Log                  | "Result" flag (True/False) in the log                                                                                                                                         |
+| If skipped      | VV HTTP client times out (3–5 min default) → records error | VV never learns job finished; with Completion Callback disabled, recurrence still advances                                                                                    |
+| When to call    | Before the platform timeout                                | In `finally` block after all work completes                                                                                                                                   |
+
+The `postCompletion()` message parameter (4th argument) is **not displayed anywhere in the UI** — only `response.json()` controls the visible log message. Verified 2026-04-14 across all 13 active WADNR scheduled processes.
+
+**Calling `response.json()` at the start is convention, not requirement.** Both patterns work as long as the total execution stays under the platform timeout (~3–5 min for Timeout=0). See `docs/architecture/visualvault-platform.md` § Scheduled Services for timeout details. However, delaying `response.json()` blocks VV's scheduler queue — other scheduled processes cannot run until the HTTP connection closes or times out. This makes calling at the start the safer default for long-running scripts.
+
+**`postCompletion()` accepts any GUID** — the API returns 200 OK even for invalid/placeholder tokens. There is no server-side token validation. With a real GUID (from VV's scheduler), it sets the Result flag and optionally advances recurrence.
+
+**Relationship to the "Completion Callback" setting:** The `Enable completion callback` checkbox on the Microservice definition (in `outsideprocessadmin`) controls whether VV **waits** for `postCompletion()` before advancing recurrence. This is a per-Microservice setting, not a per-schedule setting.
+
+| Completion Callback          | `postCompletion()` effect             | Recurrence advances when                                        |
+| ---------------------------- | ------------------------------------- | --------------------------------------------------------------- |
+| **Disabled** (WADNR default) | Sets Result flag only (cosmetic)      | `response.json()` is received (HTTP response)                   |
+| **Enabled**                  | Sets Result flag + signals completion | `postCompletion()` is received, or the Callback Timeout expires |
+
+When disabled, skipping `postCompletion()` has no operational impact — recurrence advances regardless. When enabled, skipping it causes VV to wait until the Callback Timeout expires before advancing. The Callback Timeout and its unit (Minutes, Hours, Days, etc.) are also configured on the Microservice definition. All 20 WADNR scripts have Callback=Disabled, Callback Timeout=0 Minutes. Verified 2026-04-14.
 
 **Script caching:** The server writes the script to `lib/VVRestApi/VVRestApiNodeJs/files/{scriptId}.js` on first execution. On subsequent calls, it deletes the cached file and re-writes the latest version from VV. This means script changes in the admin UI take effect on the next execution without a server restart.
 

@@ -26,7 +26,7 @@ docs/
 
 - [dev-setup.md](guides/dev-setup.md) — **Canonical setup guide** — environment setup, Playwright, credentials, code quality, troubleshooting
 - [playwright-testing.md](guides/playwright-testing.md) — Playwright patterns, architecture, extension guide
-- [scripting.md](guides/scripting.md) — Node.js server data flow, script contracts, API field casing, date passthrough behavior, FormsAPI access
+- [scripting.md](guides/scripting.md) — Node.js server data flow, script contracts, API field casing, date passthrough behavior, FormsAPI access, `response.json()` vs `postCompletion()` execution flow
 
 ### Reference
 

@@ -479,6 +479,10 @@ Clicking a service name in the grid opens an inline **"MICROSERVICE DETAILS"** d
 
 Cron-like configuration for automated scripts. Each schedule references a Microservice by name. No REST API exists for listing or creating schedules — the `scheduledProcess` manager only exposes `postCompletion()` and `runAllScheduledProcesses()`.
 
+**Completion Callback behavior:** When the "Enable completion callback" flag on the linked Microservice is **disabled** (the default — all 20 WADNR scripts use this), VV advances recurrence based on the HTTP response alone. `postCompletion()` still sets the Result flag but does not gate the scheduler. When **enabled**, VV waits for `postCompletion()` (up to the Callback Timeout) before advancing recurrence.
+
+**Timeout field unit is SECONDS.** Confirmed empirically: `Timeout=10` timed out a 15s-delayed script but allowed a 5s-delayed one (2026-04-14 on vvdemo). **Platform default (Timeout=0):** between 180s and 300s (3–5 min) — 180s delay succeeded, 300s timed out. At the boundary, VV throws `System.Threading.Tasks.TaskCanceledException` from `OutsideProcessNodeServer.DoOutsideProcess()` (`Auersoft.VisualVault.Engine.Entities.OutsideProcess.OutsideProcessNodeServer.cs:line 205`). The timeout is a .NET `Task.Wait()` cancellation — the Node server and script continue running; VV simply stops waiting for the HTTP response.
+
 **No REST API for creating scheduled services** — CRUD operations are only available via the admin UI.
 
 #### Toolbar
@@ -509,7 +513,7 @@ Clicking a schedule name opens an inline dock panel with these fields:
 | Save                 | `btnSave_input`                             | Saves current entry                                                                                                  |
 | Close                | `btnCancel_input`                           | Closes panel without saving                                                                                          |
 
-**"Test Microservice" button behavior:** Triggers an immediate execution of the linked service via the VV cloud → Node.js server pipeline. The response appears in a RadWindow dialog titled "Response from OutsideProcess". The dialog shows the `response.json()` message from the script (e.g., `"ScheduledProcessTestHarness Started"`). **Does NOT update "Last Run Date"** in the grid — that field only updates for automatic scheduled triggers, not manual tests. Verified 2026-04-13 on vvdemo.
+**"Test Microservice" button behavior:** Triggers an immediate execution of the linked service via the VV cloud → Node.js server pipeline. The response appears in a RadWindow dialog titled "Response from OutsideProcess". The dialog shows the `response.json()` message from the script (e.g., `"ScheduledProcessTestHarness Started"`). **Does NOT update "Last Run Date"** in the grid and **does NOT create a log entry** in the Scheduled Service Log — the Test button only shows the response in the dialog. Log entries are only created by automatic scheduled triggers. Verified 2026-04-14 via ngrok request history (confirmed scripts executed on server but no log entries appeared).
 
 **"View" link / Scheduled Service Log:** The `lnkViewLog` link in grid column 2 opens a `dockScheduledProcessLog` RadWindow showing execution history. Grid columns: Row, Scheduled Run Date, Actual Run Date, Completion Date, Result (True/False), Message. The **Message column** shows the `response.json()` message, not the `postCompletion()` message — see `docs/guides/scripting.md` for details. Verified 2026-04-13 on WADNR production schedules.
 
@@ -1214,7 +1218,7 @@ Discovered via `GET /api/v1/{customer}/{db}/{resource}` on vvdemo, 2026-04-09. A
 
 These do not exist as top-level REST resources: `documenttemplates`, `scheduledProcess`, `email`, `projects`, `schema`, `notifications`, `workflow`, `workflowinstances`, `processes`, `library`, `databases`, `roles`, `permissions`, `apiapplications`, `dropdownlists`, `menus`, `portals`, `tags`, `audit`, `auditlog`, `sessions`, `tokens`, `search`, `fulltext`, `calendar`, `events`, `widgets`, `exports`, `imports`, `templates`, `revisions`, `histories`.
 
-Note: `scheduledProcess` returns 404 at the top level but may be accessible as a sub-resource. Some of these (e.g., `email`, `projects`) are documented in the client library config.yml but may require different URL patterns.
+Note: `scheduledProcess` returns 500 Internal Server Error on vv5dev/WADNR (tested 2026-04-14 via both vvClient httpHelper and direct OAuth+fetch). The client library config.yml defines the endpoint but it does not support GET for listing. `POST /scheduledProcess/{id}` (postCompletion) works and accepts any GUID — even a placeholder like `00000000-...` returns `{ meta: { status: 200 }, data: true }` with no validation. Some of these (e.g., `email`, `projects`) are documented in the client library config.yml but may require different URL patterns.
 
 ### Undocumented Endpoints (discovered via FormViewer network intercept)
 
