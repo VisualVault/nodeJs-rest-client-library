@@ -87,7 +87,7 @@ Every `BaseField` shares these base properties:
 
 ## Groups and Conditions
 
-Groups control field visibility, read-only state, and security. Defined in `<GroupsHolder> → <GroupCollection> → <Group>`.
+Groups control field visibility, read-only state, and security. Defined in `<GroupsHolder> → <GroupCollection> → <Group>`. Groups bind to fields by **GUID** (`<FieldID>`), not by name — so duplicate field names do not cause group conflicts.
 
 ```xml
 <Group>
@@ -178,10 +178,12 @@ Scripts are stored inline in the XML as `<FormScriptItem>` entries.
 
 ### Script Types
 
-| `ScriptItemType`         | Access at runtime           | Description                                                         |
-| ------------------------ | --------------------------- | ------------------------------------------------------------------- |
-| `TemplateScriptItem`     | `VV.Form.Template.<Name>()` | Reusable template functions (FormValidation, FillinAndRelate, etc.) |
-| `ControlEventScriptItem` | Bound via ScriptAssignment  | Event handlers (onClick, onBlur, onChange)                          |
+| `ScriptItemType`         | Access at runtime           | Description                                                                            |
+| ------------------------ | --------------------------- | -------------------------------------------------------------------------------------- |
+| `TemplateScriptItem`     | `VV.Form.Template.<Name>()` | Reusable helper functions — called from other scripts, NOT bound via ScriptAssignment  |
+| `ControlEventScriptItem` | Bound via ScriptAssignment  | Event handlers (onClick, onBlur, onChange) — bound to a control + event via assignment |
+
+**Key distinction:** `TemplateScriptItem` entries intentionally have no `FormScriptAssignment`. They are invoked from other scripts' code via `VV.Form.Template.<Name>()`. Common examples: `FormValidation`, `SaveForm`, `UpdateDocumentPath`. The absence of an assignment does NOT mean the script is dead code — check the script type before concluding it is unused.
 
 ### Script Assignments
 
@@ -207,6 +209,12 @@ Bind scripts to controls and events:
 |  `16`   | onDataLoad | `event`                              | Runs after form data loads; bound to built-in control `00000001-0000-0000-0000-e0000000f010` |
 
 ```
+
+### Script Orphaning Behavior
+
+When a control (e.g., a button) is deleted from a form template in the VV designer, the platform does **not** automatically remove the associated scripts or script assignments. The `FormScriptItem` and `FormScriptAssignment` entries persist in the exported XML, with the assignment's `ControlId` pointing to a GUID that no longer matches any field in the template. These orphaned scripts are harmless at runtime (they never fire) but accumulate as dead code in the template XML.
+
+This is especially visible in environments that use a "base template" pattern — if the base template's buttons are removed from derived templates, the scripts and assignments from the original base propagate to all descendants and remain after the buttons are gone.
 
 ### Script Versioning
 

@@ -332,7 +332,7 @@ https://{env}.visualvault.com/FormDesigner/index.html#!/formdesigner?xcid={custo
 - `formId` is the **revision GUID** (not the template GUID)
 - `xcid` and `xcdid` require **actual GUIDs** — string aliases (e.g., `"WADNR"`, `"fpOnline"`) cause a `formErrorCode` null reference error. Get the GUIDs from the `VV.OpenWindow()` call in the FormTemplateAdmin grid row's `lnkDesign` onclick handler
 - Opened via `VV.OpenWindow()` from the FormTemplateAdmin grid — not directly navigable from the VV shell
-- **Left panel:** Controls tree (field names, buttons, containers)
+- **Left panel:** Controls tree (field names, buttons, containers). The list deduplicates by name — if two controls share the same name, only one appears in the list. The duplicate is invisible in the UI but present in the exported XML. Verified on FPAN-Amendment-Request (two `Con_SignatureHeader` containers with different GUIDs, only one shown in Controls panel)
 - **Right panel:** Control Properties — shows field config when a control is selected
 - **Menu bar:** Kendo menubar with File (Save Template, Preview), Edit, View, Field, Container, Page
 - **Save:** File > Save Template (menu item text: `"Save Template"`, in `.k-item.topMenuTopLevel` Kendo menu)
