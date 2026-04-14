@@ -79,6 +79,7 @@
         "version:list": "node tools/explore/version-diff.js --list",
         "env:profile": "node tools/explore/environment-profile.js",
         "env:profile:browser": "node tools/explore/environment-profile.js --with-browser",
+        "review:forms": "node tools/review/review-forms.js",
         "lint": "eslint lib/ scripts/",
         "lint:fix": "eslint --fix lib/ scripts/",
         "format": "prettier --write \"lib/**/*.js\" \"scripts/**/*.js\"",
