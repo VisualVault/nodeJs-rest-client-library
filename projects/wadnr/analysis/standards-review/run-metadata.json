@@ -1,0 +1,643 @@
+{
+  "generatedAt": "2026-04-14T20:27:35.002Z",
+  "project": "wadnr",
+  "filters": {
+    "template": null,
+    "rule": null,
+    "severity": null
+  },
+  "rules": [
+    "title-case",
+    "default-name",
+    "duplicate-name",
+    "empty-name",
+    "valid-identifier",
+    "accessibility-label",
+    "tab-order-zero",
+    "tab-order-unique",
+    "calendar-name-match",
+    "calendar-legacy",
+    "calendar-valid-config",
+    "script-orphan-assignment",
+    "script-unassigned",
+    "script-unused-template",
+    "script-empty-body",
+    "script-field-reference",
+    "orphan-container-ref",
+    "orphan-group-member"
+  ],
+  "ruleCount": 18,
+  "summary": {
+    "templatesScanned": 77,
+    "templatesWithErrors": 1,
+    "templatesWithWarnings": 77,
+    "cleanTemplates": 0,
+    "totalFindings": 2473,
+    "totalErrors": 1,
+    "totalWarnings": 2464,
+    "totalInfo": 8
+  },
+  "byRule": {
+    "default-name": {
+      "errors": 0,
+      "warnings": 99,
+      "info": 0,
+      "templatesAffected": 74
+    },
+    "script-orphan-assignment": {
+      "errors": 0,
+      "warnings": 1147,
+      "info": 0,
+      "templatesAffected": 77
+    },
+    "title-case": {
+      "errors": 0,
+      "warnings": 533,
+      "info": 0,
+      "templatesAffected": 56
+    },
+    "accessibility-label": {
+      "errors": 0,
+      "warnings": 463,
+      "info": 0,
+      "templatesAffected": 50
+    },
+    "valid-identifier": {
+      "errors": 0,
+      "warnings": 19,
+      "info": 0,
+      "templatesAffected": 8
+    },
+    "script-unused-template": {
+      "errors": 0,
+      "warnings": 107,
+      "info": 0,
+      "templatesAffected": 16
+    },
+    "script-field-reference": {
+      "errors": 0,
+      "warnings": 92,
+      "info": 0,
+      "templatesAffected": 17
+    },
+    "duplicate-name": {
+      "errors": 1,
+      "warnings": 0,
+      "info": 0,
+      "templatesAffected": 1
+    },
+    "calendar-name-match": {
+      "errors": 0,
+      "warnings": 0,
+      "info": 8,
+      "templatesAffected": 8
+    },
+    "tab-order-zero": {
+      "errors": 0,
+      "warnings": 4,
+      "info": 0,
+      "templatesAffected": 2
+    }
+  },
+  "templates": [
+    {
+      "name": "Access-Code",
+      "findings": 5,
+      "errors": 0,
+      "warnings": 5,
+      "info": 0
+    },
+    {
+      "name": "Activity-Map",
+      "findings": 9,
+      "errors": 0,
+      "warnings": 9,
+      "info": 0
+    },
+    {
+      "name": "ActivityMapView",
+      "findings": 9,
+      "errors": 0,
+      "warnings": 9,
+      "info": 0
+    },
+    {
+      "name": "Addendum-Issued-Date-Tracking",
+      "findings": 5,
+      "errors": 0,
+      "warnings": 5,
+      "info": 0
+    },
+    {
+      "name": "Appeal",
+      "findings": 12,
+      "errors": 0,
+      "warnings": 12,
+      "info": 0
+    },
+    {
+      "name": "Appellant",
+      "findings": 5,
+      "errors": 0,
+      "warnings": 5,
+      "info": 0
+    },
+    {
+      "name": "Application-Review-Page",
+      "findings": 161,
+      "errors": 0,
+      "warnings": 161,
+      "info": 0
+    },
+    {
+      "name": "Associated-Document-Relation",
+      "findings": 9,
+      "errors": 0,
+      "warnings": 9,
+      "info": 0
+    },
+    {
+      "name": "Base-Template",
+      "findings": 25,
+      "errors": 0,
+      "warnings": 25,
+      "info": 0
+    },
+    {
+      "name": "Box-Synchronization-Log",
+      "findings": 5,
+      "errors": 0,
+      "warnings": 5,
+      "info": 0
+    },
+    {
+      "name": "Channel-Characteristics",
+      "findings": 11,
+      "errors": 0,
+      "warnings": 11,
+      "info": 0
+    },
+    {
+      "name": "Chemical-Information",
+      "findings": 10,
+      "errors": 0,
+      "warnings": 10,
+      "info": 0
+    },
+    {
+      "name": "Communications-Log",
+      "findings": 16,
+      "errors": 0,
+      "warnings": 16,
+      "info": 0
+    },
+    {
+      "name": "Copies-Sent-To",
+      "findings": 7,
+      "errors": 0,
+      "warnings": 7,
+      "info": 0
+    },
+    {
+      "name": "Email-Template",
+      "findings": 11,
+      "errors": 0,
+      "warnings": 11,
+      "info": 0
+    },
+    {
+      "name": "External-Reviewer-Recommendations",
+      "findings": 8,
+      "errors": 0,
+      "warnings": 8,
+      "info": 0
+    },
+    {
+      "name": "FPAN-Amendment-Request",
+      "findings": 44,
+      "errors": 1,
+      "warnings": 42,
+      "info": 1
+    },
+    {
+      "name": "FPAN-Notice-of-Decision",
+      "findings": 30,
+      "errors": 0,
+      "warnings": 30,
+      "info": 0
+    },
+    {
+      "name": "FPAN-Notice-of-Transfer",
+      "findings": 77,
+      "errors": 0,
+      "warnings": 77,
+      "info": 0
+    },
+    {
+      "name": "FPAN-Record-Change-Request",
+      "findings": 6,
+      "errors": 0,
+      "warnings": 6,
+      "info": 0
+    },
+    {
+      "name": "FPAN-Record-Owner",
+      "findings": 6,
+      "errors": 0,
+      "warnings": 6,
+      "info": 0
+    },
+    {
+      "name": "FPAN-Renewal",
+      "findings": 66,
+      "errors": 0,
+      "warnings": 65,
+      "info": 1
+    },
+    {
+      "name": "FPNP-County",
+      "findings": 7,
+      "errors": 0,
+      "warnings": 7,
+      "info": 0
+    },
+    {
+      "name": "FPNP-Township-and-Range",
+      "findings": 12,
+      "errors": 0,
+      "warnings": 12,
+      "info": 0
+    },
+    {
+      "name": "FPNP-Water-Resource-Inventory-Area",
+      "findings": 8,
+      "errors": 0,
+      "warnings": 8,
+      "info": 0
+    },
+    {
+      "name": "FPNP-Watershed",
+      "findings": 7,
+      "errors": 0,
+      "warnings": 7,
+      "info": 0
+    },
+    {
+      "name": "Fee-Lookup",
+      "findings": 68,
+      "errors": 0,
+      "warnings": 68,
+      "info": 0
+    },
+    {
+      "name": "Fee",
+      "findings": 74,
+      "errors": 0,
+      "warnings": 74,
+      "info": 0
+    },
+    {
+      "name": "Field-Representative",
+      "findings": 5,
+      "errors": 0,
+      "warnings": 5,
+      "info": 0
+    },
+    {
+      "name": "Forest-Practices-Aerial-Chemical-Application",
+      "findings": 105,
+      "errors": 0,
+      "warnings": 104,
+      "info": 1
+    },
+    {
+      "name": "Forest-Practices-Application-Notification",
+      "findings": 207,
+      "errors": 0,
+      "warnings": 206,
+      "info": 1
+    },
+    {
+      "name": "Forest-Practices-Notification-Profile",
+      "findings": 20,
+      "errors": 0,
+      "warnings": 20,
+      "info": 0
+    },
+    {
+      "name": "Forest-Roads",
+      "findings": 12,
+      "errors": 0,
+      "warnings": 12,
+      "info": 0
+    },
+    {
+      "name": "Forest-Tax-Number",
+      "findings": 11,
+      "errors": 0,
+      "warnings": 11,
+      "info": 0
+    },
+    {
+      "name": "ICN-Participants",
+      "findings": 8,
+      "errors": 0,
+      "warnings": 8,
+      "info": 0
+    },
+    {
+      "name": "IFPL-Shutdown-Zone",
+      "findings": 6,
+      "errors": 0,
+      "warnings": 6,
+      "info": 0
+    },
+    {
+      "name": "Individual-Record",
+      "findings": 16,
+      "errors": 0,
+      "warnings": 16,
+      "info": 0
+    },
+    {
+      "name": "Informal-Conference-Note-SUPPORT-COPY",
+      "findings": 70,
+      "errors": 0,
+      "warnings": 70,
+      "info": 0
+    },
+    {
+      "name": "Informal-Conference-Note",
+      "findings": 72,
+      "errors": 0,
+      "warnings": 72,
+      "info": 0
+    },
+    {
+      "name": "Legal-Description",
+      "findings": 7,
+      "errors": 0,
+      "warnings": 7,
+      "info": 0
+    },
+    {
+      "name": "Long-Term-Application-5-Day-Notice",
+      "findings": 47,
+      "errors": 0,
+      "warnings": 46,
+      "info": 1
+    },
+    {
+      "name": "Multi-purpose",
+      "findings": 18,
+      "errors": 0,
+      "warnings": 17,
+      "info": 1
+    },
+    {
+      "name": "NCFLO-Tracking",
+      "findings": 5,
+      "errors": 0,
+      "warnings": 5,
+      "info": 0
+    },
+    {
+      "name": "NP-Waters",
+      "findings": 15,
+      "errors": 0,
+      "warnings": 15,
+      "info": 0
+    },
+    {
+      "name": "Nesting-Platforms",
+      "findings": 81,
+      "errors": 0,
+      "warnings": 81,
+      "info": 0
+    },
+    {
+      "name": "Notice-of-Conversion-to-Non-Forestry-Use",
+      "findings": 307,
+      "errors": 0,
+      "warnings": 307,
+      "info": 0
+    },
+    {
+      "name": "Notice-to-Comply",
+      "findings": 114,
+      "errors": 0,
+      "warnings": 114,
+      "info": 0
+    },
+    {
+      "name": "Notification-Communication",
+      "findings": 25,
+      "errors": 0,
+      "warnings": 25,
+      "info": 0
+    },
+    {
+      "name": "PDF-Package-Generation",
+      "findings": 13,
+      "errors": 0,
+      "warnings": 13,
+      "info": 0
+    },
+    {
+      "name": "Payment-Item",
+      "findings": 9,
+      "errors": 0,
+      "warnings": 9,
+      "info": 0
+    },
+    {
+      "name": "PendingDataForAGOL",
+      "findings": 8,
+      "errors": 0,
+      "warnings": 8,
+      "info": 0
+    },
+    {
+      "name": "Position-Management",
+      "findings": 8,
+      "errors": 0,
+      "warnings": 8,
+      "info": 0
+    },
+    {
+      "name": "Recommendation-Line-Items",
+      "findings": 4,
+      "errors": 0,
+      "warnings": 4,
+      "info": 0
+    },
+    {
+      "name": "Region",
+      "findings": 8,
+      "errors": 0,
+      "warnings": 8,
+      "info": 0
+    },
+    {
+      "name": "Report-Access",
+      "findings": 25,
+      "errors": 0,
+      "warnings": 25,
+      "info": 0
+    },
+    {
+      "name": "Rockpit",
+      "findings": 12,
+      "errors": 0,
+      "warnings": 12,
+      "info": 0
+    },
+    {
+      "name": "S-or-F-Waters",
+      "findings": 85,
+      "errors": 0,
+      "warnings": 85,
+      "info": 0
+    },
+    {
+      "name": "Sensitive-Site",
+      "findings": 5,
+      "errors": 0,
+      "warnings": 5,
+      "info": 0
+    },
+    {
+      "name": "Shopping-Cart",
+      "findings": 24,
+      "errors": 0,
+      "warnings": 24,
+      "info": 0
+    },
+    {
+      "name": "Signature-Access",
+      "findings": 5,
+      "errors": 0,
+      "warnings": 5,
+      "info": 0
+    },
+    {
+      "name": "Signature",
+      "findings": 32,
+      "errors": 0,
+      "warnings": 32,
+      "info": 0
+    },
+    {
+      "name": "Spoils",
+      "findings": 12,
+      "errors": 0,
+      "warnings": 12,
+      "info": 0
+    },
+    {
+      "name": "Status-History",
+      "findings": 7,
+      "errors": 0,
+      "warnings": 7,
+      "info": 0
+    },
+    {
+      "name": "Step-1-Long-Term-FPA",
+      "findings": 79,
+      "errors": 0,
+      "warnings": 78,
+      "info": 1
+    },
+    {
+      "name": "Stream-Segment",
+      "findings": 20,
+      "errors": 0,
+      "warnings": 20,
+      "info": 0
+    },
+    {
+      "name": "Survey",
+      "findings": 85,
+      "errors": 0,
+      "warnings": 85,
+      "info": 0
+    },
+    {
+      "name": "Task",
+      "findings": 15,
+      "errors": 0,
+      "warnings": 14,
+      "info": 1
+    },
+    {
+      "name": "Timber",
+      "findings": 28,
+      "errors": 0,
+      "warnings": 28,
+      "info": 0
+    },
+    {
+      "name": "Typed-Water",
+      "findings": 16,
+      "errors": 0,
+      "warnings": 16,
+      "info": 0
+    },
+    {
+      "name": "Unit-Identifier",
+      "findings": 5,
+      "errors": 0,
+      "warnings": 5,
+      "info": 0
+    },
+    {
+      "name": "WAC-Violations",
+      "findings": 7,
+      "errors": 0,
+      "warnings": 7,
+      "info": 0
+    },
+    {
+      "name": "WRIA_WAU",
+      "findings": 8,
+      "errors": 0,
+      "warnings": 8,
+      "info": 0
+    },
+    {
+      "name": "WTM-Assigned-Reviewers",
+      "findings": 9,
+      "errors": 0,
+      "warnings": 9,
+      "info": 0
+    },
+    {
+      "name": "WTM-Review-Page",
+      "findings": 34,
+      "errors": 0,
+      "warnings": 34,
+      "info": 0
+    },
+    {
+      "name": "Water-Crossings",
+      "findings": 18,
+      "errors": 0,
+      "warnings": 18,
+      "info": 0
+    },
+    {
+      "name": "Water-Segment-Modification",
+      "findings": 12,
+      "errors": 0,
+      "warnings": 12,
+      "info": 0
+    },
+    {
+      "name": "Wetlands",
+      "findings": 16,
+      "errors": 0,
+      "warnings": 16,
+      "info": 0
+    }
+  ]
+}
