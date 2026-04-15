@@ -10,12 +10,17 @@ Create a new customer/environment project workspace under `projects/` with the s
 ## Usage
 
 ```
-/@-create-project <name> [--server <server>] [--customer <customer>] [--database <database>] [--readonly] [--write-policy <mode>]
+/@-create-project <name> [--server <server>] [--customer <customer>] [--database <database>] [--readonly] [--write-policy <mode>] [--repo <url>]
 ```
 
-**Example:** `/@-create-project acme --server vv5dev --customer ACME --database Main --readonly --write-policy allowlist`
+**Example (VV project):** `/@-create-project acme --server vv5dev --customer ACME --database Main --readonly --write-policy allowlist`
+**Example (with repo):** `/@-create-project acme --server vv5dev --customer ACME --database Main --repo git@github.com:user/acme-scripts.git`
+**Example (non-VV):** `/@-create-project licensing --repo git@github.com:user/licensing.git`
 
-If server/customer/database are not provided, prompt the user for them.
+If server/customer/database are not provided AND no `--repo` is the only arg, prompt the user: "Is this a VV project or a non-VV project?"
+
+- VV project: prompt for server/customer/database
+- Non-VV: skip VV-specific scaffolding (no .env.json, no extracts, no write policy)
 
 ### Write Policy Modes
 
@@ -44,6 +49,8 @@ See root `CLAUDE.md` § "Write Safety" for the full policy architecture.
 
 ### 2. Create directory structure
 
+**VV project (with or without repo):**
+
 ```
 projects/<name>/
   CLAUDE.md
@@ -56,6 +63,25 @@ projects/<name>/
     form-templates/
   analysis/
 ```
+
+**Non-VV project:**
+
+```
+projects/<name>/
+  CLAUDE.md
+  analysis/
+  notes/
+```
+
+**If `--repo` is provided**, additionally:
+
+```
+projects/<name>/repo/       # cloned from the provided URL
+```
+
+Run `git clone <url> projects/<name>/repo/`. If the clone fails, create the directory and `git init` inside it, then report the error.
+
+If no `--repo` but the user wants a repo later, they can `mkdir projects/<name>/repo && cd projects/<name>/repo && git init`.
 
 ### 3. Generate CLAUDE.md
 
@@ -182,16 +208,23 @@ Project created: projects/<name>/
 
 Structure:
 projects/<name>/CLAUDE.md
-projects/<name>/extracts/ (web-services, schedules, global-functions, form-templates, custom-queries)
+{if VV:} projects/<name>/extracts/ (web-services, schedules, global-functions, form-templates, custom-queries)
 projects/<name>/analysis/
+{if repo:} projects/<name>/repo/ (cloned from <url>)
 
 Next steps:
+
+{if VV:}
 
 1. Ensure .env.json has the <server>/<customer> credentials
 2. Run: npm run env:profile -- --project <name> (capture environment profile)
 3. Run: npm run env:profile:browser -- --project <name> (add library versions — optional)
 4. Run: node tools/extract/extract.js --project <name> --dry-run
 5. Review and run without --dry-run to populate exports
+   {if repo and no remote:}
+6. cd projects/<name>/repo/ && git remote add origin <url> && git push -u origin master
+   {if non-VV:}
+7. Set up the project repo and start working
 
 ```
 

@@ -21,13 +21,32 @@ Collect data from these sources, then output the report in the format below.
 
 ### Data Collection
 
-**1. Git state:**
+**1. Git state (harness repo):**
 
 ```bash
 branch=$(git branch --show-current)
 last_commit=$(git log --oneline -1)
 dirty=$(git status --short | head -5)
 ahead_behind=$(git rev-list --left-right --count origin/$branch...$branch 2>/dev/null)
+```
+
+**1b. Nested repo state** — detect independent repos in `lib/` and `projects/*/repo/`:
+
+```bash
+# lib/ repo
+if [ -d lib/.git ]; then
+  lib_branch=$(git -C lib branch --show-current)
+  lib_dirty=$(git -C lib status --short | wc -l | tr -d ' ')
+fi
+
+# project repos
+for repo_dir in projects/*/repo; do
+  if [ -d "$repo_dir/.git" ]; then
+    proj=$(basename $(dirname "$repo_dir"))
+    proj_branch=$(git -C "$repo_dir" branch --show-current)
+    proj_dirty=$(git -C "$repo_dir" status --short | wc -l | tr -d ' ')
+  fi
+done
 ```
 
 **2. Active tasks** — for each `research/*/CLAUDE.md`:
@@ -75,6 +94,13 @@ done
 - **Working tree:** {clean / N uncommitted files}
 - **Last commit:** {hash} {message} ({relative time})
 - **Remote:** {up to date / N ahead, M behind}
+
+**Nested repos** (only show if any exist):
+
+| Repo                  | Branch   | Status            |
+| --------------------- | -------- | ----------------- |
+| lib/                  | {branch} | {clean / N dirty} |
+| projects/{name}/repo/ | {branch} | {clean / N dirty} |
 
 ### Active Tasks
 
