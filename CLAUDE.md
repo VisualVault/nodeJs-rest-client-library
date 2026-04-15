@@ -1,4 +1,4 @@
-# nodeV2 — VisualVault Node.js Development & Testing Workspace
+# vv-ai-harness — VisualVault AI Harness & Orchestration Layer
 
 ## What This Repo Is
 
@@ -10,7 +10,7 @@ Fork of [VisualVault/nodeJs-rest-client-library](https://github.com/VisualVault/
 ## Repo Structure
 
 ```
-nodeV2/                                # AI HARNESS (this repo)
+vv-ai-harness/                         # AI HARNESS (this repo)
   lib/                                 # VV API wrapper (independent repo, gitignored)
   tools/                               # Shared CLI tooling (see tools/)
   testing/                             # Shared Playwright infrastructure (see testing/)
@@ -164,6 +164,7 @@ See `research/` folder. Each investigation gets its own subfolder with analysis,
 | [ws-naming](research/ws-naming/)                           | Active      | Web service naming — valid character investigation                                                      |
 | [scheduled-process-logs](research/scheduled-process-logs/) | Complete    | SP execution mechanics: response.json vs postCompletion, platform timeout, log behavior                 |
 | [standards-review](research/standards-review/)             | In Progress | Deterministic standards compliance tool for VV components (form templates first)                        |
+| [unrelate-forms](research/unrelate-forms/)                 | Complete    | Client-side UnrelateForm script — API verification and reusable global function                         |
 | [wadnr](projects/wadnr/)                                   | In Progress | WADNR client project: impact analysis, exported artifacts                                               |
 
 ## Principles
@@ -213,7 +214,7 @@ This repo is an **AI harness** — a workbench that orchestrates work across mul
 ### Git Topology
 
 ```
-HARNESS REPO (emanueljofre/nodeV2)
+HARNESS REPO (emanueljofre/vv-ai-harness)
   Tracks: tools/, testing/, docs/, scripts/, research/, .claude/, configs
           projects/CLAUDE.md, projects/*/CLAUDE.md, projects/*/test-assets.md
   Ignores: /lib/, /projects/*/repo/, /projects/*/extracts/,
@@ -254,8 +255,8 @@ Work output goes to one of four destinations:
 ### Bootstrap (new machine)
 
 ```bash
-git clone <harness-url> nodeV2
-cd nodeV2 && npm install
+git clone <harness-url> vv-ai-harness
+cd vv-ai-harness && npm install
 cd lib && git clone <api-wrapper-url> .       # restore VV API wrapper
 cd ../projects/wadnr/repo && git clone <url> . # restore project repos (if any)
 ```

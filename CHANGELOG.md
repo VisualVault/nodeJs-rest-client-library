@@ -218,7 +218,7 @@ _Version bump for npm publish. Includes all changes above._
 
 ## Prior History
 
-Changes before this changelog was introduced. See [git log](https://github.com/emanueljofre/nodeV2/commits/master) for full history.
+Changes before this changelog was introduced. See [git log](https://github.com/emanueljofre/vv-ai-harness/commits/master) for full history.
 
 - Add `setFieldImage` API function and config.yml path (2025-08-21)
 - Allow parallel file downloads (2025-03-13)

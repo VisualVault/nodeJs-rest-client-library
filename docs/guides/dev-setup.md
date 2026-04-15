@@ -1,6 +1,6 @@
 # Dev Environment Setup
 
-Step-by-step guide to set up the nodeV2 development and testing environment from scratch.
+Step-by-step guide to set up the vv-ai-harness development and testing environment from scratch.
 
 ## Prerequisites
 
@@ -11,8 +11,8 @@ Step-by-step guide to set up the nodeV2 development and testing environment from
 ## 1. Clone & Install
 
 ```bash
-git clone git@github.com:emanueljofre/nodeV2.git
-cd nodeV2
+git clone git@github.com:emanueljofre/vv-ai-harness.git
+cd vv-ai-harness
 npm install
 ```
 
@@ -283,7 +283,7 @@ git fetch upstream
 git merge upstream/master
 ```
 
-Origin: `emanueljofre/nodeV2` | Upstream: `VisualVault/nodeJs-rest-client-library`
+Origin: `emanueljofre/vv-ai-harness` | Upstream: `VisualVault/nodeJs-rest-client-library`
 
 ## 7. Troubleshooting
 

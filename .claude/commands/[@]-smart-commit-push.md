@@ -41,7 +41,7 @@ Before pushing, check the target remote:
 git remote get-url origin
 ```
 
-- If `origin` points to **`emanueljofre/nodeV2`** (the shared team repo):
+- If `origin` points to **`emanueljofre/vv-ai-harness`** (the shared team repo):
     - Only push **shared** commits
     - If personal commits exist, warn: "Skipping N personal commit(s) — push these to your private remote instead"
     - List the skipped commits
