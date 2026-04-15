@@ -18,7 +18,7 @@
  *   expectedApiReturn — Expected value returned by API get
  *   bugs          — Array of bug IDs this test exercises
  *   notes         — Why this test case exists and what it proves
- *   tcRef         — Path to the markdown TC spec in tasks/date-handling/web-services/
+ *   tcRef         — Path to the markdown TC spec in research/date-handling/web-services/
  */
 
 const WS_TEST_DATA = [
@@ -42,7 +42,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: '2026-03-15',
         bugs: [],
         notes: 'Date-only baseline via API. No client-side normalizeCalValue() — Bug #7 should not apply.',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-1-A-BRT.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-1-A-BRT.md',
     },
     {
         id: 'ws-1-A-IST',
@@ -57,7 +57,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: '2026-03-15',
         bugs: [],
         notes: 'Key test: Forms UI Bug #7 shifts date in IST. API should bypass client-side JS.',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-1-A-IST.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-1-A-IST.md',
     },
     {
         id: 'ws-1-A-UTC0',
@@ -72,7 +72,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: '2026-03-15',
         bugs: [],
         notes: 'UTC control for date-only API set.',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-1-A-UTC0.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-1-A-UTC0.md',
     },
 
     // --- Config C: DateTime, no ignoreTZ ---
@@ -89,7 +89,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: null, // TBD
         bugs: [],
         notes: 'DateTime via API. Discover how server stores datetime without offset.',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-1-C-BRT.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-1-C-BRT.md',
     },
     {
         id: 'ws-1-C-IST',
@@ -104,7 +104,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: null, // TBD
         bugs: [],
         notes: 'DateTime in UTC+ via API. Does server convert to UTC?',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-1-C-IST.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-1-C-IST.md',
     },
 
     // --- Config D: DateTime + ignoreTZ (primary bug surface in Forms) ---
@@ -121,7 +121,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: null, // TBD
         bugs: [],
         notes: 'Bug #5/#6 surface in Forms. Does API bypass getCalendarFieldValue() on return?',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-1-D-BRT.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-1-D-BRT.md',
     },
     {
         id: 'ws-1-D-IST',
@@ -136,7 +136,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: null, // TBD
         bugs: [],
         notes: 'DateTime + ignoreTZ in IST via API.',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-1-D-IST.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-1-D-IST.md',
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -157,7 +157,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: '2026-03-15',
         bugs: [],
         notes: 'Read date-only field from UI-created record. API should return raw stored value.',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-2-A-BRT.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-2-A-BRT.md',
         savedRecord: 'cat3-A-BRT', // key into SAVED_RECORDS from vv-config.js
     },
     {
@@ -173,7 +173,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: null, // TBD — does API add fake Z like GetFieldValue?
         bugs: [],
         notes: 'Key test: Forms GetFieldValue adds fake Z (Bug #5). Does API do the same?',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-2-D-BRT.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-2-D-BRT.md',
         savedRecord: 'cat3-A-BRT', // same record has Config D populated
     },
 
@@ -194,7 +194,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: '2026-03-15',
         bugs: [],
         notes: 'Date-only API round-trip. No client-side drift expected.',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-3-A-BRT.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-3-A-BRT.md',
         roundTripCycles: 5,
     },
     {
@@ -210,7 +210,7 @@ const WS_TEST_DATA = [
         expectedApiReturn: null, // TBD
         bugs: [],
         notes: 'DateTime + ignoreTZ round-trip. Forms Bug #5 causes -3h/trip drift. API should be stable.',
-        tcRef: 'tasks/date-handling/web-services/test-cases/tc-ws-3-D-BRT.md',
+        tcRef: 'research/date-handling/web-services/test-cases/tc-ws-3-D-BRT.md',
         roundTripCycles: 5,
     },
 ];

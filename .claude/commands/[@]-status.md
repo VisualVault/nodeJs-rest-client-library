@@ -30,7 +30,7 @@ dirty=$(git status --short | head -5)
 ahead_behind=$(git rev-list --left-right --count origin/$branch...$branch 2>/dev/null)
 ```
 
-**2. Active tasks** — for each `tasks/*/CLAUDE.md`:
+**2. Active tasks** — for each `research/*/CLAUDE.md`:
 
 - Read the **Scope table** to get component statuses
 - Read the **"Next Steps"** section (last ~5 lines of the section)
@@ -107,7 +107,7 @@ Cell format — **adapt to the rollup table's columns**, don't assume testing se
 
 Source 1: `## Notes` from each project's rollup `status.md` — one bullet per project with non-trivial blockers, constraints, or environment issues. Cite the specific reason.
 
-Source 2: The **remaining-work section** from `tasks/{task}/CLAUDE.md` (may be titled "What Has NOT Been Tested", "Known Gaps", "Remaining Work", etc.) — one bullet, compact comma-separated list.
+Source 2: The **remaining-work section** from `research/{task}/CLAUDE.md` (may be titled "What Has NOT Been Tested", "Known Gaps", "Remaining Work", etc.) — one bullet, compact comma-separated list.
 
 ```markdown
 **Blockers:**
@@ -160,7 +160,7 @@ For each `projects/*/testing/{task}/status.md` (rollup files), extract the Summa
 **4. Recent commits for this task:**
 
 ```bash
-git log --oneline -5 -- tasks/{name}/
+git log --oneline -5 -- research/{name}/
 ````
 
 ### Output format for deep view:

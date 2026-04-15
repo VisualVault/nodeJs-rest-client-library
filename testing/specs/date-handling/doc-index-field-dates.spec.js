@@ -9,7 +9,7 @@
  *   DOC-BUG-1: Timezone offset converted to UTC with Z stripped → ambiguous values
  *   DOC-BUG-2: Cannot clear a date index field once set
  *
- * Matrix: tasks/date-handling/document-library/matrix.md (8 categories, 52 slots)
+ * Matrix: research/date-handling/document-library/matrix.md (8 categories, 52 slots)
  *
  * Prerequisites:
  *   - Test document with Date index field (per-customer config in vv-config.js)

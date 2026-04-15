@@ -31,11 +31,11 @@ This command:
 3. Executes the test scenario (calendar popup, typed input, etc.)
 4. Captures actual values and compares against expected
 5. Generates:
-    - `tasks/date-handling/forms-calendar/test-cases/tc-1-A-IST.md` (markdown spec)
-    - `tasks/date-handling/forms-calendar/runs/tc-1-A-IST-run-N.md` (execution record)
-    - `tasks/date-handling/forms-calendar/summaries/tc-1-A-IST.md` (run history)
+    - `research/date-handling/forms-calendar/test-cases/tc-1-A-IST.md` (markdown spec)
+    - `research/date-handling/forms-calendar/runs/tc-1-A-IST-run-N.md` (execution record)
+    - `research/date-handling/forms-calendar/summaries/tc-1-A-IST.md` (run history)
     - Appends test case entry to `testing/fixtures/test-data.js`
-6. Updates the test matrix (`tasks/date-handling/forms-calendar/matrix.md`)
+6. Updates the test matrix (`research/date-handling/forms-calendar/matrix.md`)
 
 ## Key Files
 
@@ -123,12 +123,12 @@ At least one of `--browser`, `--tz`, or `--project` is required (unless using `-
 
 ### Artifacts generated per executed test
 
-| Artifact      | Path                                                         | Behavior                                     |
-| ------------- | ------------------------------------------------------------ | -------------------------------------------- |
-| Run file      | `tasks/date-handling/forms-calendar/runs/tc-{id}-run-{N}.md` | New file (immutable), increments N           |
-| Summary       | `tasks/date-handling/forms-calendar/summaries/tc-{id}.md`    | Appends to Run History table, updates status |
-| Matrix row    | `tasks/date-handling/forms-calendar/matrix.md`               | Updates Status + Run Date columns            |
-| Session entry | `tasks/date-handling/forms-calendar/results.md`              | One-line index entry per test                |
+| Artifact      | Path                                                            | Behavior                                     |
+| ------------- | --------------------------------------------------------------- | -------------------------------------------- |
+| Run file      | `research/date-handling/forms-calendar/runs/tc-{id}-run-{N}.md` | New file (immutable), increments N           |
+| Summary       | `research/date-handling/forms-calendar/summaries/tc-{id}.md`    | Appends to Run History table, updates status |
+| Matrix row    | `research/date-handling/forms-calendar/matrix.md`               | Updates Status + Run Date columns            |
+| Session entry | `research/date-handling/forms-calendar/results.md`              | One-line index entry per test                |
 
 ### Adding new test cases
 

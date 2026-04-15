@@ -578,7 +578,7 @@ Authorization: <JWT token>
 → { data: { formId: "<DataID>", name: "TemplateName-001234", confirmationPage: null }, meta: { status: 201 } }
 ```
 
-**Important:** The FormsAPI's `FormInstance/Controls` endpoint returns field values in US format (`"03/15/2026 14:30:00"`) for records created via `forminstance/`, vs ISO+Z (`"2026-03-15T14:30:00Z"`) for records created via `postForms`. The actual SQL `datetime` value is identical regardless of write endpoint — the format difference is in the API response serialization. This affects how `initCalendarValueV1` parses the value on form load. See [CB-29](../../tasks/date-handling/web-services/analysis/overview.md) and [architecture](../architecture/visualvault-platform.md#serialization-format-difference-cb-29).
+**Important:** The FormsAPI's `FormInstance/Controls` endpoint returns field values in US format (`"03/15/2026 14:30:00"`) for records created via `forminstance/`, vs ISO+Z (`"2026-03-15T14:30:00Z"`) for records created via `postForms`. The actual SQL `datetime` value is identical regardless of write endpoint — the format difference is in the API response serialization. This affects how `initCalendarValueV1` parses the value on form load. See [CB-29](../../research/date-handling/web-services/analysis/overview.md) and [architecture](../architecture/visualvault-platform.md#serialization-format-difference-cb-29).
 
 ### FormInstance Save API
 

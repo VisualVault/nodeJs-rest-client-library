@@ -97,7 +97,7 @@ Calendar field configuration (enableTime) should match the intent implied by the
 
 - **Fail (warning):** Name contains "DateTime" or "Timestamp" but `enableTime` is OFF
 - **Fail (info):** Name suggests date-only (e.g., "Due Date", "Date of Receipt") but `enableTime` is ON
-- **Config reference:** See `tasks/form-templates/README.md` for A-H matrix
+- **Config reference:** See `research/form-templates/README.md` for A-H matrix
 
 ### 10. `calendar-legacy` — Calendar Legacy Datepicker
 
@@ -178,7 +178,7 @@ Group `FieldMember` entries must reference field IDs that exist in the template.
 2. Each rule exports: `{ id, name, severity, check(context) }` returning an array of findings
 3. If new file: add `require('./{file}')` to `tools/review/rules/index.js`
 4. Document the standard in this file
-5. Add a row to `tasks/standards-review/status.md`
+5. Add a row to `research/standards-review/status.md`
 
 ## Report Output
 

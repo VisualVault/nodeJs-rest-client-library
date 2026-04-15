@@ -5,7 +5,7 @@
  * Applies WHERE clauses via the hidden SQL filter textarea and verifies
  * that records are filtered correctly for date-only and DateTime fields.
  *
- * Converted from tasks/date-handling/dashboards/test-filter-v3.js
+ * Converted from research/date-handling/dashboards/test-filter-v3.js
  */
 const { test, expect } = require('@playwright/test');
 const path = require('path');

@@ -66,4 +66,4 @@ Each component has `runs/` (immutable execution records) and `summaries/` (per-T
 - This is the primary development/testing environment for platform investigations
 - **Test assets catalog: [`test-assets.md`](test-assets.md)** — DateTest forms, saved records, WS harness, field map
 - Playwright executable config: `testing/fixtures/vv-config.js`
-- Platform date bugs: `tasks/date-handling/`
+- Platform date bugs: `research/date-handling/`

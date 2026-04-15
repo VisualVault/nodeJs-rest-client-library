@@ -51,7 +51,7 @@ Before doing anything else, verify the active environment allows write operation
 
 Read the following files before doing anything else:
 
-1. `tasks/date-handling/web-services/matrix.md` — find the row matching the test ID. Extract:
+1. `research/date-handling/web-services/matrix.md` — find the row matching the test ID. Extract:
     - The category (WS-1 through WS-9) and its description
     - The Config column (A–H) — maps to field flags via FIELD_MAP
     - The TZ or variant column
@@ -59,11 +59,11 @@ Read the following files before doing anything else:
     - The Expected column
     - The Status (PASS/FAIL/PENDING) and any existing Actual value
 
-2. `tasks/date-handling/web-services/matrix.md` — **Field Configurations table** (top of file). Map the Config letter to: `enableTime`, `ignoreTimezone`, `useLegacy`, and the Test Field name.
+2. `research/date-handling/web-services/matrix.md` — **Field Configurations table** (top of file). Map the Config letter to: `enableTime`, `ignoreTimezone`, `useLegacy`, and the Test Field name.
 
-3. `tasks/date-handling/web-services/analysis/overview.md` — identify which hypotheses (H-1 through H-12) apply to this test category. Note the hypothesis, its rationale, and what the expected outcome would be if confirmed or refuted.
+3. `research/date-handling/web-services/analysis/overview.md` — identify which hypotheses (H-1 through H-12) apply to this test category. Note the hypothesis, its rationale, and what the expected outcome would be if confirmed or refuted.
 
-4. `tasks/date-handling/web-services/README.md` — reference for runner usage, credential setup, and TZ simulation.
+4. `research/date-handling/web-services/README.md` — reference for runner usage, credential setup, and TZ simulation.
 
 5. `scripts/server-scripts/webservice-test-harness.js` — check that the action handler for this category is implemented (not a stub). If stubbed, stop and report: "Action handler for WS-{N} is not yet implemented."
 
@@ -161,7 +161,7 @@ Store the complete JSON response for use in Phases 3–5. Key fields to extract:
 **Only create if the file does not exist.** TC specs are immutable after creation. If the file exists, skip to Phase 4.
 
 **Filename:** `tc-{test-id}.md`
-**Path:** `tasks/date-handling/web-services/test-cases/`
+**Path:** `research/date-handling/web-services/test-cases/`
 
 ```markdown
 # TC-{TEST-ID} — Config {X}, {Category Name}, {TZ/Variant}: {behavioral finding}
@@ -300,7 +300,7 @@ If first run: create. If re-run: append to Run History table + update status.
 
 ## Phase 6 — Update the matrix
 
-Update `tasks/date-handling/web-services/matrix.md`:
+Update `research/date-handling/web-services/matrix.md`:
 
 **1. The test row:**
 
@@ -348,8 +348,8 @@ This command produces both shared and personal artifacts. See CLAUDE.md § "Repo
 
 | Artifact          | Path                                                                | Shared? | Reason                         |
 | ----------------- | ------------------------------------------------------------------- | ------- | ------------------------------ |
-| TC spec           | `tasks/date-handling/web-services/test-cases/`                      | Yes     | Reproducible specification     |
-| Matrix update     | `tasks/date-handling/web-services/matrix.md`                        | Yes     | Methodology + coverage tracker |
+| TC spec           | `research/date-handling/web-services/test-cases/`                   | Yes     | Reproducible specification     |
+| Matrix update     | `research/date-handling/web-services/matrix.md`                     | Yes     | Methodology + coverage tracker |
 | Run file          | `projects/{customer}/testing/date-handling/web-services/runs/`      | **No**  | Env-specific execution record  |
 | Summary           | `projects/{customer}/testing/date-handling/web-services/summaries/` | **No**  | Personal tracking state        |
 | Results.md append | `projects/{customer}/testing/date-handling/web-services/results.md` | **No**  | Raw session evidence           |

@@ -185,7 +185,17 @@ testing/tmp/
 tools/explore/snapshots/
 
 # Large generated files
-tasks/date-handling/forms-calendar/main.js
+research/date-handling/forms-calendar/main.js
+
+# ─── Harness architecture ─────────────────────────────────
+# Independent repos nested inside the harness (each has its own .git)
+/lib/
+/projects/*/repo/
+
+# Project workspace artifacts (re-generable, not shared)
+/projects/*/extracts/
+/projects/*/testing/
+/projects/*/environment.json
 
 # ─── Shared repo boundaries ───────────────────────────────
 # Uncomment these lines when working on the shared team repo

@@ -7,9 +7,9 @@
  * Updating an Expected value in the matrix changes PASS/FAIL on the next run.
  *
  * Creates/updates:
- *   - Run files (new, immutable) in tasks/date-handling/web-services/runs/
- *   - Summary files (update) in tasks/date-handling/web-services/summaries/
- *   - Session index (append) in tasks/date-handling/web-services/results.md
+ *   - Run files (new, immutable) in research/date-handling/web-services/runs/
+ *   - Summary files (update) in research/date-handling/web-services/summaries/
+ *   - Session index (append) in research/date-handling/web-services/results.md
  *
  * Does NOT modify matrix.md Status/Actual columns — the matrix is authoritative.
  * Logs warnings if actual differs from Expected (potential regression).

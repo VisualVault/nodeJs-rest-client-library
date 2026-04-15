@@ -33,7 +33,7 @@ For each file below, run `git log -1 --format='%ai %s' -- <path>` to get the las
 | ------------ | ---------------------------------------------------------------------------------------- |
 | Root docs    | `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `Readme-microservices.md`                      |
 | Docs         | all `docs/**/*.md` files                                                                 |
-| Task files   | `tasks/README.md`, `tasks/date-handling/CLAUDE.md`                                       |
+| Task files   | `research/README.md`, `research/date-handling/CLAUDE.md`                                 |
 | Testing docs | `testing/README.md`, `testing/specs/date-handling/README.md`, `testing/config/README.md` |
 | Commands     | all `.claude/commands/*.md` files                                                        |
 | Config       | `package.json`, `eslint.config.js`, `.prettierrc`, `.gitignore`, `playwright.config.js`  |
@@ -65,7 +65,7 @@ Find all `.md` files in the repo (excluding `node_modules/` and `.git/`). For ea
 
 The expected root-level items are:
 
-**Directories**: `.claude/`, `.husky/`, `.playwright/`, `.playwright-cli/`, `docs/`, `lib/`, `node_modules/`, `playwright-report/`, `projects/`, `scripts/`, `tasks/`, `test-results/`, `testing/`, `tools/`
+**Directories**: `.claude/`, `.husky/`, `.playwright/`, `.playwright-cli/`, `docs/`, `lib/`, `node_modules/`, `playwright-report/`, `projects/`, `scripts/`, `research/`, `test-results/`, `testing/`, `tools/`
 
 **Files**: `_config.yml`, `.gitattributes`, `.gitignore`, `.npmignore`, `.prettierignore`, `.prettierrc`, `CHANGELOG.md`, `CLAUDE.md`, `eslint.config.js`, `package.json`, `package-lock.json`, `README.md`, `Readme-microservices.md`
 
@@ -75,7 +75,7 @@ Run `ls -1A` at root and compare against these lists. Any unexpected items: **WA
 
 Check these pairs for overlap:
 
-1. `tasks/date-handling/CLAUDE.md` vs root `CLAUDE.md` — is the task-level file redundant or contradictory?
+1. `research/date-handling/CLAUDE.md` vs root `CLAUDE.md` — is the task-level file redundant or contradictory?
 
 Read the first 30 lines of each file in the pair. If one appears to be a stale or outdated version of the other, flag as **INFO** with a recommendation.
 
@@ -95,7 +95,7 @@ find . -not -path './.git/*' -not -path './node_modules/*' -not -name 'package-l
 
 Classify:
 
-- Over 5MB: **CRITICAL** (e.g., `tasks/date-handling/forms-calendar/main.js` at ~13MB)
+- Over 5MB: **CRITICAL** (e.g., `research/date-handling/forms-calendar/main.js` at ~13MB)
 - 1–5MB: **WARNING**
 
 ### 3B. Test artifact directories
@@ -119,7 +119,7 @@ Count files in `testing/config/screenshots/` and any other screenshot directorie
 
 ### 3D. Task workspace accumulation
 
-Measure `tasks/date-handling/forms-calendar/` subdirectories:
+Measure `research/date-handling/forms-calendar/` subdirectories:
 
 - `runs/` — file count and total size
 - `summaries/` — file count and total size
@@ -138,7 +138,7 @@ Goal: cross-reference what CLAUDE.md claims vs actual filesystem state.
 Read the `## Repo Structure` section from `CLAUDE.md`. Extract every path listed in the code block. For each path, verify it exists on disk:
 
 - **WARNING** for documented paths that do NOT exist
-- **INFO** for significant directories/files that exist but are NOT documented (check `docs/`, `tasks/`, `testing/`, `scripts/`, `.claude/commands/` for undocumented items)
+- **INFO** for significant directories/files that exist but are NOT documented (check `docs/`, `research/`, `testing/`, `scripts/`, `.claude/commands/` for undocumented items)
 
 ### 4B. Active Tasks table
 
@@ -204,7 +204,7 @@ Goal: check for untracked files and gitignore gaps.
 
 Run `git status --short`. Collect any untracked files (`??` prefix). Group by directory:
 
-- **WARNING** if untracked in `docs/`, `scripts/`, `lib/`, `.claude/`, `tasks/` (likely should be committed or deleted)
+- **WARNING** if untracked in `docs/`, `scripts/`, `lib/`, `.claude/`, `research/` (likely should be committed or deleted)
 - **INFO** if untracked in `testing/config/`, `test-results/`, `playwright-report/` (expected transient files)
 
 ### 6B. Wrongly tracked files

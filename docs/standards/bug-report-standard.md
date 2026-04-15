@@ -2,7 +2,7 @@
 
 Guidelines for writing bug reports that will be read by people with no prior context — product teams, developers picking up the fix, support engineers triaging tickets.
 
-Reference implementation: `tasks/date-handling/forms-calendar/analysis/bug-1-timezone-stripping.md`
+Reference implementation: `research/date-handling/forms-calendar/analysis/bug-1-timezone-stripping.md`
 
 ---
 

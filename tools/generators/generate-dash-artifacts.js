@@ -6,9 +6,9 @@
  * Does NOT modify matrix.md — the matrix is the source of truth.
  *
  * Creates/updates:
- *   - Run files (new, immutable) in tasks/date-handling/dashboards/runs/
- *   - Summary files (update) in tasks/date-handling/dashboards/summaries/
- *   - Session index (append) in tasks/date-handling/dashboards/results.md
+ *   - Run files (new, immutable) in research/date-handling/dashboards/runs/
+ *   - Summary files (update) in research/date-handling/dashboards/summaries/
+ *   - Session index (append) in research/date-handling/dashboards/results.md
  *
  * Usage:
  *   node tools/generators/generate-dash-artifacts.js [--input path] [--category DB-N] [--dry-run]

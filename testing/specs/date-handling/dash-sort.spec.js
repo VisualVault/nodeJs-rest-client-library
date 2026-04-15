@@ -5,7 +5,7 @@
  * Triggers column header sort via __doPostBack and verifies that
  * date values are in correct ascending/descending order.
  *
- * Converted from tasks/date-handling/dashboards/test-sort-v4.js
+ * Converted from research/date-handling/dashboards/test-sort-v4.js
  */
 const { test, expect } = require('@playwright/test');
 const path = require('path');

@@ -22,7 +22,7 @@ Dashboards are **server-side rendered** (Telerik RadGrid / ASP.NET). Browser tim
 
 **Skip-verify mode:** `/test-dash-date-pw --skip-verify db-2-A db-2-B` — skips Phases 0–2 (no browser session). Extracts values from existing run files or matrix rows. Use to backfill artifacts for TCs already verified.
 
-The test ID identifies a row in `tasks/date-handling/dashboards/matrix.md` (e.g., `db-1-A`, `db-4-f7-asc`, `db-7-excel`).
+The test ID identifies a row in `research/date-handling/dashboards/matrix.md` (e.g., `db-1-A`, `db-4-f7-asc`, `db-7-excel`).
 
 ---
 
@@ -142,19 +142,19 @@ const rowCount = await page.evaluate(
 
 Read the following files before doing anything else:
 
-1. `tasks/date-handling/dashboards/matrix.md` — find the row matching the test ID. Extract:
+1. `research/date-handling/dashboards/matrix.md` — find the row matching the test ID. Extract:
     - The category (DB-1 through DB-8) and its description
     - The Config column (A–H) or variant — maps to field via the Field Configurations table
     - The Expected column
     - The Status (PASS/FAIL/PENDING) and any existing Actual value
 
-2. `tasks/date-handling/dashboards/matrix.md` — **Field Configurations table** (top of file). Map Config letter to: `enableTime`, `ignoreTZ`, `useLegacy`, Test Field name, and Dashboard Format.
+2. `research/date-handling/dashboards/matrix.md` — **Field Configurations table** (top of file). Map Config letter to: `enableTime`, `ignoreTZ`, `useLegacy`, Test Field name, and Dashboard Format.
 
-3. `tasks/date-handling/dashboards/analysis.md` — identify which bugs surface in the dashboard for this config. Note: only FORM-BUG-7 and mixed storage are relevant (FORM-BUG-5/#6 are client-side only).
+3. `research/date-handling/dashboards/analysis.md` — identify which bugs surface in the dashboard for this config. Note: only FORM-BUG-7 and mixed storage are relevant (FORM-BUG-5/#6 are client-side only).
 
-4. `tasks/date-handling/CLAUDE.md` — reference for field configuration details, known bugs, and form URLs (needed for DB-6 cross-layer tests).
+4. `research/date-handling/CLAUDE.md` — reference for field configuration details, known bugs, and form URLs (needed for DB-6 cross-layer tests).
 
-5. If the test references a known record (from WS or forms testing), check `tasks/date-handling/web-services/matrix.md` or `tasks/date-handling/forms-calendar/matrix.md` for the expected stored value.
+5. If the test references a known record (from WS or forms testing), check `research/date-handling/web-services/matrix.md` or `research/date-handling/forms-calendar/matrix.md` for the expected stored value.
 
 Do not proceed to Phase 2 until all required files are read.
 
@@ -359,7 +359,7 @@ node tools/audit/explore-dashboard.js --compare
 **Before generating:** Check if `test-cases/tc-{id}.md` already exists. If it does, **skip Phase 3 entirely** — TC specs are immutable. Proceed to Phase 4.
 
 **Filename:** `tc-{test-id}.md` (e.g., `tc-db-1-A.md`, `tc-db-4-f7-asc.md`)
-**Output path:** `tasks/date-handling/dashboards/test-cases/`
+**Output path:** `research/date-handling/dashboards/test-cases/`
 
 ---
 
@@ -474,7 +474,7 @@ Create `projects/{customer}/testing/date-handling/dashboards/runs/tc-{id}-run-{N
 ```markdown
 # TC-{ID} — Run {N} | {YYYY-MM-DD} | {PASS / FAIL-N}
 
-**Spec**: `tasks/date-handling/dashboards/test-cases/tc-{id}.md`
+**Spec**: `research/date-handling/dashboards/test-cases/tc-{id}.md`
 
 ## Environment
 
@@ -555,7 +555,7 @@ Append a one-line entry to the current session in `dashboards/results.md`:
 4. **Expected = correct behavior**: TC spec Expected Results always show what the system _should_ do, not what a buggy system produces.
 5. **No TZ suffix in IDs**: Dashboard tests don't use TZ suffixes (server-rendered, TZ irrelevant). Exception: DB-8 which tests TZ independence explicitly.
 6. **Cross-reference existing data**: Before creating new records, check forms-calendar and web-services results for records with known stored values.
-7. **Artifact paths**: TC specs in `tasks/date-handling/dashboards/test-cases/`. Execution output (runs, summaries, status) in `projects/{customer}/testing/date-handling/dashboards/`.
+7. **Artifact paths**: TC specs in `research/date-handling/dashboards/test-cases/`. Execution output (runs, summaries, status) in `projects/{customer}/testing/date-handling/dashboards/`.
 
 ## Artifact Sharing
 
@@ -563,7 +563,7 @@ This command produces both shared and personal artifacts. See CLAUDE.md § "Repo
 
 | Artifact      | Path                                                              | Shared? | Reason                        |
 | ------------- | ----------------------------------------------------------------- | ------- | ----------------------------- |
-| TC spec       | `tasks/date-handling/dashboards/test-cases/`                      | Yes     | Reproducible specification    |
+| TC spec       | `research/date-handling/dashboards/test-cases/`                   | Yes     | Reproducible specification    |
 | Run file      | `projects/{customer}/testing/date-handling/dashboards/runs/`      | No      | Env-specific execution record |
 | Status update | `projects/{customer}/testing/date-handling/dashboards/status.md`  | No      | Per-env pass/fail tracker     |
 | Summary       | `projects/{customer}/testing/date-handling/dashboards/summaries/` | No      | Per-TC tracking state         |

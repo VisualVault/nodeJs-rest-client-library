@@ -974,7 +974,7 @@ The core API's `getForms` normalizes both to ISO+Z, masking the serialization di
 
 **Root cause**: The FormsAPI has two serialization paths that produce different string formats for the same `datetime` value. Forms V1 `initCalendarValueV1` parses the string format — ISO+Z triggers UTC→local conversion, US format does not.
 
-See `tasks/date-handling/web-services/analysis/overview.md` CB-29 for full evidence.
+See `research/date-handling/web-services/analysis/overview.md` CB-29 for full evidence.
 
 ---
 
@@ -1127,7 +1127,7 @@ The VV REST API normalizes all date values in responses to ISO 8601 datetime wit
 
 ### No Server-Side Date-Only Enforcement
 
-The VV server has no date-only storage type. All date fields are stored as datetime, regardless of the `enableTime` flag. The "date-only" semantic is enforced only by the Forms client-side JS — the API and database treat all date fields identically. This means a "date-only" field can contain UTC midnight, local midnight as UTC, actual timestamps, or arbitrary times depending on the write source (Forms popup, preset, Current Date, or API). See `tasks/date-handling/web-services/analysis/overview.md` for full evidence and impact analysis.
+The VV server has no date-only storage type. All date fields are stored as datetime, regardless of the `enableTime` flag. The "date-only" semantic is enforced only by the Forms client-side JS — the API and database treat all date fields identically. This means a "date-only" field can contain UTC midnight, local midnight as UTC, actual timestamps, or arbitrary times depending on the write source (Forms popup, preset, Current Date, or API). See `research/date-handling/web-services/analysis/overview.md` for full evidence and impact analysis.
 
 ### Data Passthrough
 
@@ -1173,7 +1173,7 @@ Key behaviors:
 | `/indexfields`                             | GET    | List all index field definitions                                    |
 | `/indexfields/{id}/folders/{folderId}`     | PUT    | Assign an index field to a folder                                   |
 
-See `tasks/date-handling/document-library/matrix.md` for the test matrix (8 categories, 52 slots) and `testing/specs/date-handling/doc-index-field-dates.spec.js` for 32 data-driven regression tests.
+See `research/date-handling/document-library/matrix.md` for the test matrix (8 categories, 52 slots) and `testing/specs/date-handling/doc-index-field-dates.spec.js` for 32 data-driven regression tests.
 
 ### Auto-Save
 

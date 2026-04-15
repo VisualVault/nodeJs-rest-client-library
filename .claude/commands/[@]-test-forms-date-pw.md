@@ -39,7 +39,7 @@ See `testing/specs/date-handling/README.md` and `docs/guides/playwright-testing.
 
 **Batch + skip-verify:** `/test-forms-date-pw --skip-verify 1-A-BRT 1-B-BRT 2-A-BRT 3-A-BRT-BRT` — backfill multiple entries without opening a browser.
 
-The category ID identifies a row in `tasks/date-handling/forms-calendar/matrix.md` (e.g., `1-A-IST`, `9-D-BRT-8`, `7-C-isoNoZ`).
+The category ID identifies a row in `research/date-handling/forms-calendar/matrix.md` (e.g., `1-A-IST`, `9-D-BRT-8`, `7-C-isoNoZ`).
 
 ---
 
@@ -228,7 +228,7 @@ The returned title should be `DateTest-XXXXXX`. If it still shows `Viewer` or a 
 
 Read the following files before doing anything else:
 
-1. `tasks/date-handling/forms-calendar/matrix.md` — find the row matching the given category ID. Extract:
+1. `research/date-handling/forms-calendar/matrix.md` — find the row matching the given category ID. Extract:
     - The category section (1–13) and its scenario type (popup, typed input, SFV, GFV, round-trip, reload, etc.)
     - The Config column (A/B/C/D) — used to derive field flags in step 2
     - The TZ column — determines which timezone to set in preconditions
@@ -237,15 +237,15 @@ Read the following files before doing anything else:
     - The Status (PASS/FAIL/PENDING) and any existing Actual value
     - The Evidence column — if a TC file or results.md link is listed, note it
 
-2. `tasks/date-handling/forms-calendar/matrix.md` — **Field Configurations table** (top of file). Map the Config letter from step 1 to its flag values: `enableTime`, `ignoreTimezone`, `useLegacy`. Also note the Test Field name (e.g., Field5 for Config D) as a cross-check — but the field will be located dynamically in Phase 2 via P6.
+2. `research/date-handling/forms-calendar/matrix.md` — **Field Configurations table** (top of file). Map the Config letter from step 1 to its flag values: `enableTime`, `ignoreTimezone`, `useLegacy`. Also note the Test Field name (e.g., Field5 for Config D) as a cross-check — but the field will be located dynamically in Phase 2 via P6.
 
-3. `tasks/date-handling/forms-calendar/analysis/overview.md` — identify every bug whose trigger conditions match the field config extracted above. For each matching bug, note: its number, name, the exact function where it lives, and what the observable symptom is.
+3. `research/date-handling/forms-calendar/analysis/overview.md` — identify every bug whose trigger conditions match the field config extracted above. For each matching bug, note: its number, name, the exact function where it lives, and what the observable symptom is.
 
-4. `tasks/date-handling/forms-calendar/matrix.md` — check the CLAUDE.md section for:
+4. `research/date-handling/forms-calendar/matrix.md` — check the CLAUDE.md section for:
     - The DateTest form template URL
     - The Key JavaScript section (console snippets)
 
-    If the Key JavaScript section is not in matrix.md, read `tasks/date-handling/CLAUDE.md` to get it.
+    If the Key JavaScript section is not in matrix.md, read `research/date-handling/CLAUDE.md` to get it.
 
 5. **If the Evidence column in step 1 references a `results.md` block** (e.g., `results.md § Test 2.5`): read that block in `projects/{customer}/testing/date-handling/forms-calendar/results.md` to extract any additional context — exact console output, session notes, observed discrepancies. This supplements Phase 2 but does not replace it.
 
@@ -441,7 +441,7 @@ Compare captured values against the Expected column from Phase 1. Note any discr
 - `category-id`: the exact category ID passed as the command argument, with no modification
 - Examples: `tc-7-D-isoZ-BRT.md`, `tc-1-A-IST.md`, `tc-9-D-BRT-8.md`
 
-**Output path:** `tasks/date-handling/forms-calendar/test-cases/`
+**Output path:** `research/date-handling/forms-calendar/test-cases/`
 
 ---
 
@@ -651,7 +651,7 @@ Read the file first, then append a new entry to the `TEST_DATA` array (before th
     expectedApi: '{api value}',    // Expected GetFieldValue() return
     bugs: [{bug refs}],            // e.g., ['FORM-BUG-5', 'FORM-BUG-7'] or []
     notes: '{why this test exists and what it proves}',
-    tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-{id}.md',
+    tcRef: 'research/date-handling/forms-calendar/test-cases/tc-{id}.md',
     savedRecord: '{record key}',   // (Cat 3 only) Key into SAVED_RECORDS in vv-config.js
     saveTz: '{TZ}',                // (Cat 3 cross-TZ only) TZ the record was saved in
 },
@@ -829,8 +829,8 @@ This command produces both shared and personal artifacts. See CLAUDE.md § "Repo
 | Artifact          | Path                                                                  | Shared? | Reason                         |
 | ----------------- | --------------------------------------------------------------------- | ------- | ------------------------------ |
 | Test-data entry   | `testing/fixtures/test-data.js`                                       | Yes     | Reusable test methodology      |
-| TC spec           | `tasks/date-handling/forms-calendar/test-cases/`                      | Yes     | Reproducible specification     |
-| Matrix update     | `tasks/date-handling/forms-calendar/matrix.md`                        | Yes     | Methodology + coverage tracker |
+| TC spec           | `research/date-handling/forms-calendar/test-cases/`                   | Yes     | Reproducible specification     |
+| Matrix update     | `research/date-handling/forms-calendar/matrix.md`                     | Yes     | Methodology + coverage tracker |
 | Run file          | `projects/{customer}/testing/date-handling/forms-calendar/runs/`      | **No**  | Env-specific execution record  |
 | Summary           | `projects/{customer}/testing/date-handling/forms-calendar/summaries/` | **No**  | Personal tracking state        |
 | Results.md append | `projects/{customer}/testing/date-handling/forms-calendar/results.md` | **No**  | Raw session evidence           |

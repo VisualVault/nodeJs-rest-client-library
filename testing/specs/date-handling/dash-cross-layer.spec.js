@@ -5,7 +5,7 @@
  * Tests DateTest-000889 (date-only A,B,E,F) and DateTest-000890 (DateTime C,D,G,H).
  * For each config: captures dashboard grid value, navigates to form, captures form values.
  *
- * Converted from tasks/date-handling/dashboards/test-cross-layer.js
+ * Converted from research/date-handling/dashboards/test-cross-layer.js
  */
 const { test, expect } = require('@playwright/test');
 const path = require('path');

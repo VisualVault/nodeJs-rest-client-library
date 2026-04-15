@@ -195,13 +195,13 @@ You can also target a single cell: `npx playwright test --config=testing/playwri
 
 ### 4.7 Two Automation Layers
 
-| Aspect     | Layer 1 (interactive)                      | Layer 2 (regression)                                          |
-| ---------- | ------------------------------------------ | ------------------------------------------------------------- |
-| Tool       | `playwright-cli`                           | `@playwright/test` via `npx playwright test`                  |
-| Trigger    | `/@-test-forms-date-pw <id>`               | `npm run test:pw`                                             |
-| Purpose    | Live verification + artifact generation    | Headless regression testing                                   |
-| Auth state | `testing/config/auth-state.json`           | `testing/config/auth-state-pw.json`                           |
-| Outputs    | TC specs, run files, summaries in `tasks/` | `testing/tmp/test-results/`, `testing/tmp/playwright-report/` |
+| Aspect     | Layer 1 (interactive)                         | Layer 2 (regression)                                          |
+| ---------- | --------------------------------------------- | ------------------------------------------------------------- |
+| Tool       | `playwright-cli`                              | `@playwright/test` via `npx playwright test`                  |
+| Trigger    | `/@-test-forms-date-pw <id>`                  | `npm run test:pw`                                             |
+| Purpose    | Live verification + artifact generation       | Headless regression testing                                   |
+| Auth state | `testing/config/auth-state.json`              | `testing/config/auth-state-pw.json`                           |
+| Outputs    | TC specs, run files, summaries in `research/` | `testing/tmp/test-results/`, `testing/tmp/playwright-report/` |
 
 ## 5. Web Services Testing Setup
 
@@ -274,7 +274,7 @@ This path calls the harness through VV's Microservice routing, like a real produ
 4. **Add form fields**: On the DateTest form template, add text fields: `WSAction`, `WSConfigs`, `WSRecordID`, `WSInputDate`, `WSResult` (textarea).
 5. **Add form button**: Assign `ws-harness-button.js` as the button script (copy the code into the VV form button editor).
 
-Full details: [`tasks/date-handling/web-services/README.md`](../../tasks/date-handling/web-services/README.md)
+Full details: [`research/date-handling/web-services/README.md`](../../research/date-handling/web-services/README.md)
 
 ## 6. Upstream Sync
 

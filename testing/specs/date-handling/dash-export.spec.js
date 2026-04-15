@@ -4,7 +4,7 @@
  * Downloads Excel, Word, and XML exports from the DateTest dashboard
  * and compares date values against the grid display.
  *
- * Converted from tasks/date-handling/dashboards/test-export-v1.js
+ * Converted from research/date-handling/dashboards/test-export-v1.js
  */
 const { test, expect } = require('@playwright/test');
 const path = require('path');

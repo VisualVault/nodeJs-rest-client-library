@@ -4,10 +4,10 @@
  *
  * Reads regression-results-latest.json (or specified file) and test-data.js,
  * then creates/updates:
- *   - Run files (new, immutable) in tasks/date-handling/forms-calendar/runs/
- *   - Summary files (append) in tasks/date-handling/forms-calendar/summaries/
- *   - Matrix rows (update) in tasks/date-handling/forms-calendar/matrix.md
- *   - Session index (append) in tasks/date-handling/forms-calendar/results.md
+ *   - Run files (new, immutable) in research/date-handling/forms-calendar/runs/
+ *   - Summary files (append) in research/date-handling/forms-calendar/summaries/
+ *   - Matrix rows (update) in research/date-handling/forms-calendar/matrix.md
+ *   - Session index (append) in research/date-handling/forms-calendar/results.md
  *
  * Usage:
  *   node tools/generators/generate-artifacts.js [--input path/to/results.json] [--artifacts-only | --dry-run]

@@ -137,7 +137,7 @@ No analysis files yet. Run exports first, then use:
 
 ## Related
 
-- Platform date bugs: `tasks/date-handling/` (if applicable)
+- Platform date bugs: `research/date-handling/` (if applicable)
 
 ````
 

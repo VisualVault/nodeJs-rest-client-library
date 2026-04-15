@@ -7,8 +7,9 @@ module.exports = [
         ignores: [
             'node_modules/',
             'scripts/test-scripts/',
-            'tasks/**/main.js',
-            'tasks/**/bug-analysis/',
+            'scripts/examples/',
+            'research/**/main.js',
+            'research/**/bug-analysis/',
             'projects/',
             'lib/VVRestApi/',
         ],

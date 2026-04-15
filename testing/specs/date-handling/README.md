@@ -8,11 +8,11 @@ The VisualVault platform has **16 confirmed date-handling bugs** across Forms (7
 
 - Runs the same scenarios across BRT (UTC-3), IST (UTC+5:30), UTC+0, PST/PDT (UTC-8/-7), and JST (UTC+9) to expose timezone-dependent bugs
 - Covers ~269 Forms test slots across 16 categories + 52 Document Library slots across 8 categories
-- Produces both human-readable test documentation (in `tasks/date-handling/`) and reusable Playwright specs (here)
+- Produces both human-readable test documentation (in `research/date-handling/`) and reusable Playwright specs (here)
 
-Full investigation context: `tasks/date-handling/CLAUDE.md`
-Forms matrix: `tasks/date-handling/forms-calendar/matrix.md`
-Document Library matrix: `tasks/date-handling/document-library/matrix.md`
+Full investigation context: `research/date-handling/CLAUDE.md`
+Forms matrix: `research/date-handling/forms-calendar/matrix.md`
+Document Library matrix: `research/date-handling/document-library/matrix.md`
 
 ---
 
@@ -36,9 +36,9 @@ Layer 1: @-test-forms-date-pw command (Claude Code)
   Uses: playwright-cli (interactive CLI)
   Purpose: Live verification + artifact generation
   Outputs:
-    - tasks/.../test-cases/tc-{id}.md   (human-readable TC spec)
-    - tasks/.../runs/tc-{id}-run-N.md   (immutable execution record)
-    - tasks/.../summaries/tc-{id}.md    (run history + interpretation)
+    - research/.../test-cases/tc-{id}.md   (human-readable TC spec)
+    - research/.../runs/tc-{id}-run-N.md   (immutable execution record)
+    - research/.../summaries/tc-{id}.md    (run history + interpretation)
     - testing/fixtures/test-data.js     (appends test case definition)
   Auth state: testing/config/auth-state.json
 
@@ -161,7 +161,7 @@ The `/@-test-forms-date-pw <category-id>` command:
 
 1. Opens a browser with the target timezone
 2. Runs the test live and captures actual behavior
-3. Generates markdown TC spec, run file, and summary in `tasks/date-handling/`
+3. Generates markdown TC spec, run file, and summary in `research/date-handling/`
 4. Appends the test case definition to `testing/fixtures/test-data.js`
 
 ```

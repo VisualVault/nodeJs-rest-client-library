@@ -31,7 +31,7 @@ This repo uses a three-tier Git model (see CLAUDE.md § "Repository Architecture
 
 ### Shared (safe to push to team repo)
 
-Everything else: `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `tasks/` (analysis, matrix, test-cases), config files, CLAUDE.md.
+Everything else: `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `research/` (analysis, matrix, test-cases), config files, CLAUDE.md.
 
 ### Push Behavior
 

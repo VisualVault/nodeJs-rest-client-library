@@ -15,7 +15,7 @@ nodeV2/
   scripts/                         # VV script examples and templates (see scripts/)
   tools/                           # Standalone CLI tooling: extract, explore, runners, audit, inventory, generators (see tools/)
   testing/                         # Playwright test infrastructure: specs, helpers, fixtures, pipelines (see testing/)
-  tasks/                           # Cross-cutting investigations and analysis (see tasks/)
+  research/                       # Cross-cutting investigations and analysis (see research/)
   projects/                        # Customer workspaces with extracted artifacts (see projects/)
   docs/                            # Platform documentation: architecture, standards, guides, reference (see docs/)
 ```
@@ -117,7 +117,7 @@ npm run test:dash:regression # Dashboard regression pipeline
 
 ## Web Services Testing
 
-REST API date handling tests via the DateTestWSHarness. Run with `node tools/runners/run-ws-test.js --action WS-2`. See `tasks/date-handling/web-services/README.md`.
+REST API date handling tests via the DateTestWSHarness. Run with `node tools/runners/run-ws-test.js --action WS-2`. See `research/date-handling/web-services/README.md`.
 
 Scheduled process pattern validation via `node tools/runners/run-sp-test.js`. See `scripts/templates/scheduledprocess-pattern.js` for the canonical pattern.
 
@@ -138,7 +138,7 @@ Environment profiles consolidate platform version, service configuration, and fr
 
 ## Standards Review
 
-Deterministic rule-based review of form template XML against codified standards. See `tasks/standards-review/` for task status and `docs/standards/form-template-standard.md` for the 18 atomic standards.
+Deterministic rule-based review of form template XML against codified standards. See `research/standards-review/` for task status and `docs/standards/form-template-standard.md` for the 18 atomic standards.
 
 ```bash
 npm run review:forms -- --project wadnr        # Full review with file output
@@ -147,26 +147,26 @@ npm run review:forms -- --project wadnr --print # Stdout only
 
 Reports written to `projects/{customer}/analysis/standards-review/` (summary.md, per-template reports, run-metadata.json).
 
-## Active Tasks
+## Active Research
 
-See `tasks/` folder. Each task gets its own subfolder with analysis, test results, and working notes.
+See `research/` folder. Each investigation gets its own subfolder with analysis, test results, and working notes.
 
-| Task                                                    | Status      | Description                                                                                             |
-| ------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
-| [date-handling](tasks/date-handling/)                   | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Document Library |
-| [form-templates](tasks/form-templates/)                 | Active      | VV form template XML analysis, format documentation, and improved template generation                   |
-| [extract-optimization](tasks/extract-optimization/)     | Active      | Extract pipeline speed: parallel extraction, revision tracking, API-first                               |
-| [ws-naming](tasks/ws-naming/)                           | Active      | Web service naming — valid character investigation                                                      |
-| [scheduled-process-logs](tasks/scheduled-process-logs/) | Complete    | SP execution mechanics: response.json vs postCompletion, platform timeout, log behavior                 |
-| [standards-review](tasks/standards-review/)             | In Progress | Deterministic standards compliance tool for VV components (form templates first)                        |
-| [wadnr](projects/wadnr/)                                | In Progress | WADNR client project: impact analysis, exported artifacts                                               |
+| Research                                                   | Status      | Description                                                                                             |
+| ---------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
+| [date-handling](research/date-handling/)                   | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Document Library |
+| [form-templates](research/form-templates/)                 | Active      | VV form template XML analysis, format documentation, and improved template generation                   |
+| [extract-optimization](research/extract-optimization/)     | Active      | Extract pipeline speed: parallel extraction, revision tracking, API-first                               |
+| [ws-naming](research/ws-naming/)                           | Active      | Web service naming — valid character investigation                                                      |
+| [scheduled-process-logs](research/scheduled-process-logs/) | Complete    | SP execution mechanics: response.json vs postCompletion, platform timeout, log behavior                 |
+| [standards-review](research/standards-review/)             | In Progress | Deterministic standards compliance tool for VV components (form templates first)                        |
+| [wadnr](projects/wadnr/)                                   | In Progress | WADNR client project: impact analysis, exported artifacts                                               |
 
 ## Principles
 
 1. **Reproducibility.** Shared content must be reproducible — bug reports describe the bug, reproduction steps, and root cause. Anyone with a VV environment can verify.
 2. **Environment-agnostic tooling.** Always prefer creating reusable scripts and tools over one-off solutions. Export, audit, inventory, and generator tools must work for any VV customer and environment. Hardcoded customer references go in `projects/`.
-3. **Knowledge separation.** "Is this artifact true regardless of which customer or environment?" If yes → `tasks/`. If bound to a specific customer/environment → `projects/{customer}/`. Platform bugs, methodology, test specs, and expected behavior go in `tasks/`. Actual observed values, execution records, extracted artifacts, and customer-specific config go in `projects/{customer}/`.
-4. **Sharing boundary.** `tasks/` content is shared (platform truth). `projects/` content is personal (customer/env-bound). No mixing — a file belongs to one or the other.
+3. **Knowledge separation.** "Is this artifact true regardless of which customer or environment?" If yes → `research/`. If bound to a specific customer/environment → `projects/{customer}/`. Platform bugs, methodology, test specs, and expected behavior go in `research/`. Actual observed values, execution records, extracted artifacts, and customer-specific config go in `projects/{customer}/`.
+4. **Sharing boundary.** `research/` content is shared (platform truth). `projects/` content is personal (customer/env-bound). No mixing — a file belongs to one or the other.
 5. **Defense in depth.** Runtime guards are a safety net, not the primary defense. The primary defense is never writing unsafe code in the first place.
 6. **Documentation as map.** CLAUDE.md files include: identity, structure, principles/rules, commands, pointers to deeper docs. Exclude: file inventories, code snippets, config contents, bug descriptions, API tables, historical narratives — link to the source instead.
 7. **Documentation hygiene.** (1) If derivable with `ls`/`grep`/`cat`, link instead. (2) No duplication. (3) If it goes stale when a file is added, it doesn't belong. (4) Compress on task completion.
@@ -196,7 +196,7 @@ See the [Write Safety](#write-safety--mandatory) section for the 6 mandatory wri
 
 ### CLAUDE.md Standards
 
-**Create a CLAUDE.md for:** top-level topic folders (`tools/`, `testing/`, `tasks/`, `projects/`, `docs/`, `scripts/`), individual tasks (`tasks/{task-name}/`), individual projects (`projects/{customer}/`).
+**Create a CLAUDE.md for:** top-level topic folders (`tools/`, `testing/`, `research/`, `projects/`, `docs/`, `scripts/`), individual tasks (`research/{task-name}/`), individual projects (`projects/{customer}/`).
 
 **Do NOT create CLAUDE.md for:** implementation subfolders (`tools/extract/`, `testing/fixtures/`, etc.), data directories (`projects/wadnr/extracts/`, `projects/*/testing/`).
 
@@ -222,7 +222,7 @@ Every developer commits ALL their work to their **private repo** (full backup, m
 
 ### What Goes Where
 
-**Shared** (team repo): `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `tasks/` (analysis, matrix methodology, test-cases).
+**Shared** (team repo): `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `research/` (analysis, matrix methodology, test-cases).
 **Not shared** (private repo only): `projects/` (extracts, analysis, testing execution), `.env.json`.
 
 ### Current State

@@ -4,12 +4,13 @@ Production-style VV scripts that run inside the Node.js microservices server. Th
 
 ## Structure
 
-| Folder            | Purpose                                                             |
-| ----------------- | ------------------------------------------------------------------- |
-| `form-scripts/`   | Scripts triggered by form button events (client-side AJAX → server) |
-| `server-scripts/` | Scheduled and event-based server-side scripts                       |
-| `templates/`      | Clean boilerplate patterns for new scripts                          |
-| `test-scripts/`   | Local dev test scripts (gitignored)                                 |
+| Folder                  | Purpose                                                   |
+| ----------------------- | --------------------------------------------------------- |
+| `examples/event-based/` | Scripts triggered by server events (AJAX → POST /scripts) |
+| `examples/scheduled/`   | Scheduled process scripts (POST /scheduledscripts)        |
+| `examples/form/`        | Form button scripts and form template examples            |
+| `templates/`            | Clean boilerplate patterns for new scripts                |
+| `test-scripts/`         | Local dev test scripts (gitignored)                       |
 
 ## Relationship to the Server
 

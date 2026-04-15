@@ -26,7 +26,7 @@
  *   expectedApi   — Expected GetFieldValue() return
  *   bugs          — Array of bug IDs this test exercises (e.g., ["Bug #5", "Bug #7"])
  *   notes         — Why this test case exists and what it proves
- *   tcRef         — Path to the markdown TC spec in tasks/date-handling/
+ *   tcRef         — Path to the markdown TC spec in research/date-handling/
  *   savedRecord   — (Cat 3 only) Key into SAVED_RECORDS in vv-config.js (e.g., "cat3-A-BRT")
  *   saveTz        — (Cat 3 cross-TZ only) TZ the record was originally saved in (e.g., "BRT")
  */
@@ -51,7 +51,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Date-only baseline. No TZ shift expected in BRT (UTC-). Bug #7 only affects UTC+.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-A-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-A-BRT.md',
     },
     {
         id: '1-B-BRT',
@@ -67,7 +67,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Config B date-only + ignoreTZ. Same as A in BRT — ignoreTZ inert for date-only fields.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-B-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-B-BRT.md',
     },
     // --- Cat 1 remaining PASS tests (backfilled via --skip-verify) ---
     // Expected = correct behavior. Some will FAIL in PW because GFV applies
@@ -86,7 +86,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'UTC+0 control. Date-only baseline. No TZ shift (UTC+0 midnight = UTC midnight).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-A-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-A-UTC0.md',
     },
     {
         id: '1-C-BRT',
@@ -102,7 +102,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #4'],
         notes: 'EXPECTED FAIL on GFV: Bug #4 — GFV applies new Date().toISOString() returning "T03:00:00.000Z". Correct: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-C-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-C-BRT.md',
     },
     {
         id: '1-D-BRT',
@@ -118,7 +118,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL on GFV: Bug #5 fake Z — GFV returns "...000Z". Correct: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-D-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-D-BRT.md',
     },
     {
         id: '1-C-IST',
@@ -134,7 +134,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #4'],
         notes: 'EXPECTED FAIL on GFV: Bug #4 — GFV applies toISOString in IST → "2026-03-14T18:30:00.000Z". Correct: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-C-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-C-IST.md',
     },
     {
         id: '1-D-UTC0',
@@ -150,7 +150,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL on GFV: Bug #5 fake Z — "...000Z" suffix added. Value coincidentally correct at UTC+0 but format wrong.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-D-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-D-UTC0.md',
     },
     {
         id: '1-F-IST',
@@ -166,7 +166,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Bug #2 legacy popup stores UTC datetime "2026-03-14T18:30:00.000Z". Correct: date-only "2026-03-15".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-F-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-F-IST.md',
     },
     // --- Cat 1 FAIL tests (backfilled via --skip-verify) ---
     // Expected values = CORRECT/INTENDED behavior. Tests FAIL when bugs are present.
@@ -186,7 +186,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 stores "2026-03-14" (-1 day) in IST. Correct: "2026-03-15".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-A-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-A-IST.md',
     },
     {
         id: '1-B-IST',
@@ -202,7 +202,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Same as 1-A-IST. ignoreTZ no-op. Bug #7 -1 day.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-B-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-B-IST.md',
     },
     {
         id: '1-D-IST',
@@ -218,7 +218,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 makes GFV return "...000Z" (fake Z). Correct GFV: no Z suffix.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-D-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-D-IST.md',
     },
     {
         id: '1-E-BRT',
@@ -234,7 +234,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Bug #2 legacy popup stores UTC datetime "T03:00:00.000Z". Correct: date-only "2026-03-15".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-E-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-E-BRT.md',
     },
     {
         id: '1-F-BRT',
@@ -250,7 +250,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Same as E-BRT. ignoreTZ no-op. Bug #2 format deviation.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-F-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-F-BRT.md',
     },
     {
         id: '1-G-BRT',
@@ -266,7 +266,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Bug #2 legacy DateTime popup stores UTC "T03:00:00.000Z". Correct: local "T00:00:00".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-G-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-G-BRT.md',
     },
     {
         id: '1-H-BRT',
@@ -282,7 +282,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Same as G-BRT. Legacy DateTime + ignoreTZ no-op. Bug #2.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-H-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-H-BRT.md',
     },
     {
         id: '1-E-IST',
@@ -298,7 +298,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Bug #2 legacy popup stores UTC datetime. Correct: date-only "2026-03-15".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-E-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-E-IST.md',
     },
     {
         id: '1-G-IST',
@@ -314,7 +314,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Bug #2 legacy DateTime popup stores UTC. Correct: local "T00:00:00".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-G-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-G-IST.md',
     },
     {
         id: '1-H-IST',
@@ -330,7 +330,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Same as G-IST. Legacy DateTime + ignoreTZ no-op. Bug #2.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-H-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-H-IST.md',
     },
     {
         id: '1-E-UTC0',
@@ -346,7 +346,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Bug #2 legacy popup stores UTC datetime. Correct: date-only "2026-03-15".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-E-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-E-UTC0.md',
     },
     {
         id: '1-F-UTC0',
@@ -362,7 +362,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #2'],
         notes: 'EXPECTED FAIL: Same as E-UTC0. ignoreTZ no-op. Bug #2 format deviation.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-1-F-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-1-F-UTC0.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 2 — Typed Input
@@ -383,7 +383,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Date-only typed input baseline. No TZ shift in BRT. Matches popup (1-A-BRT) — Bug #2 absent.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-A-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-A-BRT.md',
     },
     // --- Cat 2 backfill (--skip-verify). Expected = correct behavior. ---
     // BRT tests
@@ -401,7 +401,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Date-only + ignoreTZ. Same as A in BRT. ignoreTZ inert for date-only.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-B-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-B-BRT.md',
     },
     {
         id: '2-C-BRT',
@@ -417,7 +417,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #4'],
         notes: 'EXPECTED FAIL on GFV: Bug #4 applies toISOString → "T03:00:00.000Z". Correct: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-C-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-C-BRT.md',
     },
     {
         id: '2-D-BRT',
@@ -433,7 +433,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL on GFV: Bug #5 fake Z → "...000Z". Correct: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-D-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-D-BRT.md',
     },
     {
         id: '2-E-BRT',
@@ -449,7 +449,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Legacy typed stores date-only (correct). Differs from legacy popup (Bug #2).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-E-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-E-BRT.md',
     },
     {
         id: '2-F-BRT',
@@ -465,7 +465,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Same as E-BRT. ignoreTZ no-op on date-only.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-F-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-F-BRT.md',
     },
     {
         id: '2-G-BRT',
@@ -481,7 +481,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Legacy DateTime typed. getSaveValue formats local midnight. GFV: raw unchanged (useLegacy).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-G-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-G-BRT.md',
     },
     {
         id: '2-H-BRT',
@@ -497,7 +497,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Legacy DateTime + ignoreTZ. Same as G-BRT. ignoreTZ no-op. GFV: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-H-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-H-BRT.md',
     },
     // IST tests
     {
@@ -514,7 +514,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 stores "2026-03-14" (-1 day) in IST.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-A-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-A-IST.md',
     },
     {
         id: '2-B-IST',
@@ -530,7 +530,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Same as A-IST. ignoreTZ no-op. Bug #7 -1 day.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-B-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-B-IST.md',
     },
     {
         id: '2-C-IST',
@@ -546,7 +546,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #4'],
         notes: 'EXPECTED FAIL on GFV: Bug #4 toISOString in IST → "2026-03-14T18:30:00.000Z". Correct: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-C-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-C-IST.md',
     },
     {
         id: '2-D-IST',
@@ -562,7 +562,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL on GFV: Bug #5 fake Z → "...000Z". Correct: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-D-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-D-IST.md',
     },
     {
         id: '2-E-IST',
@@ -578,7 +578,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 in legacy typed IST. Stores "2026-03-14" (-1 day).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-E-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-E-IST.md',
     },
     {
         id: '2-F-IST',
@@ -594,7 +594,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Same as E-IST. ignoreTZ no-op. Bug #7 -1 day.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-F-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-F-IST.md',
     },
     {
         id: '2-G-IST',
@@ -610,7 +610,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Legacy DateTime typed in IST. getSaveValue formats local midnight. Correct storage.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-G-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-G-IST.md',
     },
     {
         id: '2-H-IST',
@@ -626,7 +626,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Legacy DateTime + ignoreTZ in IST. Same as G-IST. GFV: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-2-H-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-2-H-IST.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 3 — Server Reload
@@ -648,7 +648,7 @@ const TEST_DATA = [
         savedRecord: 'cat3-A-BRT',
         bugs: [],
         notes: 'Date-only save/reload in same TZ. Value survives round-trip through server. No shift in BRT.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-A-BRT-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-A-BRT-BRT.md',
     },
     {
         id: '3-B-BRT-BRT',
@@ -665,7 +665,7 @@ const TEST_DATA = [
         savedRecord: 'cat3-B-BRT',
         bugs: [],
         notes: 'Config B date-only + ignoreTZ save/reload in same TZ. ignoreTZ inert for date-only. Same as 3-A-BRT-BRT.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-B-BRT-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-B-BRT-BRT.md',
     },
     {
         id: '3-B-BRT-IST',
@@ -683,7 +683,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Config B date-only + ignoreTZ cross-TZ reload (BRT→IST). ignoreTZ inert for date-only. Same as 3-A-BRT-IST.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-B-BRT-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-B-BRT-IST.md',
     },
     {
         id: '3-C-BRT-IST',
@@ -701,7 +701,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: ['Bug #1', 'Bug #4'],
         notes: 'EXPECTED FAIL on GFV: Bug #4 toISOString in IST → "2026-03-14T18:30:00.000Z". Correct: raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-C-BRT-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-C-BRT-IST.md',
     },
     {
         id: '3-A-IST-BRT',
@@ -719,7 +719,7 @@ const TEST_DATA = [
         saveTz: 'IST',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 corrupted during IST save → stores "2026-03-14". Correct: "2026-03-15".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-A-IST-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-A-IST-BRT.md',
     },
     {
         id: '3-B-IST-BRT',
@@ -737,7 +737,7 @@ const TEST_DATA = [
         saveTz: 'IST',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 corrupted during IST save → stores "2026-03-14". Same as A-IST-BRT; ignoreTZ inert for date-only.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-B-IST-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-B-IST-BRT.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 5 — Preset Date Default
@@ -760,7 +760,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01',
         bugs: ['Bug #7'],
         notes: 'Config A preset in IST. Bug #7 on init path: moment("2026-03-01").toDate() → IST midnight → Feb 28 UTC. Display correct (03/01/2026) but internal UTC date wrong. Save would store "2026-02-28".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-A-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-A-IST.md',
     },
     {
         id: '5-A-BRT',
@@ -776,7 +776,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01',
         bugs: [],
         notes: 'Config A preset in BRT. No Bug #7 (UTC- midnight stays same calendar day). Display correct, raw = Date at BRT midnight (03:00Z). Save extraction = "2026-03-01".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-A-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-A-BRT.md',
     },
     // --- Cat 3 backfill (--skip-verify). Expected = correct/intended behavior. ---
     {
@@ -794,7 +794,7 @@ const TEST_DATA = [
         savedRecord: 'cat3-C-BRT',
         bugs: ['Bug #4'],
         notes: 'EXPECTED FAIL on GFV: Bug #4 toISOString → "T03:00:00.000Z". Raw survives same-TZ reload.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-C-BRT-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-C-BRT-BRT.md',
     },
     {
         id: '3-D-BRT-BRT',
@@ -811,7 +811,7 @@ const TEST_DATA = [
         savedRecord: 'cat3-A-BRT',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL on GFV: Bug #5 fake Z → "...000Z". Raw survives same-TZ reload.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-D-BRT-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-D-BRT-BRT.md',
     },
     {
         id: '3-D-BRT-IST',
@@ -829,7 +829,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL on GFV: Bug #5 fake Z in IST context. Raw TZ-invariant (ignoreTZ field).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-D-BRT-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-D-BRT-IST.md',
     },
     {
         id: '3-A-BRT-IST',
@@ -847,7 +847,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Date-only cross-TZ (BRT→IST). Value survives — date-only strings not affected by TZ on reload.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-A-BRT-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-A-BRT-IST.md',
     },
     {
         id: '3-D-IST-BRT',
@@ -865,7 +865,7 @@ const TEST_DATA = [
         saveTz: 'IST',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL on GFV: Bug #5 fake Z. IST-saved Config D reloaded in BRT. Raw TZ-invariant.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-D-IST-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-D-IST-BRT.md',
     },
     {
         id: '3-G-BRT-BRT',
@@ -882,7 +882,7 @@ const TEST_DATA = [
         savedRecord: 'cat3-G-BRT',
         bugs: [],
         notes: 'Legacy DateTime same-TZ reload (BRT→BRT). Value survives intact — parseDateString roundtrip stable when no Z to strip. GFV returns raw unchanged (useLegacy=true).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-G-BRT-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-G-BRT-BRT.md',
     },
     {
         id: '3-E-BRT-BRT',
@@ -899,7 +899,7 @@ const TEST_DATA = [
         savedRecord: 'cat3-EF-BRT',
         bugs: [],
         notes: 'Legacy date-only same-TZ reload (BRT→BRT). Value survives — date-only string unchanged through parseDateString. Same as 3-A-BRT-BRT.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-E-BRT-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-E-BRT-BRT.md',
     },
     {
         id: '3-F-BRT-BRT',
@@ -916,7 +916,7 @@ const TEST_DATA = [
         savedRecord: 'cat3-EF-BRT',
         bugs: [],
         notes: 'Legacy date-only + ignoreTZ same-TZ reload (BRT→BRT). ignoreTZ inert for date-only. Same as 3-E-BRT-BRT.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-F-BRT-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-F-BRT-BRT.md',
     },
     {
         id: '3-H-BRT-BRT',
@@ -933,7 +933,7 @@ const TEST_DATA = [
         savedRecord: 'cat3-H-BRT',
         bugs: [],
         notes: 'Legacy DateTime + ignoreTZ same-TZ reload (BRT→BRT). Value survives — useLegacy=true bypasses Bug #5 fake Z. GFV returns raw unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-H-BRT-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-H-BRT-BRT.md',
     },
     {
         id: '3-E-BRT-IST',
@@ -951,7 +951,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Legacy date-only cross-TZ reload (BRT→IST). Date-only string survives — same as 3-A-BRT-IST. useLegacy inert for date-only.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-E-BRT-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-E-BRT-IST.md',
     },
     {
         id: '3-H-BRT-IST',
@@ -969,7 +969,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Legacy DateTime + ignoreTZ cross-TZ reload (BRT→IST). useLegacy=true bypasses Bug #5 fake Z. Compare with 3-D-BRT-IST (non-legacy, Bug #5).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-H-BRT-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-H-BRT-IST.md',
     },
     {
         id: '3-C-IST-BRT',
@@ -987,7 +987,7 @@ const TEST_DATA = [
         saveTz: 'IST',
         bugs: ['Bug #1', 'Bug #4'],
         notes: 'EXPECTED FAIL: Cross-TZ reload IST→BRT. Raw string survives ("2026-03-15T00:00:00") but GFV reinterprets as BRT midnight (T03:00:00.000Z) instead of preserving IST midnight (T18:30:00.000Z). 8.5h UTC shift due to Bug #1+#4 timezone stripping.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-3-C-IST-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-3-C-IST-BRT.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 6 — Current Date Default
@@ -1008,7 +1008,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Current Date auto-populates correctly in IST. Uses new Date() → UTC timestamp, skipping Bug #7 moment parsing. Stored as Date object. Cross-midnight edge: if tested 00:00-05:30 IST, UTC date may be previous day.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-A-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-A-IST.md',
     },
     {
         id: '6-A-BRT',
@@ -1024,7 +1024,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Config A Current Date in BRT. new Date() → UTC timestamp stored as Date object. Display = today in BRT. Cross-midnight edge: 00:00-02:59 BRT, UTC date is next day but display should show BRT local date.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-A-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-A-BRT.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 8 — GetFieldValue Return
@@ -1045,7 +1045,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: [],
         notes: 'Control test: empty Config A field returns "". Confirms Bug #6 is absent for enableTime=false. Bug #6 requires enableTime=true && ignoreTimezone=true (Config D).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-A-empty.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-A-empty.md',
     },
     {
         id: '8-C-empty',
@@ -1061,7 +1061,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: ['Bug #6'],
         notes: 'EXPECTED FAIL: Bug #6 variant — GFV THROWS RangeError instead of returning "". Correct: empty string. new Date("").toISOString() throws.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-C-empty.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-C-empty.md',
     },
     {
         id: '8-H-BRT',
@@ -1077,7 +1077,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Config H legacy control: useLegacy=true skips Bug #5 fake-Z branch. GFV returns raw value unchanged. Zero round-trip drift — contrasts Config D which drifts -3h/trip in BRT.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-H-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-H-BRT.md',
     },
     {
         id: '8-A',
@@ -1093,7 +1093,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Config A date-only: GFV returns raw date string unchanged. No transformation, no bugs. TZ-independent behavior.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-A.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-A.md',
     },
     {
         id: '8-C-BRT',
@@ -1109,7 +1109,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Config C real UTC: GFV correctly converts local BRT midnight to UTC (+3h). No fake Z — real timezone conversion.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-C-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-C-BRT.md',
     },
     {
         id: '8-C-IST',
@@ -1125,7 +1125,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-14T18:30:00.000Z',
         bugs: [],
         notes: 'Config C real UTC from IST: local midnight = previous UTC day (Mar 14 18:30Z). Day crossing is correct behavior.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-C-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-C-IST.md',
     },
     {
         id: '8-D-BRT',
@@ -1141,7 +1141,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 GFV adds fake Z → returns "2026-03-15T00:00:00.000Z". Correct behavior: raw value without transformation.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-D-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-D-BRT.md',
     },
     {
         id: '8-D-IST',
@@ -1157,7 +1157,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 same fake Z in IST — "2026-03-15T00:00:00.000Z". TZ-invariant: same fake Z as BRT proves it is not real UTC.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-D-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-D-IST.md',
     },
     {
         id: '8-D-empty',
@@ -1173,7 +1173,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: ['Bug #6'],
         notes: 'EXPECTED FAIL: Bug #6 GFV returns "Invalid Date" for empty Config D field. Correct: empty string. moment("").format() → "Invalid Date" truthy string.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-D-empty.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-D-empty.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 8B — GetDateObjectFromCalendar Return
@@ -1197,7 +1197,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT-0300',
         bugs: [],
         notes: 'GDOC returns real Date object with correct UTC. toISOString() gives real UTC (BRT midnight + 3h). Contrasts Bug #5: GFV returns fake Z "T00:00:00.000Z" while GDOC gives correct "T03:00:00.000Z".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-D-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-D-BRT.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 9-GDOC — Round-Trip via GetDateObjectFromCalendar
@@ -1220,7 +1220,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'GDOC round-trip is STABLE in BRT (0 drift). Real UTC "T03:00:00.000Z" → normalizeCalValue correctly parses Z → stores local midnight unchanged. Matrix prediction of -3h corrected. Safe alternative to GFV round-trip (Bug #5 drifts -3h/trip).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-GDOC-D-BRT-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-GDOC-D-BRT-1.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 9 — Round-Trip (GFV: SetFieldValue → GetFieldValue → SetFieldValue)
@@ -1242,7 +1242,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Config H legacy control: useLegacy=true means GFV returns raw (no fake Z), so SFV(GFV()) is identity. Zero drift — contrasts Config D which drifts -3h/trip in BRT.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-H-BRT-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-H-BRT-1.md',
     },
     {
         id: '9-C-BRT-1',
@@ -1259,7 +1259,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Config C stable control: ignoreTimezone=false means GFV uses real UTC conversion, not fake-Z branch. Zero drift — proves Bug #5 is isolated to ignoreTimezone=true.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-C-BRT-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-C-BRT-1.md',
     },
     {
         id: '9-D-BRT-1',
@@ -1276,7 +1276,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 fake Z causes -3h drift after 1 trip. GFV returns "...000Z" → SFV parses as UTC → BRT local = -3h → stored "2026-03-14T21:00:00".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-BRT-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-BRT-1.md',
     },
     {
         id: '9-D-BRT-8',
@@ -1293,7 +1293,7 @@ const TEST_DATA = [
         trips: 8,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 cumulative drift. 8 trips × -3h = -24h → full day lost. Stored value becomes "2026-03-14T00:00:00".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-BRT-8.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-BRT-8.md',
     },
     {
         id: '9-D-BRT-10',
@@ -1310,7 +1310,7 @@ const TEST_DATA = [
         trips: 10,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 cumulative drift. 10 trips × -3h = -30h → "2026-03-13T18:00:00". Nearly 2 days lost.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-BRT-10.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-BRT-10.md',
     },
     {
         id: '9-D-IST-1',
@@ -1327,7 +1327,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 in IST causes +5:30h forward drift after 1 trip. Opposite direction from BRT (-3h). Stored "2026-03-15T05:30:00".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-IST-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-IST-1.md',
     },
     {
         id: '9-D-IST-5',
@@ -1344,7 +1344,7 @@ const TEST_DATA = [
         trips: 5,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 cumulative drift in IST. 5 trips × +5:30h = +27:30h → day boundary crossed → "2026-03-16T03:30:00".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-IST-5.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-IST-5.md',
     },
     {
         id: '9-C-IST-1',
@@ -1361,7 +1361,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Config C stable in IST: real UTC conversion round-trips correctly. GFV returns real UTC → SFV parses back to local. Zero drift.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-C-IST-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-C-IST-1.md',
     },
     {
         id: '9-A-any',
@@ -1378,7 +1378,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Config A date-only immune to Bug #5. GFV returns raw date string → SFV stores unchanged. enableTime=false skips fake-Z branch.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-A-any.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-A-any.md',
     },
     {
         id: '9-B-any',
@@ -1395,7 +1395,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Config B: ignoreTimezone=true has no effect on date-only fields. Same zero drift as Config A. Proves Bug #5 requires enableTime=true + ignoreTimezone=true.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-B-any.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-B-any.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 12 — Edge Cases
@@ -1417,7 +1417,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Bug #5 control at UTC+0: fake Z is coincidentally correct because local midnight = UTC midnight. Zero drift — proves Bug #5 drift is proportional to TZ offset (BRT -3h, UTC 0, IST +5:30h).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-utc-0-control.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-utc-0-control.md',
     },
     {
         id: '12-near-midnight-1',
@@ -1433,7 +1433,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-14T21:30:00',
         bugs: ['Bug #5'],
         notes: 'ISO+Z near midnight: UTC 00:30 → BRT Mar 14 21:30. Day crosses on input. Bug #5 fake Z creates double jeopardy: shifted value + will drift on round-trips.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-near-midnight-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-near-midnight-1.md',
     },
     {
         id: '12-near-midnight-2',
@@ -1450,7 +1450,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Near-midnight round-trip. 23:00 -3h = 20:00 (stays same day after 1 trip). Subsequent trips: 20→17→14→11→08→05→02→23 (day crossed after 8 trips from 23:00).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-near-midnight-2.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-near-midnight-2.md',
     },
     {
         id: '12-dst-transition',
@@ -1467,7 +1467,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: US DST transition day (Mar 8 2026 02:00). BRT has no DST — standard -3h drift. 02:00 -3h = previous day 23:00. Needs retest from US TZ browser.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-dst-transition.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-dst-transition.md',
     },
     {
         id: '12-year-boundary',
@@ -1484,7 +1484,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Year boundary crossed in single trip! Jan 1 2026 midnight -3h = Dec 31 2025 21:00. Most dramatic Bug #5 consequence.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-year-boundary.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-year-boundary.md',
     },
     {
         id: '12-leap-day',
@@ -1501,7 +1501,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Leap day lost in single trip! Feb 29 midnight -3h = Feb 28 21:00. Single round-trip permanently corrupts leap day data.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-leap-day.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-leap-day.md',
     },
     {
         id: '12-empty-value',
@@ -1517,7 +1517,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: ['Bug #6'],
         notes: 'EXPECTED FAIL: Bug #6 GFV returns "Invalid Date" for empty Config D field. moment("").format() → truthy string breaking if(GFV()) guards.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-empty-value.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-empty-value.md',
     },
     {
         id: '12-invalid-string',
@@ -1533,7 +1533,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: ['Bug #6'],
         notes: 'Invalid input silently ignored by normalizeCalValue(). Field stays empty → Bug #6 fires on empty state. No error thrown.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-invalid-string.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-invalid-string.md',
     },
     {
         id: '12-far-future',
@@ -1550,7 +1550,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Standard -3h drift at far-future date. No JS Date overflow or special issue. Verifies V8 stability at extreme ranges.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-far-future.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-far-future.md',
     },
     {
         id: '12-pre-epoch',
@@ -1567,7 +1567,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Standard -3h drift on pre-Unix-epoch date. Negative epoch handled correctly by JS Date. No special issue.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-pre-epoch.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-pre-epoch.md',
     },
     {
         id: '12-near-midnight-1-IST',
@@ -1583,7 +1583,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T06:00:00',
         bugs: ['Bug #5'],
         notes: 'ISO+Z near midnight in IST: UTC 00:30 + 5:30 = IST 06:00. No day crossing (contrast: BRT crosses to Mar 14). Bug #5 fake Z on GFV.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-near-midnight-1-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-near-midnight-1-IST.md',
     },
     {
         id: '12-near-midnight-2-IST',
@@ -1600,7 +1600,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Near-midnight round-trip in IST. +5:30h drift → 04:30 next day. Day crosses FORWARD after 1 trip (opposite of BRT -3h staying same day).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-near-midnight-2-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-near-midnight-2-IST.md',
     },
     {
         id: '12-year-boundary-IST',
@@ -1617,7 +1617,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Year boundary in IST. +5:30h drift stays in 2026 (opposite of BRT which crosses to 2025). Less destructive at year boundaries for UTC+ users.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-year-boundary-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-year-boundary-IST.md',
     },
     {
         id: '12-leap-day-IST',
@@ -1634,7 +1634,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Leap day in IST. +5:30h drift preserves Feb 29 (opposite of BRT which loses leap day to Feb 28). Bug #5 impact is TZ-dependent.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-leap-day-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-leap-day-IST.md',
     },
     {
         id: '12-null-input',
@@ -1650,7 +1650,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: ['Bug #6'],
         notes: 'EXPECTED FAIL: Bug #6 on null input. SFV(null) normalizes to empty → GFV returns "Invalid Date" (truthy). Identical to "" path — null is not distinct.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-null-input.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-null-input.md',
     },
     {
         id: '12-empty-Config-A',
@@ -1666,7 +1666,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: [],
         notes: 'Control: empty Config A returns "". Confirms Bug #6 requires enableTime=true. Config A (enableTime=false) is immune.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-empty-Config-A.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-empty-Config-A.md',
     },
     {
         id: '12-empty-Config-C',
@@ -1682,7 +1682,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: ['Bug #6'],
         notes: 'EXPECTED FAIL: Bug #6 variant — GFV throws RangeError. new Date("").toISOString() throws. Different from Config D "Invalid Date" string: C crashes, D returns bad data.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-empty-Config-C.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-empty-Config-C.md',
     },
     {
         id: '12-config-C-near-midnight',
@@ -1699,7 +1699,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Control: Config C round-trip at near-midnight is stable. Real UTC conversion (23:00 BRT = 02:00Z) → SFV parses Z back to same local. 0 drift. Proves FORM-BUG-5 is D-specific.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-config-C-near-midnight.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-config-C-near-midnight.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Batch 2026-04-01 — Critical pending tests (12 entries)
@@ -1720,7 +1720,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Config B date-only control: ignoreTZ=true has no effect on GFV for date-only fields. Returns raw value unchanged, same as Config A.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-B.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-B.md',
     },
     {
         id: '8-H-empty',
@@ -1736,7 +1736,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: [],
         notes: 'Config H empty field: useLegacy=true prevents Bug #6. GFV returns "" (correct). Contrasts Config D empty which returns "Invalid Date" (Bug #6).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-H-empty.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-H-empty.md',
     },
     {
         id: '8-D-empty-IST',
@@ -1752,7 +1752,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: ['Bug #6'],
         notes: 'EXPECTED FAIL: Bug #6 in IST — confirms TZ-independent. GFV returns "Invalid Date" (truthy) for empty Config D. Same behavior as BRT.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-D-empty-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-D-empty-IST.md',
     },
     {
         id: '8-C-UTC0',
@@ -1768,7 +1768,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00.000Z',
         bugs: [],
         notes: 'Config C at UTC+0: real UTC = stored+Z. Trivially correct at UTC boundary. Completes 3-TZ spectrum.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-C-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-C-UTC0.md',
     },
     {
         id: '8-D-UTC0',
@@ -1784,7 +1784,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00.000Z',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 fake Z at UTC+0 — coincidentally correct (0h drift). Structurally present but invisible.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-D-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-D-UTC0.md',
     },
     {
         id: '8-E',
@@ -1800,7 +1800,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Legacy date-only Config E: GFV returns raw unchanged. Identical to Config A. useLegacy inert for date-only.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-E.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-E.md',
     },
     {
         id: '8-F',
@@ -1816,7 +1816,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Legacy date-only + ignoreTZ Config F: GFV returns raw unchanged. Both flags inert for date-only. All 4 date-only configs identical.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-F.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-F.md',
     },
     {
         id: '8-G-BRT',
@@ -1832,7 +1832,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Legacy DateTime Config G: GFV returns raw unchanged (NOT real UTC). useLegacy=true skips non-legacy branch. Same as Config H.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-G-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-G-BRT.md',
     },
     {
         id: '8-H-IST',
@@ -1848,7 +1848,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Config H IST: GFV returns raw unchanged, TZ-invariant. Confirms H-BRT. useLegacy=true prevents Bug #5.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-H-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-H-IST.md',
     },
     {
         id: '8-V2',
@@ -1864,7 +1864,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'V2 code path: GFV returns raw unchanged. Bug #5 absent. V2 bypasses all GFV transformations (no UTC conv, no fake Z).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8-V2.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8-V2.md',
     },
     // --- Category 8B additions ---
     {
@@ -1883,7 +1883,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT+0530',
         bugs: [],
         notes: 'GDOC returns correct real UTC in IST. toISOString() = "2026-03-14T18:30:00.000Z" (IST midnight in UTC). Contrasts GFV fake Z "T00:00:00.000Z". Confirms GDOC as safe alternative in UTC+ timezones.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-D-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-D-IST.md',
     },
     {
         id: '8B-D-empty',
@@ -1901,7 +1901,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: null,
         bugs: [],
         notes: 'GDOC returns undefined for empty Config D field (not null). No throw, no "Invalid Date". Falsy value — safe for developer checks. Contrasts Bug #6 in GFV.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-D-empty.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-D-empty.md',
     },
     {
         id: '8B-A-BRT',
@@ -1919,7 +1919,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT-0300',
         bugs: [],
         notes: 'Date-only Config A GDOC: creates Date at local BRT midnight. toISOString gives real UTC (+3h). Identical to Config E (legacy).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-A-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-A-BRT.md',
     },
     {
         id: '8B-A-IST',
@@ -1937,7 +1937,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 14 2026 00:00:00 GMT+0530',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 upstream stores "2026-03-14" instead of "2026-03-15". GDOC correctly reads the corrupted value. Failure is in SetFieldValue, not GDOC.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-A-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-A-IST.md',
     },
     {
         id: '8B-A-UTC0',
@@ -1955,7 +1955,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT+0000',
         bugs: [],
         notes: 'Date-only GDOC at UTC+0: toISOString = stored+Z trivially. Bug #7 absent (local=UTC).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-A-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-A-UTC0.md',
     },
     {
         id: '8B-C-BRT',
@@ -1973,7 +1973,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT-0300',
         bugs: [],
         notes: 'Config C GDOC matches GFV — both return real UTC. Only config where GDOC.toISOString() = GFV.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-C-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-C-BRT.md',
     },
     {
         id: '8B-C-IST',
@@ -1991,7 +1991,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT+0530',
         bugs: [],
         notes: 'Config C DateTime GDOC in IST. Day crossing correct (Mar 14 18:30Z). No Bug #7 for DateTime.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-C-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-C-IST.md',
     },
     {
         id: '8B-D-UTC0',
@@ -2009,7 +2009,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT+0000',
         bugs: [],
         notes: 'Config D GDOC at UTC+0. GDOC.toISOString() and GFV fake Z produce identical strings. Bug #5 invisible here.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-D-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-D-UTC0.md',
     },
     {
         id: '8B-A-empty',
@@ -2027,7 +2027,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: null,
         bugs: [],
         notes: 'GDOC returns undefined for empty date-only Config A. Falsy, safe for developer checks. Same as 8B-D-empty.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-A-empty.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-A-empty.md',
     },
     {
         id: '8B-E-BRT',
@@ -2045,7 +2045,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT-0300',
         bugs: [],
         notes: 'Legacy date-only Config E GDOC identical to Config A. useLegacy inert for date-only GDOC.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-E-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-E-BRT.md',
     },
     {
         id: '8B-H-BRT',
@@ -2063,7 +2063,7 @@ const TEST_DATA = [
         expectedGdocToStringContains: 'Mar 15 2026 00:00:00 GMT-0300',
         bugs: [],
         notes: 'Legacy DateTime Config H GDOC correct. GDOC gives real UTC, GFV gives raw local — both correct for their APIs.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-8B-H-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-8B-H-BRT.md',
     },
     // --- Category 5 addition ---
     {
@@ -2080,7 +2080,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 fires on preset Date at form load. Raw = Date object (correct local date). GFV returns IST local time with fake Z (+5:30h offset). Config D preset fields are corrupted before any user interaction.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-D-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-D-IST.md',
     },
     // --- Category 5: Config B/C/D across BRT/IST ---
     {
@@ -2097,7 +2097,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T03:00:00.000Z',
         bugs: [],
         notes: 'Config B preset in BRT. Date-only + ignoreTZ. Raw = Date at BRT midnight (UTC 03:00). No Bug #7 in BRT (negative offset preserves date). Save extraction: toISOString().substring(0,10) = "2026-03-01".',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-B-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-B-BRT.md',
     },
     {
         id: '5-C-BRT',
@@ -2113,7 +2113,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-31T11:29:14.181Z',
         bugs: [],
         notes: 'Config C preset in BRT. DateTime + ignoreTZ=false. Raw = Date identical to initialDate ("2026-03-31T11:29:14.181Z") — DateTime presets bypass parseDateString truncation. GFV uses new Date(value).toISOString() → same real UTC ISO. TZ-independent.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-C-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-C-BRT.md',
     },
     {
         id: '5-D-BRT',
@@ -2129,7 +2129,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 fires on preset Date at form load in BRT. Raw = Date object (initialDate preserved as "2026-03-01T11:28:54.627Z"). GFV returns BRT local time with fake Z ("2026-03-01T08:28:54.627Z" — shifted -3h). Config D preset fields corrupted before any user interaction.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-D-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-D-BRT.md',
     },
     {
         id: '5-B-IST',
@@ -2145,7 +2145,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 on preset init path. Config B ignoreTZ=true does not protect preset — parseDateString hardcodes ignoreTimezone=true regardless (Bug #3). moment("2026-03-01...").startOf("day").toDate() → IST midnight → Feb 28 UTC. Display correct (03/01/2026) but internal UTC date wrong.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-B-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-B-IST.md',
     },
     {
         id: '5-C-IST',
@@ -2161,7 +2161,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-31T11:29:14.181Z',
         bugs: [],
         notes: 'Config C preset in IST. DateTime + ignoreTZ=false. Identical raw and API to tc-5-C-BRT — DateTime presets store raw Date from initialDate, which is TZ-independent. Confirms Config C preset is safe across timezones.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-C-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-C-IST.md',
     },
     // --- Category 5: UTC0 + PST controls ---
     {
@@ -2178,7 +2178,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T00:00:00.000Z',
         bugs: [],
         notes: 'Config A preset at UTC+0. Bug #7 boundary control: local midnight = UTC midnight, no date shift. Save extraction "2026-03-01" correct. Deepest boundary where Bug #7 transitions from safe (UTC-) to destructive (UTC+).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-A-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-A-UTC0.md',
     },
     {
         id: '5-C-UTC0',
@@ -2194,7 +2194,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-31T11:29:14.181Z',
         bugs: [],
         notes: 'Config C preset at UTC+0. DateTime + ignoreTZ=false. Identical to BRT and IST — completes 3-TZ matrix confirming Config C DateTime presets are fully timezone-independent.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-C-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-C-UTC0.md',
     },
     {
         id: '5-D-UTC0',
@@ -2210,7 +2210,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 at UTC+0. GFV returns "2026-03-01T11:28:54.627Z" (fake Z). Value is numerically correct (local=UTC) but Z is structurally wrong. Round-trip stable (0h drift). Bug #5 invisible at UTC+0 but architecturally present.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-D-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-D-UTC0.md',
     },
     {
         id: '5-A-PST',
@@ -2226,7 +2226,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T08:00:00.000Z',
         bugs: [],
         notes: 'Config A preset at PST (UTC-8). Deepest UTC- control. PST midnight March 1 = UTC 08:00 March 1. Negative offset preserves date. TZ check shows GMT-0700 (PDT in April) but preset date uses PST offset for March 1.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-A-PST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-A-PST.md',
     },
     // --- Category 5: Legacy configs E/F/G/H ---
     {
@@ -2243,7 +2243,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T03:00:00.000Z',
         bugs: [],
         notes: 'Legacy date-only preset in BRT. Behavior identical to non-legacy Config A. parseDateString truncates to midnight; useLegacy has no effect on date-only init path.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-E-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-E-BRT.md',
     },
     {
         id: '5-F-BRT',
@@ -2259,7 +2259,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T03:00:00.000Z',
         bugs: [],
         notes: 'Legacy date-only + ignoreTZ preset in BRT. Identical to E-BRT. ignoreTZ=true inert on preset path (Bug #3 hardcodes it).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-F-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-F-BRT.md',
     },
     {
         id: '5-G-BRT',
@@ -2275,7 +2275,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T11:32:23.628Z',
         bugs: [],
         notes: 'Legacy DateTime preset in BRT. Raw Date identical to initialDate — DateTime presets bypass parseDateString. Legacy GFV returns raw Date unchanged. Same behavior as non-legacy Config C.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-G-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-G-BRT.md',
     },
     {
         id: '5-H-BRT',
@@ -2291,7 +2291,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01T11:33:07.735Z',
         bugs: [],
         notes: 'Legacy DateTime + ignoreTZ preset in BRT. No Bug #5 fake Z — legacy getCalendarFieldValue returns raw value (requires !useLegacy for fake Z path). Safer than non-legacy Config D.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-H-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-H-BRT.md',
     },
     {
         id: '5-E-IST',
@@ -2307,7 +2307,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 on legacy preset init path. useLegacy=true does not protect — parseDateString is shared. IST midnight March 1 = Feb 28 UTC. Display correct but internal Date wrong. Same as non-legacy 5-A-IST.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-E-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-E-IST.md',
     },
     {
         id: '5-F-IST',
@@ -2323,7 +2323,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-01',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 on legacy preset. Neither ignoreTZ=true nor useLegacy=true protects preset path. All 4 date-only configs (A,B,E,F) show identical Bug #7 in IST.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-5-F-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-5-F-IST.md',
     },
     // --- Category 6 addition ---
     {
@@ -2340,7 +2340,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 fires on Current Date at form load. Raw = correct Date object (today in IST). GFV returns IST local time with fake Z (+5:30h offset vs real UTC). Config D current-date fields corrupted before user interaction.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-D-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-D-IST.md',
     },
     // --- Category 6: BRT + UTC0 additions ---
     {
@@ -2357,7 +2357,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Config B Current Date in BRT. ignoreTZ=true has no effect on new Date() init path. Identical behavior to 6-A-BRT. Date object stored with correct UTC timestamp.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-B-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-B-BRT.md',
     },
     {
         id: '6-C-BRT',
@@ -2373,7 +2373,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Config C DateTime Current Date in BRT. Stores real UTC timestamp. GFV returns real UTC ISO via new Date(value).toISOString(). No transformation bugs.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-C-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-C-BRT.md',
     },
     {
         id: '6-D-BRT',
@@ -2389,7 +2389,7 @@ const TEST_DATA = [
         expectedApi: '',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 fires on Current Date at form load in BRT. Raw = correct Date (new Date() → UTC). GFV returns BRT local time with fake Z (-3h shift). Same behavior as 5-D-BRT (preset) and 6-D-IST (+5:30h).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-D-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-D-BRT.md',
     },
     {
         id: '6-A-UTC0',
@@ -2405,7 +2405,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Config A Current Date at UTC+0. Trivially correct — local = UTC. Completes 3-TZ spectrum for 6-A (BRT PASS, IST PASS, UTC0 PASS). No cross-midnight edge possible.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-A-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-A-UTC0.md',
     },
     // --- Category 6: IST B/C + legacy E/F/G/H ---
     {
@@ -2422,7 +2422,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Config B Current Date in IST. ignoreTZ inert on new Date() path. Cross-midnight edge: IST April 4 while UTC April 3 — local date interpretation correctly shows IST today.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-B-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-B-IST.md',
     },
     {
         id: '6-C-IST',
@@ -2438,7 +2438,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Config C DateTime Current Date in IST. GFV returns real UTC ISO via new Date(value).toISOString(). Cross-midnight active but DateTime value preserves full UTC timestamp.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-C-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-C-IST.md',
     },
     {
         id: '6-E-BRT',
@@ -2454,7 +2454,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Legacy date-only Current Date in BRT. new Date() bypasses all legacy-specific code paths. Behavior identical to non-legacy Config A.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-E-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-E-BRT.md',
     },
     {
         id: '6-F-BRT',
@@ -2470,7 +2470,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Legacy date-only + ignoreTZ Current Date in BRT. Both useLegacy and ignoreTZ inert on new Date() init path.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-F-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-F-BRT.md',
     },
     {
         id: '6-G-BRT',
@@ -2486,7 +2486,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Legacy DateTime Current Date in BRT. Stores correct UTC timestamp. Legacy GFV returns raw Date unchanged — no transformation.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-G-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-G-BRT.md',
     },
     {
         id: '6-H-BRT',
@@ -2502,7 +2502,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Legacy DateTime + ignoreTZ Current Date in BRT. No Bug #5 — useLegacy=true bypasses fake Z GFV path. Compare: non-legacy 6-D-BRT FAILS with Bug #5.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-H-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-H-BRT.md',
     },
     {
         id: '6-E-IST',
@@ -2518,7 +2518,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Legacy date-only Current Date in IST. No Bug #7 — new Date() bypasses moment parsing. Compare: preset 5-E-IST FAILS with Bug #7. Cross-midnight edge active.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-E-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-E-IST.md',
     },
     {
         id: '6-F-IST',
@@ -2534,7 +2534,7 @@ const TEST_DATA = [
         expectedApi: 'dynamic',
         bugs: [],
         notes: 'Legacy date-only + ignoreTZ Current Date in IST. No Bug #7. Both useLegacy and ignoreTZ inert on new Date() path. All date-only current date fields pass in IST.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-6-F-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-6-F-IST.md',
     },
     // --- Category 9 addition ---
     {
@@ -2552,7 +2552,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Config H legacy control in IST: 0 drift confirmed. useLegacy=true skips fake-Z branch regardless of timezone. Universal protection against Bug #5 — confirmed in BRT (9-H-BRT-1) and now IST.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-H-IST-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-H-IST-1.md',
     },
     {
         id: '9-D-BRT-3',
@@ -2569,7 +2569,7 @@ const TEST_DATA = [
         trips: 3,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 cumulative drift. 3 trips × -3h = -9h. Stored value becomes "2026-03-14T15:00:00". Crosses midnight backward.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-BRT-3.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-BRT-3.md',
     },
     {
         id: '9-D-IST-8',
@@ -2586,7 +2586,7 @@ const TEST_DATA = [
         trips: 8,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 cumulative drift. 8 trips × +5:30h = +44h. Stored "2026-03-16T20:00:00". Nearly 2 days forward.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-IST-8.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-IST-8.md',
     },
     {
         id: '9-D-IST-10',
@@ -2603,7 +2603,7 @@ const TEST_DATA = [
         trips: 10,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 cumulative drift. 10 trips × +5:30h = +55h. Stored "2026-03-17T07:00:00". >2 days forward.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-IST-10.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-IST-10.md',
     },
     {
         id: '9-D-UTC0',
@@ -2620,7 +2620,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'Bug #5 present but 0 drift at UTC+0 — fake Z coincidentally correct. PASS for round-trip (no value change).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-UTC0.md',
     },
     {
         id: '9-D-PST-1',
@@ -2637,7 +2637,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 in PDT (UTC-7, DST active Mar 15). 1 trip × -7h = -7h. Stored "2026-03-14T17:00:00". Most extreme UTC- tested.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-PST-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-PST-1.md',
     },
     {
         id: '9-D-JST-1',
@@ -2654,7 +2654,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 in JST (UTC+9). 1 trip × +9h = +9h. Stored "2026-03-15T09:00:00". Most extreme UTC+ tested.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-D-JST-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-D-JST-1.md',
     },
     {
         id: '9-B-IST',
@@ -2671,7 +2671,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 on date-only in IST. Initial SFV stores "2026-03-14" (Bug #7), then round-trip SFV stores "2026-03-13" (Bug #7 again). -1 day per SFV call.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-B-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-B-IST.md',
     },
     {
         id: '9-E-any',
@@ -2688,7 +2688,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Config E legacy date-only: 0 drift. Same as Config A/B in BRT. enableTime=false immune to Bug #5.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-E-any.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-E-any.md',
     },
     {
         id: '9-G-BRT-1',
@@ -2705,7 +2705,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'Config G legacy DateTime: 0 drift. useLegacy=true GFV returns raw (no UTC conversion, no fake Z). Round-trip stable.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-G-BRT-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-G-BRT-1.md',
     },
     // --- Category 9-GDOC addition ---
     {
@@ -2723,7 +2723,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'GDOC round-trip STABLE in IST (0 drift). Matrix prediction of +5:30h was WRONG. GDOC.toISOString() = real UTC "T18:30:00.000Z" → SFV parses correctly → stores local midnight unchanged. GDOC confirmed safe for round-trips in all tested TZs (BRT, IST).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-GDOC-D-IST-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-GDOC-D-IST-1.md',
     },
     {
         id: '9-GDOC-A-BRT-1',
@@ -2740,7 +2740,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'GDOC round-trip STABLE for Config A (date-only) in BRT. Real UTC "T03:00:00.000Z" → normalizeCalValue → BRT midnight Mar 15 → same date. No FORM-BUG-7 because UTC-3 midnight = same UTC day.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-GDOC-A-BRT-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-GDOC-A-BRT-1.md',
     },
     {
         id: '9-GDOC-C-BRT-1',
@@ -2757,7 +2757,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: [],
         notes: 'GDOC round-trip trivially stable for Config C. GDOC.toISOString() = real UTC (same as GFV for Config C). Both paths identical — ignoreTimezone=false uses real UTC conversion.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-GDOC-C-BRT-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-GDOC-C-BRT-1.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 7 — SetFieldValue Input Formats
@@ -2782,7 +2782,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'Date object input safe in BRT. moment(Date) → local midnight → stores correctly. GFV adds fake Z (Bug #5).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-dateObj.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-dateObj.md',
     },
     {
         id: '7-D-isoZ',
@@ -2800,7 +2800,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-14T21:00:00',
         bugs: ['Bug #5'],
         notes: 'ISO+Z causes -3h shift in BRT. UTC midnight → local Mar 14 21:00. Expected behavior for ignoreTimezone=true. GFV adds fake Z (Bug #5).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-isoZ.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-isoZ.md',
     },
     {
         id: '7-D-isoNoZ',
@@ -2818,7 +2818,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'ISO without Z safe. Treated as local → stored as-is. GFV adds fake Z (Bug #5). Recommended input format for Config D.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-isoNoZ.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-isoNoZ.md',
     },
     {
         id: '7-D-dateOnly',
@@ -2836,7 +2836,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'Date-only string → midnight appended → stored correctly. GFV adds fake Z (Bug #5).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-dateOnly.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-dateOnly.md',
     },
     {
         id: '7-D-usFormat',
@@ -2854,7 +2854,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'US format parsed and normalized to ISO local midnight. GFV adds fake Z (Bug #5).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-usFormat.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-usFormat.md',
     },
     {
         id: '7-D-usFormatTime',
@@ -2872,7 +2872,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'US format with time parsed and normalized. GFV adds fake Z (Bug #5).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-usFormatTime.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-usFormatTime.md',
     },
     {
         id: '7-D-epoch',
@@ -2890,7 +2890,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'Epoch 1773543600000 = BRT midnight Mar 15. Epoch→Date→local time stored. GFV adds fake Z (Bug #5).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-epoch.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-epoch.md',
     },
 
     // --- Config C, BRT ---
@@ -2910,7 +2910,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00.000Z',
         bugs: [],
         notes: 'Config C control. UTC→local on store (Mar 14 21:00 BRT). GFV correctly reconstructs UTC. No bugs.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-C-isoZ.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-C-isoZ.md',
     },
     {
         id: '7-C-isoNoZ',
@@ -2928,7 +2928,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Config C control. Treated as local BRT midnight → stored as-is. GFV returns real UTC (+3h). No drift.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-C-isoNoZ.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-C-isoNoZ.md',
     },
     {
         id: '7-C-dateOnly',
@@ -2946,7 +2946,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Config C control. Date-only string parsed as local BRT midnight → stored as-is. GFV returns real UTC (+3h).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-C-dateOnly.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-C-dateOnly.md',
     },
     {
         id: '7-C-dateObj',
@@ -2964,7 +2964,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Config C control. Date object at local BRT midnight → stored as-is. No double-shift (Bug #7 absent for DateTime).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-C-dateObj.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-C-dateObj.md',
     },
     {
         id: '7-C-usFormat',
@@ -2982,7 +2982,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Config C control. US format parsed as local BRT midnight → identical to date-only and ISO-without-Z.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-C-usFormat.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-C-usFormat.md',
     },
     {
         id: '7-C-usFormatTime',
@@ -3000,7 +3000,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Config C control. US+time with explicit midnight → same as time-less US format. No new information from time component.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-C-usFormatTime.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-C-usFormatTime.md',
     },
     {
         id: '7-C-epoch',
@@ -3018,7 +3018,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Config C control. Epoch 1773543600000 = BRT midnight (2026-03-15T03:00:00Z). Unambiguous input. GFV returns real UTC.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-C-epoch.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-C-epoch.md',
     },
 
     // --- Config A, BRT ---
@@ -3038,7 +3038,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Config A date-only passes in BRT (UTC-). Bug #7 only fires in UTC+ timezones. BRT control for IST sibling.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-A-dateOnly.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-A-dateOnly.md',
     },
     {
         id: '7-A-isoZ',
@@ -3056,7 +3056,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Config A strips time+Z from ISO input → date extracted correctly in BRT. In IST, Bug #7 would shift -1 day.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-A-isoZ.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-A-isoZ.md',
     },
 
     // --- Config A, IST ---
@@ -3076,7 +3076,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 stores "2026-03-14" (-1 day). moment("2026-03-15").toDate() = IST midnight → UTC Mar 14 → getSaveValue extracts wrong day.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-A-dateOnly-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-A-dateOnly-IST.md',
     },
     {
         id: '7-A-dateObj-IST',
@@ -3094,7 +3094,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 double-shift stores "2026-03-13" (-2 days). Date→toISOString→strip→reparse crosses TZ boundary twice.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-A-dateObj-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-A-dateObj-IST.md',
     },
 
     // --- Config D, IST ---
@@ -3114,7 +3114,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'Date object input SAFE for Config D DateTime in IST. moment(Date) → local midnight → stores "2026-03-15T00:00:00" (correct). No double-shift unlike date-only Config A. GFV adds fake Z (Bug #5).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-dateObj-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-dateObj-IST.md',
     },
     {
         id: '7-D-isoZ-IST',
@@ -3132,7 +3132,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: ISO+Z input causes +5:30h shift in IST. UTC midnight parsed as IST 05:30 AM → stored as "2026-03-15T05:30:00". Developers must use ISO without Z for Config D to avoid shift.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-isoZ-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-isoZ-IST.md',
     },
     {
         id: '7-D-isoNoZ-IST',
@@ -3150,7 +3150,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['Bug #5'],
         notes: 'ISO without Z SAFE for Config D in IST. Treated as local time → stores unchanged. GFV adds fake Z (Bug #5). This is the recommended input format for Config D.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-D-isoNoZ-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-D-isoNoZ-IST.md',
     },
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -3173,7 +3173,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Date object safe in BRT. moment(Date) → local midnight → getSaveValue extracts correct date. In IST, double-shift (-2 days).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-A-dateObj-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-A-dateObj-BRT.md',
     },
     {
         id: '7-A-isoNoZ',
@@ -3191,7 +3191,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'ISO without Z parsed as local midnight. Time stripped for date-only Config A. Safe in BRT.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-A-isoNoZ.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-A-isoNoZ.md',
     },
     {
         id: '7-A-usFormat',
@@ -3209,7 +3209,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'US date format parsed by moment as local midnight. Correct in BRT. Bug #7 would shift in UTC+.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-A-usFormat.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-A-usFormat.md',
     },
     {
         id: '7-A-usFormatTime',
@@ -3227,7 +3227,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'US format with time component. Time stripped for date-only Config A. Same result as plain US format.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-A-usFormatTime.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-A-usFormatTime.md',
     },
     {
         id: '7-A-epoch',
@@ -3245,7 +3245,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Epoch 1773543600000 = BRT midnight Mar 15. Epoch→Date→local date extracted correctly. TZ-aware by nature.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-A-epoch.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-A-epoch.md',
     },
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -3268,7 +3268,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Config B date-only identical to Config A in BRT. ignoreTZ inert on date-only fields. BRT control for IST sibling.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-B-dateOnly-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-B-dateOnly-BRT.md',
     },
     {
         id: '7-B-isoZ-BRT',
@@ -3286,7 +3286,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Config B ISO+Z identical to Config A isoZ. Z stripped, date extracted correctly in BRT.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-B-isoZ-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-B-isoZ-BRT.md',
     },
     {
         id: '7-B-dateObj-BRT',
@@ -3304,7 +3304,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Config B Date object identical to Config A dateObj-BRT. ignoreTZ inert. BRT control for IST sibling.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-B-dateObj-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-B-dateObj-BRT.md',
     },
     {
         id: '7-B-dateOnly-IST',
@@ -3322,7 +3322,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 stores "2026-03-14" (-1 day). Identical to A-dateOnly-IST. ignoreTZ does not protect date-only fields.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-B-dateOnly-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-B-dateOnly-IST.md',
     },
     {
         id: '7-B-dateObj-IST',
@@ -3340,7 +3340,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 double-shift stores "2026-03-13" (-2 days). Identical to A-dateObj-IST. ignoreTZ does not protect.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-B-dateObj-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-B-dateObj-IST.md',
     },
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -3363,7 +3363,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Legacy date-only identical to Config A. useLegacy inert on date-only path. BRT control for IST sibling.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-E-dateOnly-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-E-dateOnly-BRT.md',
     },
     {
         id: '7-E-dateOnly-IST',
@@ -3381,7 +3381,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 stores "2026-03-14" (-1 day). useLegacy=true does NOT protect date-only fields from Bug #7.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-E-dateOnly-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-E-dateOnly-IST.md',
     },
     {
         id: '7-F-dateOnly-IST',
@@ -3399,7 +3399,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Bug #7 stores "2026-03-14" (-1 day). Neither useLegacy nor ignoreTZ protects date-only fields.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-F-dateOnly-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-F-dateOnly-IST.md',
     },
     {
         id: '7-G-isoNoZ-BRT',
@@ -3417,7 +3417,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Legacy DateTime. GFV returns raw value directly — useLegacy bypasses UTC conversion (unlike Config C). Same store as C-isoNoZ.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-G-isoNoZ-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-G-isoNoZ-BRT.md',
     },
     {
         id: '7-G-isoZ-BRT',
@@ -3435,7 +3435,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-14T21:00:00',
         bugs: [],
         notes: 'UTC→local shift correct (-3h BRT). GFV returns raw (no UTC reconversion like Config C). Key Config G vs C comparison.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-G-isoZ-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-G-isoZ-BRT.md',
     },
     {
         id: '7-H-isoNoZ-BRT',
@@ -3453,7 +3453,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Legacy DateTime + ignoreTZ. No fake Z on GFV (useLegacy=true protects). Key Bug #5 comparison with Config D.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-H-isoNoZ-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-H-isoNoZ-BRT.md',
     },
     {
         id: '7-H-isoZ-BRT',
@@ -3471,7 +3471,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-14T21:00:00',
         bugs: [],
         notes: 'Same UTC→local shift as D-isoZ. GFV returns raw without fake Z (useLegacy protects from Bug #5). Key comparison.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-H-isoZ-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-H-isoZ-BRT.md',
     },
     {
         id: '7-H-dateObj-BRT',
@@ -3489,7 +3489,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: [],
         notes: 'Date object stores local midnight. No fake Z on GFV (useLegacy=true). Compare Config D dateObj which adds fake Z (Bug #5).',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-7-H-dateObj-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-7-H-dateObj-BRT.md',
     },
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -4204,7 +4204,7 @@ const TEST_DATA = [
         trips: 3,
         bugs: [],
         notes: 'Config H multi-trip control: useLegacy=true GFV returns raw (no fake Z). 0 drift after 3 trips. Confirms legacy immunity to FORM-BUG-5 — safe for cross-TZ scenarios.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-H-BRT-roundtrip.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-H-BRT-roundtrip.md',
     },
     {
         id: '11-A-save-BRT-load-IST',
@@ -4222,7 +4222,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Cross-TZ load PASS: date-only raw survives BRT→IST. FORM-BUG-7 fires at input/save time, NOT at form load. Matrix prediction corrected.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-A-save-BRT-load-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-A-save-BRT-load-IST.md',
     },
     {
         id: '11-B-save-BRT-load-IST',
@@ -4240,7 +4240,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Cross-TZ load PASS: Config B (ignoreTimezone=true) date-only also survives BRT→IST. ignoreTZ irrelevant for date-only load path.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-B-save-BRT-load-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-B-save-BRT-load-IST.md',
     },
     {
         id: '11-C-save-BRT-load-IST',
@@ -4258,7 +4258,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Cross-TZ load: Config C DateTime raw preserved. GFV re-interprets timezone-ambiguous value as IST midnight (different UTC than BRT). Structural limitation, not load-time bug.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-C-save-BRT-load-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-C-save-BRT-load-IST.md',
     },
     {
         id: '11-E-save-BRT-load-IST',
@@ -4276,7 +4276,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Cross-TZ load PASS: Config E (legacy date-only, useLegacy=true) survives BRT→IST. Legacy immune to load-time corruption.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-E-save-BRT-load-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-E-save-BRT-load-IST.md',
     },
     {
         id: '11-D-save-BRT-load-IST',
@@ -4294,7 +4294,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: ['Bug #5'],
         notes: 'Cross-TZ load: Config D DateTime raw preserved. GFV adds FORM-BUG-5 fake Z on IST load. Raw survives; GFV deceptive.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-D-save-BRT-load-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-D-save-BRT-load-IST.md',
     },
     {
         id: '11-F-save-BRT-load-IST',
@@ -4312,7 +4312,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Cross-TZ load PASS: Config F (legacy date-only + ignoreTZ) survives BRT→IST. Same as Config E — legacy date-only immune.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-F-save-BRT-load-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-F-save-BRT-load-IST.md',
     },
     {
         id: '11-G-save-BRT-load-IST',
@@ -4330,7 +4330,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Cross-TZ load PASS: Config G (legacy DateTime) raw preserved. useLegacy=true GFV returns raw — ignoreTimezone=false irrelevant for legacy.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-G-save-BRT-load-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-G-save-BRT-load-IST.md',
     },
     {
         id: '11-H-save-BRT-load-IST',
@@ -4348,7 +4348,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Cross-TZ load PASS: Config H (legacy DateTime + ignoreTZ) raw preserved. useLegacy=true bypasses FORM-BUG-5 fake Z — immune to cross-TZ drift.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-H-save-BRT-load-IST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-H-save-BRT-load-IST.md',
     },
     {
         id: '11-save-IST-load-BRT',
@@ -4366,7 +4366,7 @@ const TEST_DATA = [
         saveTz: 'IST',
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Config A shows "2026-03-14" — pre-existing IST save-time FORM-BUG-7 corruption. BRT load is innocent (does not introduce new corruption). Config D on same record: raw preserved, Bug #5 fake Z on GFV.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-save-IST-load-BRT.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-save-IST-load-BRT.md',
     },
     // --- Category 9-GDOC addition ---
     {
@@ -4384,7 +4384,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #7'],
         notes: 'EXPECTED FAIL: Double FORM-BUG-7 compound shift. Initial SFV stores "2026-03-14" (-1d). GDOC ISO "2026-03-13T18:30:00.000Z" → SFV strips to "2026-03-13" → Bug #7 again → stores "2026-03-12" (-3d total). GDOC round-trip UNSAFE for date-only in UTC+.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-9-GDOC-A-IST-1.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-9-GDOC-A-IST-1.md',
     },
     {
         id: '11-roundtrip-cross',
@@ -4401,7 +4401,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Compound cross-TZ drift. IST round-trip +5:30h → BRT round-trip -3h → net +2:30h from midnight. Each TZ user applies their offset via Bug #5 fake Z. Worst-case multi-user scenario.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-roundtrip-cross.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-roundtrip-cross.md',
     },
     {
         id: '11-D-concurrent-IST-edit',
@@ -4418,7 +4418,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Concurrent multi-user edit. User A (IST) round-trips +5:30h, User B (BRT) round-trips -3h, net +2:30h. Two users independently trigger Bug #5 — shifts accumulate across users.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-D-concurrent-IST-edit.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-D-concurrent-IST-edit.md',
     },
     {
         id: '11-concurrent-edit',
@@ -4435,7 +4435,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: BRT→IST concurrent edit (reverse of 11-D-concurrent-IST-edit). User A (BRT) round-trips -3h (crosses day boundary to T21:00 Mar 14), User B (IST) round-trips +5:30h on drifted value, net +2:30h. Same net drift as IST→BRT, proving commutativity.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-concurrent-edit.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-concurrent-edit.md',
     },
     {
         id: '11-load-UTC0',
@@ -4454,7 +4454,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: [],
         notes: 'Bug #5 fake Z present but coincidentally correct at UTC+0 (local=UTC). 0 drift — masks the bug. Any non-zero TZ reveals drift.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-load-UTC0.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-load-UTC0.md',
     },
     {
         id: '11-load-PST',
@@ -4473,7 +4473,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 -7h drift (PDT, not -8h PST — DST active Mar 15). Matrix prediction corrected. Raw preserved on load; round-trip drifts to "T17:00:00" prev day.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-load-PST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-load-PST.md',
     },
     {
         id: '12-dst-US-PST',
@@ -4490,7 +4490,7 @@ const TEST_DATA = [
         trips: 1,
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: DST spring-forward + Bug #5 compound. V8 advances 2AM→3AM. Fake Z "T03:00:00.000Z" → UTC lands in pre-DST window → PST Mar 7 19:00 (-8h). Crosses day + DST boundary.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-12-dst-US-PST.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-12-dst-US-PST.md',
     },
     {
         id: '11-load-Tokyo',
@@ -4509,7 +4509,7 @@ const TEST_DATA = [
         saveTz: 'BRT',
         bugs: ['Bug #5'],
         notes: 'EXPECTED FAIL: Bug #5 +9h drift (JST). Largest positive offset tested. Fake Z midnight → UTC → JST 09:00. Completes TZ spectrum: BRT -3h, PDT -7h, UTC0 0h, IST +5:30h, JST +9h.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-11-load-Tokyo.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-11-load-Tokyo.md',
     },
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -4535,7 +4535,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Mask impact baseline: Config A date-only SetFieldValue. No bugs in BRT. Unmasked stores date-only string unchanged.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-A-SFV.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-A-SFV.md',
     },
     {
         id: '14-C-SFV',
@@ -4553,7 +4553,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T17:30:00.000Z',
         bugs: [],
         notes: 'Mask impact baseline: Config C DateTime SetFieldValue. Raw stores local time. API converts BRT local 14:30 → UTC 17:30Z.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-C-SFV.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-C-SFV.md',
     },
     {
         id: '14-D-SFV',
@@ -4571,7 +4571,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T14:30:00.000Z',
         bugs: ['FORM-BUG-5'],
         notes: 'EXPECTED FAIL: Bug #5 fake Z. Mask impact baseline: Config D DateTime+iTZ SetFieldValue. Raw correct; API appends .000Z to local time.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-D-SFV.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-D-SFV.md',
     },
     {
         id: '14-C-GFV',
@@ -4587,7 +4587,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T17:30:00.000Z',
         bugs: [],
         notes: 'Mask impact baseline: Config C GetFieldValue after SFV. Reads same value set by 14-C-SFV. API correctly converts local→UTC.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-C-GFV.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-C-GFV.md',
     },
     {
         id: '14-D-GFV',
@@ -4603,7 +4603,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T14:30:00.000Z',
         bugs: ['FORM-BUG-5'],
         notes: 'EXPECTED FAIL: Bug #5 fake Z. Mask impact baseline: Config D GetFieldValue after SFV. API appends .000Z to local time.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-D-GFV.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-D-GFV.md',
     },
     {
         id: '14-C-popup',
@@ -4619,7 +4619,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Mask impact baseline: Config C popup on Kendo v2 stores local midnight T00:00:00 (not UTC-equiv T03:00:00 as on Kendo v1). API converts correctly to T03:00:00.000Z.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-C-popup.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-C-popup.md',
     },
     {
         id: '14-D-popup',
@@ -4635,7 +4635,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00.000Z',
         bugs: ['FORM-BUG-5'],
         notes: 'EXPECTED FAIL: Bug #5 fake Z. Mask impact baseline: Config D popup local midnight. Raw correct; API appends .000Z.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-D-popup.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-D-popup.md',
     },
     {
         id: '14-C-typed',
@@ -4651,7 +4651,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Mask impact baseline: Config C typed input. Kendo v2 requires all segments (date+time+AM/PM). Stores local midnight, same as popup.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-C-typed.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-C-typed.md',
     },
     {
         id: '14-D-typed',
@@ -4667,7 +4667,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00.000Z',
         bugs: ['FORM-BUG-5'],
         notes: 'EXPECTED FAIL: Bug #5 fake Z. Mask impact baseline: Config D typed input. Same as popup — local midnight + fake Z.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-D-typed.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-D-typed.md',
     },
     {
         id: '14-C-save',
@@ -4683,7 +4683,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Mask impact baseline: Config C save+reload. Raw preserved through server round-trip. API correctly converts to UTC.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-C-save.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-C-save.md',
     },
     {
         id: '14-D-save',
@@ -4699,7 +4699,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00.000Z',
         bugs: ['FORM-BUG-5'],
         notes: 'EXPECTED FAIL: Bug #5 fake Z persists after reload. Raw preserved but GetFieldValue still appends .000Z.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-D-save.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-D-save.md',
     },
     {
         id: '14-C-API',
@@ -4715,7 +4715,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00Z',
         bugs: [],
         notes: 'Mask impact baseline: Config C API read (getForms). Server returns T00:00:00Z — stores local midnight with Z appended by serializer.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-C-API.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-C-API.md',
     },
     {
         id: '14-D-API',
@@ -4731,7 +4731,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00Z',
         bugs: [],
         notes: 'Mask impact baseline: Config D API read. IDENTICAL to Config C — server stores C=D uniformly. ignoreTimezone has no effect at API level.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-14-D-API.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-14-D-API.md',
     },
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -4757,7 +4757,7 @@ const TEST_DATA = [
         expectedApiServer: '2026-03-15T00:00:00Z',
         bugs: [],
         notes: 'Server TZ test: Config A typed on vv5dev (server PDT). API returns T00:00:00Z. Awaiting vvdemo comparison.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-16-A-typed.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-16-A-typed.md',
     },
     {
         id: '16-C-typed',
@@ -4774,7 +4774,7 @@ const TEST_DATA = [
         expectedApiServer: '2026-03-15T00:00:00Z',
         bugs: [],
         notes: 'Server TZ test: Config C typed on vv5dev (server PDT). API returns T00:00:00Z. Awaiting vvdemo comparison.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-16-C-typed.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-16-C-typed.md',
     },
     {
         id: '16-D-SFV',
@@ -4793,7 +4793,7 @@ const TEST_DATA = [
         expectedApiServer: '2026-03-15T14:30:00Z',
         bugs: ['FORM-BUG-5'],
         notes: 'Server TZ test: Config D SFV on vv5dev (server PDT). API returns T14:30:00Z. Bug #5 fake Z in client. Awaiting vvdemo comparison.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-16-D-SFV.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-16-D-SFV.md',
     },
     {
         id: '16-A-controls',
@@ -4809,7 +4809,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15',
         bugs: [],
         notes: 'Server TZ controls: Config A reload on vv5dev. Raw preserved through save→reload pipeline.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-16-A-controls.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-16-A-controls.md',
     },
     {
         id: '16-C-controls',
@@ -4825,7 +4825,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T03:00:00.000Z',
         bugs: [],
         notes: 'Server TZ controls: Config C reload on vv5dev. Raw T00:00:00 preserved, API converts to UTC.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-16-C-controls.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-16-C-controls.md',
     },
     {
         id: '16-D-controls',
@@ -4841,7 +4841,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T14:30:00.000Z',
         bugs: ['FORM-BUG-5'],
         notes: 'Server TZ controls: Config D reload on vv5dev. Raw preserved, Bug #5 fake Z persists after reload.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-16-D-controls.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-16-D-controls.md',
     },
     // ═══════════════════════════════════════════════════════════════════════
     // Category 10 — Web Service Input
@@ -4863,7 +4863,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['WS-BUG-1', 'FORM-BUG-5'],
         notes: 'EXPECTED FAIL: CB-8 cross-layer shift. API stores T00:00:00Z, Forms V1 shifts -3h to T21:00:00 (Mar 14). Bug #5 adds fake Z to GFV. Date crosses from Mar 15 to Mar 14.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-10-D-ws-isoZ.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-10-D-ws-isoZ.md',
     },
     {
         id: '10-D-ws-isoNoZ',
@@ -4879,7 +4879,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['WS-BUG-1', 'FORM-BUG-5'],
         notes: 'EXPECTED FAIL: API adds Z to no-Z input → identical to isoZ. Same CB-8 shift -3h, same date crossing.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-10-D-ws-isoNoZ.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-10-D-ws-isoNoZ.md',
     },
     {
         id: '10-D-ws-dateOnly',
@@ -4895,7 +4895,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['WS-BUG-1', 'FORM-BUG-5'],
         notes: 'EXPECTED FAIL: Date-only input normalized to T00:00:00Z by API → CB-8 shift. Config D enableTime=true keeps shifted time. Config A (date-only field) would strip time and pass.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-10-D-ws-dateOnly.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-10-D-ws-dateOnly.md',
     },
     {
         id: '10-D-ws-dotnet',
@@ -4911,7 +4911,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['WS-BUG-1', 'FORM-BUG-5'],
         notes: 'EXPECTED FAIL: .NET +00:00 offset = Z equivalent. Stored as T00:00:00Z, same CB-8 shift as isoZ.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-10-D-ws-dotnet.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-10-D-ws-dotnet.md',
     },
     {
         id: '10-D-ws-epoch',
@@ -4927,7 +4927,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T00:00:00',
         bugs: ['WS-BUG-5'],
         notes: 'EXPECTED FAIL: Epoch ms silently stored as null. API accepts the value without error but stores empty. WS-BUG-5 variant — numeric format not parsed.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-10-D-ws-epoch.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-10-D-ws-epoch.md',
     },
     {
         id: '10-D-ws-midnight-cross',
@@ -4943,7 +4943,7 @@ const TEST_DATA = [
         expectedApi: '2026-03-15T02:00:00',
         bugs: ['WS-BUG-1', 'FORM-BUG-5'],
         notes: 'EXPECTED FAIL: Near-midnight crossing. T02:00:00Z -3h = T23:00:00 (Mar 14). Critical for CSV imports with timestamps < TZ offset from midnight. Date crosses to previous day.',
-        tcRef: 'tasks/date-handling/forms-calendar/test-cases/tc-10-D-ws-midnight-cross.md',
+        tcRef: 'research/date-handling/forms-calendar/test-cases/tc-10-D-ws-midnight-cross.md',
     },
 ];
 

@@ -31,7 +31,7 @@ find . -name 'CLAUDE.md' -not -path '*/node_modules/*' -not -path '*/.git/*'
 For each file found, record:
 
 - Path
-- Tier classification: **Root** (repo root), **Scope** (top-level topic folder), **Task** (tasks/_/), **Project** (projects/_/)
+- Tier classification: **Root** (repo root), **Scope** (top-level topic folder), **Task** (research/_/), **Project** (projects/_/)
 - Line count (`wc -l`)
 - Last modified date (`git log -1 --format='%ai' -- <path>`)
 
@@ -46,7 +46,7 @@ for d in tools testing tasks projects docs scripts; do
 done
 
 # Individual tasks
-for d in tasks/*/; do
+for d in research/*/; do
   [ -f "$d/CLAUDE.md" ] || echo "MISSING: ${d}CLAUDE.md"
 done
 
@@ -65,7 +65,7 @@ Check if any CLAUDE.md exists in implementation subfolders where it shouldn't:
 - `tools/extract/`, `tools/audit/`, `tools/helpers/`, `tools/runners/`, `tools/inventory/`, `tools/generators/`
 - `testing/specs/`, `testing/helpers/`, `testing/fixtures/`, `testing/pipelines/`, `testing/config/`, `testing/reporters/`
 - `projects/*/extracts/`, `projects/*/analysis/`
-- `tasks/*/analysis/`, `tasks/*/test-cases/`
+- `research/*/analysis/`, `research/*/test-cases/`
 - `projects/*/testing/`, `projects/*/extracts/`
 - `docs/architecture/`, `docs/reference/`, `docs/guides/`, `docs/standards/`
 
@@ -201,7 +201,7 @@ git log --since="$claude_md_date" --diff-filter=ADR --name-only --format="" -- "
 
 If structural changes exist, flag as **WARNING**: "N structural changes in {scope}/ since CLAUDE.md was last updated" and list them so the maintainer knows what to address.
 
-Ignore changes to files inside subdirectories that aren't described by this CLAUDE.md (e.g., changes inside `projects/emanueljofre/testing/` don't affect `tasks/CLAUDE.md`).
+Ignore changes to files inside subdirectories that aren't described by this CLAUDE.md (e.g., changes inside `projects/emanueljofre/testing/` don't affect `research/CLAUDE.md`).
 
 **Noise filter:** Ignore changes from the same commit that created or last modified the CLAUDE.md itself. Initial file moves (e.g., from a restructure) that happen in the same commit as CLAUDE.md creation are not "unaddressed changes."
 
@@ -241,7 +241,7 @@ Generate a consolidated report grouped by file, then by severity:
 - OK: within size target, no anti-patterns
 - INFO: 2 structural changes since last update (new-tool.js added, old-probe.js deleted)
 
-### tasks/date-handling/CLAUDE.md (Task — 812 lines, target <400)
+### research/date-handling/CLAUDE.md (Task — 812 lines, target <400)
 
 - CRITICAL: 412 lines over target
 - WARNING: 14 code blocks >5 lines
@@ -350,7 +350,7 @@ Report final state:
 | File | Before | After | Target | Status |
 |------|--------|-------|--------|--------|
 | /CLAUDE.md | 410 | 195 | ~200 | OK |
-| tasks/date-handling/CLAUDE.md | 812 | 185 | <400 | OK |
+| research/date-handling/CLAUDE.md | 812 | 185 | <400 | OK |
 | tools/CLAUDE.md | 32 | 32 | ~30-60 | OK |
 ...
 ```
