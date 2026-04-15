@@ -120,7 +120,7 @@ All sections are accessed from the top nav bar within `https://{env}.visualvault
 | **Admin Tools** (dropdown) | —                                                    | See [Admin Tools](#admin-tools) below                                                                                                    |
 | **Enterprise Tools**       | Via Control Panel                                    | Dropdown with sub-items below. Breadcrumb prefix: `Control Panel > Enterprise Tools`                                                     |
 | ↳ Data Connections         | `/ConnectionsAdmin`                                  | SQL Server connections backing VV databases                                                                                              |
-| ↳ Microservice Library     | `/OutsideProcessAdmin`                               | External service endpoints (nodeV2 scripts appear here)                                                                                  |
+| ↳ Microservice Library     | `/OutsideProcessAdmin`                               | External service endpoints (harness scripts appear here)                                                                                 |
 | ↳ Scheduled Services       | `/SchedulerAdmin`                                    | Cron-like automation for registered microservices                                                                                        |
 | ↳ Module Library           | `/ModuleAdmin`                                       | Reusable module/component library                                                                                                        |
 | ↳ Offline Forms            | `/OfflineForms/index.html#!/land?xcid=...&xcdid=...` | Offline form fill-in. Separate AngularJS SPA with its own routing                                                                        |
@@ -390,7 +390,7 @@ Located under **Control Panel > Enterprise Tools** (breadcrumb). These are the i
 **UI Label:** "Microservices" (formerly called "Web Services" in older VV docs)
 **Breadcrumb:** Control Panel > Enterprise Tools > Microservice Library
 
-Where external service endpoints are registered. The Node.js server (`nodeV2`) appears here.
+Where external service endpoints are registered. The Node.js server (vv-ai-harness) appears here.
 
 | Column              | Notes                                                                 |
 | ------------------- | --------------------------------------------------------------------- |
@@ -401,7 +401,7 @@ Where external service endpoints are registered. The Node.js server (`nodeV2`) a
 | Timeout             | Request timeout (0 = default)                                         |
 | Callback            | Boolean — whether VV waits for a response                             |
 
-**How it connects to nodeV2:** When a form event fires or a scheduled process runs, VV calls the registered URL in this library. The `nodeV2` server receives the POST, executes the script code, and returns results.
+**How it connects to the harness:** When a form event fires or a scheduled process runs, VV calls the registered URL in this library. The harness server receives the POST, executes the script code, and returns results.
 
 **REST API:** `GET /outsideprocesses` returns all registered microservices with metadata: `id`, `name`, `description`, `processCategory` (0=Form, 1=Scheduled, 5=Workflow), `processType`, `createDate`, `createBy`, `modifyDate`, `modifyBy`. Does **NOT** include script source code. Individual resource fetch (`GET /outsideprocesses/{id}`) returns HTTP 405 — not supported. Note: the VV client returns the response as a **raw JSON string** — parse with `typeof res === 'string' ? JSON.parse(res) : res` before accessing `.data`.
 
@@ -647,14 +647,14 @@ The UI includes a language selector with: English, Brazil Portuguese, Spanish (P
 
 ---
 
-## How nodeV2 Fits In
+## How the Harness Server Fits In
 
 ```
 VV Platform
     │
     ├── Form event fires (button click)
     │       │
-    │       └─→ POST /scripts  ──→  nodeV2 Express server (port 3000)
+    │       └─→ POST /scripts  ──→  harness Express server (port 3000)
     │                                    │
     │                                    ├── Creates temp module from script code
     │                                    ├── Injects vvClient (authenticated)
@@ -662,10 +662,10 @@ VV Platform
     │
     └── Scheduled Service triggers
             │
-            └─→ POST /scheduledscripts  ──→  nodeV2 Express server
+            └─→ POST /scheduledscripts  ──→  harness Express server
 ```
 
-The Microservice registered in VV points to `{nodeV2 server URL}/scripts` or `/scheduledscripts`. VV calls this URL with the script code as payload. The server executes it and responds.
+The Microservice registered in VV points to `{harness server URL}/scripts` or `/scheduledscripts`. VV calls this URL with the script code as payload. The server executes it and responds.
 
 **Registration:** Each script is registered in **Microservices** (`/outsideprocessadmin`) as `Service Type: NodeServer`. Form scripts use `Category: Form`; cron scripts use `Category: Scheduled` and appear in **Scheduled Services** too.
 

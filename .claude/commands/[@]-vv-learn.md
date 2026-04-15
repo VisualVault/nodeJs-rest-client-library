@@ -27,7 +27,7 @@ If nothing new was learned about VV, stop here and say so.
 Read the files under `docs/` to understand what's already documented:
 
 ```
-docs/architecture/visualvault-platform.md   ← URL structure, nav map, Enterprise Tools, nodeV2 integration
+docs/architecture/visualvault-platform.md   ← URL structure, nav map, Enterprise Tools, harness integration
 docs/README.md                              ← index of all docs
 ```
 

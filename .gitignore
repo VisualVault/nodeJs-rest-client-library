@@ -187,6 +187,10 @@ tools/explore/snapshots/
 # Large generated files
 research/date-handling/forms-calendar/main.js
 
+# Claude Code ephemeral artifacts
+.claude/plans/
+.claude/worktrees/
+
 # ─── Harness architecture ─────────────────────────────────
 # Independent repos nested inside the harness (each has its own .git)
 /lib/

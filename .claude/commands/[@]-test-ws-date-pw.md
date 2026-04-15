@@ -168,12 +168,12 @@ Store the complete JSON response for use in Phases 3–5. Key fields to extract:
 
 ## Environment
 
-| Parameter       | Value                                             |
-| --------------- | ------------------------------------------------- |
-| Execution Mode  | Script (`run-ws-test.js`) / Browser (form button) |
-| Server Timezone | `{IANA name}` — UTC±X                             |
-| Platform        | VisualVault REST API via nodeV2 client library    |
-| VV Environment  | `{instance}` — `{customerAlias}/{databaseAlias}`  |
+| Parameter       | Value                                                 |
+| --------------- | ----------------------------------------------------- |
+| Execution Mode  | Script (`run-ws-test.js`) / Browser (form button)     |
+| Server Timezone | `{IANA name}` — UTC±X                                 |
+| Platform        | VisualVault REST API via vv-ai-harness client library |
+| VV Environment  | `{instance}` — `{customerAlias}/{databaseAlias}`      |
 
 ## Test Parameters
 

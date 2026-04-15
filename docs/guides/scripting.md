@@ -1,6 +1,6 @@
 # Scripting Guide — Node.js Server Data Flow
 
-How data flows through the nodeV2 server when executing form scripts and scheduled scripts. Based on analysis of the upstream `VisualVault/nodeJs-rest-client-library` code.
+How data flows through the vv-ai-harness server when executing form scripts and scheduled scripts. Based on analysis of the upstream `VisualVault/nodeJs-rest-client-library` code.
 
 > **Note:** The `lib/` directory is sourced from [upstream](https://github.com/VisualVault/nodeJs-rest-client-library) with intentional local enhancements (write-policy guards, options plumbing, route wiring). See the root `CLAUDE.md` "Upstream Sync & Protection" section for modification rules.
 

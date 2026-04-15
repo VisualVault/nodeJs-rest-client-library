@@ -108,7 +108,7 @@ Detect: fenced code blocks (```) longer than 5 lines that contain JavaScript, JS
 Exceptions:
 
 - Dev commands (bash one-liners for running tools) — these are quick reference
-- Structure trees (`\nnodeV2/\n  tools/\n...`) — these are structural context
+- Structure trees (`\nvv-ai-harness/\n  tools/\n...`) — these are structural context
 
 Test: is this a copy of code that lives in a source file? If yes, it should be a pointer.
 

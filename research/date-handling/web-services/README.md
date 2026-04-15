@@ -54,14 +54,14 @@ Only needed for WS-4 (API→Forms cross-layer) or to validate the full productio
 
 Navigate to **Enterprise Tools > Microservices** (`/outsideprocessadmin`):
 
-| Field        | Value                                                                       |
-| ------------ | --------------------------------------------------------------------------- |
-| Service Name | `DateTestWSHarness`                                                         |
-| Category     | `Form`                                                                      |
-| Service Type | `NodeServer`                                                                |
-| URL          | `{nodeV2 server URL}/scripts` (e.g., `https://your-ngrok.ngrok.io/scripts`) |
-| Timeout      | `60` (seconds — some tests create + read multiple records)                  |
-| Callback     | `true`                                                                      |
+| Field        | Value                                                                        |
+| ------------ | ---------------------------------------------------------------------------- |
+| Service Name | `DateTestWSHarness`                                                          |
+| Category     | `Form`                                                                       |
+| Service Type | `NodeServer`                                                                 |
+| URL          | `{harness server URL}/scripts` (e.g., `https://your-ngrok.ngrok.io/scripts`) |
+| Timeout      | `60` (seconds — some tests create + read multiple records)                   |
+| Callback     | `true`                                                                       |
 
 #### 2. Add Form Fields for Test Control
 
