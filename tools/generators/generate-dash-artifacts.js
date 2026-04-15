@@ -17,7 +17,7 @@ const fs = require('fs');
 const path = require('path');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
-const ARTIFACTS_DIR = path.join(REPO_ROOT, 'tasks', 'date-handling', 'dashboards');
+const ARTIFACTS_DIR = path.join(REPO_ROOT, 'research', 'date-handling', 'dashboards');
 const RUNS_DIR = path.join(ARTIFACTS_DIR, 'runs');
 const SUMMARIES_DIR = path.join(ARTIFACTS_DIR, 'summaries');
 const MATRIX_PATH = path.join(ARTIFACTS_DIR, 'matrix.md');
