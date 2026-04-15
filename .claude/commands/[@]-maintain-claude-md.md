@@ -41,7 +41,7 @@ Scan for scope folders that SHOULD have a CLAUDE.md but don't:
 
 ```bash
 # Top-level topic folders
-for d in tools testing tasks projects docs scripts; do
+for d in tools testing research projects docs scripts; do
   [ -f "$d/CLAUDE.md" ] || echo "MISSING: $d/CLAUDE.md"
 done
 
