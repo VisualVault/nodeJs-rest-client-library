@@ -10,14 +10,19 @@ Fork of [VisualVault/nodeJs-rest-client-library](https://github.com/VisualVault/
 ## Repo Structure
 
 ```
-nodeV2/
-  lib/VVRestApi/VVRestApiNodeJs/   # Node.js microservices server (Express, REST client, auth)
-  scripts/                         # VV script examples and templates (see scripts/)
-  tools/                           # Standalone CLI tooling: extract, explore, runners, audit, inventory, generators (see tools/)
-  testing/                         # Playwright test infrastructure: specs, helpers, fixtures, pipelines (see testing/)
-  research/                       # Cross-cutting investigations and analysis (see research/)
-  projects/                        # Customer workspaces with extracted artifacts (see projects/)
-  docs/                            # Platform documentation: architecture, standards, guides, reference (see docs/)
+nodeV2/                                # AI HARNESS (this repo)
+  lib/                                 # VV API wrapper (independent repo, gitignored)
+  tools/                               # Shared CLI tooling (see tools/)
+  testing/                             # Shared Playwright infrastructure (see testing/)
+  scripts/                             # VV script examples and templates (see scripts/)
+  research/                            # Cross-cutting investigations (see research/)
+  docs/                                # Platform documentation (see docs/)
+  projects/                            # Project workspaces (see projects/)
+    {name}/                            #   Per-project workspace
+      repo/                            #     GH repo clone (independent, gitignored)
+      extracts/                        #     Extracted artifacts (gitignored)
+      analysis/                        #     Investigation findings
+      testing/                         #     Test execution records (gitignored)
 ```
 
 ## How the Server Works
@@ -179,9 +184,8 @@ See the [Write Safety](#write-safety--mandatory) section for the 6 mandatory wri
 
 ### Upstream Protection
 
-- **Never modify `lib/` files without explicit user approval.** This mirrors Write Safety rules for customer environments.
-- To commit a protected file: `UPSTREAM_OK=1 git commit ...`
-- To permanently allow a path: add it to `.husky/upstream-allowlist`
+- **`lib/` is an independent repo** — changes to lib/ are committed inside `lib/.git`, not the harness. Treat with care: modifications affect test fidelity (local server must replicate production VV behavior).
+- Never modify `lib/` files without explicit user approval.
 
 ### Content Boundaries
 
@@ -196,56 +200,72 @@ See the [Write Safety](#write-safety--mandatory) section for the 6 mandatory wri
 
 ### CLAUDE.md Standards
 
-**Create a CLAUDE.md for:** top-level topic folders (`tools/`, `testing/`, `research/`, `projects/`, `docs/`, `scripts/`), individual tasks (`research/{task-name}/`), individual projects (`projects/{customer}/`).
+**Create a CLAUDE.md for:** top-level topic folders (`tools/`, `testing/`, `research/`, `projects/`, `docs/`, `scripts/`), individual research topics (`research/{topic}/`), individual projects (`projects/{customer}/`).
 
 **Do NOT create CLAUDE.md for:** implementation subfolders (`tools/extract/`, `testing/fixtures/`, etc.), data directories (`projects/wadnr/extracts/`, `projects/*/testing/`).
 
 **Size targets:** Root ~200 lines | Scope folders ~30-80 lines | Tasks/Projects flexible but aggressively pruned.
 
-## Repository Architecture & Sharing Model
+## Repository Architecture — AI Harness
 
-This repo serves as both a **shared team workspace** and a **personal development environment**. The sharing boundary is which Git remote you push to, not which files you track.
+This repo is an **AI harness** — a workbench that orchestrates work across multiple independent projects. Claude Code operates from the harness root and has access to shared tools, knowledge, and test infrastructure regardless of which project is active.
 
-### Three-Tier Git Model
+### Git Topology
 
 ```
-VisualVault/nodeJs-rest-client-library    (upstream — read-only, library source)
-        |
-        v fork
-emanueljofre/nodeV2                       (team shared — tools, tests, docs, analysis)
-        |
-        v clone + private remote
-[private repo]                            (personal — everything including projects/)
+HARNESS REPO (emanueljofre/nodeV2)
+  Tracks: tools/, testing/, docs/, scripts/, research/, .claude/, configs
+          projects/CLAUDE.md, projects/*/CLAUDE.md, projects/*/test-assets.md
+  Ignores: /lib/, /projects/*/repo/, /projects/*/extracts/,
+           /projects/*/testing/, /projects/*/environment.json
+
+LIB REPO (independent, lives at lib/)
+  VV API wrapper — fork of VisualVault/nodeJs-rest-client-library
+  Own .git, own remote, own upstream sync
+
+PROJECT REPOS (independent, live at projects/{name}/repo/)
+  Each project's deployable code — own .git, own GH remote
 ```
 
-Every developer commits ALL their work to their **private repo** (full backup, multi-workstation). Shared content flows to `emanueljofre/nodeV2` via PRs.
+### What's Tracked Where
 
-### What Goes Where
+| Artifact                  | Harness repo | Private remote | Project repo | lib repo |
+| ------------------------- | ------------ | -------------- | ------------ | -------- |
+| Shared tools, tests, docs | yes          | yes            |              |          |
+| Research investigations   | yes          | yes            |              |          |
+| Claude commands           | yes          | yes            |              |          |
+| Project CLAUDE.md         | yes          | yes            |              |          |
+| Project extracts/analysis |              | yes            |              |          |
+| Project test records      |              | yes            |              |          |
+| Deployable project code   |              |                | yes          |          |
+| VV API wrapper            |              |                |              | yes      |
 
-**Shared** (team repo): `lib/`, `docs/`, `scripts/`, `tools/`, `testing/`, `research/` (analysis, matrix methodology, test-cases).
-**Not shared** (private repo only): `projects/` (extracts, analysis, testing execution), `.env.json`.
+### Shared vs. Project-Specific
 
-### Current State
+Work output goes to one of four destinations:
 
-Single-repo workflow — `emanueljofre/nodeV2` holds everything until team sharing begins. When shared: add a private remote, uncomment `.gitignore` line for `/projects/`. New developers clone the team repo, rename origin to `shared`, add their private repo as `origin`.
+- **Deployable code** → project's GH repo (`projects/{name}/repo/`)
+- **Project-specific tools & research** → project workspace (`projects/{name}/analysis/` or `tools/`)
+- **Workspace artifacts** (extracts, test records) → untracked locally, backed up via private remote
+- **Shared outputs** (reusable tools, standards, platform docs) → harness repo
 
-## Upstream Sync & Protection
+**Promotion flow:** project-specific → shared when a second project needs it or it describes platform behavior. The deciding question: "Would a second project ever need this?"
 
-`lib/VVRestApi/` is sourced from upstream with intentional local enhancements (write-policy guards, options plumbing). **Modifications affect test fidelity** — the local server must replicate production VV behavior for WS and scheduled process testing.
-
-### Protection layers
-
-1. **Pre-commit guard** (`.husky/pre-commit`) — blocks commits to `lib/` files unless on the allowlist or `UPSTREAM_OK=1` is set
-2. **Allowlist** (`.husky/upstream-allowlist`) — declares which `lib/` paths are locally maintained (currently: `routes/`)
-3. **CI drift report** (`.github/workflows/upstream-guard.yml`) — reports `lib/` divergence from upstream on PRs (informational, non-blocking)
-4. **Gitattributes** — `lib/VVRestApi/**` marked `upstream-tracked` for tooling visibility
-
-### Sync commands
+### Bootstrap (new machine)
 
 ```bash
-git fetch upstream
-git merge upstream/master
+git clone <harness-url> nodeV2
+cd nodeV2 && npm install
+cd lib && git clone <api-wrapper-url> .       # restore VV API wrapper
+cd ../projects/wadnr/repo && git clone <url> . # restore project repos (if any)
 ```
 
-Origin: `emanueljofre/nodeV2`
-Upstream: `VisualVault/nodeJs-rest-client-library`
+### lib/ Upstream Sync
+
+`lib/` is now an independent repo. Sync with upstream inside `lib/`:
+
+```bash
+cd lib
+git remote add upstream https://github.com/VisualVault/nodeJs-rest-client-library.git
+git fetch upstream && git merge upstream/master
+```
