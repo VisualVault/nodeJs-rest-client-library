@@ -180,7 +180,7 @@ async function main() {
     };
 
     // Load and run harness
-    const harness = require(path.join(__dirname, '..', '..', 'scripts', 'server-scripts', 'webservice-test-harness'));
+    const harness = require(path.join(__dirname, '..', '..', 'scripts', 'examples', 'webservice-test-harness'));
     await harness.main(ffCollection, vvClient, mockResponse);
 
     // Output results

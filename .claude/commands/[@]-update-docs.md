@@ -19,7 +19,6 @@ These are the documentation files in the project and what each one covers:
 | `research/date-handling/CLAUDE.md`          | Date investigation scope table, bug index, component status                       |
 | `projects/wadnr/CLAUDE.md`                  | WADNR env config, extracts summary, write safety, validation results              |
 | `projects/emanueljofre/CLAUDE.md`           | EmanuelJofre env config, extracts summary, commands                               |
-| `README.md`                                 | Library usage, installation, API examples, module list                            |
 | `CHANGELOG.md`                              | Server/library changes under Unreleased (lib/ scope + project tooling)            |
 | `docs/guides/dev-setup.md`                  | **Canonical setup guide** — env setup, Playwright, credentials, troubleshooting   |
 | `docs/guides/playwright-testing.md`         | Playwright patterns, architecture, extension guide (links to dev-setup for setup) |
@@ -29,7 +28,7 @@ These are the documentation files in the project and what each one covers:
 | `docs/README.md`                            | Index of all docs/ contents                                                       |
 | `research/README.md`                        | Task index table (folder name, status, description)                               |
 | `testing/specs/date-handling/README.md`     | Date-handling test suite context, field matrix, TZ rationale, debugging           |
-| `Readme-microservices.md`                   | Dev setup for microservices execution                                             |
+| `lib/Readme-microservices.md`               | Dev setup for microservices execution (in lib/ repo)                              |
 
 ### Single Source of Truth Principle
 
@@ -50,7 +49,7 @@ For each change, determine which docs **might** need updating using this mapping
 
 | Change area                                   | Docs to check                                                                                                                 |
 | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `lib/VVRestApi/` (new features, API changes)  | `CHANGELOG.md`, `README.md`, `CLAUDE.md` (API managers table)                                                                 |
+| `lib/VVRestApi/` (new features, API changes)  | `CHANGELOG.md`, `lib/README.md`, `CLAUDE.md` (API managers table)                                                             |
 | `lib/VVRestApi/` (bug fixes, refactors)       | `CHANGELOG.md`                                                                                                                |
 | `package.json` (scripts, deps, tooling)       | `CLAUDE.md` (dev commands), `CHANGELOG.md`, `docs/guides/dev-setup.md` (commands/tooling)                                     |
 | `scripts/`                                    | `CLAUDE.md` (repo structure if new dirs)                                                                                      |
@@ -66,7 +65,7 @@ For each change, determine which docs **might** need updating using this mapping
 | `projects/wadnr/` (test runs, new assets)     | `projects/wadnr/CLAUDE.md` (validation results, test assets)                                                                  |
 | `.claude/` (commands, config)                 | `CLAUDE.md` if it references commands                                                                                         |
 | Config files (eslint, prettier, husky, etc.)  | `CHANGELOG.md` (tooling), `docs/guides/dev-setup.md` (code quality section)                                                   |
-| `app.js`, routes (new endpoints)              | `CLAUDE.md` (server architecture), `Readme-microservices.md`                                                                  |
+| `app.js`, routes (new endpoints)              | `CLAUDE.md` (server architecture), `lib/Readme-microservices.md`                                                              |
 
 ### 3. Read and evaluate each affected doc
 
@@ -82,7 +81,7 @@ Apply updates following these rules:
 
 - **CLAUDE.md (all tiers)**: Keep the existing structure. Update tables and pointers to reflect reality. Follow the content standard from root `CLAUDE.md` § "CLAUDE.md Standards" — do NOT add progress counts, config contents, code snippets >5 lines, or file inventories. Use pointers (e.g., "See `matrix.md` for status") instead. Root CLAUDE.md does NOT contain setup instructions — those live in `dev-setup.md`.
 - **Scope/task/project CLAUDE.md**: Update scope tables, status, and validation results. Keep within size targets (scope ~30-60 lines, task/project flexible but <400). If `/maintain-claude-md` recently trimmed a file, preserve that trimming — don't re-add content it removed.
-- **README.md**: Only update if public API surface changed (new managers, new usage patterns). Do not touch prose style.
+- **lib/README.md**: Only update if public API surface changed (new managers, new usage patterns). Do not touch prose style. Lives in the lib/ repo, not the harness.
 - **CHANGELOG.md**: Add entries under `## [Unreleased]` in the correct subsection (Added/Changed/Fixed/Removed). Follow existing entry style. Keep entries concise. Scope: lib/ changes + project-wide tooling only.
 - **docs/guides/dev-setup.md**: Canonical setup guide. Update when dependencies, scripts, config, credentials, auth flow, or troubleshooting steps change. All other docs link here for setup — if this file is wrong, everything downstream is wrong.
 - **docs/guides/playwright-testing.md**: Patterns and architecture only. Setup steps link to `dev-setup.md`. Update when helpers change, new test directories are added, or extensibility patterns evolve.
@@ -90,7 +89,7 @@ Apply updates following these rules:
 - **docs/reference/**: Update when VV platform APIs, form field behaviors, or VV.Form object structure changes.
 - **research/README.md**: Update the task index table if tasks were added, completed, or removed.
 - **docs/README.md**: Update if new docs are added to `docs/` subdirectories.
-- **Readme-microservices.md**: Only update if execution modes or setup steps changed.
+- **lib/Readme-microservices.md**: Only update if execution modes or setup steps changed. Lives in the lib/ repo.
 
 ### 5. Skip what doesn't need updating
 

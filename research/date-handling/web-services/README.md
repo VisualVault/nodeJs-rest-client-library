@@ -4,16 +4,16 @@ REST API date handling investigation. Tests how dates are sent, stored, and retu
 
 ## Files
 
-| File                                                | Purpose                                                        |
-| --------------------------------------------------- | -------------------------------------------------------------- |
-| `matrix.md`                                         | Test matrix methodology — 10 categories, 148 slots             |
-| `analysis/`                                         | Analysis & conclusions (overview + per-bug documents)          |
-| `scripts/server-scripts/webservice-test-harness.js` | Server-side harness — all 10 categories via `Action` parameter |
-| `scripts/templates/webservice-pattern.js`           | Clean VV web service template (reference)                      |
-| `scripts/form-scripts/ws-harness-button.js`         | Client-side form button script to call the harness             |
-| `scripts/templates/web-service-call-pattern.js`     | Generic VV web service call pattern (reference)                |
-| `tools/runners/run-ws-test.js`                      | Direct Node.js CLI runner (auth + harness invocation)          |
-| `test-cases/`                                       | Individual TC spec files                                       |
+| File                                            | Purpose                                                        |
+| ----------------------------------------------- | -------------------------------------------------------------- |
+| `matrix.md`                                     | Test matrix methodology — 10 categories, 148 slots             |
+| `analysis/`                                     | Analysis & conclusions (overview + per-bug documents)          |
+| `scripts/examples/webservice-test-harness.js`   | Server-side harness — all 10 categories via `Action` parameter |
+| `scripts/templates/webservice-pattern.js`       | Clean VV web service template (reference)                      |
+| `scripts/examples/form/ws-harness-button.js`    | Client-side form button script to call the harness             |
+| `scripts/templates/web-service-call-pattern.js` | Generic VV web service call pattern (reference)                |
+| `tools/runners/run-ws-test.js`                  | Direct Node.js CLI runner (auth + harness invocation)          |
+| `test-cases/`                                   | Individual TC spec files                                       |
 
 Execution output (runs, summaries, status, results) lives in `projects/{customer}/testing/date-handling/web-services/`.
 

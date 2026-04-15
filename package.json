@@ -111,7 +111,7 @@
     },
     "files": [
         "lib/VVRestApi/**/*",
-        "README.md",
+        "lib/README.md",
         "package.json"
     ],
     "repository": {

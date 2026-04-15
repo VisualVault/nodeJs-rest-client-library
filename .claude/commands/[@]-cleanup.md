@@ -31,7 +31,7 @@ For each file below, run `git log -1 --format='%ai %s' -- <path>` to get the las
 
 | Category     | Paths                                                                                    |
 | ------------ | ---------------------------------------------------------------------------------------- |
-| Root docs    | `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `Readme-microservices.md`                      |
+| Root docs    | `CLAUDE.md`, `CHANGELOG.md`                                                              |
 | Docs         | all `docs/**/*.md` files                                                                 |
 | Task files   | `research/README.md`, `research/date-handling/CLAUDE.md`                                 |
 | Testing docs | `testing/README.md`, `testing/specs/date-handling/README.md`, `testing/config/README.md` |
@@ -65,9 +65,9 @@ Find all `.md` files in the repo (excluding `node_modules/` and `.git/`). For ea
 
 The expected root-level items are:
 
-**Directories**: `.claude/`, `.husky/`, `.playwright/`, `.playwright-cli/`, `docs/`, `lib/`, `node_modules/`, `playwright-report/`, `projects/`, `scripts/`, `research/`, `test-results/`, `testing/`, `tools/`
+**Directories**: `.claude/`, `.github/`, `.husky/`, `docs/`, `lib/`, `node_modules/`, `projects/`, `scripts/`, `research/`, `testing/`, `tools/`
 
-**Files**: `_config.yml`, `.gitattributes`, `.gitignore`, `.npmignore`, `.prettierignore`, `.prettierrc`, `CHANGELOG.md`, `CLAUDE.md`, `eslint.config.js`, `package.json`, `package-lock.json`, `README.md`, `Readme-microservices.md`
+**Files**: `.env.example.json`, `.gitattributes`, `.gitignore`, `.prettierignore`, `.prettierrc`, `CHANGELOG.md`, `CLAUDE.md`, `eslint.config.js`, `package.json`, `package-lock.json`
 
 Run `ls -1A` at root and compare against these lists. Any unexpected items: **WARNING** with a note about what they might be. Ignore hidden system files (`.DS_Store`, `.env`).
 

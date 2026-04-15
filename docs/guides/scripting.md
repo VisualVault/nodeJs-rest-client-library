@@ -76,7 +76,7 @@ When disabled, skipping `postCompletion()` has no operational impact — recurre
 
 **Script caching:** The server writes the script to `lib/VVRestApi/VVRestApiNodeJs/files/{scriptId}.js` on first execution. On subsequent calls, it deletes the cached file and re-writes the latest version from VV. This means script changes in the admin UI take effect on the next execution without a server restart.
 
-**Logger path:** VV writes uploaded scripts to `lib/VVRestApi/VVRestApiNodeJs/files/{scriptId}.js`. From there, `require('../log')` resolves to the server's Winston logger at `lib/VVRestApi/VVRestApiNodeJs/log.js`. Scripts in `scripts/server-scripts/` use the same `require('../log')` which resolves via `scripts/log.js` (a shim). Test scripts that must work in **both** contexts (VV platform upload + direct runner) need a try/catch dual-path — see `scripts/test-scripts/scheduled/ScheduledProcessTestHarness.js`.
+**Logger path:** VV writes uploaded scripts to `lib/VVRestApi/VVRestApiNodeJs/files/{scriptId}.js`. From there, `require('../log')` resolves to the server's Winston logger at `lib/VVRestApi/VVRestApiNodeJs/log.js`. Scripts in `scripts/examples/` use the same `require('../log')` which resolves via `scripts/log.js` (a shim). Test scripts that must work in **both** contexts (VV platform upload + direct runner) need a try/catch dual-path — see `scripts/test-scripts/scheduled/ScheduledProcessTestHarness.js`.
 
 **`getCredentials()` is required** for scheduled scripts — the server calls it to authenticate with the VV API before invoking `main()`. Form scripts don't need it (the server uses the calling user's session).
 

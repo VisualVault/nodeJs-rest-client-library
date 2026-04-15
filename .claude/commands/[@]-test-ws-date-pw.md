@@ -65,7 +65,7 @@ Read the following files before doing anything else:
 
 4. `research/date-handling/web-services/README.md` — reference for runner usage, credential setup, and TZ simulation.
 
-5. `scripts/server-scripts/webservice-test-harness.js` — check that the action handler for this category is implemented (not a stub). If stubbed, stop and report: "Action handler for WS-{N} is not yet implemented."
+5. `scripts/examples/webservice-test-harness.js` — check that the action handler for this category is implemented (not a stub). If stubbed, stop and report: "Action handler for WS-{N} is not yet implemented."
 
 Do not proceed to Phase 2 until all required files are read and the action handler is confirmed implemented.
 
