@@ -102,12 +102,12 @@ Output a summary:
 ```markdown
 ## Docs Update Summary
 
-| Doc          | Status  | Changes                               |
-| ------------ | ------- | ------------------------------------- |
-| CLAUDE.md    | Updated | Added linting scripts to dev commands |
-| CHANGELOG.md | Updated | Added ESLint + Prettier entry         |
-| README.md    | Skipped | No API surface changes                |
-| ...          | ...     | ...                                   |
+| Doc           | Status  | Changes                               |
+| ------------- | ------- | ------------------------------------- |
+| CLAUDE.md     | Updated | Added linting scripts to dev commands |
+| CHANGELOG.md  | Updated | Added ESLint + Prettier entry         |
+| lib/README.md | Skipped | No API surface changes                |
+| ...           | ...     | ...                                   |
 ```
 
 If nothing needed updating, say: **All docs are current. No updates needed.**
