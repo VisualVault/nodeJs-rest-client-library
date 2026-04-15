@@ -31,6 +31,7 @@ docs/
 
 ### Reference
 
+- [tools.md](reference/tools.md) — Complete CLI tools reference: all scripts in `tools/`, parameters, scope, write behavior, examples, cross-tool workflows, helper module API
 - [form-fields.md](reference/form-fields.md) — Calendar field config properties, popup modal behavior, V1/V2 code path, VV.Form console API, known bugs summary
 - [vv-form-api.md](reference/vv-form-api.md) — Full VV.Form object structure: properties, methods, sub-objects, field definitions, automation patterns
 - [api-date-patterns.md](reference/api-date-patterns.md) — Correct datetime handling for web services: CSV imports, TZ offsets, safe patterns, common pitfalls

@@ -4,12 +4,12 @@ Reference documentation for the VisualVault platform. All content here is **shar
 
 ## Organization
 
-| Folder          | Content                                                            |
-| --------------- | ------------------------------------------------------------------ |
-| `architecture/` | Platform architecture, URL anatomy, navigation, component diagrams |
-| `reference/`    | API reference, field types, config options, date patterns          |
-| `guides/`       | How-to guides (dev setup, Playwright testing, scripting)           |
-| `standards/`    | Coding standards, bug report structure, conventions                |
+| Folder          | Content                                                                      |
+| --------------- | ---------------------------------------------------------------------------- |
+| `architecture/` | Platform architecture, URL anatomy, navigation, component diagrams           |
+| `reference/`    | API reference, field types, config options, date patterns, CLI tools catalog |
+| `guides/`       | How-to guides (dev setup, Playwright testing, scripting)                     |
+| `standards/`    | Coding standards, bug report structure, conventions                          |
 
 ## Single Source of Truth
 
