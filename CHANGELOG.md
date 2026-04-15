@@ -2,13 +2,15 @@
 
 Notable changes to the VisualVault Node.js server and client library (`lib/VVRestApi/`).
 
-**Scope:** Server/library code changes and project-wide development tooling. For investigation work, see [`tasks/`](tasks/). For platform documentation, see [`docs/`](docs/).
+**Scope:** Server/library code changes and project-wide development tooling. For investigation work, see [`research/`](research/). For platform documentation, see [`docs/`](docs/).
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Entries stay under **Unreleased** until a version is published to npm.
 
 ## [Unreleased]
 
 ### Changed
+
+- **AI harness architecture**: Restructured repo as an AI workbench with independent nested repos. `tasks/` renamed to `research/`. `scripts/server-scripts/` and `scripts/form-scripts/` reorganized into `scripts/examples/`. `lib/` converted to independent git repo (gitignored by harness). `README.md` and `Readme-microservices.md` moved to `lib/`. Project workspace artifacts (`extracts/`, `testing/`, `environment.json`) now gitignored. `.husky/pre-commit` simplified to lint-staged only (upstream guard removed). `.husky/upstream-allowlist`, `_config.yml`, `.npmignore` removed. Claude commands updated for multi-repo awareness. `[@]-create-project` supports `--repo` flag and non-VV projects.
 
 - **Artifact routing restructure**: Execution artifacts (runs, summaries, results.md, status.md) moved from `tasks/` to `projects/{customer}/testing/{task}/{component}/`. Tasks now hold only platform methodology (matrix, test-cases, analysis). Matrix files stripped of results columns — per-env tracking in `status.md`. Generalized principle: "Is this artifact true regardless of customer/environment?" determines routing. All test commands, sharing rules, and CLAUDE.md files updated.
 

@@ -1,4 +1,4 @@
-# Tasks — Cross-Cutting Investigations
+# Research — Cross-Cutting Investigations
 
 Platform-level investigations that apply to any VV environment. Each task gets its own subfolder with analysis and methodology.
 

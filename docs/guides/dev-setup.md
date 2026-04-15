@@ -22,23 +22,23 @@ npm install
 
 These are installed automatically with `npm install` and enforced on every commit via Husky + lint-staged:
 
-| Tool            | Config File         | What It Does                                           |
-| --------------- | ------------------- | ------------------------------------------------------ |
-| **ESLint**      | `eslint.config.js`  | Flat config, CommonJS, integrated with Prettier        |
-| **Prettier**    | `.prettierrc`       | Single quotes, 4-space indent, 120 print width         |
-| **Husky**       | `.husky/pre-commit` | Upstream file guard + `lint-staged` before each commit |
-| **lint-staged** | `package.json`      | ESLint fix + Prettier on staged `.js` files            |
+| Tool            | Config File         | What It Does                                    |
+| --------------- | ------------------- | ----------------------------------------------- |
+| **ESLint**      | `eslint.config.js`  | Flat config, CommonJS, integrated with Prettier |
+| **Prettier**    | `.prettierrc`       | Single quotes, 4-space indent, 120 print width  |
+| **Husky**       | `.husky/pre-commit` | Runs `lint-staged` before each commit           |
+| **lint-staged** | `package.json`      | ESLint fix + Prettier on staged `.js` files     |
 
 Manual commands:
 
 ```bash
-npm run lint              # Check lib/ and scripts/ for issues
+npm run lint              # Check scripts/ for issues (lib/ is independent repo)
 npm run lint:fix          # Auto-fix lint issues
 npm run format            # Format all JS files
 npm run format:check      # Check formatting without writing
 ```
 
-> **Note:** `lint` and `format` scripts scope to `lib/` and `scripts/` only. Files in `testing/` are covered by lint-staged on commit, or run `npx eslint testing/` directly.
+> **Note:** `lint` and `format` scripts scope to `scripts/` only (`lib/` is an independent repo with its own git). Files in `testing/` are covered by lint-staged on commit, or run `npx eslint testing/` directly.
 
 ## 3. Start the Server
 
