@@ -63,8 +63,7 @@
 #*.RTF   diff=astextplain
 
 ###############################################################################
-# Upstream-tracked files
-# lib/VVRestApi/ is forked from VisualVault/nodeJs-rest-client-library.
-# This annotation marks upstream-sourced files for tooling visibility.
+# Note: lib/VVRestApi/ is now an independent repo (gitignored by harness).
+# The upstream-tracked attribute was removed — lib/ has its own git history.
+# See the harness architecture plan for details.
 ###############################################################################
-lib/VVRestApi/** upstream-tracked
