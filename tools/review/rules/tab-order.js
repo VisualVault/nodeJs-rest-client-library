@@ -19,6 +19,8 @@ module.exports = [
     {
         id: 'tab-order-zero',
         name: 'Tab Order Auto-Calculated',
+        component: 'form-templates',
+        appliesTo: TAB_ORDER_FIELDS,
         severity: 'warning',
 
         check(context) {
@@ -42,6 +44,8 @@ module.exports = [
     {
         id: 'tab-order-unique',
         name: 'Tab Order Unique Per Page',
+        component: 'form-templates',
+        appliesTo: TAB_ORDER_FIELDS,
         severity: 'error',
 
         check(context) {

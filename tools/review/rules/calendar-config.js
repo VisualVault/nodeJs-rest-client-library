@@ -24,6 +24,8 @@ module.exports = [
     {
         id: 'calendar-name-match',
         name: 'Calendar Config Matches Field Name',
+        component: 'form-templates',
+        appliesTo: ['FieldCalendar3'],
         severity: 'warning',
 
         check(context) {
@@ -79,6 +81,8 @@ module.exports = [
     {
         id: 'calendar-legacy',
         name: 'Calendar Legacy Datepicker',
+        component: 'form-templates',
+        appliesTo: ['FieldCalendar3'],
         severity: 'info',
 
         check(context) {
@@ -104,6 +108,8 @@ module.exports = [
     {
         id: 'calendar-valid-config',
         name: 'Calendar Valid Configuration',
+        component: 'form-templates',
+        appliesTo: ['FieldCalendar3'],
         severity: 'warning',
 
         check(context) {

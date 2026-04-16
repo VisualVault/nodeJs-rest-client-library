@@ -188,9 +188,10 @@ function main() {
         console.log(generateSummaryReport(templateResults, ruleCount));
     } else {
         // File mode
-        const { summaryPath, metadataPath } = writeReports(outputDir, templateResults, rules, opts);
+        const { summaryPath, matrixPath, metadataPath } = writeReports(outputDir, templateResults, rules, opts);
         console.log(`\nReports written to: ${path.relative(process.cwd(), outputDir)}/`);
         console.log(`  Summary:  ${path.relative(process.cwd(), summaryPath)}`);
+        console.log(`  Matrix:   ${path.relative(process.cwd(), matrixPath)}`);
         console.log(`  Metadata: ${path.relative(process.cwd(), metadataPath)}`);
     }
 

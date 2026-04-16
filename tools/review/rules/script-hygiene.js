@@ -22,6 +22,8 @@ module.exports = [
     {
         id: 'script-orphan-assignment',
         name: 'Script Assignments Reference Valid Controls',
+        component: 'form-templates',
+        appliesTo: 'template',
         severity: 'warning',
 
         check(context) {
@@ -54,6 +56,8 @@ module.exports = [
     {
         id: 'script-unassigned',
         name: 'Event Scripts Must Be Assigned to a Control',
+        component: 'form-templates',
+        appliesTo: 'template',
         severity: 'warning',
 
         check(context) {
@@ -86,6 +90,8 @@ module.exports = [
     {
         id: 'script-unused-template',
         name: 'Template Helper Scripts Must Be Referenced',
+        component: 'form-templates',
+        appliesTo: 'template',
         severity: 'warning',
 
         check(context) {
@@ -127,6 +133,8 @@ module.exports = [
     {
         id: 'script-empty-body',
         name: 'Scripts Have Non-Empty Bodies',
+        component: 'form-templates',
+        appliesTo: 'template',
         severity: 'warning',
 
         check(context) {
@@ -149,6 +157,8 @@ module.exports = [
     {
         id: 'script-field-reference',
         name: 'Script Field References Exist',
+        component: 'form-templates',
+        appliesTo: 'template',
         severity: 'warning',
 
         check(context) {
@@ -182,6 +192,47 @@ module.exports = [
                     }
                 }
             }
+            return findings;
+        },
+    },
+
+    {
+        id: 'tab-reference-by-name',
+        name: 'Tab References Should Use Names Not Numbers',
+        component: 'form-templates',
+        appliesTo: 'template',
+        severity: 'warning',
+
+        check(context) {
+            const findings = [];
+            const { scripts } = context;
+            if (scripts.length === 0) return findings;
+
+            // Patterns that reference tabs by numeric index
+            const numericTabPatterns = [
+                /SelectTab\s*\(\s*\d+\s*\)/g,
+                /TabIndex\s*[=!<>]+\s*\d+/g,
+                /\.selectedIndex\s*=\s*\d+/g,
+            ];
+
+            for (const script of scripts) {
+                if (!script.code.trim()) continue;
+
+                for (const pattern of numericTabPatterns) {
+                    const regex = new RegExp(pattern.source, 'g');
+                    let match;
+                    while ((match = regex.exec(script.code)) !== null) {
+                        findings.push({
+                            ruleId: 'tab-reference-by-name',
+                            severity: 'warning',
+                            field: script.name,
+                            page: '—',
+                            message: `Numeric tab reference "${match[0]}" — use tab name instead of number for maintainability`,
+                        });
+                    }
+                }
+            }
+
             return findings;
         },
     },

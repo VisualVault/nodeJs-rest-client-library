@@ -279,6 +279,10 @@ function writeReports(outputDir, templateResults, rules, opts) {
     const summary = generateSummaryReport(templateResults, rules.length);
     fs.writeFileSync(path.join(outputDir, 'summary.md'), summary, 'utf-8');
 
+    // Field type matrix
+    const matrixReport = generateMatrixReport(rules);
+    fs.writeFileSync(path.join(outputDir, 'matrix.md'), matrixReport, 'utf-8');
+
     // Run metadata
     const metadata = buildRunMetadata(templateResults, rules, opts);
     const metadataPath = path.join(outputDir, 'run-metadata.json');
@@ -287,8 +291,85 @@ function writeReports(outputDir, templateResults, rules, opts) {
     return {
         templateReports: templateResults.length,
         summaryPath: path.join(outputDir, 'summary.md'),
+        matrixPath: path.join(outputDir, 'matrix.md'),
         metadataPath,
     };
 }
 
-module.exports = { generateTemplateReport, generateSummaryReport, buildRunMetadata, writeReports };
+/**
+ * Generate a markdown report mapping field types to their applicable standards.
+ */
+function generateMatrixReport(rules) {
+    const lines = [];
+    lines.push('# Field Type → Standards Matrix');
+    lines.push('');
+    lines.push(`Generated: ${new Date().toISOString().slice(0, 10)} | Rules: ${rules.length}`);
+    lines.push('');
+
+    // Build the matrix from rule metadata
+    const matrix = {};
+    const wildcardRules = [];
+    const templateRules = [];
+
+    for (const rule of rules) {
+        if (!rule.appliesTo || rule.appliesTo === '*') {
+            wildcardRules.push(rule);
+        } else if (rule.appliesTo === 'template') {
+            templateRules.push(rule);
+        } else if (Array.isArray(rule.appliesTo)) {
+            for (const ft of rule.appliesTo) {
+                if (!matrix[ft]) matrix[ft] = [];
+                matrix[ft].push(rule.id);
+            }
+        }
+    }
+
+    const fieldTypes = Object.keys(matrix).sort();
+
+    // Per-field-type table
+    lines.push('## By Field Type');
+    lines.push('');
+    lines.push('| Field Type | Standards |');
+    lines.push('| :--------- | :-------- |');
+    for (const ft of fieldTypes) {
+        lines.push(`| ${ft} | ${matrix[ft].join(', ')} |`);
+    }
+    lines.push('');
+
+    // Wildcard rules
+    if (wildcardRules.length > 0) {
+        lines.push('## All Fields');
+        lines.push('');
+        lines.push('These standards apply to every field type:');
+        lines.push('');
+        for (const r of wildcardRules) {
+            lines.push(`- \`${r.id}\` — ${r.name} (${r.severity})`);
+        }
+        lines.push('');
+    }
+
+    // Template-level rules
+    if (templateRules.length > 0) {
+        lines.push('## Template-Level');
+        lines.push('');
+        lines.push('These standards operate on the template as a whole (scripts, assignments, groups):');
+        lines.push('');
+        for (const r of templateRules) {
+            lines.push(`- \`${r.id}\` — ${r.name} (${r.severity})`);
+        }
+        lines.push('');
+    }
+
+    lines.push(`**Total:** ${rules.length} standards across ${fieldTypes.length} field types`);
+    lines.push('');
+
+    return lines.join('\n');
+}
+
+module.exports = {
+    generateTemplateReport,
+    generateSummaryReport,
+    generateMatrixReport,
+    buildRunMetadata,
+    writeReports,
+};

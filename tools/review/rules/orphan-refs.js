@@ -10,6 +10,8 @@ module.exports = [
     {
         id: 'orphan-container-ref',
         name: 'Container References Valid',
+        component: 'form-templates',
+        appliesTo: 'template',
         severity: 'error',
 
         check(context) {
@@ -39,6 +41,8 @@ module.exports = [
     {
         id: 'orphan-group-member',
         name: 'Group Members Reference Valid Fields',
+        component: 'form-templates',
+        appliesTo: 'template',
         severity: 'warning',
 
         check(context) {

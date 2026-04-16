@@ -126,15 +126,29 @@ function parseTemplate(filePath) {
     for (const g of rawGroups) {
         const members = g.FieldCollection?.FieldMember || [];
         const memberList = Array.isArray(members) ? members : [members];
+        // Separate field members from form control members
+        // FormControls with a real FormControlType (SaveButton, TabControl, etc.) are platform controls.
+        // FieldType "FieldControls" with FormControlType "None" is a regular field (e.g., container).
+        const fieldMembersOut = [];
+        const formControlMembers = [];
+        for (const m of memberList.filter((x) => x)) {
+            const fct = m.FormControlType || '';
+            if (fct && fct !== 'None') {
+                formControlMembers.push(fct);
+            } else {
+                fieldMembersOut.push({ fieldId: m.FieldID || '', fieldType: m.FieldType || '' });
+            }
+        }
+
         groups.push({
             name: g.GroupName || '(unnamed)',
-            fieldMembers: memberList
-                .filter((m) => m)
-                .map((m) => ({
-                    fieldId: m.FieldID || '',
-                    fieldType: m.FieldType || '',
-                })),
+            fieldMembers: fieldMembersOut,
+            formControlMembers,
             conditions: g.ConditionCollection || null,
+            readOnlyConditions: g.ReadOnlyConditionCollection || null,
+            securityMembers: g.SecurityMemberCollection || null,
+            readOnlySecurityMembers: g.SecurityMemberReadonlyCollection || null,
+            _raw: g,
         });
     }
 

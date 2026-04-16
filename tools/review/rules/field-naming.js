@@ -67,6 +67,8 @@ module.exports = [
     {
         id: 'title-case',
         name: 'Title Case Field Names',
+        component: 'form-templates',
+        appliesTo: TITLE_CASE_FIELD_TYPES,
         severity: 'warning',
 
         check(context) {
@@ -95,6 +97,8 @@ module.exports = [
     {
         id: 'default-name',
         name: 'Default Field Names',
+        component: 'form-templates',
+        appliesTo: Object.keys(DEFAULT_NAME_PATTERNS),
         severity: 'warning',
 
         check(context) {
@@ -118,6 +122,8 @@ module.exports = [
     {
         id: 'duplicate-name',
         name: 'Duplicate Field Names',
+        component: 'form-templates',
+        appliesTo: '*',
         severity: 'error',
 
         check(context) {
@@ -152,6 +158,8 @@ module.exports = [
     {
         id: 'empty-name',
         name: 'Empty Field Names',
+        component: 'form-templates',
+        appliesTo: '*',
         severity: 'error',
 
         check(context) {
@@ -174,6 +182,8 @@ module.exports = [
     {
         id: 'valid-identifier',
         name: 'Valid Identifier Characters',
+        component: 'form-templates',
+        appliesTo: '*',
         severity: 'warning',
 
         check(context) {
