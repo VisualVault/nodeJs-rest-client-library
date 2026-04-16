@@ -1,14 +1,14 @@
 # Standards Review: Timber
 
-Generated: 2026-04-14 | Rules: 18 | Findings: 28 (0 errors, 28 warnings, 0 info)
+Generated: 2026-04-15 | Rules: 40 | Findings: 88 (0 errors, 37 warnings, 51 info)
 
 ## Summary
 
 | Severity | Count |
 | :------- | ----: |
 | Error    | 0 |
-| Warning  | 28 |
-| Info     | 0 |
+| Warning  | 37 |
+| Info     | 51 |
 
 ## Warnings
 
@@ -42,3 +42,68 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 28 (0 errors, 28 warnings, 0 info)
 | script-orphan-assignment | Volume_Harvested_onBlur | — | Script assignment references non-existent control ID: 46f44f8d-03da-cf0d-db8f-134ec261c78b |
 | script-orphan-assignment | btnClose2_onClick | — | Script assignment references non-existent control ID: dcc4c208-d05e-cac1-fade-70334c13b657 |
 | script-orphan-assignment | Steepest_Slope_Harvested_Unit_onBlur | — | Script assignment references non-existent control ID: 29b1c2a7-4395-268e-1df8-e2d8d643589c |
+| distance-to-border | Timber ID | Page 1 | Field is 10px from the right border (minimum: 30px) |
+| accessibility-label-match | Cable Assist Tethered | Page 1 | AccessibilityLabel "Cable Assist Tethered" does not match expected "Cable assist/tethered" |
+| accessibility-label-match | btnSave | Page 1 | AccessibilityLabel "Save Button" does not match expected "Save" |
+| accessibility-label-match | btnAdminSave | Page 1 | AccessibilityLabel "Admin Save Button" does not match expected "Admin Save" |
+| accessibility-label-match | Harvest Method List | Page 1 | AccessibilityLabel "Harvest Type List" does not match expected "Harvest Method List" |
+| accessibility-label-match | Logging System List | Page 1 | AccessibilityLabel "Harvest Type List" does not match expected "Logging System List" |
+| button-label-camelcase | Harvest Method | Page 1 | Label name should start with "lbl" prefix (camelCase convention) |
+| button-label-camelcase | Logging System | Page 1 | Label name should start with "lbl" prefix (camelCase convention) |
+| tab-control-visible | TabControl | — | TabControl is in group "Hide Form Tabs" — tab visibility should be controlled via Menu tab, not groups |
+
+## Info
+
+| Rule | Field | Page | Message |
+| :--- | :---- | :--- | :------ |
+| group-override-condition | Hide Form Tabs | — | Group does not reference an override field in its conditions |
+| label-unnamed-in-group | DataField2 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField1 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | Harvest Method | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | Logging System | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblSalvageVolumeHarvested | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblEstimatedNumOfTreesRemaining | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblGEQ10dbh | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblLT10dbh | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField3 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField4 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| spelling | Rubber Tired Skidder | Page 1 | Possible misspelling: "Skidder" (suggestions: Skidded, Kidder) |
+| spelling | Tracked Skidder | Page 1 | Possible misspelling: "Skidder" (suggestions: Skidded, Kidder) |
+| spelling | Dozer | Page 1 | Possible misspelling: "Dozer" (suggestions: Doper, Doter, Dower) |
+| spelling | Slash Bundler | Page 1 | Possible misspelling: "Bundler" (suggestions: Bundled, Bundle, Bundles) |
+| spelling | Greater than or equal to 10 dbh | Page 1 | Possible misspelling: "10" (suggestions: 0, 1) |
+| spelling | Greater than or equal to 10 dbh | Page 1 | Possible misspelling: "dbh" (suggestions: db, dbl, duh) |
+| spelling | Less than 10 dbh | Page 1 | Possible misspelling: "10" (suggestions: 0, 1) |
+| spelling | Less than 10 dbh | Page 1 | Possible misspelling: "dbh" (suggestions: db, dbl, duh) |
+| listener-disabled | Region Zone | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Harvest Unit Number | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Even Aged | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Uneven Aged | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Salvage | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Right of Way | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Rubber Tired Skidder | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Tracked Skidder | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Dozer | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Shovel | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Full Suspension Cable | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Leading End Suspension Cable | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Helicopter | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Cable Assist Tethered | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Animal | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Chipper | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Forwarder | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Slash Bundler | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Other | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Acres Harvested | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Volume Harvested | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Biomass Volume Harvested | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Volume Harvested Percentage | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Steepest Slope Harvest Unit | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Salvage Volume Harvested | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Greater than or equal to 10 dbh | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Less than 10 dbh | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Related Record ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Region | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Temp Data Migration ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Harvest Method List | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Logging System List | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |

@@ -1,14 +1,14 @@
 # Standards Review: Fee-Lookup
 
-Generated: 2026-04-14 | Rules: 18 | Findings: 68 (0 errors, 68 warnings, 0 info)
+Generated: 2026-04-15 | Rules: 40 | Findings: 84 (0 errors, 75 warnings, 9 info)
 
 ## Summary
 
 | Severity | Count |
 | :------- | ----: |
 | Error    | 0 |
-| Warning  | 68 |
-| Info     | 0 |
+| Warning  | 75 |
+| Info     | 9 |
 
 ## Warnings
 
@@ -82,3 +82,24 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 68 (0 errors, 68 warnings, 0 info)
 | script-orphan-assignment | TabComplaintsIncidents_onClick | — | Script assignment references non-existent control ID: c38eb918-5e09-47bf-b39f-66224779a2b4 |
 | script-orphan-assignment | Preferred_Method_Of_Contact_onBlur | — | Script assignment references non-existent control ID: ee46db83-4310-7ad5-6c6c-cb0d04a992e8 |
 | script-field-reference | Physical_Same_As_Mailing_Address_onChange | — | Script references non-existent field "Has Approved License" via GetFieldValue() |
+| distance-to-border | Form ID | Page 1 | Field is 10px from the right border (minimum: 30px) |
+| accessibility-label-match | Process Type | Page 1 | AccessibilityLabel "Fee Type field Required" does not match expected "Process Type" |
+| accessibility-label-match | Fee Amount Can Change | Page 1 | AccessibilityLabel "Fee Amount can Change" does not match expected "Fee Amount can be changed on Fee?" |
+| accessibility-label-match | Accept Checks | Page 1 | AccessibilityLabel "Accept Checks" does not match expected "Can only accept checks?" |
+| accessibility-label-match | btnSave | Page 1 | AccessibilityLabel "Save Button" does not match expected "Save" |
+| accessibility-label-match | btnAdminSave | Page 1 | AccessibilityLabel "Admin Save Button" does not match expected "Admin Save" |
+| accessibility-label-match | Admin Override | Page 1 | AccessibilityLabel "Admin Override" does not match expected "Administrator Override" |
+
+## Info
+
+| Rule | Field | Page | Message |
+| :--- | :---- | :--- | :------ |
+| label-unnamed-in-group | DataField2 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField3 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField6 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField5 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField8 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField9 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField7 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| spelling | GL Account | Page 1 | Possible misspelling: "GL" (suggestions: BL, FL, GK) |
+| field-max-length | Fee Description | Page 1 | MaxLength is 100 for notes field — recommended minimum is 3000 |

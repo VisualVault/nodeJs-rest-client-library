@@ -1,14 +1,14 @@
 # Standards Review: Notification-Communication
 
-Generated: 2026-04-14 | Rules: 18 | Findings: 25 (0 errors, 25 warnings, 0 info)
+Generated: 2026-04-15 | Rules: 40 | Findings: 54 (0 errors, 28 warnings, 26 info)
 
 ## Summary
 
 | Severity | Count |
 | :------- | ----: |
 | Error    | 0 |
-| Warning  | 25 |
-| Info     | 0 |
+| Warning  | 28 |
+| Info     | 26 |
 
 ## Warnings
 
@@ -39,3 +39,37 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 25 (0 errors, 25 warnings, 0 info)
 | script-orphan-assignment | LEG_Notifcation_Sent_onBlur | — | Script assignment references non-existent control ID: 14d67767-409c-6f15-32c9-f60209ff550b |
 | script-orphan-assignment | btnTabFourTwo_onClick | — | Script assignment references non-existent control ID: 63d8f4ec-1ad7-e63b-78c0-862e7b86c7fb |
 | script-orphan-assignment | btnTabFourOne_onClick | — | Script assignment references non-existent control ID: ede21e46-85e5-9232-15c3-572e995ebf29 |
+| distance-to-border | Top Form ID | Page 1 | Field is 10px from the right border (minimum: 30px) |
+| accessibility-label-match | btnSave | Page 1 | AccessibilityLabel "Save Button" does not match expected "Save" |
+| accessibility-label-match | btnAdminSave | Page 1 | AccessibilityLabel "Admin Save Button" does not match expected "Admin Save" |
+
+## Info
+
+| Rule | Field | Page | Message |
+| :--- | :---- | :--- | :------ |
+| label-unnamed-in-group | DataField2 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField1 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField4 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField3 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField5 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField6 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| spelling | WDFW Biologist | Page 1 | Possible misspelling: "WDFW" (suggestions: NSFW, VFW, WEFT) |
+| spelling | WDFW Conflict Inquiry Sent | Page 1 | Possible misspelling: "WDFW" (suggestions: NSFW, VFW, WEFT) |
+| spelling | WDFW Response Received | Page 1 | Possible misspelling: "WDFW" (suggestions: NSFW, VFW, WEFT) |
+| spelling | WDFW Comments | Page 1 | Possible misspelling: "WDFW" (suggestions: NSFW, VFW, WEFT) |
+| spelling | WNHP Conflict Inquiry Sent | Page 1 | Possible misspelling: "WNHP" (suggestions: PHP, WHUP, WHIP) |
+| spelling | WNHP Response Received | Page 1 | Possible misspelling: "WNHP" (suggestions: PHP, WHUP, WHIP) |
+| spelling | WNHP Comments | Page 1 | Possible misspelling: "WNHP" (suggestions: PHP, WHUP, WHIP) |
+| spelling | USFWS Conflict Inquiry Sent | Page 1 | Possible misspelling: "USFWS" (suggestions: NSFW, SAWS, SEWS) |
+| spelling | USFWS Response Received | Page 1 | Possible misspelling: "USFWS" (suggestions: NSFW, SAWS, SEWS) |
+| spelling | USFWS Comments | Page 1 | Possible misspelling: "USFWS" (suggestions: NSFW, SAWS, SEWS) |
+| spelling | DAHP Conflict Inquiry Sent | Page 1 | Possible misspelling: "DAHP" (suggestions: DAMP) |
+| spelling | DAHP Response Received | Page 1 | Possible misspelling: "DAHP" (suggestions: DAMP) |
+| spelling | DAHP Comments | Page 1 | Possible misspelling: "DAHP" (suggestions: DAMP) |
+| listener-disabled | Notification Section | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Related Record ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Temp Data Migration ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| field-max-length | WDFW Comments | Page 1 | MaxLength is 500 for notes field — recommended minimum is 3000 |
+| field-max-length | WNHP Comments | Page 1 | MaxLength is 500 for notes field — recommended minimum is 3000 |
+| field-max-length | USFWS Comments | Page 1 | MaxLength is 500 for notes field — recommended minimum is 3000 |
+| field-max-length | DAHP Comments | Page 1 | MaxLength is 500 for notes field — recommended minimum is 3000 |

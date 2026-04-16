@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-14T20:27:35.002Z",
+  "generatedAt": "2026-04-15T21:28:34.409Z",
   "project": "wadnr",
   "filters": {
     "template": null,
@@ -13,6 +13,7 @@
     "empty-name",
     "valid-identifier",
     "accessibility-label",
+    "accessibility-required",
     "tab-order-zero",
     "tab-order-unique",
     "calendar-name-match",
@@ -23,19 +24,40 @@
     "script-unused-template",
     "script-empty-body",
     "script-field-reference",
+    "tab-reference-by-name",
     "orphan-container-ref",
-    "orphan-group-member"
+    "orphan-group-member",
+    "field-multiple-groups",
+    "group-override-condition",
+    "group-meaningful-name",
+    "label-unnamed-in-group",
+    "group-consolidate-conditions",
+    "container-responsive-flow",
+    "default-text",
+    "simple-upload",
+    "distance-to-border",
+    "label-overlap",
+    "button-min-size",
+    "accessibility-label-match",
+    "spelling",
+    "button-label-camelcase",
+    "listener-disabled",
+    "field-max-length",
+    "admin-override-container",
+    "admin-override-security",
+    "save-button-hidden",
+    "tab-control-visible"
   ],
-  "ruleCount": 18,
+  "ruleCount": 40,
   "summary": {
     "templatesScanned": 77,
     "templatesWithErrors": 1,
     "templatesWithWarnings": 77,
     "cleanTemplates": 0,
-    "totalFindings": 2473,
+    "totalFindings": 8751,
     "totalErrors": 1,
-    "totalWarnings": 2464,
-    "totalInfo": 8
+    "totalWarnings": 6052,
+    "totalInfo": 2698
   },
   "byRule": {
     "default-name": {
@@ -50,6 +72,30 @@
       "info": 0,
       "templatesAffected": 77
     },
+    "label-unnamed-in-group": {
+      "errors": 0,
+      "warnings": 0,
+      "info": 1020,
+      "templatesAffected": 75
+    },
+    "distance-to-border": {
+      "errors": 0,
+      "warnings": 127,
+      "info": 0,
+      "templatesAffected": 76
+    },
+    "accessibility-label-match": {
+      "errors": 0,
+      "warnings": 1881,
+      "info": 0,
+      "templatesAffected": 77
+    },
+    "listener-disabled": {
+      "errors": 0,
+      "warnings": 0,
+      "info": 399,
+      "templatesAffected": 57
+    },
     "title-case": {
       "errors": 0,
       "warnings": 533,
@@ -62,6 +108,42 @@
       "info": 0,
       "templatesAffected": 50
     },
+    "container-responsive-flow": {
+      "errors": 0,
+      "warnings": 134,
+      "info": 0,
+      "templatesAffected": 24
+    },
+    "label-overlap": {
+      "errors": 0,
+      "warnings": 120,
+      "info": 0,
+      "templatesAffected": 31
+    },
+    "spelling": {
+      "errors": 0,
+      "warnings": 0,
+      "info": 884,
+      "templatesAffected": 53
+    },
+    "button-label-camelcase": {
+      "errors": 0,
+      "warnings": 529,
+      "info": 0,
+      "templatesAffected": 30
+    },
+    "field-max-length": {
+      "errors": 0,
+      "warnings": 0,
+      "info": 246,
+      "templatesAffected": 43
+    },
+    "simple-upload": {
+      "errors": 0,
+      "warnings": 19,
+      "info": 0,
+      "templatesAffected": 18
+    },
     "valid-identifier": {
       "errors": 0,
       "warnings": 19,
@@ -73,6 +155,42 @@
       "warnings": 107,
       "info": 0,
       "templatesAffected": 16
+    },
+    "field-multiple-groups": {
+      "errors": 0,
+      "warnings": 435,
+      "info": 0,
+      "templatesAffected": 19
+    },
+    "group-override-condition": {
+      "errors": 0,
+      "warnings": 0,
+      "info": 141,
+      "templatesAffected": 38
+    },
+    "button-min-size": {
+      "errors": 0,
+      "warnings": 234,
+      "info": 0,
+      "templatesAffected": 31
+    },
+    "default-text": {
+      "errors": 0,
+      "warnings": 13,
+      "info": 0,
+      "templatesAffected": 7
+    },
+    "accessibility-required": {
+      "errors": 0,
+      "warnings": 68,
+      "info": 0,
+      "templatesAffected": 29
+    },
+    "tab-control-visible": {
+      "errors": 0,
+      "warnings": 26,
+      "info": 0,
+      "templatesAffected": 26
     },
     "script-field-reference": {
       "errors": 0,
@@ -97,547 +215,559 @@
       "warnings": 4,
       "info": 0,
       "templatesAffected": 2
+    },
+    "admin-override-security": {
+      "errors": 0,
+      "warnings": 1,
+      "info": 0,
+      "templatesAffected": 1
+    },
+    "save-button-hidden": {
+      "errors": 0,
+      "warnings": 1,
+      "info": 0,
+      "templatesAffected": 1
     }
   },
   "templates": [
     {
       "name": "Access-Code",
-      "findings": 5,
+      "findings": 15,
       "errors": 0,
-      "warnings": 5,
-      "info": 0
+      "warnings": 8,
+      "info": 7
     },
     {
       "name": "Activity-Map",
-      "findings": 9,
+      "findings": 23,
       "errors": 0,
-      "warnings": 9,
-      "info": 0
+      "warnings": 15,
+      "info": 8
     },
     {
       "name": "ActivityMapView",
-      "findings": 9,
+      "findings": 23,
       "errors": 0,
-      "warnings": 9,
-      "info": 0
+      "warnings": 15,
+      "info": 8
     },
     {
       "name": "Addendum-Issued-Date-Tracking",
-      "findings": 5,
+      "findings": 13,
       "errors": 0,
-      "warnings": 5,
-      "info": 0
+      "warnings": 10,
+      "info": 3
     },
     {
       "name": "Appeal",
-      "findings": 12,
+      "findings": 42,
       "errors": 0,
-      "warnings": 12,
-      "info": 0
+      "warnings": 24,
+      "info": 18
     },
     {
       "name": "Appellant",
-      "findings": 5,
+      "findings": 12,
       "errors": 0,
-      "warnings": 5,
-      "info": 0
+      "warnings": 9,
+      "info": 3
     },
     {
       "name": "Application-Review-Page",
-      "findings": 161,
+      "findings": 543,
       "errors": 0,
-      "warnings": 161,
-      "info": 0
+      "warnings": 336,
+      "info": 207
     },
     {
       "name": "Associated-Document-Relation",
-      "findings": 9,
+      "findings": 25,
       "errors": 0,
-      "warnings": 9,
-      "info": 0
+      "warnings": 15,
+      "info": 10
     },
     {
       "name": "Base-Template",
-      "findings": 25,
+      "findings": 39,
       "errors": 0,
-      "warnings": 25,
-      "info": 0
+      "warnings": 37,
+      "info": 2
     },
     {
       "name": "Box-Synchronization-Log",
-      "findings": 5,
+      "findings": 16,
       "errors": 0,
-      "warnings": 5,
+      "warnings": 16,
       "info": 0
     },
     {
       "name": "Channel-Characteristics",
-      "findings": 11,
+      "findings": 29,
       "errors": 0,
-      "warnings": 11,
-      "info": 0
+      "warnings": 20,
+      "info": 9
     },
     {
       "name": "Chemical-Information",
-      "findings": 10,
+      "findings": 62,
       "errors": 0,
-      "warnings": 10,
-      "info": 0
+      "warnings": 39,
+      "info": 23
     },
     {
       "name": "Communications-Log",
-      "findings": 16,
+      "findings": 73,
       "errors": 0,
-      "warnings": 16,
-      "info": 0
+      "warnings": 42,
+      "info": 31
     },
     {
       "name": "Copies-Sent-To",
-      "findings": 7,
+      "findings": 19,
       "errors": 0,
-      "warnings": 7,
-      "info": 0
+      "warnings": 15,
+      "info": 4
     },
     {
       "name": "Email-Template",
-      "findings": 11,
+      "findings": 34,
       "errors": 0,
-      "warnings": 11,
-      "info": 0
+      "warnings": 26,
+      "info": 8
     },
     {
       "name": "External-Reviewer-Recommendations",
-      "findings": 8,
+      "findings": 25,
       "errors": 0,
-      "warnings": 8,
-      "info": 0
+      "warnings": 14,
+      "info": 11
     },
     {
       "name": "FPAN-Amendment-Request",
-      "findings": 44,
+      "findings": 280,
       "errors": 1,
-      "warnings": 42,
-      "info": 1
+      "warnings": 213,
+      "info": 66
     },
     {
       "name": "FPAN-Notice-of-Decision",
-      "findings": 30,
+      "findings": 65,
       "errors": 0,
-      "warnings": 30,
-      "info": 0
+      "warnings": 38,
+      "info": 27
     },
     {
       "name": "FPAN-Notice-of-Transfer",
-      "findings": 77,
+      "findings": 329,
       "errors": 0,
-      "warnings": 77,
-      "info": 0
+      "warnings": 269,
+      "info": 60
     },
     {
       "name": "FPAN-Record-Change-Request",
-      "findings": 6,
+      "findings": 19,
       "errors": 0,
-      "warnings": 6,
-      "info": 0
+      "warnings": 11,
+      "info": 8
     },
     {
       "name": "FPAN-Record-Owner",
-      "findings": 6,
+      "findings": 18,
       "errors": 0,
-      "warnings": 6,
-      "info": 0
+      "warnings": 9,
+      "info": 9
     },
     {
       "name": "FPAN-Renewal",
-      "findings": 66,
+      "findings": 274,
       "errors": 0,
-      "warnings": 65,
-      "info": 1
+      "warnings": 210,
+      "info": 64
     },
     {
       "name": "FPNP-County",
-      "findings": 7,
+      "findings": 18,
       "errors": 0,
-      "warnings": 7,
-      "info": 0
+      "warnings": 11,
+      "info": 7
     },
     {
       "name": "FPNP-Township-and-Range",
-      "findings": 12,
+      "findings": 22,
       "errors": 0,
-      "warnings": 12,
-      "info": 0
+      "warnings": 15,
+      "info": 7
     },
     {
       "name": "FPNP-Water-Resource-Inventory-Area",
-      "findings": 8,
+      "findings": 15,
       "errors": 0,
-      "warnings": 8,
-      "info": 0
+      "warnings": 11,
+      "info": 4
     },
     {
       "name": "FPNP-Watershed",
-      "findings": 7,
+      "findings": 14,
       "errors": 0,
-      "warnings": 7,
-      "info": 0
+      "warnings": 11,
+      "info": 3
     },
     {
       "name": "Fee-Lookup",
-      "findings": 68,
+      "findings": 84,
       "errors": 0,
-      "warnings": 68,
-      "info": 0
+      "warnings": 75,
+      "info": 9
     },
     {
       "name": "Fee",
-      "findings": 74,
+      "findings": 138,
       "errors": 0,
-      "warnings": 74,
-      "info": 0
+      "warnings": 104,
+      "info": 34
     },
     {
       "name": "Field-Representative",
-      "findings": 5,
+      "findings": 23,
       "errors": 0,
-      "warnings": 5,
-      "info": 0
+      "warnings": 17,
+      "info": 6
     },
     {
       "name": "Forest-Practices-Aerial-Chemical-Application",
-      "findings": 105,
+      "findings": 348,
       "errors": 0,
-      "warnings": 104,
-      "info": 1
+      "warnings": 273,
+      "info": 75
     },
     {
       "name": "Forest-Practices-Application-Notification",
-      "findings": 207,
+      "findings": 886,
       "errors": 0,
-      "warnings": 206,
-      "info": 1
+      "warnings": 643,
+      "info": 243
     },
     {
       "name": "Forest-Practices-Notification-Profile",
-      "findings": 20,
+      "findings": 112,
       "errors": 0,
-      "warnings": 20,
-      "info": 0
+      "warnings": 87,
+      "info": 25
     },
     {
       "name": "Forest-Roads",
-      "findings": 12,
+      "findings": 53,
       "errors": 0,
-      "warnings": 12,
-      "info": 0
+      "warnings": 34,
+      "info": 19
     },
     {
       "name": "Forest-Tax-Number",
-      "findings": 11,
+      "findings": 24,
       "errors": 0,
-      "warnings": 11,
-      "info": 0
+      "warnings": 18,
+      "info": 6
     },
     {
       "name": "ICN-Participants",
-      "findings": 8,
+      "findings": 20,
       "errors": 0,
-      "warnings": 8,
-      "info": 0
+      "warnings": 12,
+      "info": 8
     },
     {
       "name": "IFPL-Shutdown-Zone",
-      "findings": 6,
+      "findings": 12,
       "errors": 0,
-      "warnings": 6,
-      "info": 0
+      "warnings": 8,
+      "info": 4
     },
     {
       "name": "Individual-Record",
-      "findings": 16,
+      "findings": 59,
       "errors": 0,
-      "warnings": 16,
-      "info": 0
+      "warnings": 35,
+      "info": 24
     },
     {
       "name": "Informal-Conference-Note-SUPPORT-COPY",
-      "findings": 70,
+      "findings": 671,
       "errors": 0,
-      "warnings": 70,
-      "info": 0
+      "warnings": 384,
+      "info": 287
     },
     {
       "name": "Informal-Conference-Note",
-      "findings": 72,
+      "findings": 760,
       "errors": 0,
-      "warnings": 72,
-      "info": 0
+      "warnings": 468,
+      "info": 292
     },
     {
       "name": "Legal-Description",
-      "findings": 7,
+      "findings": 37,
       "errors": 0,
-      "warnings": 7,
-      "info": 0
+      "warnings": 13,
+      "info": 24
     },
     {
       "name": "Long-Term-Application-5-Day-Notice",
-      "findings": 47,
+      "findings": 321,
       "errors": 0,
-      "warnings": 46,
-      "info": 1
+      "warnings": 234,
+      "info": 87
     },
     {
       "name": "Multi-purpose",
-      "findings": 18,
+      "findings": 145,
       "errors": 0,
-      "warnings": 17,
-      "info": 1
+      "warnings": 91,
+      "info": 54
     },
     {
       "name": "NCFLO-Tracking",
-      "findings": 5,
+      "findings": 16,
       "errors": 0,
-      "warnings": 5,
-      "info": 0
+      "warnings": 9,
+      "info": 7
     },
     {
       "name": "NP-Waters",
-      "findings": 15,
+      "findings": 40,
       "errors": 0,
-      "warnings": 15,
-      "info": 0
+      "warnings": 21,
+      "info": 19
     },
     {
       "name": "Nesting-Platforms",
-      "findings": 81,
+      "findings": 116,
       "errors": 0,
-      "warnings": 81,
-      "info": 0
+      "warnings": 105,
+      "info": 11
     },
     {
       "name": "Notice-of-Conversion-to-Non-Forestry-Use",
-      "findings": 307,
+      "findings": 540,
       "errors": 0,
-      "warnings": 307,
-      "info": 0
+      "warnings": 427,
+      "info": 113
     },
     {
       "name": "Notice-to-Comply",
-      "findings": 114,
+      "findings": 382,
       "errors": 0,
-      "warnings": 114,
-      "info": 0
+      "warnings": 241,
+      "info": 141
     },
     {
       "name": "Notification-Communication",
-      "findings": 25,
+      "findings": 54,
       "errors": 0,
-      "warnings": 25,
-      "info": 0
+      "warnings": 28,
+      "info": 26
     },
     {
       "name": "PDF-Package-Generation",
-      "findings": 13,
+      "findings": 22,
       "errors": 0,
-      "warnings": 13,
-      "info": 0
+      "warnings": 16,
+      "info": 6
     },
     {
       "name": "Payment-Item",
-      "findings": 9,
+      "findings": 40,
       "errors": 0,
-      "warnings": 9,
-      "info": 0
+      "warnings": 29,
+      "info": 11
     },
     {
       "name": "PendingDataForAGOL",
-      "findings": 8,
+      "findings": 22,
       "errors": 0,
-      "warnings": 8,
-      "info": 0
+      "warnings": 15,
+      "info": 7
     },
     {
       "name": "Position-Management",
-      "findings": 8,
+      "findings": 30,
       "errors": 0,
-      "warnings": 8,
-      "info": 0
+      "warnings": 22,
+      "info": 8
     },
     {
       "name": "Recommendation-Line-Items",
-      "findings": 4,
+      "findings": 11,
       "errors": 0,
-      "warnings": 4,
-      "info": 0
+      "warnings": 8,
+      "info": 3
     },
     {
       "name": "Region",
-      "findings": 8,
+      "findings": 36,
       "errors": 0,
-      "warnings": 8,
-      "info": 0
+      "warnings": 24,
+      "info": 12
     },
     {
       "name": "Report-Access",
-      "findings": 25,
+      "findings": 40,
       "errors": 0,
-      "warnings": 25,
-      "info": 0
+      "warnings": 38,
+      "info": 2
     },
     {
       "name": "Rockpit",
-      "findings": 12,
+      "findings": 24,
       "errors": 0,
-      "warnings": 12,
-      "info": 0
+      "warnings": 17,
+      "info": 7
     },
     {
       "name": "S-or-F-Waters",
-      "findings": 85,
+      "findings": 292,
       "errors": 0,
-      "warnings": 85,
-      "info": 0
+      "warnings": 204,
+      "info": 88
     },
     {
       "name": "Sensitive-Site",
-      "findings": 5,
+      "findings": 24,
       "errors": 0,
-      "warnings": 5,
-      "info": 0
+      "warnings": 16,
+      "info": 8
     },
     {
       "name": "Shopping-Cart",
-      "findings": 24,
+      "findings": 131,
       "errors": 0,
-      "warnings": 24,
-      "info": 0
+      "warnings": 63,
+      "info": 68
     },
     {
       "name": "Signature-Access",
-      "findings": 5,
+      "findings": 17,
       "errors": 0,
-      "warnings": 5,
-      "info": 0
+      "warnings": 12,
+      "info": 5
     },
     {
       "name": "Signature",
-      "findings": 32,
+      "findings": 90,
       "errors": 0,
-      "warnings": 32,
-      "info": 0
+      "warnings": 50,
+      "info": 40
     },
     {
       "name": "Spoils",
-      "findings": 12,
+      "findings": 24,
       "errors": 0,
-      "warnings": 12,
-      "info": 0
+      "warnings": 20,
+      "info": 4
     },
     {
       "name": "Status-History",
-      "findings": 7,
+      "findings": 24,
       "errors": 0,
-      "warnings": 7,
-      "info": 0
+      "warnings": 17,
+      "info": 7
     },
     {
       "name": "Step-1-Long-Term-FPA",
-      "findings": 79,
+      "findings": 322,
       "errors": 0,
-      "warnings": 78,
-      "info": 1
+      "warnings": 247,
+      "info": 75
     },
     {
       "name": "Stream-Segment",
-      "findings": 20,
+      "findings": 58,
       "errors": 0,
-      "warnings": 20,
-      "info": 0
+      "warnings": 46,
+      "info": 12
     },
     {
       "name": "Survey",
-      "findings": 85,
+      "findings": 109,
       "errors": 0,
-      "warnings": 85,
-      "info": 0
+      "warnings": 100,
+      "info": 9
     },
     {
       "name": "Task",
-      "findings": 15,
+      "findings": 50,
       "errors": 0,
-      "warnings": 14,
-      "info": 1
+      "warnings": 22,
+      "info": 28
     },
     {
       "name": "Timber",
-      "findings": 28,
+      "findings": 88,
       "errors": 0,
-      "warnings": 28,
-      "info": 0
+      "warnings": 37,
+      "info": 51
     },
     {
       "name": "Typed-Water",
-      "findings": 16,
+      "findings": 33,
       "errors": 0,
-      "warnings": 16,
-      "info": 0
+      "warnings": 25,
+      "info": 8
     },
     {
       "name": "Unit-Identifier",
-      "findings": 5,
+      "findings": 24,
       "errors": 0,
-      "warnings": 5,
-      "info": 0
+      "warnings": 17,
+      "info": 7
     },
     {
       "name": "WAC-Violations",
-      "findings": 7,
+      "findings": 22,
       "errors": 0,
-      "warnings": 7,
-      "info": 0
+      "warnings": 15,
+      "info": 7
     },
     {
       "name": "WRIA_WAU",
-      "findings": 8,
+      "findings": 16,
       "errors": 0,
-      "warnings": 8,
-      "info": 0
+      "warnings": 10,
+      "info": 6
     },
     {
       "name": "WTM-Assigned-Reviewers",
-      "findings": 9,
+      "findings": 20,
       "errors": 0,
-      "warnings": 9,
-      "info": 0
+      "warnings": 12,
+      "info": 8
     },
     {
       "name": "WTM-Review-Page",
-      "findings": 34,
+      "findings": 140,
       "errors": 0,
-      "warnings": 34,
-      "info": 0
+      "warnings": 98,
+      "info": 42
     },
     {
       "name": "Water-Crossings",
-      "findings": 18,
+      "findings": 67,
       "errors": 0,
-      "warnings": 18,
-      "info": 0
+      "warnings": 47,
+      "info": 20
     },
     {
       "name": "Water-Segment-Modification",
-      "findings": 12,
+      "findings": 29,
       "errors": 0,
-      "warnings": 12,
-      "info": 0
+      "warnings": 22,
+      "info": 7
     },
     {
       "name": "Wetlands",
-      "findings": 16,
+      "findings": 58,
       "errors": 0,
-      "warnings": 16,
-      "info": 0
+      "warnings": 37,
+      "info": 21
     }
   ]
 }

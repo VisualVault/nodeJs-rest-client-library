@@ -1,14 +1,14 @@
 # Standards Review: Rockpit
 
-Generated: 2026-04-14 | Rules: 18 | Findings: 12 (0 errors, 12 warnings, 0 info)
+Generated: 2026-04-15 | Rules: 40 | Findings: 24 (0 errors, 17 warnings, 7 info)
 
 ## Summary
 
 | Severity | Count |
 | :------- | ----: |
 | Error    | 0 |
-| Warning  | 12 |
-| Info     | 0 |
+| Warning  | 17 |
+| Info     | 7 |
 
 ## Warnings
 
@@ -26,3 +26,20 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 12 (0 errors, 12 warnings, 0 info)
 | script-orphan-assignment | Planned_Activities_In_Wetland_onBlur | — | Script assignment references non-existent control ID: 07852c66-08c4-d8a6-05ad-a7ee5955498b |
 | script-orphan-assignment | btnTabFourOne_onClick | — | Script assignment references non-existent control ID: ede21e46-85e5-9232-15c3-572e995ebf29 |
 | script-orphan-assignment | Total_Wetland_Acres_onBlur | — | Script assignment references non-existent control ID: 5550a4b0-e923-7cd2-5ec5-537b9dc816e0 |
+| distance-to-border | Top Form ID | Page 1 | Field is 10px from the right border (minimum: 30px) |
+| accessibility-label-match | btnSave | Page 1 | AccessibilityLabel "Save Button" does not match expected "Save" |
+| accessibility-label-match | btnAdminSave | Page 1 | AccessibilityLabel "Admin Save Button" does not match expected "Admin Save" |
+| accessibility-label-match | Related Record ID | Page 1 | AccessibilityLabel "FPAN ID" does not match expected "Related Record ID" |
+| button-label-camelcase | fpOnlineTitle | Page 1 | Label name should start with "lbl" prefix (camelCase convention) |
+
+## Info
+
+| Rule | Field | Page | Message |
+| :--- | :---- | :--- | :------ |
+| label-unnamed-in-group | fpOnlineTitle | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField2 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField3 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField1 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField4 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| spelling | Rockpit Identifier | Page 1 | Possible misspelling: "Rockpit" (suggestions: Cockpit) |
+| spelling | Rockpit ID | Page 1 | Possible misspelling: "Rockpit" (suggestions: Cockpit) |

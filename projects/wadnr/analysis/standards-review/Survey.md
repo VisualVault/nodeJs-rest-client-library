@@ -1,14 +1,14 @@
 # Standards Review: Survey
 
-Generated: 2026-04-14 | Rules: 18 | Findings: 85 (0 errors, 85 warnings, 0 info)
+Generated: 2026-04-15 | Rules: 40 | Findings: 109 (0 errors, 100 warnings, 9 info)
 
 ## Summary
 
 | Severity | Count |
 | :------- | ----: |
 | Error    | 0 |
-| Warning  | 85 |
-| Info     | 0 |
+| Warning  | 100 |
+| Info     | 9 |
 
 ## Warnings
 
@@ -99,3 +99,32 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 85 (0 errors, 85 warnings, 0 info)
 | script-orphan-assignment | Q1GIS_onChange | — | Script assignment references non-existent control ID: 5110ee94-df7b-8f5c-29b7-6bc48b2e6701 |
 | script-orphan-assignment | btnHelpQ6_onClick | — | Script assignment references non-existent control ID: 21342ca7-78cb-638d-0310-8d2784240c90 |
 | script-orphan-assignment | btnHelpQ2a_onClick | — | Script assignment references non-existent control ID: 913328f8-1005-fc23-4d72-77be39260632 |
+| container-responsive-flow | Container4 | Page 1 | Container has 12 fields but ResponsiveFlow is not set to 1 Column or 2 Columns (current: none) |
+| distance-to-border | Top Form ID | Page 1 | Field is 20px from the right border (minimum: 30px) |
+| button-min-size | btnHelpSurveyID | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| button-min-size | btnHelpLegalDescription | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| button-min-size | btnHelpWDFWSurveyStatus | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| button-min-size | btnHelpSurveyResults | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| accessibility-label-match | btnHelpSurveyID | Page 1 | AccessibilityLabel "Quick Help Delineated Stand Identifier" does not match expected "?" |
+| accessibility-label-match | btnHelpLegalDescription | Page 1 | AccessibilityLabel "Quick Help Legal Description" does not match expected "?" |
+| accessibility-label-match | btnHelpWDFWSurveyStatus | Page 1 | AccessibilityLabel "Quick Help WDFW Survey Status" does not match expected "?" |
+| accessibility-label-match | btnHelpSurveyResults | Page 1 | AccessibilityLabel "Quick Help Survey Results" does not match expected "?" |
+| accessibility-label-match | btnSave | Page 1 | AccessibilityLabel "Save Button" does not match expected "Save" |
+| accessibility-label-match | btnAdminSave | Page 1 | AccessibilityLabel "Admin Save Button" does not match expected "Admin Save" |
+| accessibility-label-match | btnSaveDraft | Page 1 | AccessibilityLabel "Save Draft Button" does not match expected "Save Draft" |
+| button-label-camelcase | FormTemplateTitle | Page 1 | Label name should start with "lbl" prefix (camelCase convention) |
+| tab-control-visible | TabControl | — | TabControl is in group "Hide Form Tabs" — tab visibility should be controlled via Menu tab, not groups |
+
+## Info
+
+| Rule | Field | Page | Message |
+| :--- | :---- | :--- | :------ |
+| group-override-condition | Hide Form Tabs | — | Group does not reference an override field in its conditions |
+| label-unnamed-in-group | FormTemplateTitle | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField2 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField3 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblRelatedRecordId | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| spelling | WDFW Survey Status | Page 1 | Possible misspelling: "WDFW" (suggestions: NSFW, VFW, WEFT) |
+| listener-disabled | Related Record ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| field-max-length | Survey ID | Page 1 | MaxLength is 25 — recommended minimum is 50 |
+| field-max-length | Legal Description | Page 1 | MaxLength is 25 for notes field — recommended minimum is 3000 |

@@ -1,14 +1,14 @@
 # Standards Review: Notice-of-Conversion-to-Non-Forestry-Use
 
-Generated: 2026-04-14 | Rules: 18 | Findings: 307 (0 errors, 307 warnings, 0 info)
+Generated: 2026-04-15 | Rules: 40 | Findings: 540 (0 errors, 427 warnings, 113 info)
 
 ## Summary
 
 | Severity | Count |
 | :------- | ----: |
 | Error    | 0 |
-| Warning  | 307 |
-| Info     | 0 |
+| Warning  | 427 |
+| Info     | 113 |
 
 ## Warnings
 
@@ -321,3 +321,241 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 307 (0 errors, 307 warnings, 0 inf
 | script-field-reference | btnTimberOwnerSearch_onClick | — | Script references non-existent field "FPAN ID" via GetFieldValue() |
 | script-field-reference | Reforestation_Natural_onChange | — | Script references non-existent field "Harvesting Salvaging Timber" via GetFieldValue() |
 | script-field-reference | Reforestation_Planting_onBlur | — | Script references non-existent field "Harvesting Salvaging Timber" via GetFieldValue() |
+| field-multiple-groups | Con_MultilineText_ConstructionRoads | — | Field appears in 2 groups: Activity Information Construction Roads Visibility, Show Main Section |
+| field-multiple-groups | Con_MultilineText_DiggingPercolation | — | Field appears in 2 groups: Activity Information Digging Percolation Visibility, Show Main Section |
+| field-multiple-groups | Con_MultilineText_ExistencePermitsApplications | — | Field appears in 2 groups: Activity Information Existence Permits Applications Visibility, Show Main Section |
+| field-multiple-groups | Con_MultilineText_GradingFillingSite | — | Field appears in 2 groups: Activity Information Grading Filling Site Visibility, Show Main Section |
+| field-multiple-groups | Con_MultilineText_InstallationUtilities | — | Field appears in 2 groups: Activity Information Installation Utilities Visibility, Show Main Section |
+| field-multiple-groups | Con_MultilineText_Other | — | Field appears in 2 groups: Activity Information Other Visibility, Show Main Section |
+| field-multiple-groups | Con_MultilineText_RemovalStumps | — | Field appears in 2 groups: Activity Information Removal Stumps Visibility, Show Main Section |
+| field-multiple-groups | Con_MultilineText_RemovalVegetation | — | Field appears in 2 groups: Activity Information Removal Vegetation Visibility, Show Main Section |
+| field-multiple-groups | Con_MultilineText_RockpitNonForest | — | Field appears in 2 groups: Activity Information Rockpit Non Forest Visibility, Show Main Section |
+| field-multiple-groups | Con_LandownerBusinessSearchHeader | — | Field appears in 2 groups: Landowner Business Search Visibility, Show Main Section |
+| field-multiple-groups | Con_BusinessSearchLandowner | — | Field appears in 2 groups: Landowner Business Search Visibility, Show Main Section |
+| field-multiple-groups | Con_LandownerIndividualSearchHeader | — | Field appears in 2 groups: Landowner Individual Search Visibility, Show Main Section |
+| field-multiple-groups | Con_IndividualSearchLandowner | — | Field appears in 2 groups: Landowner Individual Search Visibility, Show Main Section |
+| field-multiple-groups | Con_OperatorBusinessSearchHeader | — | Field appears in 2 groups: Operator Business Search Visibility, Show Main Section |
+| field-multiple-groups | Con_BusinessSearchOperator | — | Field appears in 2 groups: Operator Business Search Visibility, Show Main Section |
+| field-multiple-groups | Con_OperatorIndividualSearchHeader | — | Field appears in 2 groups: Operator Individual Search Visibility, Show Main Section |
+| field-multiple-groups | Con_IndividualSearchOperator | — | Field appears in 2 groups: Operator Individual Search Visibility, Show Main Section |
+| field-multiple-groups | Con_TimberOwnerBusinessSearchHeader | — | Field appears in 2 groups: Show Main Section, Timber Owner Business Search Visibility |
+| field-multiple-groups | Con_BusinessSearchTimberOwner | — | Field appears in 2 groups: Show Main Section, Timber Owner Business Search Visibility |
+| field-multiple-groups | Con_TimberOwnerIndividualSearchHeader | — | Field appears in 2 groups: Show Main Section, Timber Owner Individual Search Visibility |
+| field-multiple-groups | Con_IndividualSearchTimberOwner | — | Field appears in 2 groups: Show Main Section, Timber Owner Individual Search Visibility |
+| container-responsive-flow | Con_Body_Manage | Page 1 | Container has 3 fields but ResponsiveFlow is not set to 1 Column or 2 Columns (current: none) |
+| default-text | Signature of Compliance Officer | Page 1 | Field text "Signature Stamp" is a default value |
+| simple-upload | btnUpload | Page 1 | DisplayUploadedFiles is not set — should be false (simple upload mode) |
+| distance-to-border | Chkbx_ConstructionRoads | Page 1 | Field is 0px from the right border (minimum: 30px) |
+| button-min-size | btnHelpLandownerBusinessOrIndividual | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| button-min-size | btnHelpTimberOwnerBusinessOrIndividual | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| button-min-size | btnHelpOperatorBusinessOrIndividual | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| accessibility-label-match | btnLegacyPDF | Page 1 | AccessibilityLabel "Button: Legacy PDF" does not match expected "Legacy PDF" |
+| accessibility-label-match | btnPrintPDF | Page 1 | AccessibilityLabel "Print PDF" does not match expected "Print" |
+| accessibility-label-match | NCNU Number | Page 1 | AccessibilityLabel "NCNU Number" does not match expected "NCNU No." |
+| accessibility-label-match | FPAN Number | Page 1 | AccessibilityLabel "FPAN Number" does not match expected "FPA/N Number" |
+| accessibility-label-match | Related Enforcement Numbers | Page 1 | AccessibilityLabel "Related Enforcement Numbers" does not match expected "Related Enforcement No." |
+| accessibility-label-match | Class Forest Practice | Page 1 | AccessibilityLabel "Class Forest Practice" does not match expected "Class of Forest Practice" |
+| accessibility-label-match | btnTabMain | Page 1 | AccessibilityLabel "Main Tab" does not match expected "Main" |
+| accessibility-label-match | btnTabManage | Page 1 | AccessibilityLabel "Manage Tab" does not match expected "Manage" |
+| accessibility-label-match | btnUpload | Page 1 | AccessibilityLabel "Upload Button" does not match expected "Upload" |
+| accessibility-label-match | btnViewDocumentation | Page 1 | AccessibilityLabel "View Documentation Button" does not match expected "View Documentation" |
+| accessibility-label-match | Landowner Business Or Individual | Page 1 | AccessibilityLabel "Landowner Business Or Individual field Required" does not match expected "Select the Landowner type you want to add" |
+| accessibility-label-match | btnHelpLandownerBusinessOrIndividual | Page 1 | AccessibilityLabel "Landowner Business or Individual Help Button" does not match expected "?" |
+| accessibility-label-match | Landowner Business Search Name | Page 1 | AccessibilityLabel "Landowner Business Search Name" does not match expected "Business Name" |
+| accessibility-label-match | Landowner Business Search Country | Page 1 | AccessibilityLabel "Landowner Business Search Country" does not match expected "Country" |
+| accessibility-label-match | Landowner Business Search Postal Zip Code | Page 1 | AccessibilityLabel "Landowner Business Search Postal Zip Code" does not match expected "Postal Code/Zip Code" |
+| accessibility-label-match | Landowner Business Search Address Line 1 | Page 1 | AccessibilityLabel "Landowner Business Search Address Line 1" does not match expected "Address Line 1" |
+| accessibility-label-match | Landowner Business Search Address Line 2 | Page 1 | AccessibilityLabel "Landowner Business Search Address Line 2" does not match expected "Address Line 2" |
+| accessibility-label-match | Landowner Business Search Address Line 3 | Page 1 | AccessibilityLabel "Landowner Business Search Address Line 3" does not match expected "Address Line 3" |
+| accessibility-label-match | Landowner Business Search County | Page 1 | AccessibilityLabel "Landowner Business Search County" does not match expected "County" |
+| accessibility-label-match | Landowner Business Search Phone | Page 1 | AccessibilityLabel "Landowner Business Search Phone" does not match expected "Phone" |
+| accessibility-label-match | Landowner Business Search Email | Page 1 | AccessibilityLabel "Landowner Business Search Email" does not match expected "Email" |
+| accessibility-label-match | btnLandownerBusinessSearch | Page 1 | AccessibilityLabel "Search Button" does not match expected "Search" |
+| accessibility-label-match | Landowner Individual Search First Name | Page 1 | AccessibilityLabel "Landowner Individual Search First Name" does not match expected "First Name" |
+| accessibility-label-match | Landowner Individual Search Country | Page 1 | AccessibilityLabel "Landowner Individual Search Country" does not match expected "Country" |
+| accessibility-label-match | Landowner Individual Search Postal Zip Code | Page 1 | AccessibilityLabel "Landowner Individual Search Postal Zip Code" does not match expected "Postal Code/Zip Code" |
+| accessibility-label-match | Landowner Individual Search Address Line 1 | Page 1 | AccessibilityLabel "Landowner Individual Search Address Line 1" does not match expected "Address Line 1" |
+| accessibility-label-match | Landowner Individual Search Address Line 2 | Page 1 | AccessibilityLabel "Landowner Individual Search Address Line 2" does not match expected "Address Line 2" |
+| accessibility-label-match | Landowner Individual Search Address Line 3 | Page 1 | AccessibilityLabel "Landowner Individual Search Address Line 3" does not match expected "Address Line 3" |
+| accessibility-label-match | Landowner Individual Search County | Page 1 | AccessibilityLabel "Landowner Individual Search County" does not match expected "County" |
+| accessibility-label-match | Landowner Individual Search Phone | Page 1 | AccessibilityLabel "Landowner Individual Search Phone" does not match expected "Phone" |
+| accessibility-label-match | Landowner Individual Search Email | Page 1 | AccessibilityLabel "Landowner Individual Search Email" does not match expected "Email" |
+| accessibility-label-match | btnLandownerIndividualSearch | Page 1 | AccessibilityLabel "Landowner Search Individual Button" does not match expected "Search" |
+| accessibility-label-match | btnRemoveSelectedLandownerBusinesses | Page 1 | AccessibilityLabel "Remove Selected Button" does not match expected "Remove Selected" |
+| accessibility-label-match | btnRemoveSelectedLandownerIndividuals | Page 1 | AccessibilityLabel "Remove Selected Button" does not match expected "Remove Selected" |
+| accessibility-label-match | Timber Owner Business Or Individual | Page 1 | AccessibilityLabel "Timber Owner Business Or Individual field Required" does not match expected "Select the Timber Owner type you want to add" |
+| accessibility-label-match | btnHelpTimberOwnerBusinessOrIndividual | Page 1 | AccessibilityLabel "Timber Owner Business or Individual Help Button" does not match expected "?" |
+| accessibility-label-match | Timber Owner Business Search Name | Page 1 | AccessibilityLabel "Timber Owner Business Search Name" does not match expected "Business Name" |
+| accessibility-label-match | Timber Owner Business Search Country | Page 1 | AccessibilityLabel "Timber Owner Search Country" does not match expected "Country" |
+| accessibility-label-match | Timber Owner Business Search Postal Zip Code | Page 1 | AccessibilityLabel "Timber Owner Business Search Postal Zip Code" does not match expected "Postal Code/Zip Code" |
+| accessibility-label-match | Timber Owner Business Search Address Line 1 | Page 1 | AccessibilityLabel "Timber Owner Business Search Address Line 1" does not match expected "Address Line 1" |
+| accessibility-label-match | Timber Owner Business Search Address Line 2 | Page 1 | AccessibilityLabel "Timber Owner Business Search Address Line 2" does not match expected "Address Line 2" |
+| accessibility-label-match | Timber Owner Business Search Address Line 3 | Page 1 | AccessibilityLabel "Timber Owner Business Search Address Line 3" does not match expected "Address Line 3" |
+| accessibility-label-match | Timber Owner Business Search County | Page 1 | AccessibilityLabel "Timber Owner Business Search County" does not match expected "County" |
+| accessibility-label-match | Timber Owner Business Search Phone | Page 1 | AccessibilityLabel "Timber Owner Business Search Phone" does not match expected "Phone" |
+| accessibility-label-match | Timber Owner Business Search Email | Page 1 | AccessibilityLabel "Timber Owner Business Search Email" does not match expected "Email" |
+| accessibility-label-match | btnTimberOwnerBusinessSearch | Page 1 | AccessibilityLabel "Timber Owner Search Business Button" does not match expected "Search" |
+| accessibility-label-match | Timber Owner Individual Search First Name | Page 1 | AccessibilityLabel "Timber Owner Individual Search First Name" does not match expected "First Name" |
+| accessibility-label-match | Timber Owner Individual Search Country | Page 1 | AccessibilityLabel "Timber Owner Individual Search Country" does not match expected "Country" |
+| accessibility-label-match | Timber Owner Individual Search Postal Zip Code | Page 1 | AccessibilityLabel "Timber Owner Individual Search Postal Zip Code" does not match expected "Postal Code/Zip Code" |
+| accessibility-label-match | Timber Owner Individual Search Address Line 1 | Page 1 | AccessibilityLabel "Timber Owner Individual Search Address Line 1" does not match expected "Address Line 1" |
+| accessibility-label-match | Timber Owner Individual Search Address Line 2 | Page 1 | AccessibilityLabel "Timber Owner Individual Search Address Line 2" does not match expected "Address Line 2" |
+| accessibility-label-match | Timber Owner Individual Search Address Line 3 | Page 1 | AccessibilityLabel "Timber Owner Individual Search Address Line 3" does not match expected "Address Line 3" |
+| accessibility-label-match | Timber Owner Individual Search County | Page 1 | AccessibilityLabel "Timber Owner Individual Search County" does not match expected "County" |
+| accessibility-label-match | Timber Owner Individual Search Phone | Page 1 | AccessibilityLabel "Timber Owner Individual Search Phone" does not match expected "Phone" |
+| accessibility-label-match | Timber Owner Individual Search Email | Page 1 | AccessibilityLabel "Timber Owner Individual Search Email" does not match expected "Email" |
+| accessibility-label-match | btnTimberOwnerIndividualSearch | Page 1 | AccessibilityLabel "Timber Owner Search Individual Button" does not match expected "Search" |
+| accessibility-label-match | btnRemoveSelectedTimberOwnerBusiness | Page 1 | AccessibilityLabel "Remove Selected Button" does not match expected "Remove Selected" |
+| accessibility-label-match | btnRemoveSelectedTimberOwnerIndividual | Page 1 | AccessibilityLabel "Remove Selected Button" does not match expected "Remove Selected" |
+| accessibility-label-match | Operator Business Or Individual | Page 1 | AccessibilityLabel "Operator Business Or Individual field Required" does not match expected "Select the Operator type you want to add" |
+| accessibility-label-match | btnHelpOperatorBusinessOrIndividual | Page 1 | AccessibilityLabel "Operator Business or Individual Help Button" does not match expected "?" |
+| accessibility-label-match | Operator Business Search Name | Page 1 | AccessibilityLabel "Operator Business Search Name" does not match expected "Business Name" |
+| accessibility-label-match | Operator Business Search Country | Page 1 | AccessibilityLabel "Operator Business Search Country" does not match expected "Country" |
+| accessibility-label-match | Operator Business Search Postal Zip Code | Page 1 | AccessibilityLabel "Operator Business Search Postal Zip Code" does not match expected "Postal Code/Zip Code" |
+| accessibility-label-match | Operator Business Search Address Line 1 | Page 1 | AccessibilityLabel "Operator Business Search Address Line 1" does not match expected "Address Line 1" |
+| accessibility-label-match | Operator Business Search Address Line 2 | Page 1 | AccessibilityLabel "Operator Business Search Address Line 2" does not match expected "Address Line 2" |
+| accessibility-label-match | Operator Business Search Address Line 3 | Page 1 | AccessibilityLabel "Operator Business Search Address Line 3" does not match expected "Address Line 3" |
+| accessibility-label-match | Operator Business Search County | Page 1 | AccessibilityLabel "Operator Business Search County" does not match expected "County" |
+| accessibility-label-match | Operator Business Search Phone | Page 1 | AccessibilityLabel "Operator Business Search Phone" does not match expected "Phone" |
+| accessibility-label-match | Operator Business Search Email | Page 1 | AccessibilityLabel "Operator Business Search Email" does not match expected "Email" |
+| accessibility-label-match | btnOperatorBusinessSearch | Page 1 | AccessibilityLabel "Operator Business Search Button" does not match expected "Search" |
+| accessibility-label-match | Operator Individual Search First Name | Page 1 | AccessibilityLabel "Operator Individual Search First Name" does not match expected "First Name" |
+| accessibility-label-match | Operator Individual Search Country | Page 1 | AccessibilityLabel "Operator Individual Search Country" does not match expected "Country" |
+| accessibility-label-match | Operator Individual Search Postal Zip Code | Page 1 | AccessibilityLabel "Operator Individual Search Postal Zip Code" does not match expected "Postal Code/Zip Code" |
+| accessibility-label-match | Operator Individual Search Address Line 1 | Page 1 | AccessibilityLabel "Operator Individual Search Address Line 1" does not match expected "Address Line 1" |
+| accessibility-label-match | Operator Individual Search Address Line 2 | Page 1 | AccessibilityLabel "Operator Individual Search Address Line 2" does not match expected "Address Line 2" |
+| accessibility-label-match | Operator Individual Search Address Line 3 | Page 1 | AccessibilityLabel "Operator Individual Search Address Line 3" does not match expected "Address Line 3" |
+| accessibility-label-match | Operator Individual Search County | Page 1 | AccessibilityLabel "Operator Individual Search County" does not match expected "County" |
+| accessibility-label-match | Operator Individual Search Phone | Page 1 | AccessibilityLabel "Operator Individual Search Phone" does not match expected "Phone" |
+| accessibility-label-match | Operator Individual Search Email | Page 1 | AccessibilityLabel "Operator Individual Search Email" does not match expected "Email" |
+| accessibility-label-match | btnOperatorIndividualSearch | Page 1 | AccessibilityLabel "Operator Search Individual Button" does not match expected "Search" |
+| accessibility-label-match | btnRemoveSelectedOperatorBusiness | Page 1 | AccessibilityLabel "Remove Operator Business Selected Button" does not match expected "Remove Selected" |
+| accessibility-label-match | btnRemoveSelectedOperatorIndividual | Page 1 | AccessibilityLabel "Remove Operator Individual Selected Button" does not match expected "Remove Selected" |
+| accessibility-label-match | Manage Status | Page 1 | AccessibilityLabel "Manage Status" does not match expected "Status" |
+| accessibility-label-match | btnSaveDraft | Page 1 | AccessibilityLabel "Save Draft Button" does not match expected "Save Draft" |
+| accessibility-label-match | btnSave | Page 1 | AccessibilityLabel "Save Button" does not match expected "Save" |
+| accessibility-label-match | btnSubmit | Page 1 | AccessibilityLabel "Submit Button" does not match expected "Submit" |
+| accessibility-label-match | btnAdminSave | Page 1 | AccessibilityLabel "Admin Save Button" does not match expected "Admin Save" |
+| accessibility-label-match | UserRoles | Page 1 | AccessibilityLabel "UserRoles" does not match expected "User Role(s)" |
+| accessibility-label-match | Individual ID | Page 1 | AccessibilityLabel "Modified By" does not match expected "Individual ID" |
+| accessibility-label-match | UserID | Page 1 | AccessibilityLabel "Modified By" does not match expected "UserID" |
+| button-label-camelcase | LabelDocHeader | Page 1 | Label name should start with "lbl" prefix (camelCase convention) |
+| button-label-camelcase | LabelDocType | Page 1 | Label name should start with "lbl" prefix (camelCase convention) |
+
+## Info
+
+| Rule | Field | Page | Message |
+| :--- | :---- | :--- | :------ |
+| group-override-condition | Manage Button Visibility | — | Group does not reference an override field in its conditions |
+| group-override-condition | Read Only - Legacy PDF Button | — | Group does not reference an override field in its conditions |
+| group-override-condition | Show Print Button | — | Group does not reference an override field in its conditions |
+| label-unnamed-in-group | DataField2 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | LabelDocHeader | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | LabelDocType | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField24 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField1 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField4 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField5 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField6 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField7 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField8 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField9 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField10 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField11 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField12 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField3 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| spelling | NCNU Number | Page 1 | Possible misspelling: "NCNU" (suggestions: GNU, CCU, MENU) |
+| spelling | FPAN Number | Page 1 | Possible misspelling: "FPAN" (suggestions: FRAN, FAN, FLAN) |
+| spelling | DG Legal Description | Page 1 | Possible misspelling: "DG" (suggestions: CG, DB, DH) |
+| spelling | DG Landowner Businesses | Page 1 | Possible misspelling: "DG" (suggestions: CG, DB, DH) |
+| spelling | DG Landowners | Page 1 | Possible misspelling: "DG" (suggestions: CG, DB, DH) |
+| spelling | DG Timber Owner Business | Page 1 | Possible misspelling: "DG" (suggestions: CG, DB, DH) |
+| spelling | DG Timber Owners | Page 1 | Possible misspelling: "DG" (suggestions: CG, DB, DH) |
+| spelling | DG Operator Business | Page 1 | Possible misspelling: "DG" (suggestions: CG, DB, DH) |
+| spelling | DG Operators | Page 1 | Possible misspelling: "DG" (suggestions: CG, DB, DH) |
+| spelling | Chkbx_RemovalVegetation | Page 1 | Possible misspelling: "Chkbx_RemovalVegetation" (suggestions: no suggestions) |
+| spelling | MT_RemovalVegetation | Page 1 | Possible misspelling: "MT_RemovalVegetation" (suggestions: no suggestions) |
+| spelling | Chkbx_RemovalStumps | Page 1 | Possible misspelling: "Chkbx_RemovalStumps" (suggestions: no suggestions) |
+| spelling | MT_RemovalStumps | Page 1 | Possible misspelling: "MT_RemovalStumps" (suggestions: no suggestions) |
+| spelling | Chkbx_InstallationUtilities | Page 1 | Possible misspelling: "Chkbx_InstallationUtilities" (suggestions: no suggestions) |
+| spelling | MT_InstallationUtilities | Page 1 | Possible misspelling: "MT_InstallationUtilities" (suggestions: no suggestions) |
+| spelling | Chkbx_DiggingPercolation | Page 1 | Possible misspelling: "Chkbx_DiggingPercolation" (suggestions: no suggestions) |
+| spelling | MT_DiggingPercolation | Page 1 | Possible misspelling: "MT_DiggingPercolation" (suggestions: no suggestions) |
+| spelling | Chkbx_ConstructionRoads | Page 1 | Possible misspelling: "Chkbx_ConstructionRoads" (suggestions: no suggestions) |
+| spelling | MT_ConstructionRoads | Page 1 | Possible misspelling: "MT_ConstructionRoads" (suggestions: no suggestions) |
+| spelling | Chkbx_GradingFillingSite | Page 1 | Possible misspelling: "Chkbx_GradingFillingSite" (suggestions: no suggestions) |
+| spelling | MT_GradingFillingSite | Page 1 | Possible misspelling: "MT_GradingFillingSite" (suggestions: no suggestions) |
+| spelling | Chkbx_ExistencePermitsApplications | Page 1 | Possible misspelling: "Chkbx_ExistencePermitsApplications" (suggestions: no suggestions) |
+| spelling | MT_ExistencePermitsApplications | Page 1 | Possible misspelling: "MT_ExistencePermitsApplications" (suggestions: no suggestions) |
+| spelling | Chkbx_RockpitNonForest | Page 1 | Possible misspelling: "Chkbx_RockpitNonForest" (suggestions: no suggestions) |
+| spelling | MT_RockpitNonForest | Page 1 | Possible misspelling: "MT_RockpitNonForest" (suggestions: no suggestions) |
+| spelling | Chkbx_Other | Page 1 | Possible misspelling: "Chkbx_Other" (suggestions: no suggestions) |
+| spelling | MT_Other | Page 1 | Possible misspelling: "MT_Other" (suggestions: MOther) |
+| spelling | UserRoles | Page 1 | Possible misspelling: "UserRoles" (suggestions: no suggestions) |
+| spelling | UserID | Page 1 | Possible misspelling: "UserID" (suggestions: serIF, User'S, UserS) |
+| spelling | PDF Report GUID | Page 1 | Possible misspelling: "GUID" (suggestions: GRID, GUIDE, GUIDO) |
+| spelling | Legacy ENF ID | Page 1 | Possible misspelling: "ENF" (suggestions: EMF, ENC, END) |
+| spelling | IsOfficeStaff | Page 1 | Possible misspelling: "IsOfficeStaff" (suggestions: no suggestions) |
+| spelling | isFieldStaff | Page 1 | Possible misspelling: "isFieldStaff" (suggestions: no suggestions) |
+| spelling | Was AutoPopulated | Page 1 | Possible misspelling: "AutoPopulated" (suggestions: no suggestions) |
+| listener-disabled | NCNU Number | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | FPAN Number | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Region | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Class Forest Practice | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Documentation Type | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Landowner Business Or Individual | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Landowner Business Search County | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Landowner Individual Search County | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Timber Owner Business Or Individual | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Timber Owner Business Search County | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Timber Owner Individual Search County | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Operator Business Or Individual | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Operator Business Search County | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Operator Individual Search County | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Manage Status | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Status | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Submitted Date | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Tab Control | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | UserRoles | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Related Record ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Individual ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Created By | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | UserID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Modified By | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | PDF Report GUID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Legacy ENF ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Document Upload Path | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | IsOfficeStaff | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Relations Loaded In | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | isFieldStaff | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Form Saved | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| field-max-length | Landowner Business Search Address Line 1 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Landowner Business Search Address Line 2 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Landowner Business Search Address Line 3 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Landowner Individual Search Last Name | Page 1 | MaxLength is 50 for name field — recommended minimum is 100 |
+| field-max-length | Landowner Individual Search Address Line 1 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Landowner Individual Search Address Line 2 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Landowner Individual Search Address Line 3 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Timber Owner Business Search Address Line 1 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Timber Owner Business Search Address Line 2 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Timber Owner Business Search Address Line 3 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Timber Owner Individual Search Last Name | Page 1 | MaxLength is 50 for name field — recommended minimum is 100 |
+| field-max-length | Timber Owner Individual Search Address Line 1 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Timber Owner Individual Search Address Line 2 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Timber Owner Individual Search Address Line 3 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Operator Business Search Address Line 1 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Operator Business Search Address Line 2 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Operator Business Search Address Line 3 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Operator Individual Search Last Name | Page 1 | MaxLength is 50 for name field — recommended minimum is 100 |
+| field-max-length | Operator Individual Search Address Line 1 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Operator Individual Search Address Line 2 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | Operator Individual Search Address Line 3 | Page 1 | MaxLength is 225 for address field — recommended minimum is 300 |
+| field-max-length | MT_RemovalVegetation | Page 1 | TextArea MaxLength is 1000 — recommended minimum is 3000 for notes/text fields |
+| field-max-length | MT_RemovalStumps | Page 1 | TextArea MaxLength is 1000 — recommended minimum is 3000 for notes/text fields |
+| field-max-length | MT_InstallationUtilities | Page 1 | TextArea MaxLength is 1000 — recommended minimum is 3000 for notes/text fields |
+| field-max-length | MT_DiggingPercolation | Page 1 | TextArea MaxLength is 1000 — recommended minimum is 3000 for notes/text fields |
+| field-max-length | MT_ConstructionRoads | Page 1 | TextArea MaxLength is 1000 — recommended minimum is 3000 for notes/text fields |
+| field-max-length | MT_GradingFillingSite | Page 1 | TextArea MaxLength is 1000 — recommended minimum is 3000 for notes/text fields |
+| field-max-length | MT_ExistencePermitsApplications | Page 1 | TextArea MaxLength is 1000 — recommended minimum is 3000 for notes/text fields |
+| field-max-length | MT_RockpitNonForest | Page 1 | TextArea MaxLength is 1000 — recommended minimum is 3000 for notes/text fields |
+| field-max-length | MT_Other | Page 1 | TextArea MaxLength is 1000 — recommended minimum is 3000 for notes/text fields |

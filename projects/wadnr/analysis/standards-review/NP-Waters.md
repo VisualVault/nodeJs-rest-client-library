@@ -1,14 +1,14 @@
 # Standards Review: NP-Waters
 
-Generated: 2026-04-14 | Rules: 18 | Findings: 15 (0 errors, 15 warnings, 0 info)
+Generated: 2026-04-15 | Rules: 40 | Findings: 40 (0 errors, 21 warnings, 19 info)
 
 ## Summary
 
 | Severity | Count |
 | :------- | ----: |
 | Error    | 0 |
-| Warning  | 15 |
-| Info     | 0 |
+| Warning  | 21 |
+| Info     | 19 |
 
 ## Warnings
 
@@ -29,3 +29,33 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 15 (0 errors, 15 warnings, 0 info)
 | script-orphan-assignment | btnClose1_onClick | — | Script assignment references non-existent control ID: a4f97f0c-71b3-74d4-4ac2-3a7e899a1bce |
 | script-orphan-assignment | Planned_Activities_In_Maximum_Width_WMZ_onBlur | — | Script assignment references non-existent control ID: f22f0c84-cd63-25ef-f420-81ab1a87686a |
 | script-field-reference | SaveForm | — | Script references non-existent field "Relationship Verified" via GetFieldValue() |
+| distance-to-border | Top Form ID | Page 1 | Field is 10px from the right border (minimum: 30px) |
+| accessibility-label-match | btnSave | Page 1 | AccessibilityLabel "Save Button" does not match expected "Save" |
+| accessibility-label-match | btnAdminSave | Page 1 | AccessibilityLabel "Admin Save Button" does not match expected "Admin Save" |
+| accessibility-label-match | Related Record ID | Page 1 | AccessibilityLabel "FPAN ID" does not match expected "Related Record ID" |
+| accessibility-label-match | Region | Page 1 | AccessibilityLabel "Region required field" does not match expected "Region" |
+| tab-control-visible | TabControl | — | TabControl is in group "Hide Form Tabs" — tab visibility should be controlled via Menu tab, not groups |
+
+## Info
+
+| Rule | Field | Page | Message |
+| :--- | :---- | :--- | :------ |
+| group-override-condition | Eastern Fields | — | Group does not reference an override field in its conditions |
+| group-override-condition | Hide Form Tabs | — | Group does not reference an override field in its conditions |
+| group-override-condition | Western Fields | — | Group does not reference an override field in its conditions |
+| label-unnamed-in-group | DataField2 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblStreamSegmentIdentifierRequired | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblTotalStreamLengthInHarvestUnitRequired | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblLengthOfNoHarvest50FtRequired | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblSelectedStrategyRequired | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField3 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField1 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField4 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| spelling | Length Of No Harvest 50 Ft | Page 1 | Possible misspelling: "50" (suggestions: 0, 5) |
+| listener-disabled | Region Zone | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Stream Segment Identifier | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Total Stream Length In Harvest Unit | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Length Of No Harvest 50 Ft | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Selected Strategy | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Related Record ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Region | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |

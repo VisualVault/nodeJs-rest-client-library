@@ -1,14 +1,14 @@
 # Standards Review: Nesting-Platforms
 
-Generated: 2026-04-14 | Rules: 18 | Findings: 81 (0 errors, 81 warnings, 0 info)
+Generated: 2026-04-15 | Rules: 40 | Findings: 116 (0 errors, 105 warnings, 11 info)
 
 ## Summary
 
 | Severity | Count |
 | :------- | ----: |
 | Error    | 0 |
-| Warning  | 81 |
-| Info     | 0 |
+| Warning  | 105 |
+| Info     | 11 |
 
 ## Warnings
 
@@ -16,6 +16,11 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 81 (0 errors, 81 warnings, 0 info)
 | :--- | :---- | :--- | :------ |
 | title-case | Nesting Platforms per Acre | Page 1 | Field name "Nesting Platforms per Acre" is not in Title Case |
 | default-name | Image57 | Page 1 | Default field name "Image57" — use a descriptive name |
+| accessibility-required | Delineated Stand Identifier | Page 1 | Required field AccessibilityLabel "Delineated Stand Identifier Required" should end with "field Required" |
+| accessibility-required | Acreage of Delineated Stand | Page 1 | Required field AccessibilityLabel "Acreage of Delineated Stand Required" should end with "field Required" |
+| accessibility-required | Nesting Platforms per Acre | Page 1 | Required field AccessibilityLabel "Nesting Platforms per Acre Required" should end with "field Required" |
+| accessibility-required | Number of Trees | Page 1 | Required field AccessibilityLabel "Number of Trees 32-inches &#xFEFF;dbh or Greater Required" should end with "field Required" |
+| accessibility-required | Platform Assessment Method | Page 1 | Required field AccessibilityLabel "Platform Assessment Method Required" should end with "field Required" |
 | script-orphan-assignment | Q3Yarding_onBlur | — | Script assignment references non-existent control ID: 6649cb91-44fa-66a7-2159-a0216c18a4ed |
 | script-orphan-assignment | Q4TextField_onBlur | — | Script assignment references non-existent control ID: 1d03b40f-5aab-5552-a001-dabeffdabeae |
 | script-orphan-assignment | btnHelpQ5_onClick | — | Script assignment references non-existent control ID: bf216cc3-caa7-f397-88fc-7984863482f4 |
@@ -95,3 +100,38 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 81 (0 errors, 81 warnings, 0 info)
 | script-orphan-assignment | Q5OtherDescribeTextField_onBlur | — | Script assignment references non-existent control ID: a6cabcca-d644-f4f4-85b7-6f2e4bf5f433 |
 | script-orphan-assignment | Q3ToeOfDeepSeated_onBlur | — | Script assignment references non-existent control ID: 73c4d499-c2aa-e4ba-0679-943868901e4f |
 | script-orphan-assignment | Q3bYesOrNo_onBlur | — | Script assignment references non-existent control ID: 68558688-e9d3-2030-c3f8-e4b0630f548b |
+| distance-to-border | Top Form ID | Page 1 | Field is 20px from the right border (minimum: 30px) |
+| distance-to-border | btnHelpInstructions | Page 1 | Field is 20px from the right border (minimum: 30px) |
+| button-min-size | btnHelpInstructions | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| button-min-size | btnHelpDelineatedStandIdentifier | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| button-min-size | btnHelpNestingPlatformsPerAcre | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| accessibility-label-match | btnHelpInstructions | Page 1 | AccessibilityLabel "Quick Help" does not match expected "?" |
+| accessibility-label-match | Delineated Stand Identifier | Page 1 | AccessibilityLabel "Delineated Stand Identifier Required" does not match expected "Delineated Stand Identifier" |
+| accessibility-label-match | btnHelpDelineatedStandIdentifier | Page 1 | AccessibilityLabel "Quick Help Delineated Stand Identifier" does not match expected "?" |
+| accessibility-label-match | Acreage of Delineated Stand | Page 1 | AccessibilityLabel "Acreage of Delineated Stand Required" does not match expected "Acreage of Delineated Stand" |
+| accessibility-label-match | Nesting Platforms per Acre | Page 1 | AccessibilityLabel "Nesting Platforms per Acre Required" does not match expected "Nesting Platforms per Acre" |
+| accessibility-label-match | btnHelpNestingPlatformsPerAcre | Page 1 | AccessibilityLabel "Quick Help Nesting Platforms Per Acre" does not match expected "?" |
+| accessibility-label-match | Number of Trees | Page 1 | AccessibilityLabel "Number of Trees 32-inches &#xFEFF;dbh or Greater Required" does not match expected "Number of Trees 32-inches &#xFEFF;dbh or Greater (24-inches for Western Hemlock) with Platforms" |
+| accessibility-label-match | Platform Assessment Method | Page 1 | AccessibilityLabel "Platform Assessment Method Required" does not match expected "Platform Assessment Method" |
+| accessibility-label-match | btnSave | Page 1 | AccessibilityLabel "Save Button" does not match expected "Save" |
+| accessibility-label-match | btnAdminSave | Page 1 | AccessibilityLabel "Admin Save Button" does not match expected "Admin Save" |
+| accessibility-label-match | btnSaveDraft | Page 1 | AccessibilityLabel "Save Draft Button" does not match expected "Save Draft" |
+| button-label-camelcase | fpOnlineTitle | Page 1 | Label name should start with "lbl" prefix (camelCase convention) |
+| button-label-camelcase | IntroductionTitle | Page 1 | Label name should start with "lbl" prefix (camelCase convention) |
+| tab-control-visible | TabControl | — | TabControl is in group "Hide Form Tabs" — tab visibility should be controlled via Menu tab, not groups |
+
+## Info
+
+| Rule | Field | Page | Message |
+| :--- | :---- | :--- | :------ |
+| group-override-condition | Hide Form Tabs | — | Group does not reference an override field in its conditions |
+| label-unnamed-in-group | fpOnlineTitle | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField2 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | IntroductionTitle | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField3 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | lblRelatedRecordId | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| listener-disabled | Related Record ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| field-max-length | Delineated Stand Identifier | Page 1 | MaxLength is 6 — recommended minimum is 50 |
+| field-max-length | Acreage of Delineated Stand | Page 1 | MaxLength is 5 — recommended minimum is 50 |
+| field-max-length | Nesting Platforms per Acre | Page 1 | MaxLength is 5 — recommended minimum is 50 |
+| field-max-length | Number of Trees | Page 1 | MaxLength is 5 — recommended minimum is 50 |

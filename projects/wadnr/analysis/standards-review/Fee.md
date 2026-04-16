@@ -1,14 +1,14 @@
 # Standards Review: Fee
 
-Generated: 2026-04-14 | Rules: 18 | Findings: 74 (0 errors, 74 warnings, 0 info)
+Generated: 2026-04-15 | Rules: 40 | Findings: 138 (0 errors, 104 warnings, 34 info)
 
 ## Summary
 
 | Severity | Count |
 | :------- | ----: |
 | Error    | 0 |
-| Warning  | 74 |
-| Info     | 0 |
+| Warning  | 104 |
+| Info     | 34 |
 
 ## Warnings
 
@@ -88,3 +88,72 @@ Generated: 2026-04-14 | Rules: 18 | Findings: 74 (0 errors, 74 warnings, 0 info)
 | script-orphan-assignment | Mailing_Street_1_onBlur | — | Script assignment references non-existent control ID: b1208848-75e2-e0b2-dc13-1306176fd9e5 |
 | script-unused-template | TabToFieldRelationships | — | Template helper "TabToFieldRelationships" is never referenced from any other script |
 | script-field-reference | Physical_Same_As_Mailing_Address_onChange | — | Script references non-existent field "Has Approved License" via GetFieldValue() |
+| container-responsive-flow | Con_Tabs | Page 1 | Container has 4 fields but ResponsiveFlow is not set to 1 Column or 2 Columns (current: none) |
+| distance-to-border | Form ID | Page 1 | Field is 10px from the right border (minimum: 30px) |
+| distance-to-border | btnOpenRelatedRecord | Page 1 | Field is 24px from the right border (minimum: 30px) |
+| distance-to-border | btnForgiveUnpaidBalance | Page 1 | Field is 25px from the right border (minimum: 30px) |
+| label-overlap | Tab Control | Page 1 | Label "Label72" overlaps field by 10px |
+| button-min-size | btnHelpCurrentBalance | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| button-min-size | btnHelpFinalizedTransactionTotal | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| button-min-size | btnHelpPendingTransactionTotal | Page 1 | Button is 20x20px — minimum is 24x24px (508 compliance) |
+| accessibility-label-match | TabFee | Page 1 | AccessibilityLabel "Fee Tab" does not match expected "Fee" |
+| accessibility-label-match | TabPaymentItems | Page 1 | AccessibilityLabel "Payment Items Tab" does not match expected "Payment Items" |
+| accessibility-label-match | TabNotes | Page 1 | AccessibilityLabel "Notes Tab" does not match expected "Notes" |
+| accessibility-label-match | TabRefund | Page 1 | AccessibilityLabel "Refund Tab" does not match expected "Refund" |
+| accessibility-label-match | btnOpenRelatedRecord | Page 1 | AccessibilityLabel "Open Record where Fee Assessed Button" does not match expected "Open Record where Fee Assessed" |
+| accessibility-label-match | btnHelpCurrentBalance | Page 1 | AccessibilityLabel "Current Balance Help Button" does not match expected "?" |
+| accessibility-label-match | btnHelpFinalizedTransactionTotal | Page 1 | AccessibilityLabel "Finalized Transaction Total Help Button" does not match expected "?" |
+| accessibility-label-match | btnHelpPendingTransactionTotal | Page 1 | AccessibilityLabel "Pending Transaction Total Help Button" does not match expected "?" |
+| accessibility-label-match | btnWaiveFee | Page 1 | AccessibilityLabel "Waive Fee Button" does not match expected "Waive Fee" |
+| accessibility-label-match | Waive Forgive Reason | Page 1 | AccessibilityLabel "Waive Forgive Reason" does not match expected "Reason" |
+| accessibility-label-match | btnForgiveUnpaidBalance | Page 1 | AccessibilityLabel "Forgive Unpaid Balance Button" does not match expected "Forgive Unpaid Balance" |
+| accessibility-label-match | btnSave | Page 1 | AccessibilityLabel "Save Button" does not match expected "Save" |
+| accessibility-label-match | btnAdminSave | Page 1 | AccessibilityLabel "Admin Save Button" does not match expected "Admin Save" |
+| accessibility-label-match | Admin Override | Page 1 | AccessibilityLabel "Admin Override" does not match expected "Administrator Override" |
+| accessibility-label-match | Fee Amount Can Change | Page 1 | AccessibilityLabel "Fee Amount can Change" does not match expected "Fee Amount can be changed on Fee?" |
+| accessibility-label-match | Accept Checks | Page 1 | AccessibilityLabel "Accept Checks" does not match expected "Can only accept checks?" |
+| accessibility-label-match | Customer Pays CCTP | Page 1 | AccessibilityLabel "Customer Pays CCTP" does not match expected "Customer Pays CCTP?" |
+| button-label-camelcase | fpOnlineTitle | Page 1 | Label name should start with "lbl" prefix (camelCase convention) |
+| button-label-camelcase | TabFee | Page 1 | Button name should start with "btn" prefix (camelCase convention) |
+| button-label-camelcase | TabPaymentItems | Page 1 | Button name should start with "btn" prefix (camelCase convention) |
+| button-label-camelcase | TabNotes | Page 1 | Button name should start with "btn" prefix (camelCase convention) |
+| button-label-camelcase | TabRefund | Page 1 | Button name should start with "btn" prefix (camelCase convention) |
+
+## Info
+
+| Rule | Field | Page | Message |
+| :--- | :---- | :--- | :------ |
+| group-override-condition | Fee | — | Group does not reference an override field in its conditions |
+| group-override-condition | Fee Amount Balance | — | Group does not reference an override field in its conditions |
+| group-override-condition | Fee Pending Finalized Transaction Totals | — | Group does not reference an override field in its conditions |
+| group-override-condition | Fee Waive Forgive | — | Group does not reference an override field in its conditions |
+| group-override-condition | Fee Waive Forgive Buttons | — | Group does not reference an override field in its conditions |
+| group-override-condition | Notes | — | Group does not reference an override field in its conditions |
+| group-override-condition | Payment Items | — | Group does not reference an override field in its conditions |
+| group-override-condition | Refund | — | Group does not reference an override field in its conditions |
+| group-override-condition | Save Button | — | Group does not reference an override field in its conditions |
+| group-override-condition | Tab Notes | — | Group does not reference an override field in its conditions |
+| group-override-condition | Tab Refund | — | Group does not reference an override field in its conditions |
+| label-unnamed-in-group | fpOnlineTitle | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField2 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField3 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField6 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField5 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField8 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField9 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField7 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField1 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| label-unnamed-in-group | DataField4 | Page 1 | Label has a custom name but is not referenced in any group — only rename labels used in groups/conditions |
+| spelling | GL Account | Page 1 | Possible misspelling: "GL" (suggestions: BL, FL, GK) |
+| spelling | Datagrid Payment Items | Page 1 | Possible misspelling: "Datagrid" (suggestions: no suggestions) |
+| spelling | Datagrid Refunds | Page 1 | Possible misspelling: "Datagrid" (suggestions: no suggestions) |
+| spelling | Related Record GUID | Page 1 | Possible misspelling: "GUID" (suggestions: GRID, GUIDE, GUIDO) |
+| spelling | Customer Pays CCTP | Page 1 | Possible misspelling: "CCTP" (suggestions: CCTV) |
+| listener-disabled | Individual ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Related Record GUID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Related Record ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Parent Fee ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Fee Lookup ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | User ID | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| listener-disabled | Unit Type | Page 1 | EnableQListener is enabled — verify this field requires query string fill-in/relate capability |
+| field-max-length | Fee Description | Page 1 | MaxLength is 100 for notes field — recommended minimum is 3000 |
