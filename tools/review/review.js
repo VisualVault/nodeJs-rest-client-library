@@ -32,7 +32,7 @@ const { rulesForComponent, fieldTypeMatrix } = require('./rules');
 const COMPONENT_CONFIG = {
     'form-templates': {
         extractDir: 'form-templates',
-        filePattern: '.xml',
+        filePattern: ['.xml', '.json'],
         parser: parseTemplate,
         outputDir: 'standards-review',
         itemLabel: 'template',
@@ -192,16 +192,17 @@ function main() {
         process.exit(1);
     }
 
-    // Discover files
+    // Discover files (filePattern can be a string or array of extensions)
+    const patterns = Array.isArray(config.filePattern) ? config.filePattern : [config.filePattern];
     let files = fs
         .readdirSync(extractsDir)
-        .filter((f) => f.endsWith(config.filePattern))
+        .filter((f) => patterns.some((p) => f.endsWith(p)))
         .sort();
 
     if (opts.template) {
-        files = files.filter((f) => f.replace(config.filePattern, '') === opts.template);
+        files = files.filter((f) => f.replace(/\.[^.]+$/, '') === opts.template);
         if (files.length === 0) {
-            console.error(`Item not found: ${opts.template}${config.filePattern} in ${extractsDir}`);
+            console.error(`Item not found: ${opts.template} in ${extractsDir}`);
             process.exit(1);
         }
     }
@@ -225,7 +226,7 @@ function main() {
 
     for (const file of files) {
         const filePath = path.join(extractsDir, file);
-        const itemName = file.replace(config.filePattern, '');
+        const itemName = file.replace(/\.[^.]+$/, '');
 
         try {
             const context = config.parser(filePath);

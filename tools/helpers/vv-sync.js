@@ -111,8 +111,9 @@ function computeChanges(allItems, manifest, opts = {}) {
         // Check if file exists on disk (if fileDir provided)
         let fileExists = true;
         if (fileDir) {
-            const fn = sanitizeFilename(item.name || item[idField]) + fileExt;
-            fileExists = fs.existsSync(path.join(fileDir, fn));
+            const baseName = sanitizeFilename(item.name || item[idField]);
+            const extensions = Array.isArray(fileExt) ? fileExt : [fileExt];
+            fileExists = extensions.some((ext) => fs.existsSync(path.join(fileDir, baseName + ext)));
         }
 
         if (!existing || !fileExists) {

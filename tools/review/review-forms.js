@@ -20,7 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 const { parseTemplate } = require('./lib/parse-template');
-const { writeReports, generateTemplateReport, generateSummaryReport, buildRunMetadata } = require('./lib/report');
+const { writeReports, generateTemplateReport, generateSummaryReport } = require('./lib/report');
 const allRules = require('./rules');
 
 // ---------- Parse CLI args ----------
@@ -107,16 +107,16 @@ function main() {
         process.exit(1);
     }
 
-    // Discover XML files
-    let xmlFiles = fs
+    // Discover template files (XML and JSON)
+    let templateFiles = fs
         .readdirSync(templatesDir)
-        .filter((f) => f.endsWith('.xml'))
+        .filter((f) => f.endsWith('.xml') || f.endsWith('.json'))
         .sort();
 
     if (opts.template) {
-        xmlFiles = xmlFiles.filter((f) => f.replace('.xml', '') === opts.template);
-        if (xmlFiles.length === 0) {
-            console.error(`Template not found: ${opts.template}.xml in ${templatesDir}`);
+        templateFiles = templateFiles.filter((f) => f.replace(/\.(xml|json)$/, '') === opts.template);
+        if (templateFiles.length === 0) {
+            console.error(`Template not found: ${opts.template} in ${templatesDir}`);
             process.exit(1);
         }
     }
@@ -131,15 +131,15 @@ function main() {
         }
     }
 
-    console.log(`Reviewing ${xmlFiles.length} template(s) with ${rules.length} rule(s)...`);
+    console.log(`Reviewing ${templateFiles.length} template(s) with ${rules.length} rule(s)...`);
 
     // Process templates
     const templateResults = [];
     let errors = 0;
 
-    for (const file of xmlFiles) {
+    for (const file of templateFiles) {
         const filePath = path.join(templatesDir, file);
-        const templateName = file.replace('.xml', '');
+        const templateName = file.replace(/\.(xml|json)$/, '');
 
         try {
             const context = parseTemplate(filePath);

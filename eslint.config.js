@@ -40,9 +40,10 @@ module.exports = [
         },
     },
     {
-        files: ['tests/**/*.js'],
+        files: ['tests/**/*.js', '.claude/**/tests/**/*.js'],
         languageOptions: {
             globals: {
+                ...globals.jest,
                 VV: 'readonly',
             },
         },
