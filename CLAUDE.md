@@ -143,14 +143,16 @@ Environment profiles consolidate platform version, service configuration, and fr
 
 ## Standards Review
 
-Deterministic rule-based review of form template XML against codified standards. See `research/standards-review/` for task status and `docs/standards/form-template-standard.md` for the 18 atomic standards.
+Deterministic rule-based review of VV component artifacts against codified standards. Component-aware architecture — each rule declares its target component and field type applicability. See `research/standards-review/` for task status and `docs/standards/form-template-standard.md` for the 40 atomic standards.
 
 ```bash
-npm run review:forms -- --project wadnr        # Full review with file output
+npm run review -- --project wadnr              # Unified CLI (defaults to form-templates)
+npm run review -- --matrix                     # Show field type → standards mapping
+npm run review:forms -- --project wadnr        # Form-specific shortcut
 npm run review:forms -- --project wadnr --print # Stdout only
 ```
 
-Reports written to `projects/{customer}/analysis/standards-review/` (summary.md, per-template reports, run-metadata.json).
+Reports written to `projects/{customer}/analysis/standards-review/` (summary.md, matrix.md, per-template reports, run-metadata.json).
 
 ## Active Research
 

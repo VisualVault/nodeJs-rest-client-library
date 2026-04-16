@@ -152,6 +152,17 @@ Groups can target built-in form controls (SaveButton, tabs, etc.) using well-kno
 
 Pattern: `00000001-0000-0000-0000-e1000000f0XX`. These are referenced in `<FieldMember xsi:type="FormControlFieldMember">` entries within group field collections.
 
+### FieldMember Types in Groups
+
+Group `<FieldMember>` entries use `<FieldType>` and `<FormControlType>` to distinguish what they reference:
+
+| `FieldType`     | `FormControlType`                | Meaning                                                                    |
+| --------------- | -------------------------------- | -------------------------------------------------------------------------- |
+| `FieldControls` | `None`                           | Regular field (container, checkbox, etc.) — referenced by `<FieldID>` GUID |
+| `FormControls`  | `SaveButton`, `TabControl`, etc. | Platform FormControl — referenced by built-in GUID                         |
+
+The `FormControlType: None` value is the key distinguisher: it means the member is a regular field that happens to use the `FieldControls` FieldType, not a platform-level FormControl. When parsing group members, filter on `FormControlType` being a real control name (not "None") to separate platform controls from regular fields.
+
 A separate built-in GUID is used as the `ControlId` target for `onDataLoad` (EventId 16) script assignments:
 
 | GUID                                   | Purpose           |
