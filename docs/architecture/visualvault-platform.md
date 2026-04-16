@@ -56,6 +56,8 @@ https://{env}.visualvault.com/FormViewer/app?hidemenu=true&formid={revisionGUID}
 - `xcdid` — database identifier (accepts both GUID and alias string, e.g., `Main`)
 - `hidemenu=true` — hides the VV navigation shell (typical for end-user forms)
 
+The FormViewer accepts additional URL parameters beyond the core four (`formid`, `DataID`, `xcid`, `xcdid`): `RelateForm`/`IsRelate` (relate on create), `PDF`, `lang`, `tab`, `isReadOnly`, `fillInKey`, and lookup params. See [FormViewer URL Parameters Reference](../reference/formviewer-url-params.md) for the complete catalog (extracted from Angular source, verified 2026-04-16).
+
 Note: `xcid`/`xcdid` accept customer/database **alias strings** as well as GUIDs. Using aliases is simpler when building URLs from config. The REST API `getFormTemplates()` response does NOT include `customerId` or `customerDatabaseId` fields, so you cannot obtain GUIDs from template metadata — use `customerAlias`/`databaseAlias` from your config instead. Verified 2026-04-09 on vvdemo.
 
 Opening a template URL creates a **new blank form instance** each time (named sequentially, e.g., `DateTest-000012`).
@@ -1219,6 +1221,36 @@ Discovered via `GET /api/v1/{customer}/{db}/{resource}` on vvdemo, 2026-04-09. A
 These do not exist as top-level REST resources: `documenttemplates`, `scheduledProcess`, `email`, `projects`, `schema`, `notifications`, `workflow`, `workflowinstances`, `processes`, `library`, `databases`, `roles`, `permissions`, `apiapplications`, `dropdownlists`, `menus`, `portals`, `tags`, `audit`, `auditlog`, `sessions`, `tokens`, `search`, `fulltext`, `calendar`, `events`, `widgets`, `exports`, `imports`, `templates`, `revisions`, `histories`.
 
 Note: `scheduledProcess` returns 500 Internal Server Error on vv5dev/WADNR (tested 2026-04-14 via both vvClient httpHelper and direct OAuth+fetch). The client library config.yml defines the endpoint but it does not support GET for listing. `POST /scheduledProcess/{id}` (postCompletion) works and accepts any GUID — even a placeholder like `00000000-...` returns `{ meta: { status: 200 }, data: true }` with no validation. Some of these (e.g., `email`, `projects`) are documented in the client library config.yml but may require different URL patterns.
+
+### Form Relations API
+
+The platform exposes two parallel API surfaces for managing form-to-form relationships. Both were verified via Angular source analysis (2026-04-16).
+
+**REST API (Node.js client library)** — used by server-side scripts via `vvClient.forms`:
+
+| Method | Endpoint                                           | Client Method           | Purpose                          |
+| ------ | -------------------------------------------------- | ----------------------- | -------------------------------- |
+| PUT    | `/forminstance/{id}/relateForm?relateToId={id}`    | `relateForm()`          | Relate two forms (by revisionId) |
+| PUT    | `/forminstance/{id}/unrelateForm?relateToId={id}`  | `unrelateForm()`        | Unrelate two forms               |
+| PUT    | `/forminstance/{id}/relateForm?relateToDocId={}`   | `relateFormByDocId()`   | Relate by document ID            |
+| PUT    | `/forminstance/{id}/unrelateForm?relateToDocId={}` | `unrelateFormByDocId()` | Unrelate by document ID          |
+| GET    | `/forminstance/{id}/forms`                         | `getFormRelatedForms()` | List related forms               |
+
+**FormsAPI (Angular SPA internal)** — used by the FormViewer's Related Forms panel:
+
+| Method | Internal Call                      | Endpoint Pattern                                             | Purpose                                      |
+| ------ | ---------------------------------- | ------------------------------------------------------------ | -------------------------------------------- |
+| POST   | `postRelateFormApi(child, parent)` | `POST /FormInstance/Relations {childFormId, parentFormId}`   | Relate forms (child/parent semantics)        |
+| DELETE | `delRelateFormApi(child, parent)`  | `DELETE /FormInstance/Relations {childFormId, parentFormId}` | Unrelate forms (used by Related Forms panel) |
+
+The `delRelateFormApi` DELETE endpoint is distinct from the `PUT /unrelateForm` REST API — both achieve the same result but use different HTTP methods and endpoint paths. The DELETE variant is used by the platform's built-in Related Forms tab; the PUT variant is used by the Node.js client library.
+
+**Key behavior** (verified 2026-04-15 on vvdemo Build 20260304.1):
+
+- Relationships are bidirectional: relating A→B makes B appear in A's related forms AND A in B's
+- Unrelating from either side removes the relationship
+- Double-unrelate is idempotent (returns 200)
+- Both relate and unrelate return `{ meta: { status: 200 } }` with no `data` property
 
 ### Undocumented Endpoints (discovered via FormViewer network intercept)
 

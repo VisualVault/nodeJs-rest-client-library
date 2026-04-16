@@ -195,7 +195,7 @@ npm run env:profile:browser
 
 ### Scheduled Process Probes
 
-Research investigation tools for SP execution mechanics. Not general-purpose — tied to the [scheduled-process-logs](../../research/scheduled-process-logs/) investigation.
+Research investigation tools for SP execution mechanics. Not general-purpose — tied to the [scheduled-process-logs](../../research/_archive/scheduled-process-logs/) investigation.
 
 **Common pattern:** Standalone Node.js/Playwright scripts, target the active environment, most support `--headed`.
 

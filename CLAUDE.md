@@ -156,18 +156,23 @@ Reports written to `projects/{customer}/analysis/standards-review/` (summary.md,
 
 ## Active Research
 
-See `research/` folder. Each investigation gets its own subfolder with analysis, test results, and working notes.
+See `research/` folder. Each investigation gets its own subfolder with analysis, test results, and working notes. Completed investigations are moved to `research/_archive/`.
 
-| Research                                                   | Status      | Description                                                                                             |
-| ---------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
-| [date-handling](research/date-handling/)                   | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Document Library |
-| [form-templates](research/form-templates/)                 | Active      | VV form template XML analysis, format documentation, and improved template generation                   |
-| [extract-optimization](research/extract-optimization/)     | Active      | Extract pipeline speed: parallel extraction, revision tracking, API-first                               |
-| [ws-naming](research/ws-naming/)                           | Active      | Web service naming — valid character investigation                                                      |
-| [scheduled-process-logs](research/scheduled-process-logs/) | Complete    | SP execution mechanics: response.json vs postCompletion, platform timeout, log behavior                 |
-| [standards-review](research/standards-review/)             | In Progress | Deterministic standards compliance tool for VV components (form templates first)                        |
-| [unrelate-forms](research/unrelate-forms/)                 | Complete    | Client-side UnrelateForm script — API verification and reusable global function                         |
-| [wadnr](projects/wadnr/)                                   | In Progress | WADNR client project: impact analysis, exported artifacts                                               |
+| Research                                               | Status      | Description                                                                                             |
+| ------------------------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------- |
+| [date-handling](research/date-handling/)               | In Progress | Cross-platform date handling bug investigation across Forms, Web Services, Dashboards, Document Library |
+| [form-templates](research/form-templates/)             | Active      | VV form template XML analysis, format documentation, and improved template generation                   |
+| [extract-optimization](research/extract-optimization/) | Active      | Extract pipeline speed: parallel extraction, revision tracking, API-first                               |
+| [standards-review](research/standards-review/)         | In Progress | Deterministic standards compliance tool for VV components (form templates first)                        |
+| [wadnr](projects/wadnr/)                               | In Progress | WADNR client project: impact analysis, exported artifacts                                               |
+
+### Completed Research (`research/_archive/`)
+
+| Research                                                            | Description                                                                             |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [ws-naming](research/_archive/ws-naming/)                           | Web service naming — valid character investigation                                      |
+| [scheduled-process-logs](research/_archive/scheduled-process-logs/) | SP execution mechanics: response.json vs postCompletion, platform timeout, log behavior |
+| [unrelate-forms](research/_archive/unrelate-forms/)                 | Client-side UnrelateForm script — API verification and reusable global function         |
 
 ## Principles
 

@@ -4,7 +4,7 @@
  * Relate/Unrelate API Round-Trip Verification
  *
  * Tests the full lifecycle: create 2 form records → relate → verify → unrelate → verify.
- * Part of research/unrelate-forms/ investigation.
+ * Part of research/_archive/unrelate-forms/ investigation.
  *
  * Usage:
  *   node tools/runners/run-relate-test.js
