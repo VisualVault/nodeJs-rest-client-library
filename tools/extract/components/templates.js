@@ -97,11 +97,11 @@ module.exports = {
                     if (idx >= total) break;
                     const item = itemsToExtract[idx];
 
-                    process.stdout.write(`  [W${workerId}] [${idx + 1}/${total}] ${item.name}...`);
+                    const prefix = `  [W${workerId}] [${idx + 1}/${total}] ${item.name}...`;
 
                     if (!item.revisionId) {
                         errors.push({ name: item.name, error: 'missing revisionId' });
-                        process.stdout.write(` SKIP (no revisionId)\n`);
+                        process.stdout.write(`${prefix} SKIP (no revisionId)\n`);
                         continue;
                     }
 
@@ -110,14 +110,14 @@ module.exports = {
                         if (xml) {
                             const hash = crypto.createHash('sha256').update(xml).digest('hex');
                             results.set(item.name, { source: xml, contentHash: hash });
-                            process.stdout.write(` OK (${(xml.length / 1024).toFixed(1)} KB)\n`);
+                            process.stdout.write(`${prefix} OK (${(xml.length / 1024).toFixed(1)} KB)\n`);
                         } else {
                             errors.push({ name: item.name, error: 'empty response' });
-                            process.stdout.write(` EMPTY\n`);
+                            process.stdout.write(`${prefix} EMPTY\n`);
                         }
                     } catch (err) {
                         errors.push({ name: item.name, error: err.message });
-                        process.stdout.write(` ERROR: ${err.message}\n`);
+                        process.stdout.write(`${prefix} ERROR: ${err.message}\n`);
                     }
                 }
             } catch (err) {
