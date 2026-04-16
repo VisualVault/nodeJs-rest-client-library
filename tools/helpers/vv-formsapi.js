@@ -5,46 +5,45 @@
  * VV API, discovers the preformsapi base URL from configuration, and retrieves
  * template pages, controls, scripts, and conditions as JSON.
  *
- * All fetch calls run inside page.evaluate() using browser session cookies
- * (for VV API) or Bearer auth (for preformsapi).
+ * VV API calls use Playwright's page.request API (sends browser context cookies
+ * regardless of page origin). PreformsAPI calls use page.evaluate with Bearer auth.
  */
 
 const PREFORMS_AUDIENCE = 'e98f5a306fed4a279a2837dee47751b6';
 
 /**
  * Discover the preformsapi base URL from the VV configuration endpoint.
+ *
+ * Uses Playwright's page.request API which sends browser context cookies
+ * regardless of the page's current origin (avoids about:blank CORS issues).
+ *
  * @param {import('playwright').Page} page - Logged-in browser page
  * @param {string} baseApi - e.g. "https://vv5dev.visualvault.com/api/v1/WADNR/fpOnline"
  * @returns {Promise<string>} e.g. "https://preformsapi.visualvault.com"
  */
 async function discoverFormsApiUrl(page, baseApi) {
-    const resp = await page.evaluate(async (url) => {
-        const r = await fetch(url, { credentials: 'include' });
-        if (!r.ok) return null;
-        return r.json();
-    }, `${baseApi}/configuration/formsapi`);
-
-    return resp?.data?.formsApiUrl || 'https://preformsapi.visualvault.com';
+    const resp = await page.request.get(`${baseApi}/configuration/formsapi`);
+    if (!resp.ok()) return 'https://preformsapi.visualvault.com';
+    const json = await resp.json();
+    return json?.data?.formsApiUrl || 'https://preformsapi.visualvault.com';
 }
 
 /**
  * Fetch a JWT for preformsapi authentication.
+ *
+ * Uses Playwright's page.request API which sends browser context cookies
+ * regardless of the page's current origin (avoids about:blank CORS issues).
+ *
  * @param {import('playwright').Page} page - Logged-in browser page
  * @param {string} baseApi - VV API base URL
  * @returns {Promise<string>} JWT token string
  */
 async function getJwt(page, baseApi) {
-    const resp = await page.evaluate(
-        async ({ url }) => {
-            const r = await fetch(url, { credentials: 'include' });
-            if (!r.ok) return { _error: `${r.status} ${r.statusText}` };
-            return r.json();
-        },
-        { url: `${baseApi}/Users/getJWT?audience=${PREFORMS_AUDIENCE}` }
-    );
-
-    const token = resp?.data?.token;
-    if (!token) throw new Error(`Failed to get preformsapi JWT: ${JSON.stringify(resp?._error || resp?.meta)}`);
+    const resp = await page.request.get(`${baseApi}/Users/getJWT?audience=${PREFORMS_AUDIENCE}`);
+    if (!resp.ok()) throw new Error(`Failed to get preformsapi JWT: ${resp.status()} ${resp.statusText()}`);
+    const json = await resp.json();
+    const token = json?.data?.token;
+    if (!token) throw new Error(`Failed to get preformsapi JWT: no token in response`);
     return token;
 }
 

@@ -107,10 +107,10 @@ function main() {
         process.exit(1);
     }
 
-    // Discover template files (XML and JSON)
+    // Discover template files (XML and JSON), excluding manifest
     let templateFiles = fs
         .readdirSync(templatesDir)
-        .filter((f) => f.endsWith('.xml') || f.endsWith('.json'))
+        .filter((f) => (f.endsWith('.xml') || f.endsWith('.json')) && f !== 'manifest.json')
         .sort();
 
     if (opts.template) {
