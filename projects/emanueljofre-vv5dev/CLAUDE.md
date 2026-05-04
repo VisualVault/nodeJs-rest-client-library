@@ -47,6 +47,10 @@ node tools/extract/extract.js --project emanueljofre-vv5dev --dry-run
 
 ## Analysis
 
+- [`analysis/date-handling/v2-impact-analysis.md`](analysis/date-handling/v2-impact-analysis.md) — Comprehensive impact analysis: severity matrix, customer-impact scenarios, V1→V2 migration risk map, compound-bug interactions, recommendations per stakeholder.
+- [`analysis/date-handling/v2-briefing.md`](analysis/date-handling/v2-briefing.md) — Manager-facing 5-minute briefing of the V2 trade-offs and bottom-line risks.
+- [`analysis/date-handling/v2-bugs-catalog.md`](analysis/date-handling/v2-bugs-catalog.md) — Catalog of every date-handling bug observable on this V2 environment: V2-only new defects, V1 defects persisting in V2, cross-component defects, partial fixes, and V1 defects fixed in V2.
+- [`analysis/date-handling/bug-reports/`](analysis/date-handling/bug-reports/) — 21 self-contained per-bug dossiers in support-ticket-ready format.
 - [`analysis/central-admin/`](analysis/central-admin/README.md) — Central Admin customer-config snapshot (v3041, captured 2026-04-20): per-tab JSON, settings index, key environment facts. See [docs/architecture/visualvault-platform.md § Central Admin](../../docs/architecture/visualvault-platform.md#central-admin-cross-customer-control-panel) for the platform-level documentation.
 
 Other analysis starting points (when extracts exist):
