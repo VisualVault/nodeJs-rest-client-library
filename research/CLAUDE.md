@@ -36,6 +36,7 @@ Execution output bound to a specific customer or environment — actual observed
 | `standards-review/`     | Deterministic standards compliance tool for VV components (form templates, web services, dashboards)      |
 | `ws-script-patterns/`   | Validate and expand canonical script templates (web service, scheduled process, WS for workflow)          |
 | `forminstance-pattern/` | Validate `vvClient.formsApi.formInstances` create + update as a workaround for WS-BUG-1 cross-layer shift |
+| `reviewer-training/`    | Training presentation for VV component reviewers (form templates, web services, dashboards)               |
 
 ## Complete (`_archive/`)
 
