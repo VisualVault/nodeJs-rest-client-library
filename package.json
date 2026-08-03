@@ -16,6 +16,7 @@
     "aws-sdk": "^2.1472.0",
     "axios": "^1.9.0",
     "body-parser": "^1.18.3",
+    "cacheable-lookup": "^6.1.0",
     "cors": "^2.8.5",
     "cross-fetch": "^3.1.4",
     "csv": "^4.0.0",
