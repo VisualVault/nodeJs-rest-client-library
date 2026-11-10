@@ -159,3 +159,5 @@ node_modules/
 lib/VVRestApi/VVRestApiNodeJS/node_modules/
 lib/VVRestApi/VVRestApiNodeJS/files
 scripts/test-scripts
+.scratch/
+.claude/worktrees/
