@@ -12,4 +12,10 @@ describe('the script server client library', () => {
         expect(client.authorize).toBeTypeOf('function');
         expect(client.forms.formFieldCollection).toBeTypeOf('function');
     });
+
+    // The script routes call this method on the authenticated client, so a rename in the package
+    // fails here rather than part-way through a script run.
+    it('takes a completion target on the authenticated client', () => {
+        expect(require('visualvault-api').VVClient.prototype.setCompletionTarget).toBeTypeOf('function');
+    });
 });
