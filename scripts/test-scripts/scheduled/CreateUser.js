@@ -14,6 +14,10 @@ var Q = require('q');
 //import logging script
 var logger = require(require('path').dirname(require.main.filename) + "/log");
 
+//Which client API this script is written against. 'v1' adds the compatibility shims;
+//'v2' hands the script the visualvault-api 2.x client as it is.
+module.exports.clientCompatibility = 'v1';
+
 //getCredentials function will be called by the VisualVault NodeJs client library (/lib/VVRestApi/VVRestAiNodeJs/VVRestApi.js) when appropriate
 //Use this as a template and replace with your API credentials and VisualVault Customer/Database alias values
 module.exports.getCredentials = function () {

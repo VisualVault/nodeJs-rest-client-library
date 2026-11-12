@@ -1,6 +1,12 @@
 var vvEntities = require("visualvault-api").default;
 var logger = require('../log');
 
+//Which client API this script is written against. 'v1' adds the compatibility shims;
+//'v2' hands the script the visualvault-api 2.x client as it is.
+//Stays on v1: the postCompletion call below is never awaited, and only the v1 Q
+//promise swallows a rejection instead of crashing the server process.
+module.exports.clientCompatibility = 'v1';
+
 module.exports.getCredentials = function () {
     var options = {};
     options.customerAlias = "GRMTesting"; //Change this to your customer name

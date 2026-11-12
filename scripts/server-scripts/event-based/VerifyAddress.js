@@ -10,16 +10,20 @@ var Q = require('q');
 //import logging script
 var logger = require("../../../../lib/VVRestApi/VVRestApiNodeJs/log");
 
+//Which client API this script is written against. 'v1' adds the compatibility shims;
+//'v2' hands the script the visualvault-api 2.x client as it is.
+module.exports.clientCompatibility = 'v2';
+
 //getCredentials function will be called by the VisualVault NodeJs client library (/lib/VVRestApi/VVRestAiNodeJs/VVRestApi.js) when appropriate
 //Use this as a template and replace with your API credentials and VisualVault Customer/Database alias values
 module.exports.getCredentials = function () {
     var options = {};
-    options.customerAlias = "Procom";
+    options.customerAlias = "Customer";
     options.databaseAlias = "Default";
-    options.userId = "tod.test";
-    options.password = "password";
-    options.clientId = "29e48740-75b6-401e-91f9-1c0b760bb06c";
-    options.clientSecret = "JU3XtoUoBxgAQWjrfLu6jP31CBT66VPtZQ5L0ABa50Q=";
+    options.userId = "api.user";
+    options.password = "REPLACE_WITH_PASSWORD";
+    options.clientId = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+    options.clientSecret = "EXAMPLEonlyNOTaREALsecretREPLACEbeforeUse00=";
     return options;
 };
 
@@ -53,7 +57,7 @@ module.exports.main = function (ffCollection, vvClient, response) {
         
         if(isUsState){
             var request = require('request'),
-                username = "test_3f51832e23159009c63159b06b2ef07f556",
+                username = "test_00000000000000000000000000000000000",
                 password = "",
                 url = "https://api.lob.com/v1/us_verifications",
                 auth = "Basic " + new Buffer(username + ":" + password).toString("base64"),
