@@ -1,4 +1,4 @@
-var vvEntities = require("../VVRestApi");
+var vvEntities = require("visualvault-api").default;
 var logger = require('../log');
 
 module.exports.getCredentials = function () {

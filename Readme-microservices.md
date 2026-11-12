@@ -1,11 +1,11 @@
 
 
-NodeJs Client Library for VisualVault
-=====================================
+NodeJs script server for VisualVault
+====================================
 
 This Readme is for developers that need to configure their development environment to execute VisualVault microservices for testing.  
 
-If you simply need to access the VisualVault API from a node.js application those instructions can be found in the [README file](https://github.com/VisualVault/nodeJs-rest-client-library/blob/master/README.md).
+If you simply need to access the VisualVault API from a node.js application, install the `visualvault-api` package and see [vv-rest-api-node](https://github.com/VisualVault/vv-rest-api-node).
 
 VisualVault allows you to define microservices which may be called from Form Buttons, Form Scripts, event handlers, and on a scheduled basis.  
 
@@ -22,14 +22,14 @@ For development and debugging you can instruct VisualVault to send scripts to be
 
 Note:  The node.js server option will only be displayed on the my preferences screen if your account has admin access.
 
-When a script it sent to server hosting the VisualVault Node.Js Client Library (the library is an express app), the app will execute the script's Main function and provide parameter values.
+When VisualVault sends a script to a machine running the script server (an express app), the app will execute the script's Main function and provide parameter values.
 
 Setup your development machine with a JavaScript IDE and node.js
 ------
 
 Install node.js version 20.0 or greater on your dev machine.  
 
-**The VisualVault node.js client library requires node version 20.0 or higher.*
+**The VisualVault node.js script server requires node version 20.0 or higher.*
 
 
 Download and install Visual Studio Code (or your favorite JavaScript IDE)
@@ -50,7 +50,7 @@ Clone this repository
 4. You will be prompted for a local folder path where the respository files will be placed.  Select a folder path.
 5. Repository will be cloned to your local workspace.  Open the Repository folder, continue followng the instructions below.
  
- **If adding the node.js client library to an existing project, create the following subdirectory structure in the existing project**
+ **If adding the script server to an existing project, create the following subdirectory structure in the existing project**
 ```shell
 \lib
 \lib\VVRestApi
@@ -59,25 +59,24 @@ Clone this repository
 \lib\VVRestApi\VVRestApiNodeJs\routes
 ```
 
-**If adding the node.js client library to an existing project, copy the following files into the project directories**
+**If adding the script server to an existing project, copy the following files into the project directories**
 
 ```shell
 \lib\VVRestApi\VVRestApiNodeJs\app.js
-\lib\VVRestApi\VVRestApiNodeJs\config.yml
-\lib\VVRestApi\VVRestApiNodeJs\VVRestApi.js
 \lib\VVRestApi\VVRestApiNodeJs\log.js
-\lib\VVRestApi\VVRestApiNodeJs\package.json
 
 \lib\VVRestApi\VVRestApiNodeJs\routes\scheduledscripts.js
 \lib\VVRestApi\VVRestApiNodeJs\routes\scripts.js
 ```
 
+Add `visualvault-api` to the existing project's own `package.json`. The server loads the client from npm; no client files are copied.
+
 Install required NPM packages
 ------
 
-After cloning the repository OR copying the repository files to your existing project, you will need to install the NPM packages required by the VisualVault node.js client library.  
+After cloning the repository OR copying the repository files to your existing project, you will need to install the NPM packages required by the VisualVault node.js script server.  
 
-Navgiate to the directory containting \lib\VVRestApi\VVRestApiNodeJs\package.json file and execute the following the npm install command  from a terminal window.  npm install will use the Package.json file to determine which packages and package versions to install.
+Navigate to the directory containing the package.json file, at the root of the repository, and execute the following npm install command from a terminal window.  npm install will use the package.json file to determine which packages and package versions to install.
 
 ```shell
     npm install
@@ -100,7 +99,7 @@ If you go back to the File Explorer view (Ctrl+Shift+E), you'll see that VS Code
 
 ![Default launch.json file](https://code.visualstudio.com/assets/docs/editor/debugging/launch-json-in-explorer.png)
 
-**Example launch configuration to launch Node.js and execute the VisualVault node.js client library.**
+**Example launch configuration to launch Node.js and execute the VisualVault node.js script server.**
 
 ```json
 {    
@@ -140,7 +139,7 @@ If you have not already read the section above "How node.js scripts are integrat
 
 **Redirect scripts stored in VisualVault to your Development machine**
 
-VisualVault sends a script to execute to a server hosting the VisualVault node client library app; the app then invokes the script's "Main" function.
+VisualVault sends a script to execute to a server hosting the VisualVault node script server app; the app then invokes the script's "Main" function.
 
 When developing scripts, you can instruct VisualVault to send scripts to your development machine vs. sending the scripts to servers located within the VisualVault cloud.
 
@@ -155,7 +154,7 @@ Redirection steps:
    If you do not have a public URL for your development machine, follow steps 4-5 below and use the free service provided by NGROK to create one.
 
 4. Install NGROK using the instructions for your OS
-5. From a terminal window in the NGROK directory, enter the command below which assumes your VisualVault Node.Js Client Library app is listening on port 3000 which is the default.  The port number can be changed within the app.js file.
+5. From a terminal window in the NGROK directory, enter the command below which assumes your VisualVault Node.Js script server app is listening on port 3000 which is the default.  The port number can be changed within the app.js file.
 
 ```shell
     ngrok http 3000
@@ -169,10 +168,10 @@ Scheduled scripts can be executed directly from your development machine for tes
 
 Below are the steps required to test scheduled scripts directly on your development machine:
 
-1. Copy or move the script to be tested into the '/scripts/test-scripts/scheduled' folder path within your project.  The VisualVault node.js client library app contains a route which will execute scripts located in this folder.
-2. From a web browser or other http client, request the following resource:  http://localhost:3000/TestScripts/Scheduled/{ScriptName} where localhost is your development machine's name and port 3000 is the default port the VisualVault Node.Js Client Library app is listening on.
+1. Copy or move the script to be tested into the '/scripts/test-scripts/scheduled' folder path within your project.  The VisualVault node.js script server app contains a route which will execute scripts located in this folder.
+2. From a web browser or other http client, request the following resource:  http://localhost:3000/TestScripts/Scheduled/{ScriptName} where localhost is your development machine's name and port 3000 is the default port the VisualVault Node.Js script server app is listening on.
 
-Example scheduled node.js script using VisualVault node.js client library
+Example scheduled node.js script using the VisualVault node.js script server
  ------
 
 ```javascript
@@ -192,7 +191,7 @@ var Q = require('q');
 //import logging script
 var logger = require("../../../lib/VVRestApi/VVRestApiNodeJs/log");
 
-//getCredentials function will be called by the VisualVault NodeJs client library (/lib/VVRestApi/VVRestAiNodeJs/VVRestApi.js) when appropriate
+//getCredentials function will be called by the script server route (/lib/VVRestApi/VVRestApiNodeJs/routes/) when appropriate
 //Use this as a template and replace with your API credentials and VisualVault Customer/Database alias values
 module.exports.getCredentials = function () {
     var options = {};
@@ -209,7 +208,7 @@ module.exports.getCredentials = function () {
     return options;
 };
 
-//main function will be called by the VisualVault NodeJs client library (/lib/VVRestApi/VVRestAiNodeJs/VVRestApi.js) when appropriate
+//main function will be called by the script server route (/lib/VVRestApi/VVRestApiNodeJs/routes/) when appropriate
 //main function parameters (vvClient, response, scriptId) are provided when a Scheduled Script is called
 module.exports.main = function (vvClient, response, scriptId) {
     logger.info("Start of TestScript on " + new Date());

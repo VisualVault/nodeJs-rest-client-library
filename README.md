@@ -1,264 +1,48 @@
-# visualvault-api
+# VisualVault Node.js script server
 
 ![Notice: npm package moved](https://img.shields.io/badge/npm%20package-moved-orange)
 
-> The `visualvault-api` npm package source code has moved to [vv-rest-api-node](https://github.com/VisualVault/vv-rest-api-node). All future package updates, issues, and pull requests should be directed there. The API wrapper code will be removed from this repository in a future update, and this repo will continue to serve as the source for the VisualVault server code.
+> This repository holds the VisualVault Node.js script server. The `visualvault-api` npm package it depends on is built from [vv-rest-api-node](https://github.com/VisualVault/vv-rest-api-node); send package updates, issues, and pull requests there.
 
-A Node.js client library that provides convenient access to the VisualVault REST API for server-side applications.
-
-## Installation
-
-```bash
-npm install visualvault-api
-```
+The server runs customer scripts on behalf of VisualVault. VisualVault posts a script to it over HTTP; the server writes the script to disk, loads it, authenticates to the VisualVault REST API through the `visualvault-api` client, and calls the script's `main()`.
 
 ## Requirements
 
 - Node.js 20.0.0 or higher
 
-## Quick Start
+## Running the server
 
-### Basic Authentication and Setup
-
-```javascript
-const vvRestApi = require('visualvault-api');
-
-// Initialize authentication
-const auth = new vvRestApi.authorize();
-
-// Get authenticated client
-auth.getVaultApi(
-    'your-client-id',
-    'your-client-secret',
-    'username',
-    'password',
-    'your-audience',
-    'https://your-vault-url.com',
-    'customer-alias',
-    'database-alias'
-).then(client => {
-    console.log('Successfully authenticated!');
-    // Use the client for API calls
-}).catch(error => {
-    console.error('Authentication failed:', error);
-});
+```bash
+npm install
+node lib/VVRestApi/VVRestApiNodeJs/app.js
 ```
 
-### JWT Authentication
+The server listens on `PORT`, or 3000 when `PORT` is unset. `GET /` returns a greeting naming the running Node version; use it to confirm the server is up.
 
-If you already have a JWT token:
+## Routes
 
-```javascript
-const auth = new vvRestApi.authorize();
+| Route | Purpose |
+|---|---|
+| `GET /`, `GET /app.js` | Greeting naming the Node version |
+| `POST /scripts`, `GET /scripts` | Run an on-demand script |
+| `POST /scheduledscripts` | Run a scheduled script |
+| `GET /testscripts/scheduled/:name` | Run a named script from `scripts/test-scripts/scheduled/` |
 
-auth.getVaultApiFromJwt(
-    'your-jwt-token',
-    'https://your-vault-url.com',
-    'customer-alias',
-    'database-alias',
-    new Date('2024-12-31') // expiration date
-).then(client => {
-    console.log('JWT authentication successful!');
-}).catch(error => {
-    console.error('JWT authentication failed:', error);
-});
-```
+Every route is also registered under a `/node/` prefix and under the virtual directory alias in `app.js`, which is `vvnodeserver`. A request that omits the alias still matches.
 
-## API Usage Examples
+## Where scripts come from
 
-### Working with Documents
+A posted script is written to a `files/` directory beside the server's entry point and required from there, so a script's relative `require` paths resolve against that `files/` directory. The repository also carries sample and test scripts under `scripts/`; they still use the v1 client call patterns, so they are not a current example.
 
-```javascript
-// Get documents from a folder
-client.library.getDocuments(params, folderId)
-    .then(response => {
-        const documents = JSON.parse(response);
-        console.log('Documents:', documents.data);
-    });
+## The client library
 
-// Upload a new document
-const documentData = {
-    fileName: 'example.pdf',
-    description: 'Example document',
-    folderId: 'your-folder-id'
-};
-
-client.documents.postDocWithFile(documentData, fileBuffer)
-    .then(response => {
-        console.log('Document uploaded:', response);
-    });
-
-// Get document details
-client.documents.getDocumentRevision(params, revisionId)
-    .then(response => {
-        const document = JSON.parse(response);
-        console.log('Document details:', document);
-    });
-```
-
-### Working with Forms
-
-```javascript
-// Get forms by template name
-client.forms.getForms(params, 'Your Form Template Name')
-    .then(response => {
-        const forms = JSON.parse(response);
-        console.log('Forms:', forms.data);
-    });
-
-// Create a new form instance
-const formData = {
-    field1: 'value1',
-    field2: 'value2'
-};
-
-client.forms.postForms(params, formData, 'Your Form Template Name')
-    .then(response => {
-        console.log('Form created:', response);
-    });
-
-// Get form instance by ID
-client.forms.getFormInstanceById(templateId, instanceId)
-    .then(response => {
-        const form = JSON.parse(response);
-        console.log('Form instance:', form);
-    });
-```
-
-### Working with Folders
-
-```javascript
-// Get folders
-client.library.getFolders(params)
-    .then(response => {
-        const folders = JSON.parse(response);
-        console.log('Folders:', folders.data);
-    });
-
-// Create a new folder
-const folderData = {
-    name: 'New Folder',
-    description: 'Folder description'
-};
-
-client.library.postFolderByPath(params, folderData, '/Parent Folder/New Folder')
-    .then(response => {
-        console.log('Folder created:', response);
-    });
-```
-
-### Working with Users
-
-```javascript
-// Get current user information
-client.users.getUser(params)
-    .then(response => {
-        const user = JSON.parse(response);
-        console.log('Current user:', user);
-    });
-
-// Get users in a site
-client.users.getUsers(params, siteId)
-    .then(response => {
-        const users = JSON.parse(response);
-        console.log('Users:', users.data);
-    });
-```
-
-### Running Custom Queries
-
-```javascript
-// Execute a custom query by name
-client.customQuery.getCustomQueryResultsByName('Your Query Name', params)
-    .then(response => {
-        const results = JSON.parse(response);
-        console.log('Query results:', results.data);
-    });
-```
-
-### Working with Files
-
-```javascript
-// Upload a file
-const fileData = {
-    fileName: 'document.pdf',
-    description: 'My document'
-};
-
-client.files.postFile(fileData, fileBuffer)
-    .then(response => {
-        console.log('File uploaded:', response);
-    });
-
-// Download a file
-client.files.getFileBytesId(fileId)
-    .then(fileBuffer => {
-        // Process the file buffer
-        console.log('File downloaded, size:', fileBuffer.length);
-    });
-```
-
-### Running Web Services
-
-```javascript
-// Execute a web service
-const serviceData = {
-    param1: 'value1',
-    param2: 'value2'
-};
-
-client.scripts.runWebService('YourWebServiceName', serviceData)
-    .then(response => {
-        console.log('Web service result:', response);
-    });
-```
-
-## API Modules
-
-The client provides access to the following VisualVault API modules:
-
-- **documents** - Document management operations
-- **forms** - Form template and instance operations
-- **library** - Folder and library management
-- **users** - User management operations
-- **groups** - Group management operations
-- **sites** - Site management operations
-- **files** - File upload/download operations
-- **scripts** - Web service execution
-- **customQuery** - Custom query execution
-- **email** - Email operations
-- **constants** - API constants and enums
-- **scheduledProcess** - Scheduled process management
-- **customer** - Customer management operations
-- **projects** - Project management operations
-- **indexFields** - Document Index field operations
-- **outsideProcesses** - Outside process management
-- **securityMembers** - Security member management
-- **reports** - Report generation
-
-
-## Error Handling
-
-```javascript
-client.documents.getDocuments(params, folderId)
-    .then(response => {
-        const result = JSON.parse(response);
-        if (result.meta && result.meta.statusCode === 200) {
-            console.log('Success:', result.data);
-        } else {
-            console.error('API Error:', result);
-        }
-    })
-    .catch(error => {
-        console.error('Request failed:', error);
-    });
-```
+The server authenticates with the credentials a script returns from `getCredentials()`, then passes the resulting `visualvault-api` client into the script's `main()`: the first argument for scheduled scripts, the second for form scripts. `package.json` pins the package to an exact version. For the client's own API, see [vv-rest-api-node](https://github.com/VisualVault/vv-rest-api-node).
 
 ## Support
 
-For more information about the VisualVault API, visit the [VisualVault documentation](https://docs.visualvault.com/).
+For setup and debugging, see [Readme-microservices](https://github.com/VisualVault/nodeJs-rest-client-library/blob/master/Readme-microservices.md).
 
-For VisualVault micro service debugging assistance see [Readme-microservices](https://github.com/VisualVault/nodeJs-rest-client-library/blob/master/Readme-microservices.md).
+For more information about the VisualVault API, visit the [VisualVault documentation](https://docs.visualvault.com/).
 
 ## License
 
