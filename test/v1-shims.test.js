@@ -202,11 +202,16 @@ describe('the clientCompatibility declaration', () => {
         return shimmedClientFor(unreachable, 'api/v1/', script);
     }
 
-    it('leaves the client unshimmed for a script that declares v2', () => {
+    it('leaves the client unshimmed for a script that declares v2', async () => {
         const client = clientFor({ clientCompatibility: 'v2' });
 
         expect(client.indexFields.putIndexFields).toBeUndefined();
-        expect(client.indexFields.getIndexFields({}).fail).toBeUndefined();
+
+        const pending = client.indexFields.getIndexFields({});
+
+        expect(pending.fail).toBeUndefined();
+        // The request to the unreachable port always rejects; the test only checks the promise type.
+        await pending.catch(() => {});
     });
 
     it('shims the client for a script that declares v1', () => {

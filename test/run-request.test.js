@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 const require = createRequire(import.meta.url);
 
-const { readRunFields, routeCompletionsTo } = require('../lib/VVRestApi/VVRestApiNodeJs/routes/runRequest');
+const { acknowledgeIdentitySource, readRunFields, resolveIdentity, routeCompletionsTo } = require('../lib/VVRestApi/VVRestApiNodeJs/routes/runRequest');
 
 describe('reading the run fields', () => {
     it('reads completionTarget and runContext from a Key/Value array body', () => {
@@ -67,5 +67,91 @@ describe('routing the completions of a run', () => {
         routeCompletionsTo({ setCompletionTarget: (target) => targets.push(target) }, null);
 
         expect(targets).toEqual([]);
+    });
+});
+
+describe('resolving the identity a run logs in with', () => {
+    it('uses the script credentials when the script exports getCredentials', () => {
+        const scriptCredentials = { clientId: 'script-key', clientSecret: 'script-secret', userId: 'script-user', password: 'script-password' };
+
+        const identity = resolveIdentity({ getCredentials: () => scriptCredentials }, null);
+
+        expect(identity.source).toBe('script-credentials');
+        // `toBe`, not `toEqual`: the script's credentials object is handed on unchanged.
+        expect(identity.params).toBe(scriptCredentials);
+    });
+    it('logs in with the run-as key when the script exports no getCredentials', () => {
+        const identity = resolveIdentity({}, {
+            version: 1,
+            secrets: {
+                clientId: 'run-as-key',
+                clientSecret: 'run-as-secret',
+                customerAlias: 'run-as-customer',
+                databaseAlias: 'run-as-database'
+            }
+        });
+
+        expect(identity.source).toBe('run-as-user');
+        expect(identity.params).toEqual({
+            clientId: 'run-as-key',
+            clientSecret: 'run-as-secret',
+            userId: 'run-as-key',
+            password: 'run-as-secret',
+            audience: null,
+            customerAlias: 'run-as-customer',
+            databaseAlias: 'run-as-database'
+        });
+    });
+    it('carries an audience the run context names', () => {
+        const identity = resolveIdentity({}, {
+            secrets: {
+                clientId: 'run-as-key',
+                clientSecret: 'run-as-secret',
+                audience: 'run-as-audience',
+                customerAlias: 'run-as-customer',
+                databaseAlias: 'run-as-database'
+            }
+        });
+
+        expect(identity.params.audience).toBe('run-as-audience');
+    });
+    it('keeps the script credentials when the request also carries run-as secrets', () => {
+        const script = { getCredentials: () => ({ clientId: 'script-key', clientSecret: 'script-secret' }) };
+
+        const identity = resolveIdentity(script, {
+            secrets: { clientId: 'run-as-key', clientSecret: 'run-as-secret' }
+        });
+
+        expect(identity.source).toBe('script-credentials');
+        expect(identity.params.clientId).toBe('script-key');
+    });
+
+    it('resolves no identity when the run has neither', () => {
+        expect(resolveIdentity({}, null)).toEqual({ source: null, params: null });
+    });
+    it('resolves no identity from secrets that carry no key', () => {
+        expect(resolveIdentity({}, { version: 1, secrets: {} })).toEqual({ source: null, params: null });
+    });
+
+    it('resolves no identity from secrets that carry a key but no secret', () => {
+        expect(resolveIdentity({}, { version: 1, secrets: { clientId: 'run-as-key' } })).toEqual({ source: null, params: null });
+    });
+});
+
+describe('acknowledging the identity a run used', () => {
+    it('names the identity source in the response header', () => {
+        const headers = {};
+
+        acknowledgeIdentitySource({ setHeader: (name, value) => (headers[name] = value) }, 'run-as-user');
+
+        expect(headers).toEqual({ 'vv-identity-source': 'run-as-user' });
+    });
+
+    it('sets no header for a run that resolved no identity', () => {
+        const headers = {};
+
+        acknowledgeIdentitySource({ setHeader: (name, value) => (headers[name] = value) }, null);
+
+        expect(headers).toEqual({});
     });
 });

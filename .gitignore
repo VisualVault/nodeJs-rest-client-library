@@ -161,3 +161,9 @@ lib/VVRestApi/VVRestApiNodeJS/files
 scripts/test-scripts
 .scratch/
 .claude/worktrees/
+
+# Scripts the route tests write while they run
+test/fixtures/files/
+lib/VVRestApi/VVRestApiNodeJs/files/
+# Real legacy scripts for the gate 2 differential (customer code)
+test/roundtrip/scripts/legacy-local/

@@ -71,7 +71,8 @@
     "winston-cloudwatch-transport": "^1.0.8"
   },
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:roundtrip": "vitest run --config test/roundtrip/vitest.config.mjs"
   },
   "engines": {
     "node": ">=20.0.0"
